@@ -91,9 +91,10 @@
     "label": "Buchungsmodus",
     "type": "dropdown",
     "possibleValues": {
-      "DEBIT": "Direkte Buchung",
-      "PREAUTH": "Reservierung mit Erfassung bei Rechnungserstellung"
-    }
+      "0": "Direkte Buchung",
+      "1": "Reservierung mit Erfassung bei Rechnungserstellung"
+    },
+    "default": "0"
   },
   {
     "tab": "Kreditkarte",

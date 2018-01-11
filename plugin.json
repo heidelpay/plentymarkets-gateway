@@ -1,0 +1,26 @@
+{
+  "name": "heidelpayPaymentGateway",
+  "marketplaceName": {
+    "de": "heidelpay Payment Gateway",
+    "en": "heidelpay Payment Gateway"
+  },
+  "description": "plentymarkets Integration for heidelpay",
+  "shortDescription": {
+    "de": "plentymarkets Integration für heidelpay",
+    "en": "plentymarkets Integration for heidelpay"
+  },
+  "categories": ["3519", "3521"],
+  "keywords": ["heidelpay", "plentymarkets", "plugin"],
+  "version": "0.0.1",
+  "license": "Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.",
+  "price": 0.00,
+  "author": "Stephano Vogel",
+  "authorIcon": "icon_author_xs.png",
+  "email": "development@heidelpay.de",
+  "type": "payment",
+  "namespace": "Heidelpay",
+  "serviceProvider": "Heidelpay\\Providers\\CreditCardServiceProvider",
+  "dependencies": {
+    "heidelpay/php-payment-api": "^1.3.0"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "defaultEntryPoint": "index.html",
+  "namespace": "Heidelpay",
+  "icon": "icon_plugin",
+  "menuEntries": [
+    {
+      "label": "Heidelpay Test",
+      "menu": "start",
+      "urlKey": "heidelpay",
+      "entryPoint": "index.html",
+      "icon": "icon-add"
+    }
+  ]
+}

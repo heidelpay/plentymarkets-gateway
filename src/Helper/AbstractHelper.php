@@ -2,6 +2,13 @@
 
 namespace Heidelpay\Helper;
 
+use Heidelpay\Constants\ConfigKeys;
+use Heidelpay\Constants\Plugin;
+use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
+use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
+use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
+use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 
 /**
@@ -17,24 +24,6 @@ use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
  */
 abstract class AbstractHelper
 {
-    const CONFIG_KEY_IS_ACTIVE = 'isActive';
-    const CONFIG_KEY_DISPLAY_NAME = 'displayName';
-    const CONFIG_KEY_DESCRIPTION_TYPE = 'infoPage.type';
-    const CONFIG_KEY_DESCRIPTION_INTERNAL = 'infoPage.intern';
-    const CONFIG_KEY_DESCRIPTION_EXTERNAL = 'infoPage.extern';
-    const CONFIG_KEY_LOGO_USE = 'logo.use';
-    const CONFIG_KEY_LOGO_URL = 'logo.url';
-    const CONFIG_KEY_CHANNEL_ID = 'channelId';
-    const CONFIG_KEY_DO_REGISTRATION = 'doRegistration';
-    const CONFIG_KEY_IFRAME_CSS_URL = 'iframeCss';
-
-    const DESCRIPTION_TYPE_NONE = '0';
-    const DESCRIPTION_TYPE_INTERNAL = '1';
-    const DESCRIPTION_TYPE_EXTERNAL = '2';
-
-    const PLUGIN_KEY = 'heidelpay_gateway';
-    const PLUGIN_NAME = 'heidelpayPaymentGateway';
-
     const NO_PAYMENTMETHOD_FOUND = 'no_paymentmethod_found';
 
     /**
@@ -80,7 +69,7 @@ abstract class AbstractHelper
     {
         if ($this->getPaymentMethodId() === self::NO_PAYMENTMETHOD_FOUND) {
             $paymentMethodData = [
-                'pluginKey' => self::PLUGIN_KEY,
+                'pluginKey' => Plugin::KEY,
                 'paymentKey' => $this->getPaymentKey(),
                 'name' => $this->getPaymentMethodDefaultName()
             ];
@@ -96,7 +85,7 @@ abstract class AbstractHelper
      */
     final public function getPaymentMethodId(): string
     {
-        $paymentMethods = $this->paymentMethodRepository->allForPlugin(self::PLUGIN_KEY);
+        $paymentMethods = $this->paymentMethodRepository->allForPlugin(Plugin::KEY);
 
         if (!empty($paymentMethods)) {
             foreach ($paymentMethods as $paymentMethod) {
@@ -110,13 +99,29 @@ abstract class AbstractHelper
     }
 
     /**
+     * Returns the event list when changes should be considered.
+     *
+     * @return array
+     */
+    public function getPaymentMethodEventList(): array
+    {
+        return [
+            AfterBasketChanged::class,
+            AfterBasketItemAdd::class,
+            AfterBasketCreate::class,
+            FrontendLanguageChanged::class,
+            FrontendShippingCountryChanged::class,
+        ];
+    }
+
+    /**
      * Returns the payment method key ('plugin_name::payment_key')
      *
      * @return string
      */
     final public function getPluginPaymentMethodKey(): string
     {
-        return self::PLUGIN_KEY . '::' . $this->getPaymentKey();
+        return Plugin::KEY . '::' . $this->getPaymentKey();
     }
 
     /**
@@ -128,7 +133,7 @@ abstract class AbstractHelper
      */
     final public function getConfigKey($key): string
     {
-        return self::PLUGIN_NAME . '.' . $key;
+        return Plugin::NAME . '.' . $key;
     }
 
     /**
@@ -138,7 +143,7 @@ abstract class AbstractHelper
      */
     final public function getChannelIdKey(): string
     {
-        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . self::CONFIG_KEY_CHANNEL_ID);
+        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::CHANNEL_ID);
     }
 
     /**
@@ -148,7 +153,7 @@ abstract class AbstractHelper
      */
     final public function getDisplayNameKey(): string
     {
-        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . self::CONFIG_KEY_DISPLAY_NAME);
+        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::DISPLAY_NAME);
     }
 
     /**
@@ -158,7 +163,7 @@ abstract class AbstractHelper
      */
     final public function getDescriptionTypeKey(): string
     {
-        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . self::CONFIG_KEY_DESCRIPTION_TYPE);
+        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::DESCRIPTION_TYPE);
     }
 
     /**
@@ -171,12 +176,10 @@ abstract class AbstractHelper
     final public function getDescriptionKey($isInternal = false): string
     {
         if (!$isInternal) {
-            return $this->getConfigKey(
-                $this->getPaymentMethodConfigKey() . '.' . self::CONFIG_KEY_DESCRIPTION_EXTERNAL
-            );
+            return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::DESCRIPTION_EXTERNAL);
         }
 
-        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . self::CONFIG_KEY_DESCRIPTION_INTERNAL);
+        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::DESCRIPTION_INTERNAL);
     }
 
     /**
@@ -186,7 +189,7 @@ abstract class AbstractHelper
      */
     final public function getIsActiveKey(): string
     {
-        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . self::CONFIG_KEY_IS_ACTIVE);
+        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::IS_ACTIVE);
     }
 
     /**
@@ -196,7 +199,7 @@ abstract class AbstractHelper
      */
     final public function getUseIconKey(): string
     {
-        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . self::CONFIG_KEY_LOGO_USE);
+        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::LOGO_USE);
     }
 
     /**
@@ -206,6 +209,6 @@ abstract class AbstractHelper
      */
     final public function getIconUrlKey(): string
     {
-        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . self::CONFIG_KEY_LOGO_URL);
+        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::LOGO_URL);
     }
 }

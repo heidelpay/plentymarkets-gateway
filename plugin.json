@@ -14,12 +14,12 @@
   "version": "0.0.1",
   "license": "Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.",
   "price": 0.00,
-  "author": "Stephano Vogel",
+  "author": "Heidelberger Payment GmbH",
   "authorIcon": "icon_author_xs.png",
   "email": "development@heidelpay.de",
   "type": "payment",
   "namespace": "Heidelpay",
-  "serviceProvider": "Heidelpay\\Providers\\CreditCardServiceProvider",
+  "serviceProvider": "Heidelpay\\Providers\\HeidelpayServiceProvider",
   "dependencies": {
     "heidelpay/php-payment-api": "^1.3.0"
   }

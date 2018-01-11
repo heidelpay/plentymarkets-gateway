@@ -1,14 +1,21 @@
 {
   "defaultEntryPoint": "index.html",
   "namespace": "Heidelpay",
-  "icon": "icon_plugin",
+  "icon": "icon-pay_heidelpay",
   "menuEntries": [
     {
-      "label": "Heidelpay Test",
+      "label": "Allgemeine Konfiguration",
       "menu": "start",
-      "urlKey": "heidelpay",
-      "entryPoint": "index.html",
-      "icon": "icon-add"
+      "urlKey": "settings-heidelpay",
+      "entryPoint": "index.html?action=settings_heidelpay",
+      "icon": "icon-pay_heidelpay"
+    },
+    {
+      "label": "heidelpay Zahlungsarten",
+      "menu": "orders/payment/methods",
+      "urlKey": "settings-heidelpay-paymentmethods",
+      "entryPoint": "index.html?action=settings_heidelpay_paymentmethods",
+      "icon": "icon-pay_heidelpay"
     }
   ]
 }

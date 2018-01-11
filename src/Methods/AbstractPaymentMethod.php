@@ -2,6 +2,7 @@
 
 namespace Heidelpay\Methods;
 
+use Heidelpay\Constants\DescriptionTypes;
 use Heidelpay\Helper\AbstractHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
@@ -86,15 +87,15 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     {
         $descriptionType = $configRepository->get($this->helper->getDescriptionTypeKey());
 
-        if ($descriptionType === AbstractHelper::DESCRIPTION_TYPE_INTERNAL) {
+        if ($descriptionType === DescriptionTypes::INTERNAL) {
             return $configRepository->get($this->helper->getDescriptionKey(true));
         }
 
-        if ($descriptionType === AbstractHelper::DESCRIPTION_TYPE_EXTERNAL) {
+        if ($descriptionType === DescriptionTypes::EXTERNAL) {
             return $configRepository->get($this->helper->getDescriptionKey());
         }
 
-        // in case of AbstractHelper::DESCRIPTION_TYPE_NONE
+        // in case of DescriptionTypes::NONE
         return '';
     }
 }

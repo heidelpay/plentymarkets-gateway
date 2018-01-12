@@ -2,9 +2,7 @@
 
 namespace Heidelpay\Providers;
 
-use Heidelpay\Helper\AbstractHelper;
-use Heidelpay\Helper\CreditCardHelper;
-use Heidelpay\Helper\PrepaymentHelper;
+use Heidelpay\Helper\HeidelpayHelper;
 use Heidelpay\Methods\CreditCardPaymentMethod;
 use Heidelpay\Methods\PrepaymentPaymentMethod;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
@@ -32,32 +30,31 @@ class HeidelpayServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->getApplication()->register(HeidelpayRouteServiceProvider::class);
     }
 
     public function boot(
+        HeidelpayHelper $paymentHelper,
         PaymentMethodContainer $paymentMethodContainer,
         Dispatcher $eventDispatcher
     ) {
         // loop through all of the plugin's available payment methods
-        foreach ($this->getPaymentMethods() as $paymentMethod => $paymentMethodHelper) {
-            /** @var AbstractHelper $helperInstance */
-            $helperInstance = new $paymentMethodHelper;
-
+        foreach ($this->getPaymentMethods() as $paymentMethod) {
             // create a mop (payment method id) if it does not exist
-            $helperInstance->createMopIfNotExists();
+            $paymentHelper->createMopIfNotExists($paymentMethod);
 
             // register the payment method in the payment method container
             $paymentMethodContainer->register(
-                $helperInstance->getPluginPaymentMethodKey(),
+                $paymentHelper->getPluginPaymentMethodKey($paymentMethod),
                 $paymentMethod,
-                $helperInstance->getPaymentMethodEventList()
+                $paymentHelper->getPaymentMethodEventList()
             );
 
             // Listen for the event that gets the payment method content
             $eventDispatcher->listen(
                 GetPaymentMethodContent::class,
-                function (GetPaymentMethodContent $event) use ($helperInstance) {
-                    if ($event->getMop() === $helperInstance->getPaymentMethodId()) {
+                function (GetPaymentMethodContent $event) use ($paymentHelper, $paymentMethod) {
+                    if ($event->getMop() === $paymentHelper->getPaymentMethodId($paymentMethod)) {
                         $event->setValue('');
                         $event->setType('continue');
                     }
@@ -67,9 +64,9 @@ class HeidelpayServiceProvider extends ServiceProvider
             // listen for the event that executes the payment
             $eventDispatcher->listen(
                 ExecutePayment::class,
-                function (ExecutePayment $event) use ($helperInstance) {
-                    if ($event->getMop() === $helperInstance->getPaymentMethodId()) {
-                        $event->setValue('<h1>' . $helperInstance->getPaymentMethodDefaultName() . '</h1>');
+                function (ExecutePayment $event) use ($paymentHelper, $paymentMethod) {
+                    if ($event->getMop() === $paymentHelper->getPaymentMethodId($paymentMethod)) {
+                        $event->setValue('<h1>' . $paymentMethod->getDefaultName() . '</h1>');
                         $event->setType('htmlContent');
                     }
                 }
@@ -77,11 +74,14 @@ class HeidelpayServiceProvider extends ServiceProvider
         }
     }
 
-    private function getPaymentMethods()
+    /**
+     * @return array
+     */
+    private function getPaymentMethods(): array
     {
         return [
-            CreditCardPaymentMethod::class => CreditCardHelper::class,
-            PrepaymentPaymentMethod::class => PrepaymentHelper::class,
+            CreditCardPaymentMethod::class,
+            PrepaymentPaymentMethod::class,
         ];
     }
 }

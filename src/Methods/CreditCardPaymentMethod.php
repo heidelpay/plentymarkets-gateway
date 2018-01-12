@@ -2,7 +2,6 @@
 
 namespace Heidelpay\Methods;
 
-use Heidelpay\Helper\CreditCardHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
 
@@ -25,16 +24,6 @@ class CreditCardPaymentMethod extends AbstractPaymentMethod
     const DEFAULT_NAME = 'Credit Card';
 
     /**
-     * CreditCardPaymentMethod constructor.
-     *
-     * @param CreditCardHelper $creditCardHelper
-     */
-    public function __construct(CreditCardHelper $creditCardHelper)
-    {
-        $this->helper = $creditCardHelper;
-    }
-
-    /**
      * @inheritdoc
      */
     public function isActive(
@@ -44,7 +33,7 @@ class CreditCardPaymentMethod extends AbstractPaymentMethod
         /** @var bool $isActive */
         $isActive = true;
 
-        if ($configRepository->get($this->helper->getIsActiveKey()) === false) {
+        if ($configRepository->get($this->helper->getIsActiveKey($this)) === false) {
             return false;
         }
 
@@ -54,8 +43,24 @@ class CreditCardPaymentMethod extends AbstractPaymentMethod
     /**
      * @inheritdoc
      */
+    public function getConfigKey(): string
+    {
+        return self::CONFIG_KEY;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getDefaultName(): string
     {
         return self::DEFAULT_NAME;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPaymentMethodKey(): string
+    {
+        return self::KEY;
     }
 }

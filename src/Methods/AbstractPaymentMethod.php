@@ -3,7 +3,7 @@
 namespace Heidelpay\Methods;
 
 use Heidelpay\Constants\DescriptionTypes;
-use Heidelpay\Helper\AbstractHelper;
+use Heidelpay\Helper\HeidelpayHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Plugin\ConfigRepository;
@@ -23,9 +23,19 @@ use Plenty\Plugin\ConfigRepository;
 abstract class AbstractPaymentMethod extends PaymentMethodService
 {
     /**
-     * @var AbstractHelper $helper
+     * @var HeidelpayHelper $helper
      */
     protected $helper;
+
+    /**
+     * AbstractPaymentMethod constructor.
+     *
+     * @param HeidelpayHelper $paymentHelper
+     */
+    public function __construct(HeidelpayHelper $paymentHelper)
+    {
+        $this->helper = $paymentHelper;
+    }
 
     /**
      * Returns if the payment method is active
@@ -42,11 +52,25 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     ): bool;
 
     /**
+     * Returns the config key for the payment method.
+     *
+     * @return string
+     */
+    abstract public function getConfigKey(): string;
+
+    /**
      * Returns a default display name for the payment method.
      *
      * @return string
      */
     abstract public function getDefaultName(): string;
+
+    /**
+     * Returns the key for the payment method.
+     *
+     * @return string
+     */
+    abstract public function getPaymentMethodKey(): string;
 
     /**
      * Returns the configured payment method display name.
@@ -57,7 +81,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
      */
     public function getName(ConfigRepository $configRepository): string
     {
-        return $configRepository->get($this->helper->getDisplayNameKey()) ?: $this->getDefaultName();
+        return $configRepository->get($this->helper->getDisplayNameKey($this)) ?: $this->getDefaultName();
     }
 
     /**
@@ -69,11 +93,11 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
      */
     public function getIcon(ConfigRepository $configRepository): string
     {
-        if ($configRepository->get($this->helper->getUseIconKey()) === false) {
+        if ($configRepository->get($this->helper->getUseIconKey($this)) === false) {
             return '';
         }
 
-        return $configRepository->get($this->helper->getIconUrlKey()) ?: '';
+        return $configRepository->get($this->helper->getIconUrlKey($this)) ?: '';
     }
 
     /**
@@ -85,14 +109,14 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
      */
     public function getDescription(ConfigRepository $configRepository): string
     {
-        $descriptionType = $configRepository->get($this->helper->getDescriptionTypeKey());
+        $descriptionType = $configRepository->get($this->helper->getDescriptionTypeKey($this));
 
         if ($descriptionType === DescriptionTypes::INTERNAL) {
-            return $configRepository->get($this->helper->getDescriptionKey(true));
+            return $configRepository->get($this->helper->getDescriptionKey($this, true));
         }
 
         if ($descriptionType === DescriptionTypes::EXTERNAL) {
-            return $configRepository->get($this->helper->getDescriptionKey());
+            return $configRepository->get($this->helper->getDescriptionKey($this));
         }
 
         // in case of DescriptionTypes::NONE

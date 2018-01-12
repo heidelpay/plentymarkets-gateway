@@ -4,6 +4,7 @@ namespace Heidelpay\Helper;
 
 use Heidelpay\Constants\ConfigKeys;
 use Heidelpay\Constants\Plugin;
+use Heidelpay\Methods\AbstractPaymentMethod;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
@@ -12,7 +13,7 @@ use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 
 /**
- * Abstract Payment Method Class
+ * Heidelpay Helper Class
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2017-present Heidelberger Payment GmbH. All rights reserved.
@@ -22,7 +23,7 @@ use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
  *
  * @package heidelpay\plentymarkets-gateway\helper
  */
-abstract class AbstractHelper
+class HeidelpayHelper
 {
     const NO_PAYMENTMETHOD_FOUND = 'no_paymentmethod_found';
 
@@ -30,27 +31,6 @@ abstract class AbstractHelper
      * @var PaymentMethodRepositoryContract $paymentMethodRepository
      */
     protected $paymentMethodRepository;
-
-    /**
-     * Returns the code for the payment method.
-     *
-     * @return string
-     */
-    abstract public function getPaymentKey(): string;
-
-    /**
-     * Returns the config key for the payment method.
-     *
-     * @return string
-     */
-    abstract public function getPaymentMethodConfigKey(): string;
-
-    /**
-     * Returns the name/label for the payment method.
-     *
-     * @return string
-     */
-    abstract public function getPaymentMethodDefaultName(): string;
 
     /**
      * AbstractHelper constructor.
@@ -64,14 +44,16 @@ abstract class AbstractHelper
 
     /**
      * Create the payment method ID if it doesn't exist yet
+     *
+     * @param AbstractPaymentMethod $paymentMethod
      */
-    final public function createMopIfNotExists()
+    public function createMopIfNotExists(AbstractPaymentMethod $paymentMethod)
     {
-        if ($this->getPaymentMethodId() === self::NO_PAYMENTMETHOD_FOUND) {
+        if ($this->getPaymentMethodId($paymentMethod) === self::NO_PAYMENTMETHOD_FOUND) {
             $paymentMethodData = [
                 'pluginKey' => Plugin::KEY,
-                'paymentKey' => $this->getPaymentKey(),
-                'name' => $this->getPaymentMethodDefaultName()
+                'paymentKey' => $paymentMethod->getPaymentMethodKey(),
+                'name' => $paymentMethod->getDefaultName()
             ];
 
             $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);
@@ -81,16 +63,18 @@ abstract class AbstractHelper
     /**
      * Load the payment method ID for the given plugin key.
      *
+     * @param AbstractPaymentMethod $paymentMethod
+     *
      * @return string
      */
-    final public function getPaymentMethodId(): string
+    public function getPaymentMethodId(AbstractPaymentMethod $paymentMethod): string
     {
         $paymentMethods = $this->paymentMethodRepository->allForPlugin(Plugin::KEY);
 
         if (!empty($paymentMethods)) {
-            foreach ($paymentMethods as $paymentMethod) {
-                if ($paymentMethod->paymentKey === $this->getPaymentKey()) {
-                    return $paymentMethod->id;
+            foreach ($paymentMethods as $payMethod) {
+                if ($payMethod->paymentKey === $paymentMethod->getPaymentMethodKey()) {
+                    return $payMethod->id;
                 }
             }
         }
@@ -117,11 +101,13 @@ abstract class AbstractHelper
     /**
      * Returns the payment method key ('plugin_name::payment_key')
      *
+     * @param AbstractPaymentMethod $paymentMethod
+     *
      * @return string
      */
-    final public function getPluginPaymentMethodKey(): string
+    public function getPluginPaymentMethodKey(AbstractPaymentMethod $paymentMethod): string
     {
-        return Plugin::KEY . '::' . $this->getPaymentKey();
+        return Plugin::KEY . '::' . $paymentMethod->getPaymentMethodKey();
     }
 
     /**
@@ -131,7 +117,7 @@ abstract class AbstractHelper
      *
      * @return string
      */
-    final public function getConfigKey($key): string
+    public function getConfigKey($key): string
     {
         return Plugin::NAME . '.' . $key;
     }
@@ -139,76 +125,89 @@ abstract class AbstractHelper
     /**
      * Returns the payment method config key for the 'Channel-ID' configuration.
      *
+     * @param AbstractPaymentMethod $paymentMethod
+     *
      * @return string
      */
-    final public function getChannelIdKey(): string
+    public function getChannelIdKey(AbstractPaymentMethod $paymentMethod): string
     {
-        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::CHANNEL_ID);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::CHANNEL_ID);
     }
 
     /**
      * Returns the payment method config key for the 'Display name' configuration.
      *
+     * @param AbstractPaymentMethod $paymentMethod
+     *
      * @return string
      */
-    final public function getDisplayNameKey(): string
+    public function getDisplayNameKey(AbstractPaymentMethod $paymentMethod): string
     {
-        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::DISPLAY_NAME);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DISPLAY_NAME);
     }
 
     /**
      * Returns the payment method config key for the 'description/info page type' configuration.
      *
+     * @param AbstractPaymentMethod $paymentMethod
+     *
      * @return string
      */
-    final public function getDescriptionTypeKey(): string
+    public function getDescriptionTypeKey(AbstractPaymentMethod $paymentMethod): string
     {
-        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::DESCRIPTION_TYPE);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_TYPE);
     }
 
     /**
      * Returns the config key for the 'description/info page' configuration.
      *
-     * @param bool $isInternal
+     * @param AbstractPaymentMethod $paymentMethod
+     * @param bool                  $isInternal
      *
      * @return string
      */
-    final public function getDescriptionKey($isInternal = false): string
+    public function getDescriptionKey(AbstractPaymentMethod $paymentMethod, $isInternal = false): string
     {
         if (!$isInternal) {
-            return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::DESCRIPTION_EXTERNAL);
+            return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_EXTERNAL);
         }
 
-        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::DESCRIPTION_INTERNAL);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_INTERNAL);
     }
 
     /**
      * Returns the payment method config key for the 'is active' configuration.
      *
+     * @param AbstractPaymentMethod $paymentMethod
+     *
      * @return string
      */
-    final public function getIsActiveKey(): string
+    public function getIsActiveKey(AbstractPaymentMethod $paymentMethod): string
     {
-        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::IS_ACTIVE);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::IS_ACTIVE);
     }
 
     /**
      * Returns the payment method config key for the 'use logo' configuration.
      *
+     * @param AbstractPaymentMethod $paymentMethod
+     *
      * @return string
      */
-    final public function getUseIconKey(): string
+    public function getUseIconKey(AbstractPaymentMethod $paymentMethod): string
     {
-        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::LOGO_USE);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::LOGO_USE);
     }
 
     /**
      * Returns the payment method config key for the 'logo url' configuration.
      *
+     * @param AbstractPaymentMethod $paymentMethod
+     *
      * @return string
      */
-    final public function getIconUrlKey(): string
+    public function getIconUrlKey(AbstractPaymentMethod $paymentMethod): string
     {
-        return $this->getConfigKey($this->getPaymentMethodConfigKey() . '.' . ConfigKeys::LOGO_URL);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::LOGO_URL);
     }
 }

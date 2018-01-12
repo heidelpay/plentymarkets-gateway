@@ -2,7 +2,6 @@
 
 namespace Heidelpay\Methods;
 
-use Heidelpay\Helper\PrepaymentHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
 
@@ -25,16 +24,6 @@ class PrepaymentPaymentMethod extends AbstractPaymentMethod
     const DEFAULT_NAME = 'Prepayment';
 
     /**
-     * CreditCardPaymentMethod constructor.
-     *
-     * @param PrepaymentHelper $paymentHelper
-     */
-    public function __construct(PrepaymentHelper $paymentHelper)
-    {
-        $this->helper = $paymentHelper;
-    }
-
-    /**
      * @inheritdoc
      */
     public function isActive(
@@ -44,7 +33,7 @@ class PrepaymentPaymentMethod extends AbstractPaymentMethod
         /** @var bool $isActive */
         $isActive = true;
 
-        if ($configRepository->get($this->helper->getIsActiveKey()) === false) {
+        if ($configRepository->get($this->helper->getIsActiveKey($this)) === false) {
             return false;
         }
 
@@ -54,8 +43,24 @@ class PrepaymentPaymentMethod extends AbstractPaymentMethod
     /**
      * @inheritdoc
      */
+    public function getConfigKey(): string
+    {
+        return self::CONFIG_KEY;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getDefaultName(): string
     {
         return self::DEFAULT_NAME;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPaymentMethodKey(): string
+    {
+        return self::KEY;
     }
 }

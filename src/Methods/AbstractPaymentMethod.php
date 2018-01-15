@@ -28,28 +28,39 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     protected $helper;
 
     /**
+     * @var ConfigRepository $configRepository
+     */
+    protected $configRepository;
+
+    /**
+     * @var BasketRepositoryContract $basketRepository
+     */
+    protected $basketRepository;
+
+    /**
      * AbstractPaymentMethod constructor.
      *
-     * @param HeidelpayHelper $paymentHelper
+     * @param HeidelpayHelper          $paymentHelper
+     * @param ConfigRepository         $configRepository
+     * @param BasketRepositoryContract $basketRepositoryContract
      */
-    public function __construct(HeidelpayHelper $paymentHelper)
-    {
+    public function __construct(
+        HeidelpayHelper $paymentHelper,
+        ConfigRepository $configRepository,
+        BasketRepositoryContract $basketRepositoryContract
+    ) {
         $this->helper = $paymentHelper;
+        $this->configRepository = $configRepository;
+        $this->basketRepository = $basketRepositoryContract;
     }
 
     /**
      * Returns if the payment method is active
      * and can be used by the customer.
      *
-     * @param ConfigRepository         $configRepository
-     * @param BasketRepositoryContract $basketRepositoryContract
-     *
      * @return bool
      */
-    abstract public function isActive(
-        ConfigRepository $configRepository,
-        BasketRepositoryContract $basketRepositoryContract
-    ): bool;
+    abstract public function isActive(): bool;
 
     /**
      * Returns the config key for the payment method.

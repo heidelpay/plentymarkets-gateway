@@ -59,7 +59,7 @@ class ResponseController extends Controller
         /** @var array $response */
         $response = $this->libCaller->call(
             'Heidelpay::payment_api_responsehandler',
-            ['json_response' => json_encode($this->request->all())]
+            [$this->request->all()]
         );
     }
 }

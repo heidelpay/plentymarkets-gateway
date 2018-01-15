@@ -26,14 +26,12 @@ class CreditCardPaymentMethod extends AbstractPaymentMethod
     /**
      * @inheritdoc
      */
-    public function isActive(
-        ConfigRepository $configRepository,
-        BasketRepositoryContract $basketRepositoryContract
-    ): bool {
+    public function isActive(): bool
+    {
         /** @var bool $isActive */
         $isActive = true;
 
-        if ($configRepository->get($this->helper->getIsActiveKey($this)) === false) {
+        if ($this->configRepository->get($this->helper->getIsActiveKey($this)) === false) {
             return false;
         }
 

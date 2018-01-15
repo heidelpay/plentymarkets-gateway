@@ -12,7 +12,7 @@
     },
     {
       "label": "heidelpay Zahlungsarten",
-      "menu": "orders/payment/methods",
+      "menu": "settings/orders/payment/methods",
       "urlKey": "settings-heidelpay-paymentmethods",
       "entryPoint": "index.html?action=settings_heidelpay_paymentmethods",
       "icon": "icon-pay_heidelpay"

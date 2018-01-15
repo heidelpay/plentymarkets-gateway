@@ -17,6 +17,6 @@ namespace Heidelpay\Constants;
 class Plugin
 {
     const KEY = 'heidelpay_gateway';
-    const NAME = 'heidelpayPaymentGateway';
+    const NAME = 'Heidelpay';
     const VERSION = '0.0.1';
 }

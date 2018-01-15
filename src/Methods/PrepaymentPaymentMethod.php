@@ -2,9 +2,6 @@
 
 namespace Heidelpay\Methods;
 
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
-use Plenty\Plugin\ConfigRepository;
-
 /**
  * heidelpay Prepayment Payment Method
  *
@@ -26,14 +23,12 @@ class PrepaymentPaymentMethod extends AbstractPaymentMethod
     /**
      * @inheritdoc
      */
-    public function isActive(
-        ConfigRepository $configRepository,
-        BasketRepositoryContract $basketRepositoryContract
-    ): bool {
+    public function isActive(): bool
+    {
         /** @var bool $isActive */
         $isActive = true;
 
-        if ($configRepository->get($this->helper->getIsActiveKey($this)) === false) {
+        if ($this->configRepository->get($this->helper->getIsActiveKey($this)) === false) {
             return false;
         }
 

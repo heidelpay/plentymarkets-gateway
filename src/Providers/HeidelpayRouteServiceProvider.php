@@ -22,7 +22,7 @@ class HeidelpayRouteServiceProvider extends RouteServiceProvider
     public function map(Router $router)
     {
         // heidelpay Payment API responses
-        $router->get('response', 'Heidelpay\Controllers\ResponseController@processResponse');
-        $router->post('response', 'Heidelpay\Controllers\ResponseController@processResponse');
+        $router->get('heidelpay/response', 'Heidelpay\Controllers\ResponseController@processResponse');
+        $router->post('heidelpay/response', 'Heidelpay\Controllers\ResponseController@processResponse');
     }
 }

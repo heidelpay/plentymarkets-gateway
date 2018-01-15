@@ -5,17 +5,15 @@
   "menuEntries": [
     {
       "label": "Allgemeine Konfiguration",
-      "menu": "start",
+      "menu": "settings/orders/heidelpay",
       "urlKey": "settings-heidelpay",
-      "entryPoint": "index.html?action=settings_heidelpay",
-      "icon": "icon-pay_heidelpay"
+      "entryPoint": "index.html"
     },
     {
-      "label": "heidelpay Zahlungsarten",
-      "menu": "settings/orders/payment/methods",
+      "label": "Zahlarten",
+      "menu": "settings/orders/heidelpay",
       "urlKey": "settings-heidelpay-paymentmethods",
-      "entryPoint": "index.html?action=settings_heidelpay_paymentmethods",
-      "icon": "icon-pay_heidelpay"
+      "entryPoint": "index.html"
     }
   ]
 }

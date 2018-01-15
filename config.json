@@ -56,6 +56,20 @@
   },
   {
     "tab": "Kreditkarte",
+    "key": "creditcard.minAmount",
+    "label": "Mindestbetrag (in Euro)",
+    "type": "text",
+    "default": "0,00"
+  },
+  {
+    "tab": "Kreditkarte",
+    "key": "creditcard.maxAmount",
+    "label": "Höchstbetrag (in Euro)",
+    "type": "text",
+    "default": "0,00"
+  },
+  {
+    "tab": "Kreditkarte",
     "key": "creditcard.infoPage.type",
     "label": "Information Page",
     "type": "dropdown",
@@ -124,6 +138,20 @@
     "label": "Channel-ID",
     "type": "text",
     "default": ""
+  },
+  {
+    "tab": "Vorkasse",
+    "key": "prepayment.minAmount",
+    "label": "Mindestbetrag (in Euro)",
+    "type": "text",
+    "default": "0,00"
+  },
+  {
+    "tab": "Vorkasse",
+    "key": "prepayment.maxAmount",
+    "label": "Höchstbetrag (in Euro)",
+    "type": "text",
+    "default": "0,00"
   },
   {
     "tab": "Vorkasse",

@@ -11,6 +11,7 @@ use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
+use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 
 /**
  * Heidelpay Helper Class
@@ -45,15 +46,15 @@ class HeidelpayHelper
     /**
      * Create the payment method ID if it doesn't exist yet
      *
-     * @param AbstractPaymentMethod $paymentMethod
+     * @param string $paymentMethod
      */
-    public function createMopIfNotExists(AbstractPaymentMethod $paymentMethod)
+    public function createMopIfNotExists($paymentMethod)
     {
         if ($this->getPaymentMethodId($paymentMethod) === self::NO_PAYMENTMETHOD_FOUND) {
             $paymentMethodData = [
                 'pluginKey' => Plugin::KEY,
-                'paymentKey' => $paymentMethod->getPaymentMethodKey(),
-                'name' => $paymentMethod->getDefaultName()
+                'paymentKey' => $this->getPaymentMethodKey($paymentMethod),
+                'name' => $this->getPaymentMethodDefaultName($paymentMethod)
             ];
 
             $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);
@@ -63,17 +64,18 @@ class HeidelpayHelper
     /**
      * Load the payment method ID for the given plugin key.
      *
-     * @param AbstractPaymentMethod $paymentMethod
+     * @param string $paymentMethod
      *
      * @return string
      */
-    public function getPaymentMethodId(AbstractPaymentMethod $paymentMethod): string
+    public function getPaymentMethodId($paymentMethod): string
     {
         $paymentMethods = $this->paymentMethodRepository->allForPlugin(Plugin::KEY);
 
         if (!empty($paymentMethods)) {
+            /** @var PaymentMethod $payMethod */
             foreach ($paymentMethods as $payMethod) {
-                if ($payMethod->paymentKey === $paymentMethod->getPaymentMethodKey()) {
+                if ($payMethod->paymentKey === $this->getPaymentMethodKey($paymentMethod)) {
                     return $payMethod->id;
                 }
             }
@@ -101,13 +103,37 @@ class HeidelpayHelper
     /**
      * Returns the payment method key ('plugin_name::payment_key')
      *
-     * @param AbstractPaymentMethod $paymentMethod
+     * @param string $paymentMethod
      *
      * @return string
      */
-    public function getPluginPaymentMethodKey(AbstractPaymentMethod $paymentMethod): string
+    public function getPluginPaymentMethodKey($paymentMethod): string
     {
-        return Plugin::KEY . '::' . $paymentMethod->getPaymentMethodKey();
+        return Plugin::KEY . '::' . \constant($paymentMethod . '::KEY');
+    }
+
+    /**
+     * Returns the default payment method name by calling the constant dynamically.
+     *
+     * @param string $paymentMethod
+     *
+     * @return string
+     */
+    public function getPaymentMethodDefaultName($paymentMethod): string
+    {
+        return \constant($paymentMethod . '::DEFAULT_NAME');
+    }
+
+    /**
+     * Returns the payment method key by calling the constant dynamically.
+     *
+     * @param string $paymentMethod
+     *
+     * @return string
+     */
+    public function getPaymentMethodKey($paymentMethod): string
+    {
+        return \constant($paymentMethod . '::KEY');
     }
 
     /**
@@ -185,6 +211,30 @@ class HeidelpayHelper
     public function getIsActiveKey(AbstractPaymentMethod $paymentMethod): string
     {
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::IS_ACTIVE);
+    }
+
+    /**
+     * Returns the minimum cart total amount for the given Payment method.
+     *
+     * @param AbstractPaymentMethod $paymentMethod
+     *
+     * @return string
+     */
+    public function getMinAmountKey(AbstractPaymentMethod $paymentMethod): string
+    {
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::MIN_AMOUNT);
+    }
+
+    /**
+     * Returns the maximum cart total amount for the given Payment method.
+     *
+     * @param AbstractPaymentMethod $paymentMethod
+     *
+     * @return string
+     */
+    public function getMaxAmountKey(AbstractPaymentMethod $paymentMethod): string
+    {
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::MAX_AMOUNT);
     }
 
     /**

@@ -20,6 +20,9 @@ class ConfigKeys
     const DISPLAY_NAME = 'displayName';
     const CHANNEL_ID = 'channelId';
 
+    const MIN_AMOUNT = 'minAmount';
+    const MAX_AMOUNT = 'maxAmount';
+
     const DESCRIPTION_TYPE = 'infoPage.type';
     const DESCRIPTION_INTERNAL = 'infoPage.intern';
     const DESCRIPTION_EXTERNAL = 'infoPage.extern';

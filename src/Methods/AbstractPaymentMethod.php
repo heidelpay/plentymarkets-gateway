@@ -5,6 +5,7 @@ namespace Heidelpay\Methods;
 use Heidelpay\Constants\DescriptionTypes;
 use Heidelpay\Helper\HeidelpayHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Plugin\ConfigRepository;
 
@@ -22,6 +23,10 @@ use Plenty\Plugin\ConfigRepository;
  */
 abstract class AbstractPaymentMethod extends PaymentMethodService
 {
+    const CONFIG_KEY = 'abstract';
+    const DEFAULT_NAME = 'Abstract Payment Method';
+    const KEY = 'ABSTRACT';
+
     /**
      * @var HeidelpayHelper $helper
      */
@@ -60,74 +65,128 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
      *
      * @return bool
      */
-    abstract public function isActive(): bool;
+    public function isActive(): bool
+    {
+        /** @var Basket $basket */
+        $basket = $this->basketRepository->load();
+
+        // return false if this method is not configured as active.
+        if ($this->configRepository->get($this->helper->getIsActiveKey($this)) === false) {
+            return false;
+        }
+
+        // check the configured minimum cart amount and return false if an amount is configured
+        // (which means > 0.00) and the cart amount is below the configured value.
+        $minAmount = $this->configRepository->get($this->helper->getMinAmountKey($this));
+        if ($minAmount !== null && $minAmount > 0.00 && $basket->basketAmount < $minAmount) {
+            return false;
+        }
+
+        // check the configured maximum cart amount and return false if an amount is configured
+        // (which means > 0.00) and the cart amount is above the configured value.
+        $maxAmount = $this->configRepository->get($this->helper->getMaxAmountKey($this));
+        return !($maxAmount !== null && $maxAmount > 0.00 && $basket->basketAmount > $maxAmount);
+    }
 
     /**
      * Returns the config key for the payment method.
      *
      * @return string
      */
-    abstract public function getConfigKey(): string;
+    public function getConfigKey(): string
+    {
+        return static::CONFIG_KEY;
+    }
 
     /**
      * Returns a default display name for the payment method.
      *
      * @return string
      */
-    abstract public function getDefaultName(): string;
+    public function getDefaultName(): string
+    {
+        return static::DEFAULT_NAME;
+    }
 
     /**
      * Returns the key for the payment method.
      *
      * @return string
      */
-    abstract public function getPaymentMethodKey(): string;
+    public function getMethodKey(): string
+    {
+        return static::KEY;
+    }
+
+    /**
+     * Returns the config key for the payment method (static).
+     *
+     * @return string
+     */
+    public static function getPaymentMethodConfigKey(): string
+    {
+        return static::CONFIG_KEY;
+    }
+
+    /**
+     * Returns the default display name for the payment method (static).
+     *
+     * @return string
+     */
+    public static function getPaymentMethodDefaultName(): string
+    {
+        return static::DEFAULT_NAME;
+    }
+
+    /**
+     * Returns the key for the payment method (static).
+     *
+     * @return string
+     */
+    public static function getPaymentMethodKey(): string
+    {
+        return static::KEY;
+    }
 
     /**
      * Returns the configured payment method display name.
      *
-     * @param ConfigRepository $configRepository
-     *
      * @return string
      */
-    public function getName(ConfigRepository $configRepository): string
+    public function getName(): string
     {
-        return $configRepository->get($this->helper->getDisplayNameKey($this)) ?: $this->getDefaultName();
+        return $this->configRepository->get($this->helper->getDisplayNameKey($this)) ?: $this->getDefaultName();
     }
 
     /**
      * Returns the configured icon logo, if logo usage is enabled for this payment method.
      *
-     * @param ConfigRepository $configRepository
-     *
      * @return string
      */
-    public function getIcon(ConfigRepository $configRepository): string
+    public function getIcon(): string
     {
-        if ($configRepository->get($this->helper->getUseIconKey($this)) === false) {
+        if ($this->configRepository->get($this->helper->getUseIconKey($this)) === false) {
             return '';
         }
 
-        return $configRepository->get($this->helper->getIconUrlKey($this)) ?: '';
+        return $this->configRepository->get($this->helper->getIconUrlKey($this)) ?: '';
     }
 
     /**
      * Returns the configured payment method description
      *
-     * @param ConfigRepository $configRepository
-     *
      * @return string
      */
-    public function getDescription(ConfigRepository $configRepository): string
+    public function getDescription(): string
     {
-        $descriptionType = $configRepository->get($this->helper->getDescriptionTypeKey($this));
+        $descriptionType = $this->configRepository->get($this->helper->getDescriptionTypeKey($this));
 
         if ($descriptionType === DescriptionTypes::INTERNAL) {
-            return $configRepository->get($this->helper->getDescriptionKey($this, true));
+            return $this->configRepository->get($this->helper->getDescriptionKey($this, true));
         }
 
         if ($descriptionType === DescriptionTypes::EXTERNAL) {
-            return $configRepository->get($this->helper->getDescriptionKey($this));
+            return $this->configRepository->get($this->helper->getDescriptionKey($this));
         }
 
         // in case of DescriptionTypes::NONE

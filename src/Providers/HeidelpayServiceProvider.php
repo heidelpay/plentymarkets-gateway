@@ -39,6 +39,7 @@ class HeidelpayServiceProvider extends ServiceProvider
         Dispatcher $eventDispatcher
     ) {
         // loop through all of the plugin's available payment methods
+        /** @var string $paymentMethod */
         foreach ($this->getPaymentMethods() as $paymentMethod) {
             // create a mop (payment method id) if it does not exist
             $paymentHelper->createMopIfNotExists($paymentMethod);
@@ -50,7 +51,7 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $paymentHelper->getPaymentMethodEventList()
             );
 
-            // Listen for the event that gets the payment method content
+            // listen for the event that gets the payment method content
             $eventDispatcher->listen(
                 GetPaymentMethodContent::class,
                 function (GetPaymentMethodContent $event) use ($paymentHelper, $paymentMethod) {
@@ -66,7 +67,9 @@ class HeidelpayServiceProvider extends ServiceProvider
                 ExecutePayment::class,
                 function (ExecutePayment $event) use ($paymentHelper, $paymentMethod) {
                     if ($event->getMop() === $paymentHelper->getPaymentMethodId($paymentMethod)) {
-                        $event->setValue('<h1>' . $paymentMethod->getDefaultName() . '</h1>');
+                        $event->setValue(
+                            '<h1>' . $paymentHelper->getPaymentMethodDefaultName($paymentMethod) . '</h1>'
+                        );
                         $event->setType('htmlContent');
                     }
                 }
@@ -75,6 +78,8 @@ class HeidelpayServiceProvider extends ServiceProvider
     }
 
     /**
+     * Returns the available payment methods for this plugin.
+     *
      * @return array
      */
     private function getPaymentMethods(): array

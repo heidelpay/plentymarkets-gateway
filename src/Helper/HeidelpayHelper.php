@@ -46,15 +46,15 @@ class HeidelpayHelper
     /**
      * Create the payment method ID if it doesn't exist yet
      *
-     * @param string $paymentMethod
+     * @param AbstractPaymentMethod $paymentMethod
      */
-    public function createMopIfNotExists($paymentMethod)
+    public function createMopIfNotExists(AbstractPaymentMethod $paymentMethod)
     {
         if ($this->getPaymentMethodId($paymentMethod) === self::NO_PAYMENTMETHOD_FOUND) {
             $paymentMethodData = [
                 'pluginKey' => Plugin::KEY,
-                'paymentKey' => $this->getPaymentMethodKey($paymentMethod),
-                'name' => $this->getPaymentMethodDefaultName($paymentMethod)
+                'paymentKey' => $paymentMethod->getMethodKey(),
+                'name' => $paymentMethod->getDefaultName()
             ];
 
             $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);
@@ -64,18 +64,18 @@ class HeidelpayHelper
     /**
      * Load the payment method ID for the given plugin key.
      *
-     * @param string $paymentMethod
+     * @param AbstractPaymentMethod $paymentMethod
      *
      * @return string
      */
-    public function getPaymentMethodId($paymentMethod): string
+    public function getPaymentMethodId(AbstractPaymentMethod $paymentMethod): string
     {
         $paymentMethods = $this->paymentMethodRepository->allForPlugin(Plugin::KEY);
 
         if (!empty($paymentMethods)) {
             /** @var PaymentMethod $payMethod */
             foreach ($paymentMethods as $payMethod) {
-                if ($payMethod->paymentKey === $this->getPaymentMethodKey($paymentMethod)) {
+                if ($payMethod->paymentKey === $paymentMethod->getMethodKey()) {
                     return $payMethod->id;
                 }
             }
@@ -103,37 +103,13 @@ class HeidelpayHelper
     /**
      * Returns the payment method key ('plugin_name::payment_key')
      *
-     * @param string $paymentMethod
+     * @param AbstractPaymentMethod $paymentMethod
      *
      * @return string
      */
-    public function getPluginPaymentMethodKey($paymentMethod): string
+    public function getPluginPaymentMethodKey(AbstractPaymentMethod $paymentMethod): string
     {
-        return Plugin::KEY . '::' . \constant($paymentMethod . '::KEY');
-    }
-
-    /**
-     * Returns the default payment method name by calling the constant dynamically.
-     *
-     * @param string $paymentMethod
-     *
-     * @return string
-     */
-    public function getPaymentMethodDefaultName($paymentMethod): string
-    {
-        return \constant($paymentMethod . '::DEFAULT_NAME');
-    }
-
-    /**
-     * Returns the payment method key by calling the constant dynamically.
-     *
-     * @param string $paymentMethod
-     *
-     * @return string
-     */
-    public function getPaymentMethodKey($paymentMethod): string
-    {
-        return \constant($paymentMethod . '::KEY');
+        return Plugin::KEY . '::' . $paymentMethod->getMethodKey();
     }
 
     /**

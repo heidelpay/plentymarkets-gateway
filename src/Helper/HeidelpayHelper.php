@@ -48,7 +48,7 @@ class HeidelpayHelper
      *
      * @param AbstractPaymentMethod $paymentMethod
      */
-    public function createMopIfNotExists(AbstractPaymentMethod $paymentMethod)
+    public function createMopIfNotExists($paymentMethod)
     {
         if ($this->getPaymentMethodId($paymentMethod) === self::NO_PAYMENTMETHOD_FOUND) {
             $paymentMethodData = [
@@ -68,7 +68,7 @@ class HeidelpayHelper
      *
      * @return string
      */
-    public function getPaymentMethodId(AbstractPaymentMethod $paymentMethod): string
+    public function getPaymentMethodId($paymentMethod): string
     {
         $paymentMethods = $this->paymentMethodRepository->allForPlugin(Plugin::KEY);
 
@@ -107,7 +107,7 @@ class HeidelpayHelper
      *
      * @return string
      */
-    public function getPluginPaymentMethodKey(AbstractPaymentMethod $paymentMethod): string
+    public function getPluginPaymentMethodKey($paymentMethod): string
     {
         return Plugin::KEY . '::' . $paymentMethod->getMethodKey();
     }

@@ -292,11 +292,11 @@ class HeidelpayHelper
     /**
      * Returns the available payment methods and their helper strings (config-key, payment-key, default name).
      *
-     * @return array
+     * @return string[]
      */
     public function getPaymentMethods(): array
     {
-        return $this->paymentMethodHelperStrings;
+        return array_keys($this->paymentMethodHelperStrings);
     }
 
     /**

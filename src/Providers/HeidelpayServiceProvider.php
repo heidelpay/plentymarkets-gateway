@@ -40,22 +40,25 @@ class HeidelpayServiceProvider extends ServiceProvider
         Dispatcher $eventDispatcher
     ) {
         // loop through all of the plugin's available payment methods
-        /** @var string $paymentMethod */
-        foreach ($paymentHelper->getPaymentMethods() as $paymentMethod) {
-            $paymentHelper->createMopIfNotExists($paymentMethod);
+        /**
+         * @var string $paymentMethodClass
+         * @var array $paymentMethodStrings
+         */
+        foreach ($paymentHelper->getPaymentMethods() as $paymentMethodClass => $paymentMethodStrings) {
+            $paymentHelper->createMopIfNotExists($paymentMethodClass);
 
             // register the payment method in the payment method container
             $paymentMethodContainer->register(
-                $paymentHelper->getPluginPaymentMethodKey($paymentMethod),
-                $paymentMethod,
+                $paymentHelper->getPluginPaymentMethodKey($paymentMethodClass),
+                $paymentMethodClass,
                 $paymentHelper->getPaymentMethodEventList()
             );
 
             // listen for the event that gets the payment method content
             $eventDispatcher->listen(
                 GetPaymentMethodContent::class,
-                function (GetPaymentMethodContent $event) use ($paymentHelper, $paymentMethod) {
-                    if ($event->getMop() === $paymentHelper->getPaymentMethodId($paymentMethod)) {
+                function (GetPaymentMethodContent $event) use ($paymentHelper, $paymentMethodClass) {
+                    if ($event->getMop() === $paymentHelper->getPaymentMethodId($paymentMethodClass)) {
                         $event->setValue('');
                         $event->setType('continue');
                     }
@@ -65,10 +68,10 @@ class HeidelpayServiceProvider extends ServiceProvider
             // listen for the event that executes the payment
             $eventDispatcher->listen(
                 ExecutePayment::class,
-                function (ExecutePayment $event) use ($paymentHelper, $paymentMethod) {
-                    if ($event->getMop() === $paymentHelper->getPaymentMethodId($paymentMethod)) {
+                function (ExecutePayment $event) use ($paymentHelper, $paymentMethodClass) {
+                    if ($event->getMop() === $paymentHelper->getPaymentMethodId($paymentMethodClass)) {
                         $event->setValue(
-                            '<h1>' . $paymentHelper->getPaymentMethodDefaultName($paymentMethod) . '</h1>'
+                            '<h1>' . $paymentHelper->getPaymentMethodDefaultName($paymentMethodClass) . '</h1>'
                         );
                         $event->setType('htmlContent');
                     }

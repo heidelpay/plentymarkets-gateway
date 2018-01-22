@@ -24,6 +24,7 @@ use Plenty\Modules\Payment\Method\Models\PaymentMethod;
  * @copyright Copyright © 2017-present Heidelberger Payment GmbH. All rights reserved.
  *
  * @link http://dev.heidelpay.com/plentymarkets-gateway
+ *
  * @author Stephano Vogel <development@heidelpay.de>
  *
  * @package heidelpay\plentymarkets-gateway\helper
@@ -33,6 +34,10 @@ class HeidelpayHelper
     const ARRAY_KEY_CONFIG_KEY = 'config_key';
     const ARRAY_KEY_DEFAULT_NAME = 'default_name';
     const ARRAY_KEY_KEY = 'key';
+
+    const NO_CONFIG_KEY_FOUND = 'no_config_key_found';
+    const NO_DEFAULT_NAME_FOUND = 'no_default_name_found';
+    const NO_KEY_FOUND = 'no_key_found';
 
     const NO_PAYMENTMETHOD_FOUND = 'no_paymentmethod_found';
 
@@ -60,15 +65,15 @@ class HeidelpayHelper
     /**
      * Create the payment method ID if it doesn't exist yet
      *
-     * @param string $paymentMethod
+     * @param string $paymentMethodClass
      */
-    public function createMopIfNotExists($paymentMethod)
+    public function createMopIfNotExists(string $paymentMethodClass)
     {
-        if ($this->getPaymentMethodId($paymentMethod) === self::NO_PAYMENTMETHOD_FOUND) {
+        if ($this->getPaymentMethodId($paymentMethodClass) === self::NO_PAYMENTMETHOD_FOUND) {
             $paymentMethodData = [
                 'pluginKey' => Plugin::KEY,
-                'paymentKey' => $this->getPaymentMethodKey($paymentMethod),
-                'name' => $this->getPaymentMethodDefaultName($paymentMethod)
+                'paymentKey' => $this->getPaymentMethodKey($paymentMethodClass),
+                'name' => $this->getPaymentMethodDefaultName($paymentMethodClass)
             ];
 
             $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);
@@ -78,18 +83,18 @@ class HeidelpayHelper
     /**
      * Load the payment method ID for the given plugin key.
      *
-     * @param string $paymentMethod
+     * @param string $paymentMethodClass
      *
      * @return string
      */
-    public function getPaymentMethodId($paymentMethod): string
+    public function getPaymentMethodId(string $paymentMethodClass): string
     {
         $paymentMethods = $this->paymentMethodRepository->allForPlugin(Plugin::KEY);
 
         if (!empty($paymentMethods)) {
             /** @var PaymentMethod $payMethod */
             foreach ($paymentMethods as $payMethod) {
-                if ($payMethod->paymentKey === $this->getPaymentMethodKey($paymentMethod)) {
+                if ($payMethod->paymentKey === $this->getPaymentMethodKey($paymentMethodClass)) {
                     return $payMethod->id;
                 }
             }
@@ -117,13 +122,13 @@ class HeidelpayHelper
     /**
      * Returns the payment method key ('plugin_name::payment_key')
      *
-     * @param string $paymentMethod
+     * @param string $paymentMethodClass
      *
      * @return string
      */
-    public function getPluginPaymentMethodKey($paymentMethod): string
+    public function getPluginPaymentMethodKey(string $paymentMethodClass): string
     {
-        return Plugin::KEY . '::' . $this->getPaymentMethodKey($paymentMethod);
+        return Plugin::KEY . '::' . $this->getPaymentMethodKey($paymentMethodClass);
     }
 
     /**
@@ -133,7 +138,7 @@ class HeidelpayHelper
      *
      * @return string
      */
-    public function getConfigKey($key): string
+    public function getConfigKey(string $key): string
     {
         return Plugin::NAME . '.' . $key;
     }
@@ -182,7 +187,7 @@ class HeidelpayHelper
      *
      * @return string
      */
-    public function getDescriptionKey(AbstractPaymentMethod $paymentMethod, $isInternal = false): string
+    public function getDescriptionKey(AbstractPaymentMethod $paymentMethod, bool $isInternal = false): string
     {
         if (!$isInternal) {
             return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_EXTERNAL);
@@ -256,9 +261,10 @@ class HeidelpayHelper
      *
      * @return string
      */
-    public function getPaymentMethodConfigKey($paymentMethod): string
+    public function getPaymentMethodConfigKey(string $paymentMethod): string
     {
-        return $this->paymentMethodHelperStrings[$paymentMethod][self::ARRAY_KEY_CONFIG_KEY] ?? null;
+        return $this->paymentMethodHelperStrings[$paymentMethod][self::ARRAY_KEY_CONFIG_KEY]
+            ?? self::NO_CONFIG_KEY_FOUND;
     }
 
     /**
@@ -266,9 +272,10 @@ class HeidelpayHelper
      *
      * @return string
      */
-    public function getPaymentMethodDefaultName($paymentMethod): string
+    public function getPaymentMethodDefaultName(string $paymentMethod): string
     {
-        return $this->paymentMethodHelperStrings[$paymentMethod][self::ARRAY_KEY_DEFAULT_NAME] ?? null;
+        return $this->paymentMethodHelperStrings[$paymentMethod][self::ARRAY_KEY_DEFAULT_NAME]
+            ?? self::NO_DEFAULT_NAME_FOUND;
     }
 
     /**
@@ -276,12 +283,15 @@ class HeidelpayHelper
      *
      * @return string
      */
-    public function getPaymentMethodKey($paymentMethod): string
+    public function getPaymentMethodKey(string $paymentMethod): string
     {
-        return $this->paymentMethodHelperStrings[$paymentMethod][self::ARRAY_KEY_KEY] ?? null;
+        return $this->paymentMethodHelperStrings[$paymentMethod][self::ARRAY_KEY_KEY]
+            ?? self::NO_KEY_FOUND;
     }
 
     /**
+     * Returns the available payment methods and their helper strings (config-key, payment-key, default name).
+     *
      * @return array
      */
     public function getPaymentMethods(): array
@@ -290,12 +300,14 @@ class HeidelpayHelper
     }
 
     /**
+     * Gets a certain key from a given payment method in the helper string array.
+     *
      * @param string $paymentMethodClass
      * @param string $key
      *
      * @return string
      */
-    public function getPaymentMethodString($paymentMethodClass, $key): string
+    public function getPaymentMethodString(string $paymentMethodClass, string $key): string
     {
         return $this->paymentMethodHelperStrings[$paymentMethodClass][$key] ?? null;
     }
@@ -303,7 +315,7 @@ class HeidelpayHelper
     /**
      * Sets the available payment methods and their strings for this plugin.
      */
-    private function setPaymentMethodHelperStrings()
+    private function setPaymentMethodHelperStrings(): void
     {
         $this->paymentMethodHelperStrings = [
             CreditCardPaymentMethod::class => [

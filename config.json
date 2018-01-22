@@ -119,6 +119,78 @@
   },
 
   {
+    "tab": "Sofort.",
+    "key": "sofort.isActive",
+    "label": "Aktiv",
+    "type": "checkbox",
+    "default": false
+  },
+  {
+    "tab": "Sofort.",
+    "key": "sofort.displayName",
+    "label": "Anzeigename",
+    "type": "text",
+    "default": "Vorkasse"
+  },
+  {
+    "tab": "Sofort.",
+    "key": "sofort.channelId",
+    "label": "Channel-ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "tab": "Sofort.",
+    "key": "sofort.minAmount",
+    "label": "Mindestbetrag (in Euro)",
+    "type": "text",
+    "default": "0,00"
+  },
+  {
+    "tab": "Sofort.",
+    "key": "sofort.maxAmount",
+    "label": "Höchstbetrag (in Euro)",
+    "type": "text",
+    "default": "0,00"
+  },
+
+  {
+    "tab": "PayPal",
+    "key": "paypal.isActive",
+    "label": "Aktiv",
+    "type": "checkbox",
+    "default": false
+  },
+  {
+    "tab": "PayPal",
+    "key": "paypal.displayName",
+    "label": "Anzeigename",
+    "type": "text",
+    "default": "Vorkasse"
+  },
+  {
+    "tab": "PayPal",
+    "key": "paypal.channelId",
+    "label": "Channel-ID",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "tab": "PayPal",
+    "key": "paypal.minAmount",
+    "label": "Mindestbetrag (in Euro)",
+    "type": "text",
+    "default": "0,00"
+  },
+  {
+    "tab": "PayPal",
+    "key": "paypal.maxAmount",
+    "label": "Höchstbetrag (in Euro)",
+    "type": "text",
+    "default": "0,00"
+  },
+
+  {
     "tab": "Vorkasse",
     "key": "prepayment.isActive",
     "label": "Aktiv",

@@ -315,7 +315,7 @@ class HeidelpayHelper
     /**
      * Sets the available payment methods and their strings for this plugin.
      */
-    private function setPaymentMethodHelperStrings(): void
+    private function setPaymentMethodHelperStrings()
     {
         $this->paymentMethodHelperStrings = [
             CreditCardPaymentMethod::class => [

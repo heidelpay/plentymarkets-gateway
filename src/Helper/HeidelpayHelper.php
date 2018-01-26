@@ -16,6 +16,7 @@ use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Heidelpay Helper Class
@@ -31,6 +32,8 @@ use Plenty\Modules\Payment\Method\Models\PaymentMethod;
  */
 class HeidelpayHelper
 {
+    use Loggable;
+
     const ARRAY_KEY_CONFIG_KEY = 'config_key';
     const ARRAY_KEY_DEFAULT_NAME = 'default_name';
     const ARRAY_KEY_KEY = 'key';
@@ -70,6 +73,10 @@ class HeidelpayHelper
     public function createMopIfNotExists(string $paymentMethodClass)
     {
         if ($this->getPaymentMethodId($paymentMethodClass) === self::NO_PAYMENTMETHOD_FOUND) {
+            $this->getLogger(__METHOD__)->info('Heidelpay::service_provider.method_not_found', [
+                'paymentMethod' => $this->getPaymentMethodDefaultName($paymentMethodClass)
+            ]);
+
             $paymentMethodData = [
                 'pluginKey' => Plugin::KEY,
                 'paymentKey' => $this->getPaymentMethodKey($paymentMethodClass),

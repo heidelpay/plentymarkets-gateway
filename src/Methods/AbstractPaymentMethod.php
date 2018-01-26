@@ -89,6 +89,36 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
+     * Returns a fee amount for this payment method.
+     *
+     * @return float
+     */
+    public function getFee(): float
+    {
+        return 0.00;
+    }
+
+    /**
+     * Determines if the customer can switch to this payment method.
+     *
+     * @return bool
+     */
+    public function isSwitchableTo(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determines if the customer can switch from this payment method.
+     *
+     * @return bool
+     */
+    public function isSwitchableFrom(): bool
+    {
+        return true;
+    }
+
+    /**
      * Returns the config key for the payment method.
      *
      * @return string

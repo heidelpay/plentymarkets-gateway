@@ -39,12 +39,16 @@ class HeidelpayServiceProvider extends ServiceProvider
         PaymentMethodContainer $paymentMethodContainer,
         Dispatcher $eventDispatcher
     ) {
+        $this->getLogger(__METHOD__)->debug('Heidelpay::service_provider.booting');
+
         // loop through all of the plugin's available payment methods
-        /**
-         * @var string $paymentMethodClass
-         */
+        /** @var string $paymentMethodClass */
         foreach ($paymentHelper->getPaymentMethods() as $paymentMethodClass) {
             $paymentHelper->createMopIfNotExists($paymentMethodClass);
+
+            $this->getLogger(__METHOD__)->info('Heidelpay::service_provider.register_method', [
+                'paymentMethod' => $paymentHelper->getPaymentMethodDefaultName($paymentMethodClass)
+            ]);
 
             // register the payment method in the payment method container
             $paymentMethodContainer->register(

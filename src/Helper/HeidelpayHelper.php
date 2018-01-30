@@ -45,14 +45,35 @@ class HeidelpayHelper
     const NO_PAYMENTMETHOD_FOUND = 'no_paymentmethod_found';
 
     /**
-     * @var array
-     */
-    private $paymentMethodHelperStrings;
-
-    /**
-     * @var PaymentMethodRepositoryContract $paymentMethodRepository
+     * @var PaymentMethodRepositoryContract
      */
     protected $paymentMethodRepository;
+
+    /**
+     * @var array
+     */
+    public static $paymentMethods = [
+        CreditCardPaymentMethod::class => [
+            self::ARRAY_KEY_CONFIG_KEY => CreditCardPaymentMethod::CONFIG_KEY,
+            self::ARRAY_KEY_KEY => CreditCardPaymentMethod::KEY,
+            self::ARRAY_KEY_DEFAULT_NAME => CreditCardPaymentMethod::DEFAULT_NAME,
+        ],
+        PrepaymentPaymentMethod::class => [
+            self::ARRAY_KEY_CONFIG_KEY => PrepaymentPaymentMethod::CONFIG_KEY,
+            self::ARRAY_KEY_KEY => PrepaymentPaymentMethod::KEY,
+            self::ARRAY_KEY_DEFAULT_NAME => PrepaymentPaymentMethod::DEFAULT_NAME,
+        ],
+        SofortPaymentMethod::class => [
+            self::ARRAY_KEY_CONFIG_KEY => SofortPaymentMethod::CONFIG_KEY,
+            self::ARRAY_KEY_KEY => SofortPaymentMethod::KEY,
+            self::ARRAY_KEY_DEFAULT_NAME => SofortPaymentMethod::DEFAULT_NAME,
+        ],
+        PayPalPaymentMethod::class => [
+            self::ARRAY_KEY_CONFIG_KEY => PayPalPaymentMethod::CONFIG_KEY,
+            self::ARRAY_KEY_KEY => PayPalPaymentMethod::KEY,
+            self::ARRAY_KEY_DEFAULT_NAME => PayPalPaymentMethod::DEFAULT_NAME,
+        ],
+    ];
 
     /**
      * AbstractHelper constructor.
@@ -62,7 +83,6 @@ class HeidelpayHelper
     public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository)
     {
         $this->paymentMethodRepository = $paymentMethodRepository;
-        $this->setPaymentMethodHelperStrings();
     }
 
     /**
@@ -270,7 +290,7 @@ class HeidelpayHelper
      */
     public function getPaymentMethodConfigKey(string $paymentMethod): string
     {
-        return $this->paymentMethodHelperStrings[$paymentMethod][self::ARRAY_KEY_CONFIG_KEY]
+        return static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_CONFIG_KEY]
             ?? self::NO_CONFIG_KEY_FOUND;
     }
 
@@ -281,7 +301,7 @@ class HeidelpayHelper
      */
     public function getPaymentMethodDefaultName(string $paymentMethod): string
     {
-        return $this->paymentMethodHelperStrings[$paymentMethod][self::ARRAY_KEY_DEFAULT_NAME]
+        return static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_DEFAULT_NAME]
             ?? self::NO_DEFAULT_NAME_FOUND;
     }
 
@@ -292,7 +312,7 @@ class HeidelpayHelper
      */
     public function getPaymentMethodKey(string $paymentMethod): string
     {
-        return $this->paymentMethodHelperStrings[$paymentMethod][self::ARRAY_KEY_KEY]
+        return static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_KEY]
             ?? self::NO_KEY_FOUND;
     }
 
@@ -301,9 +321,9 @@ class HeidelpayHelper
      *
      * @return string[]
      */
-    public function getPaymentMethods(): array
+    public static function getPaymentMethods(): array
     {
-        return array_keys($this->paymentMethodHelperStrings);
+        return array_keys(static::$paymentMethods);
     }
 
     /**
@@ -316,35 +336,6 @@ class HeidelpayHelper
      */
     public function getPaymentMethodString(string $paymentMethodClass, string $key): string
     {
-        return $this->paymentMethodHelperStrings[$paymentMethodClass][$key] ?? null;
-    }
-
-    /**
-     * Sets the available payment methods and their strings for this plugin.
-     */
-    private function setPaymentMethodHelperStrings()
-    {
-        $this->paymentMethodHelperStrings = [
-            CreditCardPaymentMethod::class => [
-                self::ARRAY_KEY_CONFIG_KEY => CreditCardPaymentMethod::CONFIG_KEY,
-                self::ARRAY_KEY_KEY => CreditCardPaymentMethod::KEY,
-                self::ARRAY_KEY_DEFAULT_NAME => CreditCardPaymentMethod::DEFAULT_NAME,
-            ],
-            PrepaymentPaymentMethod::class => [
-                self::ARRAY_KEY_CONFIG_KEY => PrepaymentPaymentMethod::CONFIG_KEY,
-                self::ARRAY_KEY_KEY => PrepaymentPaymentMethod::KEY,
-                self::ARRAY_KEY_DEFAULT_NAME => PrepaymentPaymentMethod::DEFAULT_NAME,
-            ],
-            SofortPaymentMethod::class => [
-                self::ARRAY_KEY_CONFIG_KEY => SofortPaymentMethod::CONFIG_KEY,
-                self::ARRAY_KEY_KEY => SofortPaymentMethod::KEY,
-                self::ARRAY_KEY_DEFAULT_NAME => SofortPaymentMethod::DEFAULT_NAME,
-            ],
-            PayPalPaymentMethod::class => [
-                self::ARRAY_KEY_CONFIG_KEY => PayPalPaymentMethod::CONFIG_KEY,
-                self::ARRAY_KEY_KEY => PayPalPaymentMethod::KEY,
-                self::ARRAY_KEY_DEFAULT_NAME => PayPalPaymentMethod::DEFAULT_NAME,
-            ],
-        ];
+        return static::$paymentMethods[$paymentMethodClass][$key] ?? null;
     }
 }

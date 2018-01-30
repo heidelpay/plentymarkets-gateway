@@ -10,7 +10,7 @@
     "en": "plentymarkets Integration for heidelpay"
   },
   "categories": ["3519", "3521"],
-  "keywords": ["heidelpay", "plentymarkets", "plugin"],
+  "keywords": ["heidelpay", "plentymarkets", "plugin", "payment", "payment method"],
   "version": "0.0.1",
   "license": "Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.",
   "price": 0.00,

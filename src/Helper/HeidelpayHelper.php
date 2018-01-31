@@ -301,8 +301,11 @@ class HeidelpayHelper
      */
     public function getPaymentMethodDefaultName(string $paymentMethod): string
     {
-        return static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_DEFAULT_NAME]
+        $prefix = Plugin::NAME . ' - ';
+        $name = static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_DEFAULT_NAME]
             ?? self::NO_DEFAULT_NAME_FOUND;
+
+        return $prefix . $name;
     }
 
     /**

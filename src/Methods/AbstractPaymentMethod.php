@@ -195,7 +195,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
      */
     public function getIcon(): string
     {
-        if ($this->configRepository->get($this->helper->getUseIconKey($this)) === false) {
+        if ($this->configRepository->get($this->helper->getUseIconKey($this)) == false) {
             return '';
         }
 

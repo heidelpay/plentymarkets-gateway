@@ -71,7 +71,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
         $basket = $this->basketRepository->load();
 
         // return false if this method is not configured as active.
-        if ($this->configRepository->get($this->helper->getIsActiveKey($this)) === false) {
+        if ($this->configRepository->get($this->helper->getIsActiveKey($this)) == false) {
             return false;
         }
 

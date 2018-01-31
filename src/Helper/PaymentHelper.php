@@ -16,10 +16,11 @@ use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
+use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Log\Loggable;
 
 /**
- * Heidelpay Helper Class
+ * Heidelpay Payment Helper Class
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2017-present Heidelberger Payment GmbH. All rights reserved.
@@ -30,7 +31,7 @@ use Plenty\Plugin\Log\Loggable;
  *
  * @package heidelpay\plentymarkets-gateway\helper
  */
-class HeidelpayHelper
+class PaymentHelper
 {
     use Loggable;
 
@@ -43,6 +44,11 @@ class HeidelpayHelper
     const NO_KEY_FOUND = 'no_key_found';
 
     const NO_PAYMENTMETHOD_FOUND = 'no_paymentmethod_found';
+
+    /**
+     * @var ConfigRepository
+     */
+    private $config;
 
     /**
      * @var PaymentMethodRepositoryContract
@@ -78,10 +84,14 @@ class HeidelpayHelper
     /**
      * AbstractHelper constructor.
      *
+     * @param ConfigRepository $configRepository
      * @param PaymentMethodRepositoryContract $paymentMethodRepository
      */
-    public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository)
-    {
+    public function __construct(
+        ConfigRepository $configRepository,
+        PaymentMethodRepositoryContract $paymentMethodRepository
+    ) {
+        $this->config = $configRepository;
         $this->paymentMethodRepository = $paymentMethodRepository;
     }
 
@@ -143,6 +153,20 @@ class HeidelpayHelper
             AfterBasketCreate::class,
             FrontendLanguageChanged::class,
             FrontendShippingCountryChanged::class,
+        ];
+    }
+
+    /**
+     * Returns the heidelpay authentication data (senderId, login, password) as array.
+     *
+     * @return array
+     */
+    public function getHeidelpayAuthenticationConfig(): array
+    {
+        return [
+            'SECURITY.SENDER' => $this->config->get($this->getConfigKey(ConfigKeys::AUTH_SENDER_ID)),
+            'USER.LOGIN' => $this->config->get($this->getConfigKey(ConfigKeys::AUTH_LOGIN)),
+            'USER.PWD' => $this->config->get($this->getConfigKey(ConfigKeys::AUTH_PASSWORD)),
         ];
     }
 

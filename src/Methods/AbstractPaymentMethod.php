@@ -3,7 +3,7 @@
 namespace Heidelpay\Methods;
 
 use Heidelpay\Constants\DescriptionTypes;
-use Heidelpay\Helper\HeidelpayHelper;
+use Heidelpay\Helper\PaymentHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
@@ -28,7 +28,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     const KEY = 'ABSTRACT';
 
     /**
-     * @var HeidelpayHelper $helper
+     * @var PaymentHelper $helper
      */
     protected $helper;
 
@@ -45,12 +45,12 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     /**
      * AbstractPaymentMethod constructor.
      *
-     * @param HeidelpayHelper          $paymentHelper
+     * @param PaymentHelper          $paymentHelper
      * @param ConfigRepository         $configRepository
      * @param BasketRepositoryContract $basketRepositoryContract
      */
     public function __construct(
-        HeidelpayHelper $paymentHelper,
+        PaymentHelper $paymentHelper,
         ConfigRepository $configRepository,
         BasketRepositoryContract $basketRepositoryContract
     ) {
@@ -89,6 +89,16 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
+     * Returns if the payment method can be used for Express Checkout.
+     *
+     * @return bool
+     */
+    public function isExpressCheckout(): bool
+    {
+        return false;
+    }
+
+    /**
      * Returns a fee amount for this payment method.
      *
      * @return float
@@ -99,23 +109,36 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Determines if the customer can switch to this payment method.
+     * Returns if the payment method can be selected.
+     *
+     * @return bool
+     */
+    public function isSelectable(): bool
+    {
+        // TODO: this is a test. set to true as default!
+        return false;
+    }
+
+    /**
+     * Determines if the customer can switch to this payment method
+     * in his 'My account' area after an order has been placed.
      *
      * @return bool
      */
     public function isSwitchableTo(): bool
     {
-        return true;
+        return false;
     }
 
     /**
-     * Determines if the customer can switch from this payment method.
+     * Determines if the customer can switch from this payment method
+     * in his 'My account' area after an order has been placed.
      *
      * @return bool
      */
     public function isSwitchableFrom(): bool
     {
-        return true;
+        return false;
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Heidelpay\Providers;
 
-use Heidelpay\Helper\HeidelpayHelper;
+use Heidelpay\Helper\PaymentHelper;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
@@ -35,7 +35,7 @@ class HeidelpayServiceProvider extends ServiceProvider
     }
 
     public function boot(
-        HeidelpayHelper $paymentHelper,
+        PaymentHelper $paymentHelper,
         PaymentMethodContainer $paymentMethodContainer,
         Dispatcher $eventDispatcher
     ) {
@@ -63,7 +63,7 @@ class HeidelpayServiceProvider extends ServiceProvider
                 function (GetPaymentMethodContent $event) use ($paymentHelper, $paymentMethodClass) {
                     if ($event->getMop() === $paymentHelper->getPaymentMethodId($paymentMethodClass)) {
                         $event->setValue('');
-                        $event->setType('continue');
+                        $event->setType(GetPaymentMethodContent::RETURN_TYPE_CONTINUE);
                     }
                 }
             );
@@ -76,7 +76,7 @@ class HeidelpayServiceProvider extends ServiceProvider
                         $event->setValue(
                             '<h1>' . $paymentHelper->getPaymentMethodDefaultName($paymentMethodClass) . '</h1>'
                         );
-                        $event->setType('htmlContent');
+                        $event->setType(GetPaymentMethodContent::RETURN_TYPE_HTML);
                     }
                 }
             );

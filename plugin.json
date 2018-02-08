@@ -21,6 +21,6 @@
   "namespace": "Heidelpay",
   "serviceProvider": "Heidelpay\\Providers\\HeidelpayServiceProvider",
   "dependencies": {
-    "heidelpay/php-payment-api": "^1.3.0"
+    "heidelpay/php-payment-api": "^1.4.0"
   }
 }

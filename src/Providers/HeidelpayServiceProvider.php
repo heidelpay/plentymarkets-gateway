@@ -3,6 +3,7 @@
 namespace Heidelpay\Providers;
 
 use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Services\PaymentService;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
@@ -37,6 +38,7 @@ class HeidelpayServiceProvider extends ServiceProvider
     public function boot(
         PaymentHelper $paymentHelper,
         PaymentMethodContainer $paymentMethodContainer,
+        PaymentService $paymentService,
         Dispatcher $eventDispatcher
     ) {
         $this->getLogger(__METHOD__)->debug('Heidelpay::service_provider.booting');

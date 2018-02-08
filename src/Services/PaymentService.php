@@ -2,7 +2,6 @@
 
 namespace Heidelpay\Services;
 
-use Heidelpay\Constants\Plugin;
 use Heidelpay\Helper\PaymentHelper;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
@@ -28,6 +27,11 @@ class PaymentService
      * @var string
      */
     private $returnType;
+
+    /**
+     * @var array
+     */
+    private $heidelpayRequest;
 
     /**
      * @var ConfigRepository
@@ -68,6 +72,11 @@ class PaymentService
         $this->paymentHelper = $paymentHelper;
     }
 
+    public function executePayment()
+    {
+        // TODO: send the request
+    }
+
     public function getPaymentMethodContent(Basket $basket): string
     {
         return '';
@@ -76,18 +85,16 @@ class PaymentService
     /**
      * @param Basket $basket
      * @param $content
-     *
-     * @return array
      */
-    private function prepareRequest(Basket $basket, $content): array
+    private function prepareRequest(Basket $basket, $content)
     {
-        $requestArray = [];
-        $requestArray = array_merge($requestArray, $this->paymentHelper->getHeidelpayAuthenticationConfig());
+        $this->heidelpayRequest = array_merge(
+            $this->heidelpayRequest,
+            $this->paymentHelper->getHeidelpayAuthenticationConfig()
+        );
 
         // TODO: get channel by payment method
 
         // TODO: gather data by basket, customer data, etc...
-
-        return $requestArray;
     }
 }

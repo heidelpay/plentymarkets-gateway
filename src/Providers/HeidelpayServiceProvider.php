@@ -3,7 +3,14 @@
 namespace Heidelpay\Providers;
 
 use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Methods\PayPalPaymentMethod;
 use Heidelpay\Services\PaymentService;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
+use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
+use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
+use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
@@ -36,6 +43,7 @@ class HeidelpayServiceProvider extends ServiceProvider
     }
 
     public function boot(
+        BasketRepositoryContract $basketRepository,
         PaymentHelper $paymentHelper,
         PaymentMethodContainer $paymentMethodContainer,
         PaymentService $paymentService,
@@ -56,16 +64,23 @@ class HeidelpayServiceProvider extends ServiceProvider
             $paymentMethodContainer->register(
                 $paymentHelper->getPluginPaymentMethodKey($paymentMethodClass),
                 $paymentMethodClass,
-                $paymentHelper->getPaymentMethodEventList()
+                $this->getPaymentMethodEventList()
             );
 
             // listen for the event that gets the payment method content
             $eventDispatcher->listen(
                 GetPaymentMethodContent::class,
-                function (GetPaymentMethodContent $event) use ($paymentHelper, $paymentMethodClass) {
+                function (GetPaymentMethodContent $event) use ($basketRepository, $paymentHelper, $paymentService, $paymentMethodClass) {
+                    /*
                     if ($event->getMop() === $paymentHelper->getPaymentMethodId($paymentMethodClass)) {
                         $event->setValue('');
                         $event->setType(GetPaymentMethodContent::RETURN_TYPE_CONTINUE);
+                    }
+                    */
+
+                    if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPalPaymentMethod::class)) {
+                        $event->setType(GetPaymentMethodContent::RETURN_TYPE_CONTINUE)
+                            ->setValue('');
                     }
                 }
             );
@@ -73,15 +88,32 @@ class HeidelpayServiceProvider extends ServiceProvider
             // listen for the event that executes the payment
             $eventDispatcher->listen(
                 ExecutePayment::class,
-                function (ExecutePayment $event) use ($paymentHelper, $paymentMethodClass) {
-                    if ($event->getMop() === $paymentHelper->getPaymentMethodId($paymentMethodClass)) {
-                        $event->setValue(
-                            '<h1>' . $paymentHelper->getPaymentMethodDefaultName($paymentMethodClass) . '</h1>'
-                        );
-                        $event->setType(GetPaymentMethodContent::RETURN_TYPE_HTML);
+                function (ExecutePayment $event) use ($basketRepository, $paymentHelper, $paymentService, $paymentMethodClass) {
+                    if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPalPaymentMethod::class)) {
+                        $basket = $basketRepository->load();
+                        $paymentService->executePayment($basket);
+
+                        $event->setValue('');
+                        $event->setType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
                     }
                 }
             );
         }
+    }
+
+    /**
+     * Returns a list of events that should be observed.
+     *
+     * @return array
+     */
+    public function getPaymentMethodEventList(): array
+    {
+        return [
+            AfterBasketChanged::class,
+            AfterBasketItemAdd::class,
+            AfterBasketCreate::class,
+            FrontendLanguageChanged::class,
+            FrontendShippingCountryChanged::class,
+        ];
     }
 }

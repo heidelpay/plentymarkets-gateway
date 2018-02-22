@@ -9,12 +9,12 @@
  *
  * @author Stephano Vogel <development@heidelpay.de>
  *
- * @package heidelpay\plentymarkets-gateway
+ * @package heidelpay\plentymarkets-gateway\external-lib-callbacks
  */
 
 use Heidelpay\PhpPaymentApi\Response as HeidelpayResponse;
 
-$response = HeidelpayResponse::fromPost(SdkRestApi::getParam('json_response'));
+$response = HeidelpayResponse::fromPost(SdkRestApi::getParam('response'));
 
 /** @return array */
-return json_decode($response->toJson(), true);
+return $response->toArray();

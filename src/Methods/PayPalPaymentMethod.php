@@ -19,4 +19,12 @@ class PayPalPaymentMethod extends AbstractPaymentMethod
     const CONFIG_KEY = 'paypal';
     const KEY = 'PAYPAL';
     const DEFAULT_NAME = 'PayPal';
+
+    /**
+     * @inheritdoc
+     */
+    public function isSelectable(): bool
+    {
+        return true;
+    }
 }

@@ -9,11 +9,6 @@ use Heidelpay\Methods\CreditCardPaymentMethod;
 use Heidelpay\Methods\PayPalPaymentMethod;
 use Heidelpay\Methods\PrepaymentPaymentMethod;
 use Heidelpay\Methods\SofortPaymentMethod;
-use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
-use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
-use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
-use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
-use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Plugin\ConfigRepository;
@@ -138,22 +133,6 @@ class PaymentHelper
         }
 
         return self::NO_PAYMENTMETHOD_FOUND;
-    }
-
-    /**
-     * Returns the event list when changes should be considered.
-     *
-     * @return array
-     */
-    public function getPaymentMethodEventList(): array
-    {
-        return [
-            AfterBasketChanged::class,
-            AfterBasketItemAdd::class,
-            AfterBasketCreate::class,
-            FrontendLanguageChanged::class,
-            FrontendShippingCountryChanged::class,
-        ];
     }
 
     /**
@@ -339,8 +318,7 @@ class PaymentHelper
      */
     public function getPaymentMethodKey(string $paymentMethod): string
     {
-        return static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_KEY]
-            ?? self::NO_KEY_FOUND;
+        return static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_KEY] ?? self::NO_KEY_FOUND;
     }
 
     /**

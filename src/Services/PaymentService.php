@@ -15,11 +15,11 @@ use Plenty\Plugin\ConfigRepository;
  * heidelpay Payment Service class
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
- * @copyright Copyright © 2017-present Heidelberger Payment GmbH. All rights reserved.
+ * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
  *
  * @link http://dev.heidelpay.com/plentymarkets-gateway
  *
- * @author Stephano Vogel <development@heidelpay.de>
+ * @author Stephano Vogel <development@heidelpay.com>
  *
  * @package heidelpay\plentymarkets-gateway\services
  */
@@ -99,7 +99,7 @@ class PaymentService
         return $this->returnType;
     }
 
-    public function executePayment(Basket $basket)
+    public function executePayment(Basket $basket, $paymentMethod, $transactionType)
     {
         $this->prepareRequest($basket);
         // TODO: send the request
@@ -112,9 +112,8 @@ class PaymentService
 
     /**
      * @param Basket $basket
-     * @param $content
      */
-    private function prepareRequest(Basket $basket, $content)
+    private function prepareRequest(Basket $basket)
     {
         // set authentification data
         $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig();

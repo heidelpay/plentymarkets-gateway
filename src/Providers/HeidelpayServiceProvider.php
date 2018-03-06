@@ -80,7 +80,7 @@ class HeidelpayServiceProvider extends ServiceProvider
 
                     if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPalPaymentMethod::class)) {
                         $event->setType(GetPaymentMethodContent::RETURN_TYPE_CONTINUE)
-                            ->setValue('');
+                            ->setValue($paymentService->getPaymentMethodContent($paymentMethodClass));
                     }
                 }
             );
@@ -91,10 +91,9 @@ class HeidelpayServiceProvider extends ServiceProvider
                 function (ExecutePayment $event) use ($basketRepository, $paymentHelper, $paymentService, $paymentMethodClass) {
                     if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPalPaymentMethod::class)) {
                         $basket = $basketRepository->load();
-                        $paymentService->executePayment($basket);
 
-                        $event->setValue('');
-                        $event->setType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
+                        $event->setValue($paymentService->executePayment($basket, $paymentMethodClass));
+                        $event->setType($paymentService->getReturnType());
                     }
                 }
             );

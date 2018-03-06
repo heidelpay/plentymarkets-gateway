@@ -19,6 +19,7 @@ class ConfigKeys
     const AUTH_SENDER_ID = 'main.senderId';
     const AUTH_PASSWORD = 'main.password';
     const AUTH_LOGIN = 'main.login';
+    const ENVIRONMENT = 'main.environment';
 
     const IS_ACTIVE = 'isActive';
     const DISPLAY_NAME = 'displayName';

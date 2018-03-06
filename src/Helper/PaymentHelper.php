@@ -4,6 +4,7 @@ namespace Heidelpay\Helper;
 
 use Heidelpay\Constants\ConfigKeys;
 use Heidelpay\Constants\Plugin;
+use Heidelpay\Constants\TransactionMode;
 use Heidelpay\Methods\AbstractPaymentMethod;
 use Heidelpay\Methods\CreditCardPaymentMethod;
 use Heidelpay\Methods\PayPalPaymentMethod;
@@ -136,17 +137,77 @@ class PaymentHelper
     }
 
     /**
-     * Returns the heidelpay authentication data (senderId, login, password) as array.
+     * Returns the heidelpay authentication data (senderId, login, password, environment) as array.
+     *
+     * @param string $paymentMethod
      *
      * @return array
      */
-    public function getHeidelpayAuthenticationConfig(): array
+    public function getHeidelpayAuthenticationConfig(string $paymentMethod): array
     {
         return [
-            'SECURITY.SENDER' => $this->config->get($this->getConfigKey(ConfigKeys::AUTH_SENDER_ID)),
-            'USER.LOGIN' => $this->config->get($this->getConfigKey(ConfigKeys::AUTH_LOGIN)),
-            'USER.PWD' => $this->config->get($this->getConfigKey(ConfigKeys::AUTH_PASSWORD)),
+            'SECURITY.SENDER' => $this->getSenderId(),
+            'TRANSACTION.CHANNEL' => $this->getTransactionChannel($paymentMethod),
+            'TRANSACTION.MODE' => $this->getEnvironment(),
+            'USER.LOGIN' => $this->getUserLogin(),
+            'USER.PWD' => $this->getUserPassword(),
         ];
+    }
+
+    /**
+     * Returns the senderId for authentification.
+     *
+     * @return string
+     */
+    private function getSenderId(): string
+    {
+        return $this->config->get($this->getConfigKey(ConfigKeys::AUTH_SENDER_ID));
+    }
+
+    /**
+     * Returns the user login for authentification.
+     *
+     * @return string
+     */
+    private function getUserLogin(): string
+    {
+        return $this->config->get($this->getConfigKey(ConfigKeys::AUTH_LOGIN));
+    }
+
+    /**
+     * Returns the user password for authentification.
+     *
+     * @return string
+     */
+    private function getUserPassword(): string
+    {
+        return $this->config->get($this->getConfigKey(ConfigKeys::AUTH_PASSWORD));
+    }
+
+    /**
+     * Returns the value for the transaction mode (which is the environment).
+     *
+     * @return string
+     */
+    private function getEnvironment(): string
+    {
+        $transactionMode = $this->config->get($this->getConfigKey(ConfigKeys::ENVIRONMENT));
+
+        if ($transactionMode == '0') {
+            return TransactionMode::CONNECTOR_TEST;
+        }
+
+        return TransactionMode::LIVE;
+    }
+
+    /**
+     * @param string $paymentMethod
+     *
+     * @return string
+     */
+    private function getTransactionChannel(string $paymentMethod): string
+    {
+        return $this->config->get($this->getChannelIdKey($paymentMethod));
     }
 
     /**
@@ -176,13 +237,15 @@ class PaymentHelper
     /**
      * Returns the payment method config key for the 'Channel-ID' configuration.
      *
-     * @param AbstractPaymentMethod $paymentMethod
+     * @param string $paymentMethod
      *
      * @return string
      */
-    public function getChannelIdKey(AbstractPaymentMethod $paymentMethod): string
+    public function getChannelIdKey(string $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::CHANNEL_ID);
+        $paymentMethodKey = static::$paymentMethods[$paymentMethod][static::ARRAY_KEY_CONFIG_KEY];
+
+        return $this->getConfigKey($paymentMethodKey . '.' . ConfigKeys::CHANNEL_ID);
     }
 
     /**

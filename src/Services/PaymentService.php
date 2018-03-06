@@ -3,11 +3,13 @@
 namespace Heidelpay\Services;
 
 use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Methods\PayPalPaymentMethod;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
+use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
 
@@ -99,29 +101,58 @@ class PaymentService
         return $this->returnType;
     }
 
-    public function executePayment(Basket $basket, $paymentMethod, $transactionType)
+    /**
+     * @param string $type
+     */
+    private function setReturnType(string $type)
     {
-        $this->prepareRequest($basket);
-        // TODO: send the request
-    }
-
-    public function getPaymentMethodContent(Basket $basket): string
-    {
-        return '';
+        $this->returnType = $type;
     }
 
     /**
      * @param Basket $basket
+     * @param $paymentMethod
+     *
+     * @return string
      */
-    private function prepareRequest(Basket $basket)
+    public function executePayment(Basket $basket, $paymentMethod): string
+    {
+        $returnValue = '';
+        $this->prepareRequest($basket, $paymentMethod);
+
+        // todo: determine transaction type and payment method by $paymentMethod
+        if ($paymentMethod == PayPalPaymentMethod::class) {
+            $this->heidelpayRequest['PAYMENT.CODE'] = 'VA.DB';
+            $this->heidelpayRequest['ACCOUNT.BRAND'] = 'PAYPAL';
+        }
+
+        $response = $this->libService->sendPayPalTransactionRequest($this->heidelpayRequest);
+
+        if (isset($response['exceptionCode'])) {
+            $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
+            $returnValue = $response['exceptionMsg'];
+        } else {
+            $returnValue = $response['FRONTEND.REDIRECT_URL'];
+            $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
+        }
+
+        return $returnValue;
+    }
+
+    public function getPaymentMethodContent(string $paymentMethod): string
+    {
+        return '<h1>Test - ' . $paymentMethod . '</h1>';
+    }
+
+    /**
+     * @param Basket $basket
+     * @param string $paymentMethod
+     */
+    private function prepareRequest(Basket $basket, string $paymentMethod)
     {
         // set authentification data
-        $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig();
+        $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($paymentMethod);
         $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
-
-        // TODO: get channel by payment method and transaction mode (LIVE/TEST).
-        $this->heidelpayRequest['TRANSACTION.MODE'] = 'CONNECTOR_TEST';
-        $this->heidelpayRequest['TRANSACTION.CHANNEL'] = '1234ABCD';
 
         // set customer personal information & address data
         $addresses = $this->getCustomerAddressData($basket);
@@ -153,7 +184,6 @@ class PaymentService
         }
 
         // TODO: Riskinformation for future payment methods
-
     }
 
     /**

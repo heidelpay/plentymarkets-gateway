@@ -21,7 +21,7 @@ use Plenty\Plugin\ConfigRepository;
  *
  * @package heidelpay\plentymarkets-gateway\payment-methods
  */
-abstract class AbstractPaymentMethod extends PaymentMethodService
+abstract class AbstractMethod extends PaymentMethodService implements PaymentMethodContract
 {
     const CONFIG_KEY = 'abstract';
     const DEFAULT_NAME = 'Abstract Payment Method';
@@ -43,7 +43,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     protected $basketRepository;
 
     /**
-     * AbstractPaymentMethod constructor.
+     * AbstractMethod constructor.
      *
      * @param PaymentHelper          $paymentHelper
      * @param ConfigRepository         $configRepository
@@ -60,10 +60,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Returns if the payment method is active
-     * and can be used by the customer.
-     *
-     * @return bool
+     * @inheritdoc
      */
     public function isActive(): bool
     {
@@ -89,9 +86,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Returns if the payment method can be used for Express Checkout.
-     *
-     * @return bool
+     * @inheritdoc
      */
     public function isExpressCheckout(): bool
     {
@@ -99,9 +94,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Returns a fee amount for this payment method.
-     *
-     * @return float
+     * @inheritdoc
      */
     public function getFee(): float
     {
@@ -109,9 +102,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Returns if the payment method can be selected.
-     *
-     * @return bool
+     * @inheritdoc
      */
     public function isSelectable(): bool
     {
@@ -119,10 +110,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Determines if the customer can switch to this payment method
-     * in his 'My account' area after an order has been placed.
-     *
-     * @return bool
+     * @inheritdoc
      */
     public function isSwitchableTo(): bool
     {
@@ -130,10 +118,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Determines if the customer can switch from this payment method
-     * in his 'My account' area after an order has been placed.
-     *
-     * @return bool
+     * @inheritdoc
      */
     public function isSwitchableFrom(): bool
     {
@@ -141,9 +126,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Returns the config key for the payment method.
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getConfigKey(): string
     {
@@ -151,9 +134,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Returns a default display name for the payment method.
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getDefaultName(): string
     {
@@ -161,9 +142,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Returns the key for the payment method.
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getMethodKey(): string
     {
@@ -171,19 +150,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Returns the config key for the payment method (static).
-     *
-     * @return string
-     */
-    public static function getPaymentMethodConfigKey(): string
-    {
-        return static::CONFIG_KEY;
-    }
-
-    /**
-     * Returns the default display name for the payment method (static).
-     *
-     * @return string
+     * @inheritdoc
      */
     public static function getPaymentMethodDefaultName(): string
     {
@@ -191,9 +158,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Returns the key for the payment method (static).
-     *
-     * @return string
+     * @inheritdoc
      */
     public static function getPaymentMethodKey(): string
     {
@@ -201,9 +166,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Returns the configured payment method display name.
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -211,9 +174,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Returns the configured icon logo, if logo usage is enabled for this payment method.
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getIcon(): string
     {
@@ -221,9 +182,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * Returns the configured payment method description
-     *
-     * @return string
+     * @inheritdoc
      */
     public function getDescription(): string
     {

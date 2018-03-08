@@ -3,7 +3,7 @@
 namespace Heidelpay\Providers;
 
 use Heidelpay\Helper\PaymentHelper;
-use Heidelpay\Methods\PayPalPaymentMethod;
+use Heidelpay\Methods\PayPal;
 use Heidelpay\Services\PaymentService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
@@ -42,6 +42,16 @@ class HeidelpayServiceProvider extends ServiceProvider
         $this->getApplication()->register(HeidelpayRouteServiceProvider::class);
     }
 
+    /**
+     * Boot the heidelpay Service Prodiver
+     * Register payment methods, add event listeners, ...
+     *
+     * @param BasketRepositoryContract $basketRepository
+     * @param PaymentHelper            $paymentHelper
+     * @param PaymentMethodContainer   $paymentMethodContainer
+     * @param PaymentService           $paymentService
+     * @param Dispatcher               $eventDispatcher
+     */
     public function boot(
         BasketRepositoryContract $basketRepository,
         PaymentHelper $paymentHelper,
@@ -58,7 +68,7 @@ class HeidelpayServiceProvider extends ServiceProvider
             $paymentMethodContainer->register(
                 $paymentHelper->getPluginPaymentMethodKey($paymentMethodClass),
                 $paymentMethodClass,
-                $this->getPaymentMethodEventList()
+                $paymentHelper->getPaymentMethodEventList()
             );
 
             // listen for the event that gets the payment method content
@@ -70,27 +80,11 @@ class HeidelpayServiceProvider extends ServiceProvider
                     $paymentService,
                     $paymentMethodClass
                 ) {
-                    $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.debug', [
-                        'paymentMethod' => $paymentMethodClass,
-                        'event' => GetPaymentMethodContent::class,
-                    ]);
-
-                    $this->getLogger(__METHOD__)->error('heidelpay_gateway::serviceprovider.debug', [
-                        'paymentMethod' => $paymentMethodClass,
-                        'event' => GetPaymentMethodContent::class,
-                    ]);
-                    /*
-                    if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPalPaymentMethod::class)) {
-                        $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.debug', [
-                            'event' => 'Enter paypal tree.'
-                        ]);
-                        $event->setType(GetPaymentMethodContent::RETURN_TYPE_CONTINUE)
-                            ->setValue($paymentService->getPaymentMethodContent($paymentMethodClass));
+                    if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPal::class)) {
+                        $basket = $basketRepository->load();
+                        $event->setValue($paymentService->getPaymentMethodContent($paymentMethodClass, $basket));
+                        $event->setType($paymentService->getReturnType());
                     }
-                    */
-
-                    $event->setType(GetPaymentMethodContent::RETURN_TYPE_HTML)
-                        ->setValue('<h1>Test ' . $paymentMethodClass . '</h1>');
                 }
             );
 
@@ -103,7 +97,7 @@ class HeidelpayServiceProvider extends ServiceProvider
                     $paymentService,
                     $paymentMethodClass
                 ) {
-                    if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPalPaymentMethod::class)) {
+                    if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPal::class)) {
                         $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.debug', [
                             'paymentMethod' => $paymentMethodClass,
                             'event' => GetPaymentMethodContent::class,
@@ -117,21 +111,5 @@ class HeidelpayServiceProvider extends ServiceProvider
                 }
             );
         }
-    }
-
-    /**
-     * Returns a list of events that should be observed.
-     *
-     * @return array
-     */
-    public function getPaymentMethodEventList(): array
-    {
-        return [
-            AfterBasketChanged::class,
-            AfterBasketItemAdd::class,
-            AfterBasketCreate::class,
-            FrontendLanguageChanged::class,
-            FrontendShippingCountryChanged::class,
-        ];
     }
 }

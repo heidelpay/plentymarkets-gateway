@@ -14,7 +14,7 @@ namespace Heidelpay\Methods;
  *
  * @package heidelpay\plentymarkets-gateway\payment-methods
  */
-class CreditCardPaymentMethod extends AbstractPaymentMethod
+class CreditCard extends AbstractMethod
 {
     const CONFIG_KEY = 'creditcard';
     const KEY = 'CREDIT_CARD';

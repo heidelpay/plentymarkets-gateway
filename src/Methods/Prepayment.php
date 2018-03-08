@@ -3,7 +3,7 @@
 namespace Heidelpay\Methods;
 
 /**
- * heidelpay Sofort. Payment Method
+ * heidelpay Prepayment Payment Method
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
@@ -14,9 +14,9 @@ namespace Heidelpay\Methods;
  *
  * @package heidelpay\plentymarkets-gateway\payment-methods
  */
-class SofortPaymentMethod extends AbstractPaymentMethod
+class Prepayment extends AbstractMethod
 {
-    const CONFIG_KEY = 'sofort';
-    const KEY = 'SOFORT';
-    const DEFAULT_NAME = 'Sofort.';
+    const CONFIG_KEY = 'prepayment';
+    const KEY = 'PREPAYMENT';
+    const DEFAULT_NAME = 'Prepayment';
 }

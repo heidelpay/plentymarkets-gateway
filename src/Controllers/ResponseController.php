@@ -2,9 +2,10 @@
 
 namespace Heidelpay\Controllers;
 
-use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
+use Heidelpay\Services\PaymentService;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
+use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -31,20 +32,27 @@ class ResponseController extends Controller
     private $request;
 
     /**
-     * @var LibraryCallContract $libCall
+     * @var Response
      */
-    private $libCaller;
+    private $response;
+
+    /**
+     * @var PaymentService
+     */
+    private $paymentService;
 
     /**
      * ResponseController constructor.
      *
-     * @param Request             $request
-     * @param LibraryCallContract $libCall
+     * @param Request        $request
+     * @param Response       $response
+     * @param PaymentService $paymentService
      */
-    public function __construct(Request $request, LibraryCallContract $libCall)
+    public function __construct(Request $request, Response $response, PaymentService $paymentService)
     {
         $this->request = $request;
-        $this->libCaller = $libCall;
+        $this->response = $response;
+        $this->paymentService = $paymentService;
     }
 
     /**
@@ -57,9 +65,22 @@ class ResponseController extends Controller
         $this->getLogger(__METHOD__)->info('Heidelpay::response.received');
 
         /** @var array $response */
-        $response = $this->libCaller->call(
-            'Heidelpay::payment_api_responsehandler',
-            [$this->request->all()]
-        );
+        $response = $this->paymentService->handleAsyncPaymentResponse($this->request->all());
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function checkoutSuccess(): \Symfony\Component\HttpFoundation\Response
+    {
+        return $this->response->redirectTo('place-order');
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function checkoutCancel(): \Symfony\Component\HttpFoundation\Response
+    {
+        return $this->response->redirectTo('place-order');
     }
 }

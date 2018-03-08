@@ -3,7 +3,10 @@
 namespace Heidelpay\Services;
 
 use Heidelpay\Helper\PaymentHelper;
-use Heidelpay\Methods\PayPalPaymentMethod;
+use Heidelpay\Methods\CreditCard;
+use Heidelpay\Methods\PayPal;
+use Heidelpay\Methods\Prepayment;
+use Heidelpay\Methods\Sofort;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Models\Basket;
@@ -121,7 +124,7 @@ class PaymentService
         $this->prepareRequest($basket, $paymentMethod);
 
         // todo: determine transaction type and payment method by $paymentMethod
-        if ($paymentMethod === PayPalPaymentMethod::class) {
+        if ($paymentMethod === PayPal::class) {
             $this->heidelpayRequest['PAYMENT.CODE'] = 'VA.DB';
             $this->heidelpayRequest['ACCOUNT.BRAND'] = 'PAYPAL';
         }
@@ -139,9 +142,33 @@ class PaymentService
         return $returnValue;
     }
 
-    public function getPaymentMethodContent(string $paymentMethod): string
+    public function getPaymentMethodContent(string $paymentMethod, Basket $basket): string
     {
-        return '<h1>Test - ' . $paymentMethod . '</h1>';
+        $returnValue = '';
+
+        switch ($paymentMethod) {
+            case CreditCard::class:
+                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_EXTERNAL_CONTENT_URL);
+                $returnValue = '';
+                break;
+
+            case PayPal::class:
+            case Sofort::class:
+                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
+                $this->executePayment($basket, $paymentMethod);
+                break;
+
+            case Prepayment::class:
+                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_CONTINUE);
+                break;
+
+            default:
+                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
+                $returnValue = 'Internal Error. Please try again later.';
+                break;
+        }
+
+        return $returnValue;
     }
 
     /**
@@ -185,6 +212,18 @@ class PaymentService
         }
 
         // TODO: Riskinformation for future payment methods
+    }
+
+    /**
+     * Handles the asynchronous response coming from the heidelpay API.
+     *
+     * @param array $post
+     *
+     * @return array
+     */
+    public function handleAsyncPaymentResponse(array $post): array
+    {
+        return $this->libService->handleResponse($post);
     }
 
     /**

@@ -14,17 +14,9 @@ namespace Heidelpay\Methods;
  *
  * @package heidelpay\plentymarkets-gateway\payment-methods
  */
-class PayPalPaymentMethod extends AbstractPaymentMethod
+class PayPal extends AbstractMethod
 {
     const CONFIG_KEY = 'paypal';
     const KEY = 'PAYPAL';
     const DEFAULT_NAME = 'PayPal';
-
-    /**
-     * @inheritdoc
-     */
-    public function isSelectable(): bool
-    {
-        return true;
-    }
 }

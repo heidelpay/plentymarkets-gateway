@@ -1,5 +1,7 @@
 {
   "name": "Heidelpay",
+  "namespace": "Heidelpay",
+  "serviceProvider": "Heidelpay\\Providers\\HeidelpayServiceProvider",
   "marketplaceName": {
     "de": "heidelpay Payment Gateway",
     "en": "heidelpay Payment Gateway"
@@ -18,8 +20,6 @@
   "authorIcon": "icon_author_xs.png",
   "email": "development@heidelpay.com",
   "type": "payment",
-  "namespace": "Heidelpay",
-  "serviceProvider": "Heidelpay\\Providers\\HeidelpayServiceProvider",
   "dependencies": {
     "heidelpay/php-basket-api": "^1.0.0",
     "heidelpay/php-payment-api": "^1.4.0"

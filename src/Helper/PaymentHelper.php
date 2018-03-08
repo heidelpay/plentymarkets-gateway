@@ -231,7 +231,7 @@ class PaymentHelper
      */
     public function getMinAmount(AbstractPaymentMethod $paymentMethod): float
     {
-        return (float) $this->config->get($this->getMinAmountKey($paymentMethod));
+        return (float) str_replace(',', '.', $this->config->get($this->getMinAmountKey($paymentMethod)));
     }
 
     /**
@@ -243,7 +243,7 @@ class PaymentHelper
      */
     public function getMaxAmount(AbstractPaymentMethod $paymentMethod): float
     {
-        return (float) $this->config->get($this->getMaxAmountKey($paymentMethod));
+        return (float) str_replace(',', '.', $this->config->get($this->getMaxAmountKey($paymentMethod)));
     }
 
     /**

@@ -70,19 +70,18 @@ class HeidelpayServiceProvider extends ServiceProvider
                     $paymentService,
                     $paymentMethodClass
                 ) {
-                    /*
-                    if ($event->getMop() === $paymentHelper->getPaymentMethodId($paymentMethodClass)) {
-                        $event->setValue('');
-                        $event->setType(GetPaymentMethodContent::RETURN_TYPE_CONTINUE);
-                    }
-                    */
-                    $this->getLogger(__METHOD__)->info('Heidelpay::serviceprovider.debug', [
+                    $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.debug', [
+                        'paymentMethod' => $paymentMethodClass,
+                        'event' => GetPaymentMethodContent::class,
+                    ]);
+
+                    $this->getLogger(__METHOD__)->error('heidelpay_gateway::serviceprovider.debug', [
                         'paymentMethod' => $paymentMethodClass,
                         'event' => GetPaymentMethodContent::class,
                     ]);
 
                     if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPalPaymentMethod::class)) {
-                        $this->getLogger(__METHOD__)->info('Heidelpay::serviceprovider.debug', [
+                        $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.debug', [
                             'event' => 'Enter paypal tree.'
                         ]);
                         $event->setType(GetPaymentMethodContent::RETURN_TYPE_CONTINUE)

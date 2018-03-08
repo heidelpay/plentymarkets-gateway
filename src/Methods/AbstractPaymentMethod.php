@@ -236,8 +236,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
         $useIcon = $this->configRepository->get($this->helper->getUseIconKey($this));
         $this->getLogger(__METHOD__)->debug('Heidelpay::service_provider.debug', [
             'method' => static::class,
-            'useIcon' => $useIcon,
-            'type' => \gettype($useIcon)
+            'useIcon' => $useIcon
         ]);
         if ($useIcon == false) {
             return '';

@@ -99,7 +99,7 @@ class PaymentHelper
     public function createMopIfNotExists(string $paymentMethodClass)
     {
         if ($this->getPaymentMethodId($paymentMethodClass) === self::NO_PAYMENTMETHOD_FOUND) {
-            $this->getLogger(__METHOD__)->info('Heidelpay::service_provider.method_not_found', [
+            $this->getLogger(__METHOD__)->info('Heidelpay::serviceprovider.methodNotFound', [
                 'paymentMethod' => $this->getPaymentMethodDefaultName($paymentMethodClass)
             ]);
 

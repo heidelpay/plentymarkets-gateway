@@ -56,7 +56,7 @@ class HeidelpayServiceProvider extends ServiceProvider
         foreach ($paymentHelper::getPaymentMethods() as $paymentMethodClass) {
             $paymentHelper->createMopIfNotExists($paymentMethodClass);
 
-            $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.register_method', [
+            $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.registerMethod', [
                 'paymentMethod' => $paymentHelper->getPaymentMethodDefaultName($paymentMethodClass)
             ]);
 

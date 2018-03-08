@@ -49,16 +49,10 @@ class HeidelpayServiceProvider extends ServiceProvider
         PaymentService $paymentService,
         Dispatcher $eventDispatcher
     ) {
-        $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.booting');
-
         // loop through all of the plugin's available payment methods
         /** @var string $paymentMethodClass */
         foreach ($paymentHelper::getPaymentMethods() as $paymentMethodClass) {
             $paymentHelper->createMopIfNotExists($paymentMethodClass);
-
-            $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.registerMethod', [
-                'paymentMethod' => $paymentHelper->getPaymentMethodDefaultName($paymentMethodClass)
-            ]);
 
             // register the payment method in the payment method container
             $paymentMethodContainer->register(
@@ -82,7 +76,15 @@ class HeidelpayServiceProvider extends ServiceProvider
                         $event->setType(GetPaymentMethodContent::RETURN_TYPE_CONTINUE);
                     }
                     */
+                    $this->getLogger(__METHOD__)->info('Heidelpay::serviceprovider.debug', [
+                        'paymentMethod' => $paymentMethodClass,
+                        'event' => GetPaymentMethodContent::class,
+                    ]);
+
                     if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPalPaymentMethod::class)) {
+                        $this->getLogger(__METHOD__)->info('Heidelpay::serviceprovider.debug', [
+                            'event' => 'Enter paypal tree.'
+                        ]);
                         $event->setType(GetPaymentMethodContent::RETURN_TYPE_CONTINUE)
                             ->setValue($paymentService->getPaymentMethodContent($paymentMethodClass));
                     }
@@ -99,6 +101,11 @@ class HeidelpayServiceProvider extends ServiceProvider
                     $paymentMethodClass
                 ) {
                     if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPalPaymentMethod::class)) {
+                        $this->getLogger(__METHOD__)->info('Heidelpay::serviceprovider.debug', [
+                            'paymentMethod' => $paymentMethodClass,
+                            'event' => GetPaymentMethodContent::class,
+                        ]);
+
                         $basket = $basketRepository->load();
 
                         $event->setValue($paymentService->executePayment($basket, $paymentMethodClass));

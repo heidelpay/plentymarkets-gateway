@@ -75,7 +75,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
 
         // return false if this method is not configured as active.
         $isActive = $this->configRepository->get($this->helper->getIsActiveKey($this));
-        $this->getLogger(__METHOD__)->debug('Heidelpay::service_provider.debug', [
+        $this->getLogger(__METHOD__)->error('Heidelpay::service_provider.debug', [
             'method' => static::class,
             'isActive' => $isActive
         ]);
@@ -86,7 +86,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
         // check the configured minimum cart amount and return false if an amount is configured
         // (which means > 0.00) and the cart amount is below the configured value.
         $minAmount = $this->configRepository->get($this->helper->getMinAmountKey($this));
-        $this->getLogger(__METHOD__)->debug('Heidelpay::service_provider.debug', [
+        $this->getLogger(__METHOD__)->error('Heidelpay::service_provider.debug', [
             'method' => static::class,
             'minAmount' => $minAmount
         ]);
@@ -97,7 +97,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
         // check the configured maximum cart amount and return false if an amount is configured
         // (which means > 0.00) and the cart amount is above the configured value.
         $maxAmount = $this->configRepository->get($this->helper->getMaxAmountKey($this));
-        $this->getLogger(__METHOD__)->debug('Heidelpay::service_provider.debug', [
+        $this->getLogger(__METHOD__)->error('Heidelpay::service_provider.debug', [
             'method' => static::class,
             'maxAmount' => $maxAmount
         ]);
@@ -234,7 +234,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
     public function getIcon(): string
     {
         $useIcon = $this->configRepository->get($this->helper->getUseIconKey($this));
-        $this->getLogger(__METHOD__)->debug('Heidelpay::service_provider.debug', [
+        $this->getLogger(__METHOD__)->error('Heidelpay::service_provider.debug', [
             'method' => static::class,
             'useIcon' => $useIcon
         ]);

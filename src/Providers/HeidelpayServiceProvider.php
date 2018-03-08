@@ -49,14 +49,14 @@ class HeidelpayServiceProvider extends ServiceProvider
         PaymentService $paymentService,
         Dispatcher $eventDispatcher
     ) {
-        $this->getLogger(__METHOD__)->debug('Heidelpay::service_provider.booting');
+        $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.booting');
 
         // loop through all of the plugin's available payment methods
         /** @var string $paymentMethodClass */
         foreach ($paymentHelper::getPaymentMethods() as $paymentMethodClass) {
             $paymentHelper->createMopIfNotExists($paymentMethodClass);
 
-            $this->getLogger(__METHOD__)->info('Heidelpay::service_provider.register_method', [
+            $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.register_method', [
                 'paymentMethod' => $paymentHelper->getPaymentMethodDefaultName($paymentMethodClass)
             ]);
 

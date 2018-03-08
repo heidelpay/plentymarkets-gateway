@@ -70,14 +70,18 @@ class HeidelpayServiceProvider extends ServiceProvider
             // listen for the event that gets the payment method content
             $eventDispatcher->listen(
                 GetPaymentMethodContent::class,
-                function (GetPaymentMethodContent $event) use ($basketRepository, $paymentHelper, $paymentService, $paymentMethodClass) {
+                function (GetPaymentMethodContent $event) use (
+                    $basketRepository,
+                    $paymentHelper,
+                    $paymentService,
+                    $paymentMethodClass
+                ) {
                     /*
                     if ($event->getMop() === $paymentHelper->getPaymentMethodId($paymentMethodClass)) {
                         $event->setValue('');
                         $event->setType(GetPaymentMethodContent::RETURN_TYPE_CONTINUE);
                     }
                     */
-
                     if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPalPaymentMethod::class)) {
                         $event->setType(GetPaymentMethodContent::RETURN_TYPE_CONTINUE)
                             ->setValue($paymentService->getPaymentMethodContent($paymentMethodClass));
@@ -88,7 +92,12 @@ class HeidelpayServiceProvider extends ServiceProvider
             // listen for the event that executes the payment
             $eventDispatcher->listen(
                 ExecutePayment::class,
-                function (ExecutePayment $event) use ($basketRepository, $paymentHelper, $paymentService, $paymentMethodClass) {
+                function (ExecutePayment $event) use (
+                    $basketRepository,
+                    $paymentHelper,
+                    $paymentService,
+                    $paymentMethodClass
+                ) {
                     if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPalPaymentMethod::class)) {
                         $basket = $basketRepository->load();
 

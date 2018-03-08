@@ -8,6 +8,7 @@ use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Plugin\ConfigRepository;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Abstract Payment Method Class
@@ -23,6 +24,8 @@ use Plenty\Plugin\ConfigRepository;
  */
 abstract class AbstractPaymentMethod extends PaymentMethodService
 {
+    use Loggable;
+
     const CONFIG_KEY = 'abstract';
     const DEFAULT_NAME = 'Abstract Payment Method';
     const KEY = 'ABSTRACT';
@@ -71,13 +74,24 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
         $basket = $this->basketRepository->load();
 
         // return false if this method is not configured as active.
-        if ($this->configRepository->get($this->helper->getIsActiveKey($this)) == false) {
+        $isActive = $this->configRepository->get($this->helper->getIsActiveKey($this));
+        $this->getLogger(__METHOD__)->debug('Heidelpay::service_provider.debug', [
+            'method' => static::class,
+            'isActive' => $isActive,
+            'type' => \gettype($isActive)
+        ]);
+        if ($isActive == false) {
             return false;
         }
 
         // check the configured minimum cart amount and return false if an amount is configured
         // (which means > 0.00) and the cart amount is below the configured value.
         $minAmount = $this->configRepository->get($this->helper->getMinAmountKey($this));
+        $this->getLogger(__METHOD__)->debug('Heidelpay::service_provider.debug', [
+            'method' => static::class,
+            'minAmount' => $minAmount,
+            'type' => \gettype($minAmount)
+        ]);
         if ($minAmount !== null && $minAmount > 0.00 && $basket->basketAmount < $minAmount) {
             return false;
         }
@@ -85,6 +99,11 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
         // check the configured maximum cart amount and return false if an amount is configured
         // (which means > 0.00) and the cart amount is above the configured value.
         $maxAmount = $this->configRepository->get($this->helper->getMaxAmountKey($this));
+        $this->getLogger(__METHOD__)->debug('Heidelpay::service_provider.debug', [
+            'method' => static::class,
+            'maxAmount' => $maxAmount,
+            'type' => \gettype($maxAmount)
+        ]);
         return !($maxAmount !== null && $maxAmount > 0.00 && $basket->basketAmount > $maxAmount);
     }
 
@@ -115,8 +134,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
      */
     public function isSelectable(): bool
     {
-        // TODO: this is a test. set to true as default!
-        return false;
+        return true;
     }
 
     /**
@@ -218,7 +236,13 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
      */
     public function getIcon(): string
     {
-        if ($this->configRepository->get($this->helper->getUseIconKey($this)) == false) {
+        $useIcon = $this->configRepository->get($this->helper->getUseIconKey($this));
+        $this->getLogger(__METHOD__)->debug('Heidelpay::service_provider.debug', [
+            'method' => static::class,
+            'useIcon' => $useIcon,
+            'type' => \gettype($useIcon)
+        ]);
+        if ($useIcon == false) {
             return '';
         }
 

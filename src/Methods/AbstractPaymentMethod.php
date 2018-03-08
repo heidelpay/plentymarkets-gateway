@@ -91,7 +91,6 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
         $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.debug', [
             'method' => static::class,
             'minAmount' => $minAmount,
-            'isFloat' => \is_float($minAmount) ? 'yes' : 'no',
             'isString' => \is_string($minAmount) ? 'yes' : 'no',
         ]);
         if ($minAmount !== null && $minAmount > 0.00 && $basket->basketAmount < $minAmount) {

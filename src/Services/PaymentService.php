@@ -121,7 +121,7 @@ class PaymentService
         $this->prepareRequest($basket, $paymentMethod);
 
         // todo: determine transaction type and payment method by $paymentMethod
-        if ($paymentMethod == PayPalPaymentMethod::class) {
+        if ($paymentMethod === PayPalPaymentMethod::class) {
             $this->heidelpayRequest['PAYMENT.CODE'] = 'VA.DB';
             $this->heidelpayRequest['ACCOUNT.BRAND'] = 'PAYPAL';
         }
@@ -164,10 +164,11 @@ class PaymentService
         $this->heidelpayRequest['ADDRESS.ZIP'] = $addresses['billing']->postalCode;
         $this->heidelpayRequest['ADDRESS.CITY'] = $addresses['billing']->town;
         $this->heidelpayRequest['ADDRESS.COUNTRY'] = $this->countryRepository->findIsoCode(
-            $addresses['billing']->countryId, 'isoCode2'
+            $addresses['billing']->countryId,
+            'isoCode2'
         );
 
-        if (isset($addresses['billing']->companyName)) {
+        if ($addresses['billing']->companyName !== null) {
             $this->heidelpayRequest['NAME.COMPANY'] = $addresses['billing']->companyName;
         }
 
@@ -178,7 +179,7 @@ class PaymentService
 
         // TODO: Secure information for B2C payment methods
         if (false) {
-            $this->heidelpayRequest['NAME.SALUTATION'] = $addresses['billing']->gender == 'male' ? 'MR' : 'MRS';
+            $this->heidelpayRequest['NAME.SALUTATION'] = $addresses['billing']->gender === 'male' ? 'MR' : 'MRS';
             $this->heidelpayRequest['NAME.BIRTHDATE'] = $addresses['billing']->birthday;
             $this->heidelpayRequest['BASKET.ID'] = $this->getBasketId($basket, $heidelpayAuth);
         }

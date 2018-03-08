@@ -77,8 +77,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
         $isActive = $this->configRepository->get($this->helper->getIsActiveKey($this));
         $this->getLogger(__METHOD__)->debug('Heidelpay::service_provider.debug', [
             'method' => static::class,
-            'isActive' => $isActive,
-            'type' => \gettype($isActive)
+            'isActive' => $isActive
         ]);
         if ($isActive == false) {
             return false;
@@ -89,8 +88,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
         $minAmount = $this->configRepository->get($this->helper->getMinAmountKey($this));
         $this->getLogger(__METHOD__)->debug('Heidelpay::service_provider.debug', [
             'method' => static::class,
-            'minAmount' => $minAmount,
-            'type' => \gettype($minAmount)
+            'minAmount' => $minAmount
         ]);
         if ($minAmount !== null && $minAmount > 0.00 && $basket->basketAmount < $minAmount) {
             return false;
@@ -101,8 +99,7 @@ abstract class AbstractPaymentMethod extends PaymentMethodService
         $maxAmount = $this->configRepository->get($this->helper->getMaxAmountKey($this));
         $this->getLogger(__METHOD__)->debug('Heidelpay::service_provider.debug', [
             'method' => static::class,
-            'maxAmount' => $maxAmount,
-            'type' => \gettype($maxAmount)
+            'maxAmount' => $maxAmount
         ]);
         return !($maxAmount !== null && $maxAmount > 0.00 && $basket->basketAmount > $maxAmount);
     }

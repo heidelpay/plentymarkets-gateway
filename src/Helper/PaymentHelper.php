@@ -46,7 +46,7 @@ class PaymentHelper
     const NO_DEFAULT_NAME_FOUND = 'no_default_name_found';
     const NO_KEY_FOUND = 'no_key_found';
 
-    const NO_PAYMENTMETHOD_FOUND = 'no_paymentmethod_found';
+    const NO_PAYMENTMETHOD_FOUND = 0;
 
     /**
      * @var ConfigRepository
@@ -106,10 +106,6 @@ class PaymentHelper
     public function createMopIfNotExists(string $paymentMethodClass)
     {
         if ($this->getPaymentMethodId($paymentMethodClass) === self::NO_PAYMENTMETHOD_FOUND) {
-            $this->getLogger(__METHOD__)->info('Heidelpay::serviceprovider.methodNotFound', [
-                'paymentMethod' => $this->getPaymentMethodDefaultName($paymentMethodClass)
-            ]);
-
             $paymentMethodData = [
                 'pluginKey' => Plugin::KEY,
                 'paymentKey' => $this->getPaymentMethodKey($paymentMethodClass),
@@ -125,9 +121,9 @@ class PaymentHelper
      *
      * @param string $paymentMethodClass
      *
-     * @return string
+     * @return int
      */
-    public function getPaymentMethodId(string $paymentMethodClass): string
+    public function getPaymentMethodId(string $paymentMethodClass): int
     {
         $paymentMethods = $this->paymentMethodRepository->allForPlugin(Plugin::KEY);
 

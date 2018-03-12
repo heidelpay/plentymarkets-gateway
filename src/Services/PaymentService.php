@@ -16,6 +16,7 @@ use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * heidelpay Payment Service class
@@ -31,6 +32,8 @@ use Plenty\Plugin\ConfigRepository;
  */
 class PaymentService
 {
+    use Loggable;
+
     /**
      * @var string
      */
@@ -110,6 +113,10 @@ class PaymentService
      */
     private function setReturnType(string $type)
     {
+        $this->getLogger(__METHOD__)->error('Setting return type', [
+            'type' => $type
+        ]);
+
         $this->returnType = $type;
     }
 
@@ -146,10 +153,14 @@ class PaymentService
     {
         $this->prepareRequest($basket, $paymentMethod);
 
-        return $this->libService->sendTransactionRequest($paymentMethod, [
+        $result = $this->libService->sendTransactionRequest($paymentMethod, [
             'request' => $this->heidelpayRequest,
             'transactionType' => TransactionType::AUTHORIZE // TODO: change depending on payment method & step.
         ]);
+
+        $this->getLogger(__METHOD__)->error('GetPaymentMethodContent result', $result);
+
+        return $result;
     }
 
     /**
@@ -173,6 +184,7 @@ class PaymentService
 
             case PayPal::class:
             case Sofort::class:
+                $this->getLogger(__METHOD__)->error('PayPal/Sofort case');
                 $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
                 $result = $this->sendGetPaymentMethodContentRequest($basket, $paymentMethod);
                 break;
@@ -193,6 +205,8 @@ class PaymentService
         ], true)) {
             return $result;
         }
+
+        $this->getLogger(__METHOD__)->error('getPaymentMethodContent result', [$result]);
 
         if (\is_array($result)) {
             // return the exception message, if present.
@@ -269,6 +283,8 @@ class PaymentService
             $this->heidelpayRequest['NAME.BIRTHDATE'] = $addresses['billing']->birthday;
             $this->heidelpayRequest['BASKET.ID'] = $this->getBasketId($basket, $heidelpayAuth);
         }
+
+        $this->getLogger(__METHOD__)->error('prepareRequest', $this->heidelpayRequest);
 
         // TODO: Riskinformation for future payment methods
     }

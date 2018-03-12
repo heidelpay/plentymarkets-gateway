@@ -135,17 +135,10 @@ class PaymentHelper
             /** @var PaymentMethod $payMethod */
             foreach ($paymentMethods as $payMethod) {
                 if ($payMethod->paymentKey === $this->getPaymentMethodKey($paymentMethodClass)) {
-                    $this->getLogger(__METHOD__)->error('heidelpay::serviceprovider.debug', [
-                        'methodID' => $payMethod->id
-                    ]);
                     return $payMethod->id;
                 }
             }
         }
-
-        $this->getLogger(__METHOD__)->error('heidelpay::serviceprovider.debug', [
-            'methodID' => self::NO_PAYMENTMETHOD_FOUND
-        ]);
 
         return self::NO_PAYMENTMETHOD_FOUND;
     }

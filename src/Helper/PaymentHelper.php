@@ -370,7 +370,7 @@ class PaymentHelper
      */
     public function getMethodDescriptionType(PaymentMethodContract $paymentMethod): string
     {
-        return $this->config->get($this->getDescriptionTypeKey($paymentMethod));
+        return $this->config->get($this->getDescriptionTypeKey($paymentMethod)) ?? DescriptionTypes::NONE;
     }
 
     /**

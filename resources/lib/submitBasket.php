@@ -44,6 +44,6 @@ $response = $request->addNewBasket();
 
 return [
     'basketId' => $response->getBasketId(),
-    'result' => $response->getResult(),
+    'isSuccess' => $response->isSuccess(),
     'resultMsg' => $response->printMessage()
 ];

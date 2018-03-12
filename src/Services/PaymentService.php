@@ -2,6 +2,7 @@
 
 namespace Heidelpay\Services;
 
+use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\PayPal;
@@ -120,16 +121,9 @@ class PaymentService
      */
     public function executePayment(Basket $basket, $paymentMethod): string
     {
-        $returnValue = '';
         $this->prepareRequest($basket, $paymentMethod);
 
-        // todo: determine transaction type and payment method by $paymentMethod
-        if ($paymentMethod === PayPal::class) {
-            $this->heidelpayRequest['PAYMENT.CODE'] = 'VA.DB';
-            $this->heidelpayRequest['ACCOUNT.BRAND'] = 'PAYPAL';
-        }
-
-        $response = $this->libService->sendPayPalTransactionRequest($this->heidelpayRequest);
+        $response = $this->libService->sendTransactionRequest($paymentMethod, $this->heidelpayRequest);
 
         if (isset($response['exceptionCode'])) {
             $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
@@ -142,20 +136,45 @@ class PaymentService
         return $returnValue;
     }
 
+    /**
+     * @param Basket $basket
+     * @param string $paymentMethod
+     *
+     * @return array
+     */
+    private function sendGetPaymentMethodContentRequest(Basket $basket, string $paymentMethod): array
+    {
+        $this->prepareRequest($basket, $paymentMethod);
+
+        return $this->libService->sendTransactionRequest($paymentMethod, [
+            'request' => $this->heidelpayRequest,
+            'transactionType' => TransactionType::AUTHORIZE // TODO: change depending on payment method & step.
+        ]);
+    }
+
+    /**
+     * Depending on the given payment method, return some information
+     * (or just continue) regarding the payment method.
+     *
+     * @param string $paymentMethod
+     * @param Basket $basket
+     *
+     * @return string
+     */
     public function getPaymentMethodContent(string $paymentMethod, Basket $basket): string
     {
-        $returnValue = '';
+        $result = '';
 
         switch ($paymentMethod) {
             case CreditCard::class:
                 $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_EXTERNAL_CONTENT_URL);
-                $returnValue = '';
+                $result = $this->sendGetPaymentMethodContentRequest($basket, $paymentMethod);
                 break;
 
             case PayPal::class:
             case Sofort::class:
                 $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
-                $this->executePayment($basket, $paymentMethod);
+                $result = $this->sendGetPaymentMethodContentRequest($basket, $paymentMethod);
                 break;
 
             case Prepayment::class:
@@ -164,11 +183,46 @@ class PaymentService
 
             default:
                 $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
-                $returnValue = 'Internal Error. Please try again later.';
+                $result = 'Internal Error. Please try again later.';
                 break;
         }
 
-        return $returnValue;
+        if (\in_array($this->getReturnType(), [
+            GetPaymentMethodContent::RETURN_TYPE_ERROR,
+            GetPaymentMethodContent::RETURN_TYPE_CONTINUE
+        ], true)) {
+            return $result;
+        }
+
+        if (\is_array($result)) {
+            // return the exception message, if present.
+            if (isset($result['exceptionCode'])) {
+                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
+                return $result['exceptionMsg'];
+            }
+
+            // return the iFrame url, if present.
+            if ($this->getReturnType() === GetPaymentMethodContent::RETURN_TYPE_EXTERNAL_CONTENT_URL) {
+                if (!$result['isSuccess']) {
+                    $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
+                    return $result['PROCESSING_REASON'];
+                }
+
+                return $result['FRONTEND_PAYMENT_FRAME_URL'];
+            }
+
+            // return the redirect url, if present.
+            if ($this->getReturnType() === GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL) {
+                if (!$result['isSuccess']) {
+                    $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
+                    return $result['PROCESSING_REASON'];
+                }
+
+                return $result['FRONTEND_REDIRECT_URL'];
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -203,6 +257,11 @@ class PaymentService
         $this->heidelpayRequest['PRESENTATION.AMOUNT'] = $basket->basketAmount;
         $this->heidelpayRequest['PRESENTATION.CURRENCY'] = $basket->currency;
         $this->heidelpayRequest['IDENTIFICATION.TRANSACTIONID'] = $basket->orderId;
+
+        // TODO: receive frontend language somehow.
+        $this->heidelpayRequest['FRONTEND.ENABLED'] = 'TRUE';
+        $this->heidelpayRequest['FRONTEND.LANGUAGE'] = 'DE';
+        $this->heidelpayRequest['FRONTEND.RESPONSE_URL'] = $this->paymentHelper->getDomain() . '/heidelpay/response';
 
         // TODO: Secure information for B2C payment methods
         if (false) {

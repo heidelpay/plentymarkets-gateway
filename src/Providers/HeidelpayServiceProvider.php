@@ -100,7 +100,7 @@ class HeidelpayServiceProvider extends ServiceProvider
                     if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPal::class)) {
                         $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.debug', [
                             'paymentMethod' => $paymentMethodClass,
-                            'event' => GetPaymentMethodContent::class,
+                            'event' => ExecutePayment::class,
                         ]);
 
                         $basket = $basketRepository->load();

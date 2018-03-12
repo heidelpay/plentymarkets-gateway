@@ -18,17 +18,17 @@ use Heidelpay\PhpPaymentApi\Request;
 $requestParams = SdkRestApi::getParam('request');
 $transactionType = SdkRestApi::getParam('transactionType');
 
-$payPalPaymentMethod = new \Heidelpay\PhpPaymentApi\PaymentMethods\PayPalPaymentMethod();
-$payPalPaymentMethod->setRequest(Request::fromPost($requestParams));
+$sofortPaymentMethod = new \Heidelpay\PhpPaymentApi\PaymentMethods\SofortPaymentMethod();
+$sofortPaymentMethod->setRequest(Request::fromPost($requestParams));
 
 $responseArray = null;
 
 try {
-    if (!is_callable([$payPalPaymentMethod, $transactionType])) {
-        throw new \Exception('Invalid transaction type for PayPal payment method (' . $transactionType . ')!');
+    if (!is_callable([$sofortPaymentMethod, $transactionType])) {
+        throw new \Exception('Invalid transaction type for Sofort payment method (' . $transactionType . ')!');
     }
 
-    $response = $payPalPaymentMethod->{$transactionType}();
+    $response = $sofortPaymentMethod->{$transactionType}();
 } catch (\Exception $e) {
     $responseArray = [
         'exceptionCode' => $e->getCode(),
@@ -38,8 +38,8 @@ try {
 }
 
 return $responseArray ?? [
-    'response' => $payPalPaymentMethod->getResponse()->toArray(),
-    'isSuccess' => $payPalPaymentMethod->getResponse()->isSuccess(),
-    'isPending' => $payPalPaymentMethod->getResponse()->isPending(),
-    'isError' => $payPalPaymentMethod->getResponse()->isError()
+    'response' => $sofortPaymentMethod->getResponse()->toArray(),
+    'isSuccess' => $sofortPaymentMethod->getResponse()->isSuccess(),
+    'isPending' => $sofortPaymentMethod->getResponse()->isPending(),
+    'isError' => $sofortPaymentMethod->getResponse()->isError()
 ];

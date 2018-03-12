@@ -19,14 +19,19 @@ use Plenty\Plugin\Routing\Router;
  */
 class HeidelpayRouteServiceProvider extends RouteServiceProvider
 {
+    /**
+     * Register mappings for the routes.
+     *
+     * @param Router $router
+     */
     public function map(Router $router)
     {
         // heidelpay Payment API responses
         $router->get('heidelpay/response', 'Heidelpay\Controllers\ResponseController@emergencyRedirect');
         $router->post('heidelpay/response', 'Heidelpay\Controllers\ResponseController@processResponse');
 
-        // Get the PayPal success and cancellation URLs
-        $router->get('payment/heidelpay/checkoutSuccess', 'Heidelpay\Controllers\ResponseController@checkoutSuccess');
-        $router->get('payment/heidelpay/checkoutCancel', 'Heidelpay\Controllers\ResponseController@checkoutCancel');
+        // redirects in success or cancellation/failure cases
+        $router->get('heidelpay/checkoutSuccess', 'Heidelpay\Controllers\ResponseController@checkoutSuccess');
+        $router->get('heidelpay/checkoutCancel', 'Heidelpay\Controllers\ResponseController@checkoutCancel');
     }
 }

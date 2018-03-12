@@ -70,71 +70,50 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $paymentMethodClass,
                 $paymentHelper->getPaymentMethodEventList()
             );
-
-            // listen for the event that gets the payment method content
-            $eventDispatcher->listen(
-                GetPaymentMethodContent::class,
-                function (GetPaymentMethodContent $event) use (
-                    $basketRepository,
-                    $paymentHelper,
-                    $paymentService,
-                    $paymentMethodClass
-                ) {
-                    $this->getLogger(__METHOD__)->error('heidelpay::serviceprovider.debug', [
-                        'event' => GetPaymentMethodContent::class,
-                        'eventMop' => $event->getMop(),
-                        'methodId' => $paymentHelper->getPaymentMethodId($paymentMethodClass),
-                        'paypalMethodId' => $paymentHelper->getPaymentMethodId(PayPal::class),
-                        'paymentMethod' => $paymentMethodClass
-                    ]);
-
-                    if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPal::class)) {
-                        $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.debug', [
-                            'paymentMethod' => $paymentMethodClass,
-                            'event' => GetPaymentMethodContent::class,
-                        ]);
-
-                        $basket = $basketRepository->load();
-                        $event->setValue($paymentService->getPaymentMethodContent($paymentMethodClass, $basket));
-                        $event->setType($paymentService->getReturnType());
-                    }
-                }
-            );
-
-            // listen for the event that executes the payment
-            $eventDispatcher->listen(
-                ExecutePayment::class,
-                function (ExecutePayment $event) use (
-                    $basketRepository,
-                    $paymentHelper,
-                    $paymentService,
-                    $paymentMethodClass
-                ) {
-                    $this->getLogger(__METHOD__)->error('heidelpay::serviceprovider.debug', [
-                        'event' => ExecutePayment::class,
-                        'eventMop' => $event->getMop(),
-                        'methodId' => $paymentHelper->getPaymentMethodId($paymentMethodClass),
-                        'paypalMethodId' => $paymentHelper->getPaymentMethodId(PayPal::class),
-                        'paymentMethod' => $paymentMethodClass
-                    ]);
-
-                    $this->getLogger(__METHOD__)->error('Heidelpay::serviceprodiver.debug', [
-                        'isPayPalId' => $event->getMop() === $paymentHelper->getPaymentMethodId(PayPal::class)
-                    ]);
-
-                    if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPal::class)) {
-                        $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.debug', [
-                            'paymentMethod' => $paymentMethodClass,
-                            'event' => ExecutePayment::class,
-                        ]);
-
-                        $basket = $basketRepository->load();
-
-                        $event->setValue($paymentService->executePayment($basket, $paymentMethodClass));
-                        $event->setType($paymentService->getReturnType());
-                    }
-                }
-            );
         }
+
+        // listen for the event that gets the payment method content
+        $eventDispatcher->listen(
+            GetPaymentMethodContent::class,
+            function (GetPaymentMethodContent $event) use (
+                $basketRepository,
+                $paymentHelper,
+                $paymentService
+            ) {
+                if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPal::class)) {
+                    $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.debug', [
+                        'paymentMethod' => PayPal::class,
+                        'event' => GetPaymentMethodContent::class,
+                    ]);
+
+                    $basket = $basketRepository->load();
+                    $event->setValue($paymentService->getPaymentMethodContent(PayPal::class, $basket));
+                    $event->setType($paymentService->getReturnType());
+                }
+            }
+        );
+
+        // listen for the event that executes the payment
+        $eventDispatcher->listen(
+            ExecutePayment::class,
+            function (ExecutePayment $event) use (
+                $basketRepository,
+                $paymentHelper,
+                $paymentService,
+                $paymentMethodClass
+            ) {
+                if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPal::class)) {
+                    $this->getLogger(__METHOD__)->error('Heidelpay::serviceprovider.debug', [
+                        'paymentMethod' => $paymentMethodClass,
+                        'event' => ExecutePayment::class,
+                    ]);
+
+                    $basket = $basketRepository->load();
+
+                    $event->setValue($paymentService->executePayment($basket, $paymentMethodClass));
+                    $event->setType($paymentService->getReturnType());
+                }
+            }
+        );
     }
 }

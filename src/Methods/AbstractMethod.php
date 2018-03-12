@@ -2,7 +2,6 @@
 
 namespace Heidelpay\Methods;
 
-use Heidelpay\Constants\DescriptionTypes;
 use Heidelpay\Helper\PaymentHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
@@ -33,11 +32,6 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     protected $helper;
 
     /**
-     * @var ConfigRepository $configRepository
-     */
-    protected $configRepository;
-
-    /**
      * @var BasketRepositoryContract $basketRepository
      */
     protected $basketRepository;
@@ -46,16 +40,13 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      * AbstractMethod constructor.
      *
      * @param PaymentHelper          $paymentHelper
-     * @param ConfigRepository         $configRepository
      * @param BasketRepositoryContract $basketRepositoryContract
      */
     public function __construct(
         PaymentHelper $paymentHelper,
-        ConfigRepository $configRepository,
         BasketRepositoryContract $basketRepositoryContract
     ) {
         $this->helper = $paymentHelper;
-        $this->configRepository = $configRepository;
         $this->basketRepository = $basketRepositoryContract;
     }
 
@@ -170,7 +161,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function getName(): string
     {
-        return $this->configRepository->get($this->helper->getDisplayNameKey($this)) ?: $this->getDefaultName();
+        return $this->helper->getPaymentMethodName($this) ?: $this->getDefaultName();
     }
 
     /**
@@ -186,17 +177,6 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function getDescription(): string
     {
-        $descriptionType = $this->configRepository->get($this->helper->getDescriptionTypeKey($this));
-
-        if ($descriptionType === DescriptionTypes::INTERNAL) {
-            return $this->configRepository->get($this->helper->getDescriptionKey($this, true));
-        }
-
-        if ($descriptionType === DescriptionTypes::EXTERNAL) {
-            return $this->configRepository->get($this->helper->getDescriptionKey($this));
-        }
-
-        // in case of DescriptionTypes::NONE
-        return '';
+        return $this->helper->getMethodDescription($this);
     }
 }

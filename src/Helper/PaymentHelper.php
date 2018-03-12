@@ -3,6 +3,7 @@
 namespace Heidelpay\Helper;
 
 use Heidelpay\Constants\ConfigKeys;
+use Heidelpay\Constants\DescriptionTypes;
 use Heidelpay\Constants\Plugin;
 use Heidelpay\Constants\TransactionMode;
 use Heidelpay\Methods\CreditCard;
@@ -143,6 +144,68 @@ class PaymentHelper
     }
 
     /**
+     * Returns the payment method key ('plugin_name::payment_key')
+     *
+     * @param string $paymentMethodClass
+     *
+     * @return string
+     */
+    public function getPluginPaymentMethodKey(string $paymentMethodClass): string
+    {
+        return Plugin::KEY . '::' . $this->getPaymentMethodKey($paymentMethodClass);
+    }
+
+    /**
+     * Returns the available payment methods and their helper strings (config-key, payment-key, default name).
+     *
+     * @return string[]
+     */
+    public static function getPaymentMethods(): array
+    {
+        return array_keys(static::$paymentMethods);
+    }
+
+    /**
+     * Gets a certain key from a given payment method in the helper string array.
+     *
+     * @param string $paymentMethodClass
+     * @param string $key
+     *
+     * @return string
+     */
+    public function getPaymentMethodString(string $paymentMethodClass, string $key): string
+    {
+        return static::$paymentMethods[$paymentMethodClass][$key] ?? null;
+    }
+
+    /**
+     * Returns a list of events that should be observed.
+     *
+     * @return array
+     */
+    public function getPaymentMethodEventList(): array
+    {
+        return [
+            AfterBasketChanged::class,
+            AfterBasketItemAdd::class,
+            AfterBasketCreate::class,
+            FrontendLanguageChanged::class,
+            FrontendShippingCountryChanged::class,
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getDomain(): string
+    {
+        /** @var WebstoreHelper $webstoreHelper */
+        $webstoreHelper = pluginApp(WebstoreHelper::class);
+
+        return $webstoreHelper->getCurrentWebstoreConfiguration()->domainSsl;
+    }
+
+    /**
      * Returns the heidelpay authentication data (senderId, login, password, environment) as array.
      *
      * @param string $paymentMethod
@@ -229,6 +292,16 @@ class PaymentHelper
     }
 
     /**
+     * @param PaymentMethodContract $paymentMethod
+     *
+     * @return string
+     */
+    public function getPaymentMethodName(PaymentMethodContract $paymentMethod): string
+    {
+        return $this->config->get($this->getDisplayNameKey($paymentMethod));
+    }
+
+    /**
      * Returns the configured minimum amount for the given payment method.
      *
      * @param PaymentMethodContract $paymentMethod
@@ -270,15 +343,48 @@ class PaymentHelper
     }
 
     /**
-     * Returns the payment method key ('plugin_name::payment_key')
-     *
-     * @param string $paymentMethodClass
+     * @param PaymentMethodContract $paymentMethod
      *
      * @return string
      */
-    public function getPluginPaymentMethodKey(string $paymentMethodClass): string
+    public function getMethodDescription(PaymentMethodContract $paymentMethod): string
     {
-        return Plugin::KEY . '::' . $this->getPaymentMethodKey($paymentMethodClass);
+        $type = $this->getMethodDescriptionType($paymentMethod);
+
+        if ($type === DescriptionTypes::INTERNAL) {
+            return $this->config->get($this->getDescriptionKey($paymentMethod, true));
+        }
+
+        if ($type === DescriptionTypes::EXTERNAL) {
+            return $this->config->get($this->getDescriptionKey($paymentMethod));
+        }
+
+        // in case of DescriptionTypes::NONE
+        return '';
+    }
+
+    /**
+     * @param PaymentMethodContract $paymentMethod
+     *
+     * @return string
+     */
+    public function getMethodDescriptionType(PaymentMethodContract $paymentMethod): string
+    {
+        return $this->config->get($this->getDescriptionTypeKey($paymentMethod));
+    }
+
+    /**
+     * @param string $paymentMethod
+     *
+     * @return string
+     */
+    protected function getPaymentMethodDefaultName(string $paymentMethod): string
+    {
+        $prefix = Plugin::NAME . ' - ';
+        $name = static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_DEFAULT_NAME]
+            ?? self::NO_DEFAULT_NAME_FOUND;
+
+        return $prefix . $name;
     }
 
     /**
@@ -288,7 +394,7 @@ class PaymentHelper
      *
      * @return string
      */
-    public function getConfigKey(string $key): string
+    protected function getConfigKey(string $key): string
     {
         return Plugin::NAME . '.' . $key;
     }
@@ -300,7 +406,7 @@ class PaymentHelper
      *
      * @return string
      */
-    public function getChannelIdKey(string $paymentMethod): string
+    protected function getChannelIdKey(string $paymentMethod): string
     {
         $paymentMethodKey = static::$paymentMethods[$paymentMethod][static::ARRAY_KEY_CONFIG_KEY];
 
@@ -314,7 +420,7 @@ class PaymentHelper
      *
      * @return string
      */
-    public function getDisplayNameKey(PaymentMethodContract $paymentMethod): string
+    protected function getDisplayNameKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DISPLAY_NAME);
     }
@@ -326,7 +432,7 @@ class PaymentHelper
      *
      * @return string
      */
-    public function getDescriptionTypeKey(PaymentMethodContract $paymentMethod): string
+    protected function getDescriptionTypeKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_TYPE);
     }
@@ -339,7 +445,7 @@ class PaymentHelper
      *
      * @return string
      */
-    public function getDescriptionKey(PaymentMethodContract $paymentMethod, bool $isInternal = false): string
+    protected function getDescriptionKey(PaymentMethodContract $paymentMethod, bool $isInternal = false): string
     {
         if (!$isInternal) {
             return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_EXTERNAL);
@@ -355,7 +461,7 @@ class PaymentHelper
      *
      * @return string
      */
-    private function getIsActiveKey(PaymentMethodContract $paymentMethod): string
+    protected function getIsActiveKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::IS_ACTIVE);
     }
@@ -367,7 +473,7 @@ class PaymentHelper
      *
      * @return string
      */
-    private function getMinAmountKey(PaymentMethodContract $paymentMethod): string
+    protected function getMinAmountKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::MIN_AMOUNT);
     }
@@ -379,7 +485,7 @@ class PaymentHelper
      *
      * @return string
      */
-    private function getMaxAmountKey(PaymentMethodContract $paymentMethod): string
+    protected function getMaxAmountKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::MAX_AMOUNT);
     }
@@ -391,7 +497,7 @@ class PaymentHelper
      *
      * @return string
      */
-    private function getUseIconKey(PaymentMethodContract $paymentMethod): string
+    protected function getUseIconKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::LOGO_USE);
     }
@@ -403,7 +509,7 @@ class PaymentHelper
      *
      * @return string
      */
-    private function getIconUrlKey(PaymentMethodContract $paymentMethod): string
+    protected function getIconUrlKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::LOGO_URL);
     }
@@ -413,72 +519,8 @@ class PaymentHelper
      *
      * @return string
      */
-    public function getPaymentMethodDefaultName(string $paymentMethod): string
-    {
-        $prefix = Plugin::NAME . ' - ';
-        $name = static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_DEFAULT_NAME]
-            ?? self::NO_DEFAULT_NAME_FOUND;
-
-        return $prefix . $name;
-    }
-
-    /**
-     * @param string $paymentMethod
-     *
-     * @return string
-     */
-    public function getPaymentMethodKey(string $paymentMethod): string
+    protected function getPaymentMethodKey(string $paymentMethod): string
     {
         return static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_KEY] ?? self::NO_KEY_FOUND;
-    }
-
-    /**
-     * Returns the available payment methods and their helper strings (config-key, payment-key, default name).
-     *
-     * @return string[]
-     */
-    public static function getPaymentMethods(): array
-    {
-        return array_keys(static::$paymentMethods);
-    }
-
-    /**
-     * Gets a certain key from a given payment method in the helper string array.
-     *
-     * @param string $paymentMethodClass
-     * @param string $key
-     *
-     * @return string
-     */
-    public function getPaymentMethodString(string $paymentMethodClass, string $key): string
-    {
-        return static::$paymentMethods[$paymentMethodClass][$key] ?? null;
-    }
-
-    /**
-     * Returns a list of events that should be observed.
-     *
-     * @return array
-     */
-    public function getPaymentMethodEventList(): array
-    {
-        return [
-            AfterBasketChanged::class,
-            AfterBasketItemAdd::class,
-            AfterBasketCreate::class,
-            FrontendLanguageChanged::class,
-            FrontendShippingCountryChanged::class,
-        ];
-    }
-
-    /**
-     * @return string
-     */
-    public function getDomain(): string
-    {
-        /** @var WebstoreHelper $webstoreHelper */
-        $webstoreHelper = pluginApp(WebstoreHelper::class);
-
-        return $webstoreHelper->getCurrentWebstoreConfiguration()->domainSsl;
     }
 }

@@ -46,7 +46,7 @@ class PaymentHelper
     const NO_DEFAULT_NAME_FOUND = 'no_default_name_found';
     const NO_KEY_FOUND = 'no_key_found';
 
-    const NO_PAYMENTMETHOD_FOUND = 0;
+    const NO_PAYMENTMETHOD_FOUND = -1;
 
     /**
      * @var ConfigRepository

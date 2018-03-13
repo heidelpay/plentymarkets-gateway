@@ -1,5 +1,5 @@
 {
-  "name": "Heidelpay",
+  "name": "heidelpay",
   "namespace": "Heidelpay",
   "serviceProvider": "Heidelpay\\Providers\\HeidelpayServiceProvider",
   "marketplaceName": {

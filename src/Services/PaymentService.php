@@ -42,7 +42,7 @@ class PaymentService
     /**
      * @var array
      */
-    private $heidelpayRequest;
+    private $heidelpayRequest = [];
 
     /**
      * @var AddressRepositoryContract
@@ -244,7 +244,6 @@ class PaymentService
     {
         // set authentification data
         $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($paymentMethod);
-        $this->getLogger(__METHOD__)->error('auth config', $heidelpayAuth);
         $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
         $this->getLogger(__METHOD__)->error('request array after merge', $this->heidelpayRequest);
 

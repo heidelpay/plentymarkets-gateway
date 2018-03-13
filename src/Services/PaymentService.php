@@ -216,20 +216,20 @@ class PaymentService
             if ($this->getReturnType() === GetPaymentMethodContent::RETURN_TYPE_EXTERNAL_CONTENT_URL) {
                 if (!$result['isSuccess']) {
                     $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
-                    return $result['PROCESSING_REASON'];
+                    return $result['response']['PROCESSING_RETURN'];
                 }
 
-                return $result['FRONTEND_PAYMENT_FRAME_URL'];
+                return $result['response']['FRONTEND_PAYMENT_FRAME_URL'];
             }
 
             // return the redirect url, if present.
             if ($this->getReturnType() === GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL) {
                 if (!$result['isSuccess']) {
                     $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
-                    return $result['PROCESSING_REASON'];
+                    return $result['response']['PROCESSING_RETURN'];
                 }
 
-                return $result['FRONTEND_REDIRECT_URL'];
+                return $result['response']['FRONTEND_REDIRECT_URL'];
             }
         }
 
@@ -244,7 +244,9 @@ class PaymentService
     {
         // set authentification data
         $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($paymentMethod);
+        $this->getLogger(__METHOD__)->error('auth config', $heidelpayAuth);
         $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
+        $this->getLogger(__METHOD__)->error('request array after merge', $this->heidelpayRequest);
 
         // set customer personal information & address data
         $addresses = $this->getCustomerAddressData($basket);

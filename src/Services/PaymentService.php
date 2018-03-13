@@ -136,7 +136,7 @@ class PaymentService
             $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
             $returnValue = $response['exceptionMsg'];
         } else {
-            $returnValue = $response['FRONTEND.REDIRECT_URL'];
+            $returnValue = $response['FRONTEND_REDIRECT_URL'];
             $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
         }
 
@@ -267,18 +267,18 @@ class PaymentService
         // set basket information (amount, currency, orderId, ...)
         $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basket->basketAmount;
         $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basket->currency;
-        $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $basket->orderId;
+        $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $basket->id;
 
         // TODO: receive frontend language somehow.
-        $this->heidelpayRequest['FRONTEND.ENABLED'] = 'TRUE';
-        $this->heidelpayRequest['FRONTEND.LANGUAGE'] = 'DE';
-        $this->heidelpayRequest['FRONTEND.RESPONSE_URL'] = $this->paymentHelper->getDomain() . '/heidelpay/response';
+        $this->heidelpayRequest['FRONTEND_ENABLED'] = 'TRUE';
+        $this->heidelpayRequest['FRONTEND_LANGUAGE'] = 'DE';
+        $this->heidelpayRequest['FRONTEND_RESPONSE_URL'] = $this->paymentHelper->getDomain() . '/heidelpay/response';
 
         // TODO: Secure information for B2C payment methods
         if (false) {
-            $this->heidelpayRequest['NAME.SALUTATION'] = $addresses['billing']->gender === 'male' ? 'MR' : 'MRS';
-            $this->heidelpayRequest['NAME.BIRTHDATE'] = $addresses['billing']->birthday;
-            $this->heidelpayRequest['BASKET.ID'] = $this->getBasketId($basket, $heidelpayAuth);
+            $this->heidelpayRequest['NAME_SALUTATION'] = $addresses['billing']->gender === 'male' ? 'MR' : 'MRS';
+            $this->heidelpayRequest['NAME_BIRTHDATE'] = $addresses['billing']->birthday;
+            $this->heidelpayRequest['BASKET_ID'] = $this->getBasketId($basket, $heidelpayAuth);
         }
 
         $this->getLogger(__METHOD__)->error('prepareRequest', $this->heidelpayRequest);

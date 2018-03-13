@@ -3,15 +3,13 @@
 namespace Heidelpay\Controllers;
 
 use Heidelpay\Services\PaymentService;
-use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
-use Plenty\Plugin\Log\Loggable;
 
 /**
- * heidelpay Response Controller
+ * heidelpay Payment Controller
  *
- * Processes the transaction/payment responses coming from the heidelpay payment system.
+ * Handles general processes that are interactions with the customer.
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
@@ -20,12 +18,10 @@ use Plenty\Plugin\Log\Loggable;
  *
  * @author Stephano Vogel <development@heidelpay.com>
  *
- * @package heidelpay\plentymarkets-gateway\controllers
+ * @package heidelpay\plentymarkets-gateway
  */
-class ResponseController extends Controller
+class PaymentController
 {
-    use Loggable;
-
     /**
      * @var Request $request
      */
@@ -56,32 +52,18 @@ class ResponseController extends Controller
     }
 
     /**
-     * Processes the incoming POST response.
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function processResponse(): \Symfony\Component\HttpFoundation\Response
+    public function checkoutSuccess(): \Symfony\Component\HttpFoundation\Response
     {
-        $this->getLogger(__METHOD__)->debug('heidelpay::response.receivedResponse');
-
-        /** @var array $response */
-        $response = $this->paymentService->handleAsyncPaymentResponse($this->request->all());
-
-        // TODO: return to a success (or the default plentymarkets "after-create-order") page
         return $this->response->redirectTo('checkout');
     }
 
     /**
-     * When the processResponse cannot be accessed, or something went wrong during the process,
-     * the heidelpay API redirects to the processResponse url using GET instead of POST.
-     * This method is for handling this "emergency" behaviour.
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function emergencyRedirect(): \Symfony\Component\HttpFoundation\Response
+    public function checkoutCancel(): \Symfony\Component\HttpFoundation\Response
     {
-        $this->getLogger(__METHOD__)->warning('heidelpay::response.emergency');
-
         return $this->response->redirectTo('checkout');
     }
 }

@@ -60,7 +60,6 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
             return false;
         }
 
-        /** @var Basket $basket */
         $basket = $this->basketRepository->load();
 
         // check the configured minimum cart amount and return false if an amount is configured

@@ -17,4 +17,9 @@ use Heidelpay\PhpPaymentApi\Response as HeidelpayResponse;
 $response = HeidelpayResponse::fromPost(SdkRestApi::getParam('response'));
 
 /** @return array */
-return $response->toArray();
+return [
+    'response' => $response->toArray(),
+    'isSuccess' => $response->isSuccess(),
+    'isPending' => $response->isPending(),
+    'isError' => $response->isError(),
+];

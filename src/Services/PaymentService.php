@@ -282,6 +282,9 @@ class PaymentService
             $this->heidelpayRequest['BASKET_ID'] = $this->getBasketId($basket, $heidelpayAuth);
         }
 
+        // shop + module information
+        $this->heidelpayRequest['CRITERION_SHOP_TYPE'] = 'plentymarkets 7';
+
         $this->getLogger(__METHOD__)->error('prepareRequest', $this->heidelpayRequest);
 
         // TODO: Riskinformation for future payment methods

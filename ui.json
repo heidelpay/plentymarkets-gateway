@@ -1,6 +1,6 @@
 {
   "defaultEntryPoint": "index.html",
-  "namespace": "Heidelpay",
+  "namespace": "heidelpay",
   "icon": "icon-pay_heidelpay",
   "menuEntries": [
     {

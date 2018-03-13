@@ -130,7 +130,7 @@
     "key": "sofort.displayName",
     "label": "Anzeigename",
     "type": "text",
-    "default": "Vorkasse"
+    "default": "Sofort."
   },
   {
     "tab": "Sofort.",
@@ -166,7 +166,7 @@
     "key": "paypal.displayName",
     "label": "Anzeigename",
     "type": "text",
-    "default": "Vorkasse"
+    "default": "PayPal"
   },
   {
     "tab": "PayPal",

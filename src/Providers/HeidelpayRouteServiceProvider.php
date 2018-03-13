@@ -31,7 +31,7 @@ class HeidelpayRouteServiceProvider extends RouteServiceProvider
         $router->post('heidelpay/response', 'Heidelpay\Controllers\ResponseController@processResponse');
 
         // redirects in success or cancellation/failure cases
-        $router->get('heidelpay/checkoutSuccess', 'Heidelpay\Controllers\ResponseController@checkoutSuccess');
-        $router->get('heidelpay/checkoutCancel', 'Heidelpay\Controllers\ResponseController@checkoutCancel');
+        $router->get('heidelpay/checkoutSuccess', 'Heidelpay\Controllers\PaymentController@checkoutSuccess');
+        $router->get('heidelpay/checkoutCancel', 'Heidelpay\Controllers\PaymentController@checkoutCancel');
     }
 }

@@ -8,6 +8,7 @@ use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
 use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * heidelpay Lib Service class
@@ -23,6 +24,8 @@ use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
  */
 class LibService
 {
+    use Loggable;
+
     /**
      * @var LibraryCallContract
      */
@@ -150,6 +153,11 @@ class LibService
      */
     private function executeLibCall($libCall, array $params, $pluginName = Plugin::NAME): array
     {
+        $this->getLogger(__METHOD__)->error('LibService exec libCall', [
+            'libCall' => $libCall,
+            'pluginName' => $pluginName,
+            'fullName' => $pluginName . '::' . $libCall,
+        ]);
         return $this->libCall->call($pluginName . '::' . $libCall, $params);
     }
 }

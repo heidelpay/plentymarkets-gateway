@@ -216,20 +216,20 @@ class PaymentService
             if ($this->getReturnType() === GetPaymentMethodContent::RETURN_TYPE_EXTERNAL_CONTENT_URL) {
                 if (!$result['isSuccess']) {
                     $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
-                    return $result['response']['PROCESSING_RETURN'];
+                    return $result['response']['PROCESSING.RETURN'];
                 }
 
-                return $result['response']['FRONTEND_PAYMENT_FRAME_URL'];
+                return $result['response']['FRONTEND.PAYMENT_FRAME_URL'];
             }
 
             // return the redirect url, if present.
             if ($this->getReturnType() === GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL) {
                 if (!$result['isSuccess']) {
                     $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
-                    return $result['response']['PROCESSING_RETURN'];
+                    return $result['response']['PROCESSING.RETURN'];
                 }
 
-                return $result['response']['FRONTEND_REDIRECT_URL'];
+                return $result['response']['FRONTEND.REDIRECT_URL'];
             }
         }
 

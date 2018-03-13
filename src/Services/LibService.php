@@ -84,7 +84,7 @@ class LibService
      */
     protected function sendPayPalTransactionRequest(array $params): array
     {
-        return $this->executeLibCall('payPalTransactionRequest', $params);
+        return $this->executeLibCall('paypalTransactionRequest', $params);
     }
 
     /**
@@ -158,6 +158,18 @@ class LibService
             'pluginName' => $pluginName,
             'fullName' => $pluginName . '::' . $libCall,
         ]);
-        return $this->libCall->call($pluginName . '::' . $libCall, $params);
+
+        $result = $this->libCall->call($pluginName . '::' . $libCall, $params);
+
+        // if an exception/error occured when trying to call the external sdk,
+        // an object will be returned. convert it to an array to work with it.
+        if ($result->error ?? false) {
+            return [
+                'exceptionCode' => $result->error_no ?? 500,
+                'exceptionMsg' => $result->error_msg ?? 'Internal error',
+            ];
+        }
+
+        return $result;
     }
 }

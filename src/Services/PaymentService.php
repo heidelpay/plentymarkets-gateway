@@ -158,8 +158,6 @@ class PaymentService
             'transactionType' => TransactionType::AUTHORIZE // TODO: change depending on payment method & step.
         ]);
 
-        $this->getLogger(__METHOD__)->error('GetPaymentMethodContent result', $result);
-
         return $result;
     }
 
@@ -184,7 +182,6 @@ class PaymentService
 
             case PayPal::class:
             case Sofort::class:
-                $this->getLogger(__METHOD__)->error('PayPal/Sofort case');
                 $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
                 $result = $this->sendGetPaymentMethodContentRequest($basket, $paymentMethod);
                 break;

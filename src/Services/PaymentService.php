@@ -248,26 +248,26 @@ class PaymentService
 
         // set customer personal information & address data
         $addresses = $this->getCustomerAddressData($basket);
-        $this->heidelpayRequest['IDENTIFICATION.SHOPPERID'] = $basket->customerId;
-        $this->heidelpayRequest['NAME.GIVEN'] = $addresses['billing']->firstName;
-        $this->heidelpayRequest['NAME.FAMILY'] = $addresses['billing']->lastName;
-        $this->heidelpayRequest['CONTACT.EMAIL'] = $addresses['billing']->email;
-        $this->heidelpayRequest['ADDRESS.STREET'] = $this->getFullStreetAndHouseNumber($addresses['billing']);
-        $this->heidelpayRequest['ADDRESS.ZIP'] = $addresses['billing']->postalCode;
-        $this->heidelpayRequest['ADDRESS.CITY'] = $addresses['billing']->town;
-        $this->heidelpayRequest['ADDRESS.COUNTRY'] = $this->countryRepository->findIsoCode(
+        $this->heidelpayRequest['IDENTIFICATION_SHOPPERID'] = $basket->customerId;
+        $this->heidelpayRequest['NAME_GIVEN'] = $addresses['billing']->firstName;
+        $this->heidelpayRequest['NAME_FAMILY'] = $addresses['billing']->lastName;
+        $this->heidelpayRequest['CONTACT_EMAIL'] = $addresses['billing']->email;
+        $this->heidelpayRequest['ADDRESS_STREET'] = $this->getFullStreetAndHouseNumber($addresses['billing']);
+        $this->heidelpayRequest['ADDRESS_ZIP'] = $addresses['billing']->postalCode;
+        $this->heidelpayRequest['ADDRESS_CITY'] = $addresses['billing']->town;
+        $this->heidelpayRequest['ADDRESS_COUNTRY'] = $this->countryRepository->findIsoCode(
             $addresses['billing']->countryId,
             'isoCode2'
         );
 
         if ($addresses['billing']->companyName !== null) {
-            $this->heidelpayRequest['NAME.COMPANY'] = $addresses['billing']->companyName;
+            $this->heidelpayRequest['NAME_COMPANY'] = $addresses['billing']->companyName;
         }
 
         // set basket information (amount, currency, orderId, ...)
-        $this->heidelpayRequest['PRESENTATION.AMOUNT'] = $basket->basketAmount;
-        $this->heidelpayRequest['PRESENTATION.CURRENCY'] = $basket->currency;
-        $this->heidelpayRequest['IDENTIFICATION.TRANSACTIONID'] = $basket->orderId;
+        $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basket->basketAmount;
+        $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basket->currency;
+        $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $basket->orderId;
 
         // TODO: receive frontend language somehow.
         $this->heidelpayRequest['FRONTEND.ENABLED'] = 'TRUE';
@@ -310,9 +310,9 @@ class PaymentService
     {
         $params = [];
         $params['auth'] = [
-            'login' => $authData['USER.LOGIN'],
-            'password' => $authData['USER.PWD'],
-            'senderId' => $authData['SECURITY.SENDER'],
+            'login' => $authData['USER_LOGIN'],
+            'password' => $authData['USER_PWD'],
+            'senderId' => $authData['SECURITY_SENDER'],
         ];
         $params['basket'] = $basket->toArray();
 

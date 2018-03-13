@@ -211,11 +211,11 @@ class PaymentHelper
     public function getHeidelpayAuthenticationConfig(string $paymentMethod): array
     {
         return [
-            'SECURITY.SENDER' => $this->getSenderId(),
-            'TRANSACTION.CHANNEL' => $this->getTransactionChannel($paymentMethod),
-            'TRANSACTION.MODE' => $this->getEnvironment(),
-            'USER.LOGIN' => $this->getUserLogin(),
-            'USER.PWD' => $this->getUserPassword(),
+            'SECURITY_SENDER' => $this->getSenderId(),
+            'TRANSACTION_CHANNEL' => $this->getTransactionChannel($paymentMethod),
+            'TRANSACTION_MODE' => $this->getEnvironment(),
+            'USER_LOGIN' => $this->getUserLogin(),
+            'USER_PWD' => $this->getUserPassword(),
         ];
     }
 

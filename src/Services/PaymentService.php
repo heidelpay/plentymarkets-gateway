@@ -334,8 +334,14 @@ class PaymentService
     {
         $addresses = [];
         $addresses['billing'] = $this->addressRepository->findAddressById($basket->customerInvoiceAddressId);
-        $addresses['shipping'] = $this->addressRepository->findAddressById($basket->customerShippingAddressId);
 
+        // if the shipping address is -99, it is matching the billing address.
+        if ($basket->customerShippingAddressId === null || $basket->customerShippingAddressId === -99) {
+            $addresses['shipping'] = $addresses['billing'];
+            return $addresses;
+        }
+
+        $addresses['shipping'] = $this->addressRepository->findAddressById($basket->customerShippingAddressId);
         return $addresses;
     }
 

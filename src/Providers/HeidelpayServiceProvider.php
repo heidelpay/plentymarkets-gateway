@@ -3,6 +3,7 @@
 namespace Heidelpay\Providers;
 
 use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Services\PaymentService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
@@ -78,6 +79,12 @@ class HeidelpayServiceProvider extends ServiceProvider
                 if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPal::class)) {
                     $basket = $basketRepository->load();
                     $event->setValue($paymentService->getPaymentMethodContent(PayPal::class, $basket));
+                    $event->setType($paymentService->getReturnType());
+                }
+
+                if ($event->getMop() === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
+                    $basket = $basketRepository->load();
+                    $event->setValue($paymentService->getPaymentMethodContent(CreditCard::class, $basket));
                     $event->setType($paymentService->getReturnType());
                 }
             }

@@ -2,6 +2,7 @@
 
 namespace Heidelpay\Services;
 
+use Heidelpay\Constants\Plugin;
 use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\CreditCard;
@@ -284,6 +285,7 @@ class PaymentService
 
         // shop + module information
         $this->heidelpayRequest['CRITERION_SHOP_TYPE'] = 'plentymarkets 7';
+        $this->heidelpayRequest['CRITERION_SHOPMODULE_VERSION'] = Plugin::VERSION;
 
         $this->getLogger(__METHOD__)->error('prepareRequest', $this->heidelpayRequest);
 

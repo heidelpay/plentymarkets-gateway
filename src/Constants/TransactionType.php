@@ -12,7 +12,7 @@ namespace Heidelpay\Constants;
  *
  * @author Stephano Vogel <development@heidelpay.com>
  *
- * @package heidelpay\plentymarkets-gateway
+ * @package heidelpay\plentymarkets-gateway\constants
  */
 class TransactionType
 {

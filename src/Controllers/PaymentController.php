@@ -3,6 +3,7 @@
 namespace Heidelpay\Controllers;
 
 use Heidelpay\Services\PaymentService;
+use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
@@ -20,7 +21,7 @@ use Plenty\Plugin\Http\Response;
  *
  * @package heidelpay\plentymarkets-gateway
  */
-class PaymentController
+class PaymentController extends Controller
 {
     /**
      * @var Request $request

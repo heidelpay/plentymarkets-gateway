@@ -22,13 +22,18 @@ $creditCardPaymentMethod = new \Heidelpay\PhpPaymentApi\PaymentMethods\CreditCar
 $creditCardPaymentMethod->setRequest(Request::fromPost($requestParams));
 
 $responseArray = null;
+$refId = SdkRestApi::getParam('referenceId') ?: null;
 
 try {
     if (!is_callable([$creditCardPaymentMethod, $transactionType])) {
         throw new \Exception('Invalid transaction type for PayPal payment method (' . $transactionType . ')!');
     }
 
-    $response = $creditCardPaymentMethod->{$transactionType}();
+    if ($refId !== null) {
+        $response = $creditCardPaymentMethod->{$transactionType}($refId);
+    } else {
+        $response = $creditCardPaymentMethod->{$transactionType}();
+    }
 } catch (\Exception $e) {
     $responseArray = [
         'exceptionCode' => $e->getCode(),
@@ -37,6 +42,8 @@ try {
     ];
 }
 
+// return the responseArray, if an exception has been thrown.
+// else,
 return $responseArray ?? [
     'response' => $creditCardPaymentMethod->getResponse()->toArray(),
     'isSuccess' => $creditCardPaymentMethod->getResponse()->isSuccess(),

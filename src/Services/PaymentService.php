@@ -3,9 +3,12 @@
 namespace Heidelpay\Services;
 
 use Heidelpay\Constants\Plugin;
+use Heidelpay\Constants\Routes;
+use Heidelpay\Constants\Salutation;
 use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\CreditCard;
+use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
@@ -243,10 +246,15 @@ class PaymentService
      */
     private function prepareRequest(Basket $basket, string $paymentMethod)
     {
+        /** @var PaymentMethodContract $methodInstance */
+        $methodInstance = pluginApp($paymentMethod);
+        $this->getLogger(__METHOD__)->error('paymentMethod instance', [
+            $methodInstance
+        ]);
+
         // set authentification data
         $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($paymentMethod);
         $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
-        $this->getLogger(__METHOD__)->error('request array after merge', $this->heidelpayRequest);
 
         // set customer personal information & address data
         $addresses = $this->getCustomerAddressData($basket);
@@ -272,13 +280,24 @@ class PaymentService
         $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $basket->id;
 
         // TODO: receive frontend language somehow.
-        $this->heidelpayRequest['FRONTEND_ENABLED'] = 'TRUE';
+        $this->heidelpayRequest['FRONTEND_ENABLED'] = $this->paymentHelper->getFrontendEnabled($paymentMethod);
         $this->heidelpayRequest['FRONTEND_LANGUAGE'] = 'DE';
-        $this->heidelpayRequest['FRONTEND_RESPONSE_URL'] = $this->paymentHelper->getDomain() . '/heidelpay/response';
+        $this->heidelpayRequest['FRONTEND_RESPONSE_URL'] =
+            $this->paymentHelper->getDomain() . '/' . Routes::RESPONSE_URL;
+
+        // add the origin domain, which is important for the SOP
+        // set 'PREVENT_ASYNC_REDIRECT' to false, to ensure the customer is being redirected after submitting the form.
+        if ($paymentMethod === CreditCard::class) {
+            $this->heidelpayRequest['FRONTEND_PAYMENT_FRAME_ORIGIN'] = $this->paymentHelper->getDomain();
+            $this->heidelpayRequest['FRONTEND_PREVENT_ASYNC_REDIRECT'] = 'FALSE';
+        }
 
         // TODO: Secure information for B2C payment methods
         if (false) {
-            $this->heidelpayRequest['NAME_SALUTATION'] = $addresses['billing']->gender === 'male' ? 'MR' : 'MRS';
+            $this->heidelpayRequest['NAME_SALUTATION'] = $addresses['billing']->gender === 'male'
+                ? Salutation::MR
+                : Salutation::MRS;
+
             $this->heidelpayRequest['NAME_BIRTHDATE'] = $addresses['billing']->birthday;
             $this->heidelpayRequest['BASKET_ID'] = $this->getBasketId($basket, $heidelpayAuth);
         }
@@ -338,7 +357,7 @@ class PaymentService
         $addresses = [];
         $addresses['billing'] = $this->addressRepository->findAddressById($basket->customerInvoiceAddressId);
 
-        // if the shipping address is -99, it is matching the billing address.
+        // if the shipping address is -99 or null, it is matching the billing address.
         if ($basket->customerShippingAddressId === null || $basket->customerShippingAddressId === -99) {
             $addresses['shipping'] = $addresses['billing'];
             return $addresses;

@@ -202,6 +202,14 @@ class PaymentHelper
     }
 
     /**
+     * @param string $paymentMethod
+     */
+    public function getFrontendEnabled(string $paymentMethod): string
+    {
+        return 'TRUE';
+    }
+
+    /**
      * Returns the heidelpay authentication data (senderId, login, password, environment) as array.
      *
      * @param string $paymentMethod

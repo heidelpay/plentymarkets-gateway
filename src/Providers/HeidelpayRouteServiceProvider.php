@@ -2,6 +2,7 @@
 
 namespace Heidelpay\Providers;
 
+use Heidelpay\Constants\Routes;
 use Plenty\Plugin\RouteServiceProvider;
 use Plenty\Plugin\Routing\Router;
 
@@ -27,11 +28,11 @@ class HeidelpayRouteServiceProvider extends RouteServiceProvider
     public function map(Router $router)
     {
         // heidelpay Payment API responses
-        $router->get('heidelpay/response', 'Heidelpay\Controllers\ResponseController@emergencyRedirect');
-        $router->post('heidelpay/response', 'Heidelpay\Controllers\ResponseController@processResponse');
+        $router->get(Routes::RESPONSE_URL, 'Heidelpay\Controllers\ResponseController@emergencyRedirect');
+        $router->post(Routes::RESPONSE_URL, 'Heidelpay\Controllers\ResponseController@processResponse');
 
         // redirects in success or cancellation/failure cases
-        $router->get('heidelpay/checkoutSuccess', 'Heidelpay\Controllers\PaymentController@checkoutSuccess');
-        $router->get('heidelpay/checkoutCancel', 'Heidelpay\Controllers\PaymentController@checkoutCancel');
+        $router->get(Routes::CHECKOUT_SUCCESS, 'Heidelpay\Controllers\PaymentController@checkoutSuccess');
+        $router->get(Routes::CHECKOUT_CANCEL, 'Heidelpay\Controllers\PaymentController@checkoutCancel');
     }
 }

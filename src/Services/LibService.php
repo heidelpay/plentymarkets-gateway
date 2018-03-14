@@ -60,7 +60,7 @@ class LibService
      */
     protected function sendCreditCardTransactionRequest(array $params): array
     {
-        return $this->executeLibCall('creditCardTransactionRequest', $params);
+        return $this->executeLibCall('creditcardTransactionRequest', $params);
     }
 
     /**

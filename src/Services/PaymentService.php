@@ -289,7 +289,7 @@ class PaymentService
         // set 'PREVENT_ASYNC_REDIRECT' to false, to ensure the customer is being redirected after submitting the form.
         if ($paymentMethod === CreditCard::class) {
             $this->heidelpayRequest['FRONTEND_PAYMENT_FRAME_ORIGIN'] = $this->paymentHelper->getDomain();
-            $this->heidelpayRequest['FRONTEND_PREVENT_ASYNC_REDIRECT'] = 'FALSE';
+            $this->heidelpayRequest['FRONTEND_PREVENT_ASYNC_REDIRECT'] = 'false';
         }
 
         // TODO: Secure information for B2C payment methods

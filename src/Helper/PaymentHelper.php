@@ -206,7 +206,7 @@ class PaymentHelper
      */
     public function getFrontendEnabled(string $paymentMethod): string
     {
-        return 'TRUE';
+        return 'true';
     }
 
     /**

@@ -67,6 +67,8 @@ class ResponseController extends Controller
         /** @var array $response */
         $response = $this->paymentService->handleAsyncPaymentResponse($this->request->all());
 
+        $this->getLogger(__METHOD__)->error('response result', $response);
+
         // TODO: return to a success (or the default plentymarkets "after-create-order") page
         return $this->response->redirectTo('checkout');
     }

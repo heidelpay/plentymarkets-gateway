@@ -1,0 +1,47 @@
+<style>
+    #heidelpayForm {
+
+    }
+</style>
+
+<div id="heidelpayForm">
+    <iframe src="{{ paymentFormUrl }}" id="heidelpayIFrame"></iframe>
+    <button id="heidelpaySubmitBtn">
+        {{ trans('Ceres::Template.orderBuyNow') }}
+    </button>
+</div>
+
+<script type="text/javascript">
+    var paymentIFrame = document.getElementById('heidelpayIFrame');
+    var submitButton = document.getElementById('heidelpaySubmitBtn');
+    var targetOrigin = getIFrameDomain(paymentIFrame);
+
+    if (window.addEventListener) {
+        window.addEventListener('message', receiveResponse);
+        submitButton.addEventListener('click', submitIFrame);
+    } else if (window.attachEvent) {
+        window.attachEvent('onmessage', receiveResponse);
+        submitButton.attachEvent('onclick', submitIFrame);
+    }
+
+    function getIFrameDomain(elem) {
+        var url = elem.src.split("/");
+        return url[0] + "//" + url[2];
+    }
+
+    function receiveResponse(event) {
+        if (event.origin !== targetOrigin) {
+            return;
+        }
+
+        var responseContent = JSON.parse(event.data);
+        if (responseContent["POST.VALIDATION"] === "NOK") {
+            submitButton.disabled = false;
+        }
+    }
+
+    function submitIFrame() {
+        submitButton.disabled = true;
+        paymentIFrame.contentWindow.postMessage(null, targetOrigin);
+    }
+</script>

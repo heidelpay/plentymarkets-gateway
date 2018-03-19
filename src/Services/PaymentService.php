@@ -15,12 +15,18 @@ use Heidelpay\Methods\Sofort;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Models\Basket;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
+use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
+use Plenty\Modules\Payment\Models\Payment;
+use Plenty\Modules\Payment\Models\PaymentOrderRelation;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Log\Loggable;
+use Plenty\Plugin\Templates\Twig;
 
 /**
  * heidelpay Payment Service class
@@ -59,14 +65,19 @@ class PaymentService
     private $countryRepository;
 
     /**
-     * @var ConfigRepository
+     * @var OrderRepositoryContract
      */
-    private $configRepository;
+    private $orderRepository;
 
     /**
      * @var PaymentMethodRepositoryContract
      */
     private $paymentMethodRepository;
+
+    /**
+     * @var PaymentOrderRelationRepositoryContract
+     */
+    private $paymentOrderRelationRepository;
 
     /**
      * @var PaymentRepositoryContract
@@ -83,22 +94,46 @@ class PaymentService
      */
     private $libService;
 
+    /**
+     * @var Twig
+     */
+    private $twig;
+
+    /**
+     * PaymentService constructor.
+     *
+     * @param AddressRepositoryContract              $addressRepository
+     * @param CountryRepositoryContract              $countryRepository
+     * @param ConfigRepository                       $configRepository
+     * @param LibService                             $libraryService
+     * @param OrderRepositoryContract                $orderRepository
+     * @param PaymentMethodRepositoryContract        $paymentMethodRepository
+     * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository
+     * @param PaymentRepositoryContract              $paymentRepository
+     * @param PaymentHelper                          $paymentHelper
+     * @param Twig                                   $twig
+     */
     public function __construct(
         AddressRepositoryContract $addressRepository,
         CountryRepositoryContract $countryRepository,
         ConfigRepository $configRepository,
         LibService $libraryService,
+        OrderRepositoryContract $orderRepository,
         PaymentMethodRepositoryContract $paymentMethodRepository,
+        PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository,
         PaymentRepositoryContract $paymentRepository,
-        PaymentHelper $paymentHelper
+        PaymentHelper $paymentHelper,
+        Twig $twig
     ) {
         $this->addressRepository = $addressRepository;
         $this->countryRepository = $countryRepository;
-        $this->configRepository = $configRepository;
         $this->libService = $libraryService;
+        $this->orderRepository = $orderRepository;
         $this->paymentMethodRepository = $paymentMethodRepository;
+        $this->paymentOrderRelationRepository = $paymentOrderRelationRepository;
         $this->paymentRepository = $paymentRepository;
         $this->paymentHelper = $paymentHelper;
+        $this->twig = $twig;
     }
 
     /**
@@ -180,7 +215,7 @@ class PaymentService
 
         switch ($paymentMethod) {
             case CreditCard::class:
-                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_EXTERNAL_CONTENT_URL);
+                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_HTML);
                 $result = $this->sendGetPaymentMethodContentRequest($basket, $paymentMethod);
                 break;
 
@@ -224,6 +259,19 @@ class PaymentService
                 }
 
                 return $result['response']['FRONTEND.PAYMENT_FRAME_URL'];
+            }
+
+            // return rendered html content
+            if ($this->getReturnType() === GetPaymentMethodContent::RETURN_TYPE_HTML) {
+                if (!$result['isSuccess']) {
+                    $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
+                    return $result['response']['PROCESSING.RETURN'];
+                }
+
+                $urlKey = $paymentMethod === CreditCard::class ? 'PAYMENT_FRAME_URL' : 'REDIRECT_URL';
+                return $this->twig->render('heidelpay::externalCardForm', [
+                    'paymentFormUrl' => $result['response'][$urlKey]
+                ]);
             }
 
             // return the redirect url, if present.
@@ -285,7 +333,7 @@ class PaymentService
         $this->heidelpayRequest['FRONTEND_RESPONSE_URL'] =
             $this->paymentHelper->getDomain() . '/' . Routes::RESPONSE_URL;
 
-        // add the origin domain, which is important for the SOP
+        // add the origin domain, which is important for the CSP
         // set 'PREVENT_ASYNC_REDIRECT' to false, to ensure the customer is being redirected after submitting the form.
         if ($paymentMethod === CreditCard::class) {
             $this->heidelpayRequest['FRONTEND_PAYMENT_FRAME_ORIGIN'] = $this->paymentHelper->getDomain();
@@ -377,5 +425,26 @@ class PaymentService
     private function getFullStreetAndHouseNumber(Address $address): string
     {
         return $address->street . ' ' . $address->houseNumber;
+    }
+
+    /**
+     * Assigns a payment to an order.
+     *
+     * @param Payment $payment
+     * @param int     $orderId
+     *
+     * @return bool
+     */
+    public function assignPaymentToOrder(Payment $payment, int $orderId): bool
+    {
+        $order = $this->orderRepository->findOrderById($orderId);
+
+        if ($order instanceof Order) {
+            $paymentOrderRelation = $this->paymentOrderRelationRepository->createOrderRelation($payment, $order);
+
+            return $paymentOrderRelation instanceof PaymentOrderRelation;
+        }
+
+        return false;
     }
 }

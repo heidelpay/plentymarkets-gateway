@@ -268,7 +268,7 @@ class PaymentService
                     return $result['response']['PROCESSING.RETURN'];
                 }
 
-                $urlKey = $paymentMethod === CreditCard::class ? 'PAYMENT_FRAME_URL' : 'REDIRECT_URL';
+                $urlKey = $paymentMethod === CreditCard::class ? 'FRONTEND_PAYMENT_FRAME_URL' : 'FRONTEND_REDIRECT_URL';
                 return $this->twig->render('heidelpay::externalCardForm', [
                     'paymentFormUrl' => $result['response'][$urlKey]
                 ]);

@@ -302,9 +302,12 @@ class PaymentService
     {
         /** @var PaymentMethodContract $methodInstance */
         $methodInstance = pluginApp($paymentMethod);
+        $this->getLogger(__METHOD__)->error('paymentMethod instance', [
+            $methodInstance
+        ]);
 
         // set authentification data
-        $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($methodInstance);
+        $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($paymentMethod);
         $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
 
         // set customer personal information & address data
@@ -331,7 +334,7 @@ class PaymentService
         $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $basket->id;
 
         // TODO: receive frontend language somehow.
-        $this->heidelpayRequest['FRONTEND_ENABLED'] = $this->paymentHelper->getFrontendEnabled($methodInstance);
+        $this->heidelpayRequest['FRONTEND_ENABLED'] = $this->paymentHelper->getFrontendEnabled($paymentMethod);
         $this->heidelpayRequest['FRONTEND_LANGUAGE'] = 'DE';
         $this->heidelpayRequest['FRONTEND_RESPONSE_URL'] =
             $this->paymentHelper->getDomain() . '/' . Routes::RESPONSE_URL;

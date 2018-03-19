@@ -268,7 +268,7 @@ class PaymentService
                     return $result['response']['PROCESSING.RETURN'];
                 }
 
-                $urlKey = $paymentMethod === CreditCard::class ? 'FRONTEND_PAYMENT_FRAME_URL' : 'FRONTEND_REDIRECT_URL';
+                $urlKey = $paymentMethod === CreditCard::class ? 'FRONTEND.PAYMENT_FRAME_URL' : 'FRONTEND.REDIRECT_URL';
 
                 $this->getLogger(__METHOD__)->error('html return urlKey', [
                     'urlKey' => $urlKey,

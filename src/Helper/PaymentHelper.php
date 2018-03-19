@@ -62,26 +62,10 @@ class PaymentHelper
      * @var array
      */
     public static $paymentMethods = [
-        CreditCard::class => [
-            self::ARRAY_KEY_CONFIG_KEY => CreditCard::CONFIG_KEY,
-            self::ARRAY_KEY_KEY => CreditCard::KEY,
-            self::ARRAY_KEY_DEFAULT_NAME => CreditCard::DEFAULT_NAME,
-        ],
-        Prepayment::class => [
-            self::ARRAY_KEY_CONFIG_KEY => Prepayment::CONFIG_KEY,
-            self::ARRAY_KEY_KEY => Prepayment::KEY,
-            self::ARRAY_KEY_DEFAULT_NAME => Prepayment::DEFAULT_NAME,
-        ],
-        Sofort::class => [
-            self::ARRAY_KEY_CONFIG_KEY => Sofort::CONFIG_KEY,
-            self::ARRAY_KEY_KEY => Sofort::KEY,
-            self::ARRAY_KEY_DEFAULT_NAME => Sofort::DEFAULT_NAME,
-        ],
-        PayPal::class => [
-            self::ARRAY_KEY_CONFIG_KEY => PayPal::CONFIG_KEY,
-            self::ARRAY_KEY_KEY => PayPal::KEY,
-            self::ARRAY_KEY_DEFAULT_NAME => PayPal::DEFAULT_NAME,
-        ],
+        CreditCard::class,
+        Prepayment::class,
+        Sofort::class,
+        PayPal::class,
     ];
 
     /**
@@ -101,15 +85,15 @@ class PaymentHelper
     /**
      * Create the payment method ID if it doesn't exist yet
      *
-     * @param string $paymentMethodClass
+     * @param PaymentMethodContract $paymentMethod
      */
-    public function createMopIfNotExists(string $paymentMethodClass)
+    public function createMopIfNotExists(PaymentMethodContract $paymentMethod)
     {
-        if ($this->getPaymentMethodId($paymentMethodClass) === self::NO_PAYMENTMETHOD_FOUND) {
+        if ($this->getPaymentMethodIdByInstance($paymentMethod) === self::NO_PAYMENTMETHOD_FOUND) {
             $paymentMethodData = [
                 'pluginKey' => Plugin::KEY,
-                'paymentKey' => $this->getPaymentMethodKey($paymentMethodClass),
-                'name' => $this->getPaymentMethodDefaultName($paymentMethodClass)
+                'paymentKey' => $this->getPaymentMethodKey($paymentMethod),
+                'name' => $this->getPaymentMethodDefaultName($paymentMethod)
             ];
 
             $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);
@@ -119,18 +103,18 @@ class PaymentHelper
     /**
      * Load the payment method ID for the given plugin key.
      *
-     * @param string $paymentMethodClass
+     * @param PaymentMethodContract $paymentMethod
      *
      * @return int
      */
-    public function getPaymentMethodId(string $paymentMethodClass): int
+    public function getPaymentMethodIdByInstance(PaymentMethodContract $paymentMethod): int
     {
         $paymentMethods = $this->paymentMethodRepository->allForPlugin(Plugin::KEY);
 
         if (!empty($paymentMethods)) {
             /** @var PaymentMethod $payMethod */
             foreach ($paymentMethods as $payMethod) {
-                if ($payMethod->paymentKey === $this->getPaymentMethodKey($paymentMethodClass)) {
+                if ($payMethod->paymentKey === $this->getPaymentMethodKey($paymentMethod)) {
                     return $payMethod->id;
                 }
             }
@@ -140,15 +124,28 @@ class PaymentHelper
     }
 
     /**
+     * @param string $paymentMethod
+     *
+     * @return int
+     */
+    public function getPaymentMethodIdByClass(string $paymentMethod): int
+    {
+        /** @var PaymentMethodContract $methodInstance */
+        $methodInstance = pluginApp($paymentMethod);
+
+        return $this->getPaymentMethodIdByInstance($methodInstance);
+    }
+
+    /**
      * Returns the payment method key ('plugin_name::payment_key')
      *
-     * @param string $paymentMethodClass
+     * @param PaymentMethodContract $paymentMethod
      *
      * @return string
      */
-    public function getPluginPaymentMethodKey(string $paymentMethodClass): string
+    public function getPluginPaymentMethodKey(PaymentMethodContract $paymentMethod): string
     {
-        return Plugin::KEY . '::' . $this->getPaymentMethodKey($paymentMethodClass);
+        return Plugin::KEY . '::' . $this->getPaymentMethodKey($paymentMethod);
     }
 
     /**
@@ -158,20 +155,7 @@ class PaymentHelper
      */
     public static function getPaymentMethods(): array
     {
-        return array_keys(static::$paymentMethods);
-    }
-
-    /**
-     * Gets a certain key from a given payment method in the helper string array.
-     *
-     * @param string $paymentMethodClass
-     * @param string $key
-     *
-     * @return string
-     */
-    public function getPaymentMethodString(string $paymentMethodClass, string $key): string
-    {
-        return static::$paymentMethods[$paymentMethodClass][$key] ?? null;
+        return static::$paymentMethods;
     }
 
     /**
@@ -202,9 +186,11 @@ class PaymentHelper
     }
 
     /**
-     * @param string $paymentMethod
+     * @param PaymentMethodContract $paymentMethod
+     *
+     * @return string
      */
-    public function getFrontendEnabled(string $paymentMethod): string
+    public function getFrontendEnabled(PaymentMethodContract $paymentMethod): string
     {
         return 'true';
     }
@@ -212,11 +198,11 @@ class PaymentHelper
     /**
      * Returns the heidelpay authentication data (senderId, login, password, environment) as array.
      *
-     * @param string $paymentMethod
+     * @param PaymentMethodContract $paymentMethod
      *
      * @return array
      */
-    public function getHeidelpayAuthenticationConfig(string $paymentMethod): array
+    public function getHeidelpayAuthenticationConfig(PaymentMethodContract $paymentMethod): array
     {
         return [
             'SECURITY_SENDER' => $this->getSenderId(),
@@ -274,11 +260,11 @@ class PaymentHelper
     }
 
     /**
-     * @param string $paymentMethod
+     * @param PaymentMethodContract $paymentMethod
      *
      * @return string
      */
-    private function getTransactionChannel(string $paymentMethod): string
+    private function getTransactionChannel(PaymentMethodContract $paymentMethod): string
     {
         return $this->config->get($this->getChannelIdKey($paymentMethod));
     }
@@ -378,15 +364,14 @@ class PaymentHelper
     }
 
     /**
-     * @param string $paymentMethod
+     * @param PaymentMethodContract $paymentMethod
      *
      * @return string
      */
-    protected function getPaymentMethodDefaultName(string $paymentMethod): string
+    protected function getPaymentMethodDefaultName(PaymentMethodContract $paymentMethod): string
     {
         $prefix = Plugin::NAME . ' - ';
-        $name = static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_DEFAULT_NAME]
-            ?? self::NO_DEFAULT_NAME_FOUND;
+        $name = $paymentMethod->getDefaultName() ?? self::NO_DEFAULT_NAME_FOUND;
 
         return $prefix . $name;
     }
@@ -406,13 +391,13 @@ class PaymentHelper
     /**
      * Returns the payment method config key for the 'Channel-ID' configuration.
      *
-     * @param string $paymentMethod
+     * @param PaymentMethodContract $paymentMethod
      *
      * @return string
      */
-    protected function getChannelIdKey(string $paymentMethod): string
+    protected function getChannelIdKey(PaymentMethodContract $paymentMethod): string
     {
-        $paymentMethodKey = static::$paymentMethods[$paymentMethod][static::ARRAY_KEY_CONFIG_KEY];
+        $paymentMethodKey = $paymentMethod->getConfigKey();
 
         return $this->getConfigKey($paymentMethodKey . '.' . ConfigKeys::CHANNEL_ID);
     }
@@ -519,12 +504,12 @@ class PaymentHelper
     }
 
     /**
-     * @param string $paymentMethod
+     * @param PaymentMethodContract $paymentMethod
      *
      * @return string
      */
-    protected function getPaymentMethodKey(string $paymentMethod): string
+    protected function getPaymentMethodKey(PaymentMethodContract $paymentMethod): string
     {
-        return static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_KEY] ?? self::NO_KEY_FOUND;
+        return $paymentMethod->getMethodKey() ?? self::NO_KEY_FOUND;
     }
 }

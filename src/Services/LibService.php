@@ -155,12 +155,16 @@ class LibService
     {
         $result = $this->libCall->call($pluginName . '::' . $libCall, $params);
 
+        $this->getLogger(__METHOD__)->error('LibCall result', [
+            'result' => $result
+        ]);
+
         // if an exception/error occured when trying to call the external sdk,
         // an object will be returned. convert it to an array to work with it.
         if ($result['error'] ?? false) {
             return [
-                'exceptionCode' => $result->error_no ?? 500,
-                'exceptionMsg' => $result->error_msg ?? 'Internal error',
+                'exceptionCode' => $result['error_no'] ?? 500,
+                'exceptionMsg' => $result['error_msg'] ?? 'Internal error',
             ];
         }
 

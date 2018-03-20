@@ -75,6 +75,9 @@ class ResponseController extends Controller
      */
     public function processResponse(): string
     {
+        $postResponse = $this->request->all();
+        unset($postResponse['plentyMarkets']);
+
         $this->getLogger('heidelpay Post Response')->error('raw response', [
             'response' => $this->request->all()
         ]);
@@ -89,7 +92,7 @@ class ResponseController extends Controller
 
         // if something went wrong during the lib call, return the cancel url.
         // exceptionCode = problem inside of the lib, error = error during libCall.
-        if (isset($response['exceptionCode']) || isset($response['error'])) {
+        if (isset($response['exceptionCode'])) {
             return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
         }
 

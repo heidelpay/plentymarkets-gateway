@@ -3,6 +3,7 @@
 namespace Heidelpay\Controllers;
 
 use Heidelpay\Constants\Routes;
+use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Services\PaymentService;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
@@ -38,6 +39,11 @@ class ResponseController extends Controller
     private $response;
 
     /**
+     * @var PaymentHelper
+     */
+    private $paymentHelper;
+
+    /**
      * @var PaymentService
      */
     private $paymentService;
@@ -49,10 +55,15 @@ class ResponseController extends Controller
      * @param Response       $response
      * @param PaymentService $paymentService
      */
-    public function __construct(Request $request, Response $response, PaymentService $paymentService)
-    {
+    public function __construct(
+        Request $request,
+        Response $response,
+        PaymentHelper $paymentHelper,
+        PaymentService $paymentService
+    ) {
         $this->request = $request;
         $this->response = $response;
+        $this->paymentHelper = $paymentHelper;
         $this->paymentService = $paymentService;
     }
 
@@ -64,6 +75,10 @@ class ResponseController extends Controller
      */
     public function processResponse(): string
     {
+        $this->getLogger('heidelpay Post Response')->error('raw response', [
+            'response' => $this->request->all()
+        ]);
+
         $response = $this->paymentService->handleAsyncPaymentResponse([
             'response' => $this->request->all()
         ]);
@@ -73,16 +88,17 @@ class ResponseController extends Controller
         ]);
 
         // if something went wrong during the lib call, return the cancel url.
-        if (isset($response['exceptionCode'])) {
-            return Routes::CHECKOUT_CANCEL;
+        // exceptionCode = problem inside of the lib, error = error during libCall.
+        if (isset($response['exceptionCode']) || isset($response['error'])) {
+            return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
         }
 
         // if the transaction is successful or pending, return the success url.
         if ($response['isSuccess'] || $response['isPending']) {
-            return Routes::CHECKOUT_SUCCESS;
+            return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_SUCCESS;
         }
 
-        return Routes::CHECKOUT_CANCEL;
+        return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
     }
 
     /**

@@ -57,25 +57,32 @@ class ResponseController extends Controller
     }
 
     /**
-     * Processes the incoming POST response.
+     * Processes the incoming POST response and returns
+     * an action url depending on the response result.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return string
      */
-    public function processResponse(): \Symfony\Component\HttpFoundation\Response
+    public function processResponse(): string
     {
-        $this->getLogger(__METHOD__)->debug('heidelpay::response.receivedResponse', [
-            'response' => $this->request->all()
-        ]);
-
         $response = $this->paymentService->handleAsyncPaymentResponse([
             'response' => $this->request->all()
         ]);
 
-        if ($response['isSuccess'] ?? false) {
-            return $this->response->redirectTo(Routes::CHECKOUT_SUCCESS);
+        $this->getLogger('heidelpay async response')->error('heidelpay::response.receivedResponse', [
+            'response' => $response
+        ]);
+
+        // if something went wrong during the lib call, return the cancel url.
+        if (isset($response['exceptionCode'])) {
+            return Routes::CHECKOUT_CANCEL;
         }
 
-        return $this->response->redirectTo(Routes::CHECKOUT_CANCEL);
+        // if the transaction is successful or pending, return the success url.
+        if ($response['isSuccess'] || $response['isPending']) {
+            return Routes::CHECKOUT_SUCCESS;
+        }
+
+        return Routes::CHECKOUT_CANCEL;
     }
 
     /**

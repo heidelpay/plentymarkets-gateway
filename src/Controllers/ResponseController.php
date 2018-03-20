@@ -2,6 +2,7 @@
 
 namespace Heidelpay\Controllers;
 
+use Heidelpay\Constants\Routes;
 use Heidelpay\Services\PaymentService;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
@@ -62,15 +63,19 @@ class ResponseController extends Controller
      */
     public function processResponse(): \Symfony\Component\HttpFoundation\Response
     {
-        $this->getLogger(__METHOD__)->debug('heidelpay::response.receivedResponse');
+        $this->getLogger(__METHOD__)->debug('heidelpay::response.receivedResponse', [
+            'response' => $this->request->all()
+        ]);
 
-        /** @var array $response */
-        $response = $this->paymentService->handleAsyncPaymentResponse($this->request->all());
+        $response = $this->paymentService->handleAsyncPaymentResponse([
+            'response' => $this->request->all()
+        ]);
 
-        $this->getLogger(__METHOD__)->error('response result', $response);
+        if ($response['isSuccess'] ?? false) {
+            return $this->response->redirectTo(Routes::CHECKOUT_SUCCESS);
+        }
 
-        // TODO: return to a success (or the default plentymarkets "after-create-order") page
-        return $this->response->redirectTo('checkout');
+        return $this->response->redirectTo(Routes::CHECKOUT_CANCEL);
     }
 
     /**

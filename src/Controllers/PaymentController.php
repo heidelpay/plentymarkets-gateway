@@ -57,7 +57,7 @@ class PaymentController extends Controller
      */
     public function checkoutSuccess(): \Symfony\Component\HttpFoundation\Response
     {
-        return $this->response->redirectTo('checkout');
+        return $this->response->redirectTo('place-order');
     }
 
     /**

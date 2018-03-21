@@ -159,8 +159,8 @@ class LibService
             'result' => $result
         ]);
 
-        // if an exception/error occured when trying to call the external sdk,
-        // an object will be returned. convert it to an array to work with it.
+        // if an exception/error occured when trying to call the external sdk, return
+        // the values from the assoc array containing the error details.
         if ($result['error'] ?? false) {
             return [
                 'exceptionCode' => $result['error_no'] ?? 500,

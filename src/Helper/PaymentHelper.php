@@ -203,6 +203,8 @@ class PaymentHelper
 
     /**
      * @param string $paymentMethod
+     *
+     * @return string
      */
     public function getFrontendEnabled(string $paymentMethod): string
     {
@@ -347,6 +349,18 @@ class PaymentHelper
     }
 
     /**
+     * Returns the iFrame Css Path for the payment method.
+     *
+     * @param PaymentMethodContract $paymentMethodContract
+     *
+     * @return string
+     */
+    public function getIFrameCssPath(PaymentMethodContract $paymentMethodContract): string
+    {
+        return $this->config->get($this->getIFrameCssPathKey($paymentMethodContract));
+    }
+
+    /**
      * @param PaymentMethodContract $paymentMethod
      *
      * @return string
@@ -427,6 +441,18 @@ class PaymentHelper
     protected function getDisplayNameKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DISPLAY_NAME);
+    }
+
+    /**
+     * Returns the config key for the iframe css url.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     *
+     * @return string
+     */
+    protected function getIFrameCssPathKey(PaymentMethodContract $paymentMethod): string
+    {
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::IFRAME_CSS_URL);
     }
 
     /**

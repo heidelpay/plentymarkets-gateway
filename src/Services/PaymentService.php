@@ -433,6 +433,17 @@ class PaymentService
         return $address->street . ' ' . $address->houseNumber;
     }
 
+    public function createPlentyPayment()
+    {
+        /** @var Payment $payment */
+        $payment = pluginApp(Payment::class);
+
+        $payment->mopId = '';
+        $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
+        $payment->status = 0;
+        $payment->currency = 'EUR';
+    }
+
     /**
      * Assigns a payment to an order.
      *

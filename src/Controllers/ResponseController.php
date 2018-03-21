@@ -78,14 +78,7 @@ class ResponseController extends Controller
         $postResponse = $this->request->all();
         unset($postResponse['plentyMarkets']);
 
-        $this->getLogger('heidelpay Post Response')->error('raw response', [
-            'response' => $this->request->all()
-        ]);
-
-        $response = $this->paymentService->handleAsyncPaymentResponse([
-            'response' => $postResponse
-        ]);
-
+        $response = $this->paymentService->handleAsyncPaymentResponse(['response' => $postResponse]);
         $this->getLogger('heidelpay async response')->error('heidelpay::response.receivedResponse', [
             'response' => $response
         ]);

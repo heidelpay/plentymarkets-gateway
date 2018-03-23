@@ -19,6 +19,7 @@ use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Helper\Services\WebstoreHelper;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
+use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Log\Loggable;
 
@@ -552,5 +553,23 @@ class PaymentHelper
     protected function getPaymentMethodKey(string $paymentMethod): string
     {
         return static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_KEY] ?? self::NO_KEY_FOUND;
+    }
+
+    /**
+     * Maps the transaction result into a plentymarkets Payment status ID.
+     *
+     * @param array $paymentData
+     *
+     * @return int
+     */
+    public function mapToPlentyStatus(array $paymentData): int
+    {
+        $paymentStatus = Payment::STATUS_CAPTURED;
+
+        if (isset($paymentData['PROCESSING.STATUS_CODE']) && $paymentData['PROCESSING.STATUS_CODE'] === '80') {
+            $paymentStatus = Payment::STATUS_AWAITING_APPROVAL;
+        }
+
+        return $paymentStatus;
     }
 }

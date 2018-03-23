@@ -110,4 +110,21 @@ class ResponseController extends Controller
 
         return $this->response->redirectTo('checkout');
     }
+
+    /**
+     * @return Response
+     */
+    public function processPush(): Response
+    {
+        $postPayload = $this->request->all();
+        $this->getLogger(__METHOD__)->error('heidelpay::response.pushNotification', [
+            'post' => $postPayload,
+            'rawInput' => $this->request->input(),
+            'queryString' => $this->request->getQueryString()
+        ]);
+
+        //$this->paymentService->handlePushNotification($postPayload);
+
+        return $this->response->make('OK', Response::HTTP_OK);
+    }
 }

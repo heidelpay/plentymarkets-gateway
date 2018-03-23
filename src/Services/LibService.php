@@ -42,13 +42,27 @@ class LibService
     }
 
     /**
-     * @param $params
+     * Handles the asynchronous heidelpay POST Response and returns the Response array.
+     *
+     * @param array $params
      *
      * @return array
      */
     public function handleResponse(array $params): array
     {
-        return $this->executeLibCall('handleResponse', $params);
+        return $this->executeLibCall('handleAsyncResponse', $params);
+    }
+
+    /**
+     * Handle the heidelpay XML Push Notification and returns the Response array.
+     *
+     * @param array $params
+     *
+     * @return array
+     */
+    public function handlePushNotification(array $params): array
+    {
+        return $this->executeLibCall('handlePushNotification', $params);
     }
 
     /**

@@ -161,11 +161,11 @@ class PaymentService
 
     /**
      * @param Basket $basket
-     * @param $paymentMethod
+     * @param string $paymentMethod
      *
      * @return string
      */
-    public function executePayment(Basket $basket, $paymentMethod): string
+    public function executePayment(string $paymentMethod, Basket $basket): string
     {
         $this->prepareRequest($basket, $paymentMethod);
 
@@ -378,6 +378,18 @@ class PaymentService
     }
 
     /**
+     * Calls the handler for the push notification processing.
+     *
+     * @param array $post
+     *
+     * @return array
+     */
+    public function handlePushNotification(array $post): array
+    {
+        return $this->libService->handlePushNotification($post);
+    }
+
+    /**
      * Submits the Basket to the Basket-API and returns its ID.
      *
      * @param Basket $basket
@@ -433,15 +445,28 @@ class PaymentService
         return $address->street . ' ' . $address->houseNumber;
     }
 
-    public function createPlentyPayment()
+    /**
+     * Creates a plentymarkets payment entity.
+     *
+     * @param array $paymentData
+     *
+     * @return Payment
+     */
+    public function createPlentyPayment(array $paymentData)
     {
         /** @var Payment $payment */
         $payment = pluginApp(Payment::class);
 
         $payment->mopId = '';
         $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
-        $payment->status = 0;
-        $payment->currency = 'EUR';
+        $payment->origin = Payment::ORIGIN_PLUGIN;
+        $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentData);
+        $payment->currency = $paymentData['PRESENTATION.CURRENCY'];
+
+        // create the payment
+        $payment = $this->paymentRepository->createPayment($payment);
+
+        return $payment;
     }
 
     /**

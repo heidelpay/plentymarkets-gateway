@@ -17,6 +17,8 @@ namespace Heidelpay\Constants;
 class Routes
 {
     const RESPONSE_URL = 'payment/heidelpay/response';
+    const PUSH_NOTIFICATION_URL = 'payment/heidelpay/pushNotification';
+
     const CHECKOUT_SUCCESS = 'payment/heidelpay/checkoutSuccess';
     const CHECKOUT_CANCEL = 'payment/heidelpay/checkoutCancel';
 }

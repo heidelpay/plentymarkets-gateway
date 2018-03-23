@@ -3,7 +3,7 @@
 namespace Heidelpay\Constants;
 
 /**
- * Constant class for transaction types
+ * Constant class for database entities.
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
@@ -14,9 +14,7 @@ namespace Heidelpay\Constants;
  *
  * @package heidelpay\plentymarkets-gateway\constants
  */
-class TransactionType
+class Database
 {
-    const AUTHORIZE = 'authorize';
-    const CAPTURE = 'capture';
-    const DEBIT = 'debit';
+    const TABLE_TRANSACTIONS = 'transactions';
 }

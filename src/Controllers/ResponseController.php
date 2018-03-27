@@ -123,7 +123,8 @@ class ResponseController extends Controller
             'queryString' => $this->request->getQueryString()
         ]);
 
-        //$this->paymentService->handlePushNotification($postPayload);
+        $response = $this->paymentService->handlePushNotification(['xmlContent' => $this->request->input()]);
+        $this->getLogger(__METHOD__)->error('pushResponse content', $response);
 
         return $this->response->make('OK', Response::HTTP_OK);
     }

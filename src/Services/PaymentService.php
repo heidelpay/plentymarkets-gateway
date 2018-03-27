@@ -300,12 +300,6 @@ class PaymentService
      */
     private function prepareRequest(Basket $basket, string $paymentMethod)
     {
-        /** @var PaymentMethodContract $methodInstance */
-        $methodInstance = pluginApp($paymentMethod);
-        $this->getLogger(__METHOD__)->error('paymentMethod instance', [
-            $methodInstance
-        ]);
-
         // set authentification data
         $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($paymentMethod);
         $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
@@ -359,6 +353,8 @@ class PaymentService
         // shop + module information
         $this->heidelpayRequest['CRITERION_SHOP_TYPE'] = 'plentymarkets 7';
         $this->heidelpayRequest['CRITERION_SHOPMODULE_VERSION'] = Plugin::VERSION;
+        $this->heidelpayRequest['CRITERION_PUSH_URL'] =
+            $this->paymentHelper->getDomain() . '/' . Routes::PUSH_NOTIFICATION_URL;
 
         $this->getLogger(__METHOD__)->error('prepareRequest', $this->heidelpayRequest);
 

@@ -116,17 +116,12 @@ class ResponseController extends Controller
      */
     public function processPush(): Response
     {
-        $postPayload = $this->request->except(['plentyMarkets']);
+        $postPayload = $this->request->getContent();
         $this->getLogger(__METHOD__)->error('heidelpay::response.pushNotification', [
-            'post' => $postPayload,
-            'rawInput' => $this->request->input(),
-            'queryString' => $this->request->getQueryString(),
-            'requestQuery' => $this->request->query(),
-            'content' => $this->request->getContent(),
-            'xmlFormat' => $this->request->format('xml'),
+            'content' => $postPayload,
         ]);
 
-        $response = $this->paymentService->handlePushNotification(['xmlContent' => $this->request->input()]);
+        $response = $this->paymentService->handlePushNotification(['xmlContent' => $postPayload]);
         $this->getLogger(__METHOD__)->error('pushResponse content', $response);
 
         if (isset($response['exceptionCode'])) {

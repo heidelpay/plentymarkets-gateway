@@ -75,8 +75,8 @@ class ResponseController extends Controller
      */
     public function processResponse(): string
     {
-        $postResponse = $this->request->all();
-        unset($postResponse['plentyMarkets']);
+        // get all post parameters except the 'plentyMarkets' one injected by the plentymarkets core.
+        $postResponse = $this->request->except(['plentyMarkets']);
 
         $response = $this->paymentService->handleAsyncPaymentResponse(['response' => $postResponse]);
         $this->getLogger('heidelpay async response')->error('heidelpay::response.receivedResponse', [
@@ -116,15 +116,23 @@ class ResponseController extends Controller
      */
     public function processPush(): Response
     {
-        $postPayload = $this->request->all();
+        $postPayload = $this->request->except(['plentyMarkets']);
         $this->getLogger(__METHOD__)->error('heidelpay::response.pushNotification', [
             'post' => $postPayload,
             'rawInput' => $this->request->input(),
-            'queryString' => $this->request->getQueryString()
+            'queryString' => $this->request->getQueryString(),
+            'requestQuery' => $this->request->query(),
+            'content' => $this->request->getContent(),
+            'xmlFormat' => $this->request->format('xml'),
         ]);
 
         $response = $this->paymentService->handlePushNotification(['xmlContent' => $this->request->input()]);
         $this->getLogger(__METHOD__)->error('pushResponse content', $response);
+
+        if (isset($response['exceptionCode'])) {
+            $this->getLogger('processPush')->error('Returning a non-200 HTTP code.');
+            return $this->response->make('Not Ok.', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
         return $this->response->make('OK', Response::HTTP_OK);
     }

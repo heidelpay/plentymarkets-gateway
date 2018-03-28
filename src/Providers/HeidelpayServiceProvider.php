@@ -58,8 +58,6 @@ class HeidelpayServiceProvider extends ServiceProvider
         // loop through all of the plugin's available payment methods
         /** @var string $paymentMethodClass */
         foreach ($paymentHelper::getPaymentMethods() as $paymentMethodClass) {
-            $paymentHelper->createMopIfNotExists($paymentMethodClass);
-
             // register the payment method in the payment method container
             $paymentMethodContainer->register(
                 $paymentHelper->getPluginPaymentMethodKey($paymentMethodClass),

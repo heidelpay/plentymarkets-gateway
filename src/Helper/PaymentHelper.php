@@ -6,6 +6,8 @@ use Heidelpay\Constants\ConfigKeys;
 use Heidelpay\Constants\DescriptionTypes;
 use Heidelpay\Constants\Plugin;
 use Heidelpay\Constants\TransactionMode;
+use Heidelpay\Constants\TransactionStatus;
+use Heidelpay\Constants\TransactionType;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
@@ -571,5 +573,61 @@ class PaymentHelper
         }
 
         return $paymentStatus;
+    }
+
+    /**
+     * Maps a heidelpay transaction response to a custom status code for this plugin.
+     *
+     * @param array $paymentData
+     *
+     * @return int
+     */
+    public function mapHeidelpayTransactionStatus(array $paymentData): int
+    {
+        if ($paymentData['isSuccess'] === true) {
+            return TransactionStatus::ACK;
+        }
+
+        if ($paymentData['isPending'] === true) {
+            return TransactionStatus::PENDING;
+        }
+
+        return TransactionStatus::NOK;
+    }
+
+    /**
+     * @param string $paymentCode
+     *
+     * @return string
+     */
+    public function mapHeidelpayTransactionType(string $paymentCode): string
+    {
+        @list($methodCode, $transactionType) = explode('_', $paymentCode);
+
+        switch ($transactionType) {
+            case TransactionType::HP_AUTHORIZE:
+                $result = TransactionType::AUTHORIZE;
+                break;
+            case TransactionType::HP_CREDIT:
+                $result = TransactionType::CREDIT;
+                break;
+            case TransactionType::HP_DEBIT:
+                $result = TransactionType::DEBIT;
+                break;
+            case TransactionType::HP_CAPTURE:
+                $result = TransactionType::CAPTURE;
+                break;
+            case TransactionType::HP_RECEIPT:
+                $result = TransactionType::RECEIPT;
+                break;
+            case TransactionType::HP_FINALIZE:
+                $result = TransactionType::FINALIZE;
+                break;
+            default:
+                $result = '';
+                break;
+        }
+
+        return $result;
     }
 }

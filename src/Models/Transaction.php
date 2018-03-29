@@ -24,16 +24,27 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  * @property int $basketId
  * @property int $orderId
  * @property int $paymentMethodId
+ * @property int $status
  * @property string $transactionType
  * @property string $shortId
  * @property string $uniqueId
  * @property array $transactionDetails
- * @property string $source
+ * @property array $transactionProcessing
  * @property string $createdAt
  * @property string $updatedAt
  */
 class Transaction extends Model
 {
+    const PROCESSING_CODE = 'code';
+    const PROCESSING_REASON = 'reason';
+    const PROCESSING_REASON_CODE = 'reason_code';
+    const PROCESSING_RESULT = 'result';
+    const PROCESSING_RETURN = 'return';
+    const PROCESSING_RETURN_CODE = 'return_code';
+    const PROCESSING_STATUS = 'status';
+    const PROCESSING_STATUS_CODE = 'status_code';
+    const PROCESSING_TIMESTAMP = 'timestamp';
+
     public $id = 0;
     public $storeId;
     public $customerId;
@@ -45,7 +56,7 @@ class Transaction extends Model
     public $shortId = '';
     public $uniqueId = '';
     public $transactionDetails = [];
-    public $source = '';
+    public $transactionProcessing = [];
     public $createdAt = '';
     public $updatedAt = '';
 

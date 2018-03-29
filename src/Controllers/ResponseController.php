@@ -53,6 +53,7 @@ class ResponseController extends Controller
      *
      * @param Request        $request
      * @param Response       $response
+     * @param PaymentHelper  $paymentHelper
      * @param PaymentService $paymentService
      */
     public function __construct(

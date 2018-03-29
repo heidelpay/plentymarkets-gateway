@@ -3,6 +3,7 @@
 namespace Heidelpay\Models\Repositories;
 
 use Heidelpay\Constants\TransactionType;
+use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Transaction;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
@@ -43,6 +44,10 @@ class TransactionRepository implements TransactionRepositoryContract
     {
         /** @var Transaction $transaction */
         $transaction = pluginApp(Transaction::class);
+
+        foreach ($data as $key => $value) {
+            $transaction->$key = $value;
+        }
 
         $transaction = $this->database->save($transaction);
         return $transaction;

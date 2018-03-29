@@ -39,6 +39,7 @@ try {
 
 return $responseArray ?? [
     'response' => $payPalPaymentMethod->getResponse()->toArray(),
+    'jsonResponse' => $response->toJson(),
     'isSuccess' => $payPalPaymentMethod->getResponse()->isSuccess(),
     'isPending' => $payPalPaymentMethod->getResponse()->isPending(),
     'isError' => $payPalPaymentMethod->getResponse()->isError()

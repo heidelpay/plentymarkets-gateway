@@ -8,7 +8,6 @@ use Heidelpay\Constants\Salutation;
 use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\CreditCard;
-use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
@@ -20,8 +19,8 @@ use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
+use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
-use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentOrderRelation;
 use Plenty\Plugin\ConfigRepository;
@@ -70,11 +69,6 @@ class PaymentService
     private $orderRepository;
 
     /**
-     * @var PaymentMethodRepositoryContract
-     */
-    private $paymentMethodRepository;
-
-    /**
      * @var PaymentOrderRelationRepositoryContract
      */
     private $paymentOrderRelationRepository;
@@ -107,7 +101,6 @@ class PaymentService
      * @param ConfigRepository                       $configRepository
      * @param LibService                             $libraryService
      * @param OrderRepositoryContract                $orderRepository
-     * @param PaymentMethodRepositoryContract        $paymentMethodRepository
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository
      * @param PaymentRepositoryContract              $paymentRepository
      * @param PaymentHelper                          $paymentHelper
@@ -119,7 +112,6 @@ class PaymentService
         ConfigRepository $configRepository,
         LibService $libraryService,
         OrderRepositoryContract $orderRepository,
-        PaymentMethodRepositoryContract $paymentMethodRepository,
         PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository,
         PaymentRepositoryContract $paymentRepository,
         PaymentHelper $paymentHelper,
@@ -129,7 +121,6 @@ class PaymentService
         $this->countryRepository = $countryRepository;
         $this->libService = $libraryService;
         $this->orderRepository = $orderRepository;
-        $this->paymentMethodRepository = $paymentMethodRepository;
         $this->paymentOrderRelationRepository = $paymentOrderRelationRepository;
         $this->paymentRepository = $paymentRepository;
         $this->paymentHelper = $paymentHelper;
@@ -160,26 +151,37 @@ class PaymentService
     }
 
     /**
-     * @param Basket $basket
-     * @param string $paymentMethod
+     * Executes payment tasks after an order has been created.
+     *
+     * @param Basket         $basket
+     * @param string         $paymentMethod
+     * @param ExecutePayment $event
      *
      * @return string
      */
-    public function executePayment(string $paymentMethod, Basket $basket): string
+    public function executePayment(string $paymentMethod, Basket $basket, ExecutePayment $event): string
     {
-        $this->prepareRequest($basket, $paymentMethod);
+        $this->getLogger(__METHOD__)->error('executePayment call', [
+            'paymentMethod' => $paymentMethod,
+            'basketId' => $basket->id,
+            'mopId' => $event->getMop(),
+            'orderId' => $event->getOrderId()
+        ]);
 
-        $response = $this->libService->sendTransactionRequest($paymentMethod, $this->heidelpayRequest);
+        // todo: retrieve a heidelpay Transaction by basketId and paymentMethod-Id (Mop)
 
-        if (isset($response['exceptionCode'])) {
-            $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
-            $returnValue = $response['exceptionMsg'];
-        } else {
-            $returnValue = $response['FRONTEND_REDIRECT_URL'];
-            $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
+        // todo: call createPlentyPayment and create the payment
+        // todo: if the payment is an instance of Payment, link it to the order.
+        // todo: ... if not, set returnType to 'error' and return a (user-friendly) message.
+
+        // TODO: just a test.
+        if (true) {
+            $this->setReturnType('error');
+            return 'Error during payment execution!';
         }
 
-        return $returnValue;
+        $this->setReturnType('success');
+        return 'Payment was successful!';
     }
 
     /**
@@ -445,17 +447,18 @@ class PaymentService
      * Creates a plentymarkets payment entity.
      *
      * @param array $paymentData
+     * @param int   $paymentMethodId
      *
      * @return Payment
      */
-    public function createPlentyPayment(array $paymentData)
+    public function createPlentyPayment(array $paymentData, int $paymentMethodId): Payment
     {
         /** @var Payment $payment */
         $payment = pluginApp(Payment::class);
 
-        $payment->mopId = '';
-        $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
+        $payment->mopId = $paymentMethodId;
         $payment->origin = Payment::ORIGIN_PLUGIN;
+        $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
         $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentData);
         $payment->currency = $paymentData['PRESENTATION.CURRENCY'];
 

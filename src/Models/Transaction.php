@@ -35,11 +35,12 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 class Transaction extends Model
 {
     public $id = 0;
-    public $storeId = 0;
-    public $customerId = 0;
-    public $basketId = 0;
-    public $orderId = 0;
-    public $paymentMethodId = 0;
+    public $storeId;
+    public $customerId;
+    public $basketId;
+    public $orderId;
+    public $paymentMethodId;
+    public $status;
     public $transactionType = '';
     public $shortId = '';
     public $uniqueId = '';

@@ -52,9 +52,10 @@ try {
 }
 
 // return the responseArray, if an exception has been thrown.
-// else,
+// else, return an array containing response results.
 return $responseArray ?? [
     'response' => $creditCardPaymentMethod->getResponse()->toArray(),
+    'jsonResponse' => $response->toJson(),
     'isSuccess' => $creditCardPaymentMethod->getResponse()->isSuccess(),
     'isPending' => $creditCardPaymentMethod->getResponse()->isPending(),
     'isError' => $creditCardPaymentMethod->getResponse()->isError()

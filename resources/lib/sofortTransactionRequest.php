@@ -39,6 +39,7 @@ try {
 
 return $responseArray ?? [
     'response' => $sofortPaymentMethod->getResponse()->toArray(),
+    'jsonResponse' => $response->toJson(),
     'isSuccess' => $sofortPaymentMethod->getResponse()->isSuccess(),
     'isPending' => $sofortPaymentMethod->getResponse()->isPending(),
     'isError' => $sofortPaymentMethod->getResponse()->isError()

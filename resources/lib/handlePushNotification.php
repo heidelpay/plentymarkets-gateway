@@ -28,6 +28,7 @@ try {
 
 return $responseArray ?? [
     'response' => $heidelpayResponse->toArray(),
+    'jsonResponse' => $response->toJson(),
     'isSuccess' => $heidelpayResponse->isSuccess(),
     'isPending' => $heidelpayResponse->isPending(),
     'isError' => $heidelpayResponse->isError()

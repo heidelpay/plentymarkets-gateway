@@ -19,6 +19,7 @@ $response = HeidelpayResponse::fromPost(SdkRestApi::getParam('response'));
 /** @return array */
 return [
     'response' => $response->toArray(),
+    'jsonResponse' => $response->toJson(),
     'isSuccess' => $response->isSuccess(),
     'isPending' => $response->isPending(),
     'isError' => $response->isError(),

@@ -43,11 +43,7 @@ class TransactionRepository implements TransactionRepositoryContract
     public function createTransaction(array $data): Transaction
     {
         /** @var Transaction $transaction */
-        $transaction = pluginApp(Transaction::class);
-
-        foreach ($data as $key => $value) {
-            $transaction->$key = $value;
-        }
+        $transaction = pluginApp(Transaction::class, $data);
 
         $transaction = $this->database->save($transaction);
         return $transaction;

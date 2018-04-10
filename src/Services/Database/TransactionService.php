@@ -5,6 +5,7 @@ namespace Heidelpay\Services\Database;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Transaction;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Transaction Service class
@@ -20,6 +21,8 @@ use Heidelpay\Models\Transaction;
  */
 class TransactionService
 {
+    use Loggable;
+
     /**
      * @var PaymentHelper
      */
@@ -56,6 +59,13 @@ class TransactionService
         int $paymentMethodId,
         int $orderId = null
     ): Transaction {
+        $this->getLogger(__METHOD__)->error('create Transaction', [
+            'response' => $heidelpayResponse,
+            'storeId' => $storeId,
+            'paymentMethodId' => $paymentMethodId,
+            'orderId' => $orderId,
+        ]);
+
         $data = [];
         $data['basketId'] = (int) $heidelpayResponse['IDENTIFICATION.TRANSACTIONID'];
         $data['customerId'] = (int) $heidelpayResponse['IDENTIFICATION.SHOPPERID'];

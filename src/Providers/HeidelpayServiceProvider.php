@@ -5,6 +5,8 @@ namespace Heidelpay\Providers;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\PayPal;
+use Heidelpay\Models\Contracts\TransactionRepositoryContract;
+use Heidelpay\Models\Repositories\TransactionRepository;
 use Heidelpay\Services\PaymentService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
@@ -36,6 +38,7 @@ class HeidelpayServiceProvider extends ServiceProvider
     public function register()
     {
         $this->getApplication()->register(HeidelpayRouteServiceProvider::class);
+        $this->getApplication()->bind(TransactionRepositoryContract::class, TransactionRepository::class);
     }
 
     /**

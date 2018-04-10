@@ -32,7 +32,7 @@ class HeidelpayRouteServiceProvider extends RouteServiceProvider
         $apiRouter->version(
             ['v1'],
             ['namespace' => 'Heidelpay\Controllers\Api', 'middleware' => 'oauth'],
-            function (ApiRouter $apiRouter) {
+            function ($apiRouter) {
                 $apiRouter->get(Routes::API_TRANSACTION_BY_ID, 'TransactionController@getTransactionById');
                 $apiRouter->get(
                     Routes::API_TRANSACTION_BY_CUSTOMERID,

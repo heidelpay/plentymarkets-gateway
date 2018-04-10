@@ -42,6 +42,14 @@ class TransactionService
         $this->transactionRepository = $transactionRepository;
     }
 
+    /**
+     * @param array    $heidelpayResponse
+     * @param int      $storeId
+     * @param int      $paymentMethodId
+     * @param int|null $orderId
+     *
+     * @return Transaction
+     */
     public function createTransaction(
         array $heidelpayResponse,
         int $storeId,
@@ -80,6 +88,26 @@ class TransactionService
         ];
 
         return $this->transactionRepository->createTransaction($data);
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return Transaction
+     */
+    public function getTransactionById(int $id): Transaction
+    {
+        return $this->transactionRepository->getTransactionById($id);
+    }
+
+    /**
+     * @param int $customerId
+     *
+     * @return Transaction[]
+     */
+    public function getTransactionsByCustomerId(int $customerId): array
+    {
+        return $this->transactionRepository->getTransactionsByCustomerId($customerId);
     }
 
     /**

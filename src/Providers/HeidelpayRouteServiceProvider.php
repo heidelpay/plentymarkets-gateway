@@ -4,6 +4,7 @@ namespace Heidelpay\Providers;
 
 use Heidelpay\Constants\Routes;
 use Plenty\Plugin\RouteServiceProvider;
+use Plenty\Plugin\Routing\ApiRouter;
 use Plenty\Plugin\Routing\Router;
 
 /**
@@ -23,10 +24,23 @@ class HeidelpayRouteServiceProvider extends RouteServiceProvider
     /**
      * Register mappings for the routes.
      *
-     * @param Router $router
+     * @param Router    $router
+     * @param ApiRouter $apiRouter
      */
-    public function map(Router $router)
+    public function map(Router $router, ApiRouter $apiRouter)
     {
+        $apiRouter->version(
+            ['v1'],
+            ['namespace' => 'Heidelpay\Controllers\Api', 'middleware' => 'oauth'],
+            function (ApiRouter $apiRouter) {
+                $apiRouter->get(Routes::API_TRANSACTION_BY_ID, 'TransactionController@getTransactionById');
+                $apiRouter->get(
+                    Routes::API_TRANSACTION_BY_CUSTOMERID,
+                    'TransactionController@getTransactionByCustomerId'
+                );
+            }
+        );
+
         // heidelpay Payment API responses
         $router->get(Routes::RESPONSE_URL, 'Heidelpay\Controllers\ResponseController@emergencyRedirect');
         $router->post(Routes::RESPONSE_URL, 'Heidelpay\Controllers\ResponseController@processResponse');

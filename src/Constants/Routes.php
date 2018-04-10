@@ -16,6 +16,9 @@ namespace Heidelpay\Constants;
  */
 class Routes
 {
+    const API_TRANSACTION_BY_ID = 'payment/heidelpay/transactions/{id}';
+    const API_TRANSACTION_BY_CUSTOMERID = 'payment/heidelpay/transactions/customer/{id}';
+
     const RESPONSE_URL = 'payment/heidelpay/response';
     const PUSH_NOTIFICATION_URL = 'payment/heidelpay/pushNotification';
 

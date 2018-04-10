@@ -99,8 +99,10 @@ class ResponseController extends Controller
             return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
         }
 
-        // todo: create the transaction entity.
-        //$this->transactionService->createTransaction($response);
+        // create the transaction entity.
+        $storeId = (int) $response['CRITERION.STORE_ID'];
+        $mopId = (int) $response['CRITERION.MOP'];
+        $this->transactionService->createTransaction($response, $storeId, $mopId);
 
         // if the transaction is successful or pending, return the success url.
         if ($response['isSuccess'] || $response['isPending']) {

@@ -98,9 +98,20 @@ class TransactionRepository implements TransactionRepositoryContract
     }
 
     /**
-     * @param string $transactionType
-     *
-     * @return array
+     * @inheritdoc
+     */
+    public function getTransactionsByCustomerId(int $customerId): array
+    {
+        /** @var Transaction[] $result */
+        $result = $this->database->query(Transaction::class)
+            ->where('customerId', '=', $customerId)
+            ->get();
+
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getTransactionsByType(string $transactionType = TransactionType::AUTHORIZE): array
     {

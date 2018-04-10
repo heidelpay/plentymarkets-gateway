@@ -165,7 +165,8 @@ class PaymentService
             'paymentMethod' => $paymentMethod,
             'basketId' => $basket->id,
             'mopId' => $event->getMop(),
-            'orderId' => $event->getOrderId()
+            'orderId' => $event->getOrderId(),
+            'eventType' => $event->getType(),
         ]);
 
         // todo: retrieve a heidelpay Transaction by basketId and paymentMethod-Id (Mop)
@@ -187,12 +188,16 @@ class PaymentService
     /**
      * @param Basket $basket
      * @param string $paymentMethod
+     * @param int    $mopId
      *
      * @return array
      */
-    private function sendGetPaymentMethodContentRequest(Basket $basket, string $paymentMethod): array
-    {
-        $this->prepareRequest($basket, $paymentMethod);
+    private function sendGetPaymentMethodContentRequest(
+        Basket $basket,
+        string $paymentMethod,
+        int $mopId
+    ): array {
+        $this->prepareRequest($basket, $paymentMethod, $mopId);
 
         $result = $this->libService->sendTransactionRequest($paymentMethod, [
             'request' => $this->heidelpayRequest,
@@ -204,27 +209,31 @@ class PaymentService
 
     /**
      * Depending on the given payment method, return some information
-     * (or just continue) regarding the payment method.
+     * regarding the payment method, or just continue the process.
      *
      * @param string $paymentMethod
      * @param Basket $basket
+     * @param int    $mopId
      *
      * @return string
      */
-    public function getPaymentMethodContent(string $paymentMethod, Basket $basket): string
-    {
+    public function getPaymentMethodContent(
+        string $paymentMethod,
+        Basket $basket,
+        int $mopId
+    ): string {
         $result = '';
 
         switch ($paymentMethod) {
             case CreditCard::class:
                 $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_HTML);
-                $result = $this->sendGetPaymentMethodContentRequest($basket, $paymentMethod);
+                $result = $this->sendGetPaymentMethodContentRequest($basket, $paymentMethod, $mopId);
                 break;
 
             case PayPal::class:
             case Sofort::class:
                 $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
-                $result = $this->sendGetPaymentMethodContentRequest($basket, $paymentMethod);
+                $result = $this->sendGetPaymentMethodContentRequest($basket, $paymentMethod, $mopId);
                 break;
 
             case Prepayment::class:
@@ -299,8 +308,9 @@ class PaymentService
     /**
      * @param Basket $basket
      * @param string $paymentMethod
+     * @param int    $mopId
      */
-    private function prepareRequest(Basket $basket, string $paymentMethod)
+    private function prepareRequest(Basket $basket, string $paymentMethod, int $mopId)
     {
         // set authentification data
         $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($paymentMethod);
@@ -353,6 +363,8 @@ class PaymentService
         }
 
         // shop + module information
+        $this->heidelpayRequest['CRITERION_STORE_ID'] = $this->paymentHelper->getWebstoreId();
+        $this->heidelpayRequest['CRITERION_MOP'] = $mopId;
         $this->heidelpayRequest['CRITERION_SHOP_TYPE'] = 'plentymarkets 7';
         $this->heidelpayRequest['CRITERION_SHOPMODULE_VERSION'] = Plugin::VERSION;
         $this->heidelpayRequest['CRITERION_PUSH_URL'] =

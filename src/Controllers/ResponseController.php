@@ -4,6 +4,7 @@ namespace Heidelpay\Controllers;
 
 use Heidelpay\Constants\Routes;
 use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\PaymentService;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
@@ -49,6 +50,11 @@ class ResponseController extends Controller
     private $paymentService;
 
     /**
+     * @var TransactionService
+     */
+    private $transactionService;
+
+    /**
      * ResponseController constructor.
      *
      * @param Request        $request
@@ -60,12 +66,14 @@ class ResponseController extends Controller
         Request $request,
         Response $response,
         PaymentHelper $paymentHelper,
-        PaymentService $paymentService
+        PaymentService $paymentService,
+        TransactionService $transactionService
     ) {
         $this->request = $request;
         $this->response = $response;
         $this->paymentHelper = $paymentHelper;
         $this->paymentService = $paymentService;
+        $this->transactionService = $transactionService;
     }
 
     /**
@@ -77,7 +85,8 @@ class ResponseController extends Controller
     public function processResponse(): string
     {
         // get all post parameters except the 'plentyMarkets' one injected by the plentymarkets core.
-        $postResponse = $this->request->except(['plentyMarkets']);
+        // also scrap the 'lang' parameter which will be sent when e.g. PayPal is being used.
+        $postResponse = $this->request->except(['plentyMarkets', 'lang']);
 
         $response = $this->paymentService->handleAsyncPaymentResponse(['response' => $postResponse]);
         $this->getLogger('heidelpay async response')->error('heidelpay::response.receivedResponse', [
@@ -89,6 +98,9 @@ class ResponseController extends Controller
         if (isset($response['exceptionCode'])) {
             return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
         }
+
+        // todo: create the transaction entity.
+        //$this->transactionService->createTransaction($response);
 
         // if the transaction is successful or pending, return the success url.
         if ($response['isSuccess'] || $response['isPending']) {

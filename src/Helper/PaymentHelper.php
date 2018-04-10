@@ -205,6 +205,17 @@ class PaymentHelper
     }
 
     /**
+     * @return int
+     */
+    public function getWebstoreId(): int
+    {
+        /** @var WebstoreHelper $webstoreHelper */
+        $webstoreHelper = pluginApp(WebstoreHelper::class);
+
+        return $webstoreHelper->getCurrentWebstoreConfiguration()->webstoreId;
+    }
+
+    /**
      * @param string $paymentMethod
      *
      * @return string

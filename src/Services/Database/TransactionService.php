@@ -57,15 +57,15 @@ class TransactionService
         int $orderId = null
     ): Transaction {
         $data = [];
-        $data['basketId'] = (int) $heidelpayResponse['IDENTIFICATION_TRANSACTIONID'];
-        $data['customerId'] = (int) $heidelpayResponse['IDENTIFICATION_SHOPPERID'];
+        $data['basketId'] = (int) $heidelpayResponse['IDENTIFICATION.TRANSACTIONID'];
+        $data['customerId'] = (int) $heidelpayResponse['IDENTIFICATION.SHOPPERID'];
         $data['storeId'] = $storeId;
         $data['paymentMethodId'] = $paymentMethodId;
         $data['transactionType'] =
-            $this->paymentHelper->mapHeidelpayTransactionType($heidelpayResponse['PAYMENT_CODE']);
+            $this->paymentHelper->mapHeidelpayTransactionType($heidelpayResponse['PAYMENT.CODE']);
         $data['status'] = $this->paymentHelper->mapHeidelpayTransactionStatus($heidelpayResponse);
-        $data['shortId'] = $heidelpayResponse['IDENTIFICATION_SHORTID'];
-        $data['uniqueId'] = $heidelpayResponse['IDENTIFICATION_UNIQUEID'];
+        $data['shortId'] = $heidelpayResponse['IDENTIFICATION.SHORTID'];
+        $data['uniqueId'] = $heidelpayResponse['IDENTIFICATION.UNIQUEID'];
         $data['createdAt'] = date('Y-m-d H:i:s');
 
         if ($orderId !== null) {
@@ -76,15 +76,15 @@ class TransactionService
 
         // transaction processing data
         $data['transactionProcessing'] = [
-            Transaction::PROCESSING_CODE => $heidelpayResponse['PROCESSING_CODE'],
-            Transaction::PROCESSING_REASON => $heidelpayResponse['PROCESSING_REASON'],
-            Transaction::PROCESSING_REASON_CODE => $heidelpayResponse['PROCESSING_REASON_CODE'],
-            Transaction::PROCESSING_RESULT => $heidelpayResponse['PROCESSING_RESULT'],
-            Transaction::PROCESSING_RETURN => $heidelpayResponse['PROCESSING_RETURN'],
-            Transaction::PROCESSING_RETURN_CODE => $heidelpayResponse['PROCESSING_RETURN_CODE'],
-            Transaction::PROCESSING_STATUS => $heidelpayResponse['PROCESSING_STATUS'],
-            Transaction::PROCESSING_STATUS_CODE => $heidelpayResponse['PROCESSING_STATUS_CODE'],
-            Transaction::PROCESSING_TIMESTAMP => $heidelpayResponse['PROCESSING_TIMESTAMP'],
+            Transaction::PROCESSING_CODE => $heidelpayResponse['PROCESSING.CODE'],
+            Transaction::PROCESSING_REASON => $heidelpayResponse['PROCESSING.REASON'],
+            Transaction::PROCESSING_REASON_CODE => $heidelpayResponse['PROCESSING.REASON_CODE'],
+            Transaction::PROCESSING_RESULT => $heidelpayResponse['PROCESSING.RESULT'],
+            Transaction::PROCESSING_RETURN => $heidelpayResponse['PROCESSING.RETURN'],
+            Transaction::PROCESSING_RETURN_CODE => $heidelpayResponse['PROCESSING.RETURN_CODE'],
+            Transaction::PROCESSING_STATUS => $heidelpayResponse['PROCESSING.STATUS'],
+            Transaction::PROCESSING_STATUS_CODE => $heidelpayResponse['PROCESSING.STATUS_CODE'],
+            Transaction::PROCESSING_TIMESTAMP => $heidelpayResponse['PROCESSING.TIMESTAMP'],
         ];
 
         return $this->transactionRepository->createTransaction($data);
@@ -125,9 +125,9 @@ class TransactionService
 
         // contains unnecessary parameter keys
         $toDelete = [
-            'ACCOUNT_EXPIRY_YEAR', 'ACCOUNT_EXPIRY_MONTH', 'ACCOUNT_HOLDER', 'ACCOUNT_NUMBER', 'ACCOUNT_VERIFICATION',
-            'CRITERION_PAYMENT_METHOD', 'CRITERION_PUSH_URL', 'CRITERION_SDK_NAME', 'CRITERION_SDK_VERSION',
-            'CRITERION_SHOPMODULE_VERSION', 'CRITERION_SHOP_TYPE', 'PAYMENT_CODE', 'SECURITY_SENDER',
+            'ACCOUNT.EXPIRY_YEAR', 'ACCOUNT.EXPIRY_MONTH', 'ACCOUNT.HOLDER', 'ACCOUNT.NUMBER', 'ACCOUNT.VERIFICATION',
+            'CRITERION.PAYMENT_METHOD', 'CRITERION.PUSH_URL', 'CRITERION.SDK_NAME', 'CRITERION.SDK_VERSION',
+            'CRITERION.SHOPMODULE_VERSION', 'CRITERION.SHOP_TYPE', 'PAYMENT.CODE', 'SECURITY.SENDER',
         ];
 
         foreach ($heidelpayData as $key => $value) {

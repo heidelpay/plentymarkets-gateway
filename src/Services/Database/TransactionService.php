@@ -47,16 +47,16 @@ class TransactionService
 
     /**
      * @param array    $heidelpayResponse
-     * @param int      $storeId
-     * @param int      $paymentMethodId
+     * @param int|null $storeId
+     * @param int|null $paymentMethodId
      * @param int|null $orderId
      *
      * @return Transaction
      */
     public function createTransaction(
         array $heidelpayResponse,
-        int $storeId,
-        int $paymentMethodId,
+        int $storeId = null,
+        int $paymentMethodId = null,
         int $orderId = null
     ): Transaction {
         $this->getLogger(__METHOD__)->error('create Transaction', [
@@ -65,6 +65,14 @@ class TransactionService
             'paymentMethodId' => $paymentMethodId,
             'orderId' => $orderId,
         ]);
+
+        if ($storeId === null) {
+            $storeId = (int) $heidelpayResponse['CRITERION.STORE_ID'];
+        }
+
+        if ($paymentMethodId === null) {
+            $paymentMethodId = (int) $heidelpayResponse['CRITERION.MOP'];
+        }
 
         $data = [];
         $data['basketId'] = (int) $heidelpayResponse['IDENTIFICATION.TRANSACTIONID'];

@@ -4,6 +4,7 @@ namespace Heidelpay\Controllers;
 
 use Heidelpay\Constants\Routes;
 use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\PaymentService;
 use Plenty\Plugin\Controller;
@@ -100,9 +101,14 @@ class ResponseController extends Controller
         }
 
         // create the transaction entity.
-        $storeId = (int) $response['CRITERION.STORE_ID'];
-        $mopId = (int) $response['CRITERION.MOP'];
-        $this->transactionService->createTransaction($response, $storeId, $mopId);
+        $newTransaction = $this->transactionService->createTransaction($response['response']);
+        if ($newTransaction === null || ! $newTransaction instanceof Transaction) {
+            $this->getLogger(__METHOD__)->error('Transaction not created!', [
+                'data' => $response['response']
+            ]);
+
+            return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
+        }
 
         // if the transaction is successful or pending, return the success url.
         if ($response['isSuccess'] || $response['isPending']) {

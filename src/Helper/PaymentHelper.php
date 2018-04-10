@@ -613,7 +613,11 @@ class PaymentHelper
      */
     public function mapHeidelpayTransactionType(string $paymentCode): string
     {
-        @list($methodCode, $transactionType) = explode('_', $paymentCode);
+        if (strpos($paymentCode, '.')) {
+            list(, $transactionType) = explode('.', $paymentCode);
+        } else {
+            list(, $transactionType) = explode('_', $paymentCode);
+        }
 
         switch ($transactionType) {
             case TransactionType::HP_AUTHORIZE:

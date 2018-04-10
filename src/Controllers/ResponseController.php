@@ -101,7 +101,7 @@ class ResponseController extends Controller
         }
 
         // create the transaction entity.
-        $newTransaction = $this->transactionService->createTransaction($response['response']);
+        $newTransaction = $this->transactionService->createTransaction($response);
         if ($newTransaction === null || ! $newTransaction instanceof Transaction) {
             $this->getLogger(__METHOD__)->error('Transaction not created!', [
                 'data' => $response['response']

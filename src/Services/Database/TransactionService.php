@@ -46,7 +46,7 @@ class TransactionService
     }
 
     /**
-     * @param array    $heidelpayResponse
+     * @param array    $responseData
      * @param int|null $storeId
      * @param int|null $paymentMethodId
      * @param int|null $orderId
@@ -54,17 +54,19 @@ class TransactionService
      * @return Transaction
      */
     public function createTransaction(
-        array $heidelpayResponse,
+        array $responseData,
         int $storeId = null,
         int $paymentMethodId = null,
         int $orderId = null
     ): Transaction {
         $this->getLogger(__METHOD__)->error('create Transaction', [
-            'response' => $heidelpayResponse,
+            'response' => $responseData,
             'storeId' => $storeId,
             'paymentMethodId' => $paymentMethodId,
             'orderId' => $orderId,
         ]);
+
+        $heidelpayResponse = $responseData['response'];
 
         if ($storeId === null) {
             $storeId = (int) $heidelpayResponse['CRITERION.STORE_ID'];
@@ -81,7 +83,7 @@ class TransactionService
         $data['paymentMethodId'] = $paymentMethodId;
         $data['transactionType'] =
             $this->paymentHelper->mapHeidelpayTransactionType($heidelpayResponse['PAYMENT.CODE']);
-        $data['status'] = $this->paymentHelper->mapHeidelpayTransactionStatus($heidelpayResponse);
+        $data['status'] = $this->paymentHelper->mapHeidelpayTransactionStatus($responseData);
         $data['shortId'] = $heidelpayResponse['IDENTIFICATION.SHORTID'];
         $data['uniqueId'] = $heidelpayResponse['IDENTIFICATION.UNIQUEID'];
         $data['createdAt'] = date('Y-m-d H:i:s');
@@ -139,7 +141,7 @@ class TransactionService
     private function getTransactionDetails(array $heidelpayData): array
     {
         // contains unnecessary parameter groups
-        $groupPattern = '/^ADDRESS/^CONFIG/^CONTACT/^FRONTEND/^NAME/^PAYMENT/^USER/';
+        $groupPattern = '/^ADDRESS|^CONFIG|^CONTACT|^FRONTEND|^NAME|^PAYMENT|^USER/';
 
         // contains unnecessary parameter keys
         $toDelete = [

@@ -3,10 +3,10 @@
 namespace Heidelpay\Models\Repositories;
 
 use Heidelpay\Constants\TransactionType;
-use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Transaction;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * heidelpay Transaction repository class
@@ -22,6 +22,8 @@ use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
  */
 class TransactionRepository implements TransactionRepositoryContract
 {
+    use Loggable;
+
     /**
      * @var DataBase
      */
@@ -44,6 +46,10 @@ class TransactionRepository implements TransactionRepositoryContract
     {
         /** @var Transaction $transaction */
         $transaction = pluginApp(Transaction::class, $data);
+
+        $this->getLogger(__METHOD__)->error('transaction data', [
+            'transaction' => $transaction
+        ]);
 
         $transaction = $this->database->save($transaction);
         return $transaction;

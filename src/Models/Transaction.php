@@ -28,7 +28,7 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  * @property string $transactionType
  * @property string $shortId
  * @property string $uniqueId
- * @property boolean $isDone
+ * @property boolean $isClosed
  * @property array $transactionDetails
  * @property array $transactionProcessing
  * @property string $createdAt

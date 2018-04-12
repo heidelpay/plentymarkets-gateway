@@ -45,7 +45,23 @@ class TransactionRepository implements TransactionRepositoryContract
     public function createTransaction(array $data): Transaction
     {
         /** @var Transaction $transaction */
-        $transaction = pluginApp(Transaction::class, $data);
+        $transaction = pluginApp(Transaction::class);
+
+        $transaction->storeId = $data['storeId'];
+        $transaction->customerId = $data['customerId'];
+        $transaction->basketId = $data['basketId'];
+        $transaction->orderId = $data['orderId'];
+        $transaction->paymentMethodId = $data['paymentMethodId'];
+        $transaction->status = $data['status'];
+        $transaction->transactionType = $data['transactionType'];
+        $transaction->shortId = $data['shortId'];
+        $transaction->uniqueId = $data['uniqueId'];
+        $transaction->transactionDetails = $data['transactionDetails'];
+        $transaction->transactionProcessing = $data['transactionProcessing'];
+
+        if (isset($data['isClosed']) && $data['isCloded'] === true) {
+            $transaction->isClosed = true;
+        }
 
         $this->getLogger(__METHOD__)->error('transaction data', [
             'transaction' => $transaction

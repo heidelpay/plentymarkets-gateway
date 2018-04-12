@@ -86,7 +86,7 @@ class TransactionService
         $data['status'] = $this->paymentHelper->mapHeidelpayTransactionStatus($responseData);
         $data['shortId'] = $heidelpayResponse['IDENTIFICATION.SHORTID'];
         $data['uniqueId'] = $heidelpayResponse['IDENTIFICATION.UNIQUEID'];
-        $data['createdAt'] = date('Y-m-d H:i:s');
+        $data['createdAt'] = $heidelpayResponse['PROCESSING.TIMESTAMP'];
 
         if ($orderId !== null) {
             $data['orderId'] = $orderId;
@@ -156,7 +156,6 @@ class TransactionService
             }
         }
 
-        sort($heidelpayData);
         return $heidelpayData;
     }
 }

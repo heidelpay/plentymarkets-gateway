@@ -35,13 +35,13 @@ class TransactionController
     }
 
     /**
-     * @param $id
+     * @param $transactionId
      *
      * @return Transaction
      */
-    public function getTransactionById($id): Transaction
+    public function getTransactionById($transactionId): Transaction
     {
-        return $this->transactionService->getTransactionById($id);
+        return $this->transactionService->getTransactionById($transactionId);
     }
 
     /**

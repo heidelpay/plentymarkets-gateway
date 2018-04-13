@@ -141,13 +141,15 @@ class TransactionService
     private function getTransactionDetails(array $heidelpayData): array
     {
         // contains unnecessary parameter groups
-        $groupPattern = '/^ADDRESS|^CONFIG|^CONTACT|^FRONTEND|^NAME|^PAYMENT|^USER/';
+        $groupPattern = '/^ADDRESS|^CONFIG|^CONTACT|^FRONTEND|^NAME|^PAYMENT|^PROCESSING|^USER/';
 
         // contains unnecessary parameter keys
         $toDelete = [
             'ACCOUNT.EXPIRY_YEAR', 'ACCOUNT.EXPIRY_MONTH', 'ACCOUNT.HOLDER', 'ACCOUNT.NUMBER', 'ACCOUNT.VERIFICATION',
             'CRITERION.PAYMENT_METHOD', 'CRITERION.PUSH_URL', 'CRITERION.SDK_NAME', 'CRITERION.SDK_VERSION',
-            'CRITERION.SHOPMODULE_VERSION', 'CRITERION.SHOP_TYPE', 'PAYMENT.CODE', 'SECURITY.SENDER',
+            'CRITERION.SHOPMODULE_VERSION', 'CRITERION.SHOP_TYPE', 'IDENTIFICATION.SHOPPERID',
+            'IDENTIFICATION.SHORTID', 'IDENTIFICATION.TRANSACTIONID', 'IDENTIFICATION.UNIQUEID',
+            'PAYMENT.CODE', 'SECURITY.SENDER',
         ];
 
         foreach ($heidelpayData as $key => $value) {

@@ -13,11 +13,11 @@
             "selectBoxValues": [
               {
                 "value": "0",
-                "caption": "Config.mainEnvironmentPossibleValue-0"
+                "caption": "Config.mainEnvironmentPossibleValue0"
               },
               {
                 "value": "1",
-                "caption": "Config.mainEnvironmentPossibleValue-1"
+                "caption": "Config.mainEnvironmentPossibleValue1"
               }
             ]
           }
@@ -102,15 +102,15 @@
             "selectBoxValues": [
               {
                 "value": "0",
-                "caption": "Config.creditcardInfoPageTypePossibleValue-0"
+                "caption": "Config.creditcardInfoPageTypePossibleValue0"
               },
               {
                 "value": "1",
-                "caption": "Config.creditcardInfoPageTypePossibleValue-1"
+                "caption": "Config.creditcardInfoPageTypePossibleValue1"
               },
               {
                 "value": "2",
-                "caption": "Config.creditcardInfoPageTypePossibleValue-2"
+                "caption": "Config.creditcardInfoPageTypePossibleValue2"
               }
             ]
           }
@@ -144,11 +144,11 @@
             "selectBoxValues": [
               {
                 "value": "0",
-                "caption": "Config.creditcardTransactionTypePossibleValue-0"
+                "caption": "Config.creditcardTransactionTypePossibleValue0"
               },
               {
                 "value": "1",
-                "caption": "Config.creditcardTransactionTypePossibleValue-1"
+                "caption": "Config.creditcardTransactionTypePossibleValue1"
               }
             ]
           }
@@ -305,15 +305,15 @@
             "selectBoxValues": [
               {
                 "value": "0",
-                "caption": "Config.prepaymentInfoPageTypePossibleValue-0"
+                "caption": "Config.prepaymentInfoPageTypePossibleValue0"
               },
               {
                 "value": "1",
-                "caption": "Config.prepaymentInfoPageTypePossibleValue-1"
+                "caption": "Config.prepaymentInfoPageTypePossibleValue1"
               },
               {
                 "value": "2",
-                "caption": "Config.prepaymentInfoPageTypePossibleValue-2"
+                "caption": "Config.prepaymentInfoPageTypePossibleValue2"
               }
             ]
           }

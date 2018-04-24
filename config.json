@@ -1,252 +1,336 @@
-[
-  {
-    "tab": "heidelpay Einstellungen",
-    "key": "main.environment",
-    "label": "Test-/Livesystem",
-    "type": "dropdown",
-    "possibleValues": {
-      "0": "Testumgebung (CONNECTOR_TEST)",
-      "1": "Liveumgebung (LIVE)"
+{
+  "formatVersion": 1,
+  "menu": {
+    "Config.heidelpayEinstellungenTab": {
+      "label": "Config.heidelpayEinstellungenTab",
+      "formFields": {
+        "main.environment": {
+          "type": "selectBox",
+          "required": false,
+          "label": "Config.mainEnvironmentLabel",
+          "options": {
+            "defaultValue": "0",
+            "selectBoxValues": [
+              {
+                "value": "0",
+                "caption": "Config.mainEnvironmentPossibleValue-0"
+              },
+              {
+                "value": "1",
+                "caption": "Config.mainEnvironmentPossibleValue-1"
+              }
+            ]
+          }
+        },
+        "main.senderId": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.mainSenderIdLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        },
+        "main.login": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.mainLoginLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        },
+        "main.password": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.mainPasswordLabel",
+          "options": {
+            "defaultValue": "",
+            "isPassword": true,
+            "isIBAN": false
+          }
+        }
+      }
     },
-    "default": "0"
-  },
-  {
-    "tab": "heidelpay Einstellungen",
-    "key": "main.senderId",
-    "label": "Sender-ID",
-    "type": "text",
-    "default": ""
-  },
-  {
-    "tab": "heidelpay Einstellungen",
-    "key": "main.login",
-    "label": "Login",
-    "type": "text",
-    "default": ""
-  },
-  {
-    "tab": "heidelpay Einstellungen",
-    "key": "main.password",
-    "label": "Kennwort",
-    "type": "password",
-    "default": ""
-  },
-
-
-  {
-    "tab": "Kreditkarte",
-    "key": "creditcard.isActive",
-    "label": "Aktiv",
-    "type": "checkbox",
-    "default": false
-  },
-  {
-    "tab": "Kreditkarte",
-    "key": "creditcard.displayName",
-    "label": "Anzeigename",
-    "type": "text",
-    "default": "Kreditkarte"
-  },
-  {
-    "tab": "Kreditkarte",
-    "key": "creditcard.channelId",
-    "label": "Channel-ID",
-    "type": "text",
-    "default": ""
-  },
-  {
-    "tab": "Kreditkarte",
-    "key": "creditcard.minAmount",
-    "label": "Mindestbetrag (in Euro)",
-    "type": "text",
-    "default": "0,00"
-  },
-  {
-    "tab": "Kreditkarte",
-    "key": "creditcard.maxAmount",
-    "label": "Höchstbetrag (in Euro)",
-    "type": "text",
-    "default": "0,00"
-  },
-  {
-    "tab": "Kreditkarte",
-    "key": "creditcard.infoPage.type",
-    "label": "Information Page",
-    "type": "dropdown",
-    "possibleValues": {
-      "0": "None",
-      "1": "External Content",
-      "2": "Internal Content"
+    "Config.KreditkarteTab": {
+      "label": "Config.KreditkarteTab",
+      "formFields": {
+        "creditcard.isActive": {
+          "type": "checkBox",
+          "required": false,
+          "label": "Config.creditcardIsActiveLabel",
+          "options": {
+            "defaultValue": false
+          }
+        },
+        "creditcard.displayName": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.creditcardDisplayNameLabel",
+          "options": {
+            "defaultValue": "Kreditkarte"
+          }
+        },
+        "creditcard.channelId": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.creditcardChannelIdLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        },
+        "creditcard.minAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.creditcardMinAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "creditcard.maxAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.creditcardMaxAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "creditcard.infoPage.type": {
+          "type": "selectBox",
+          "required": false,
+          "label": "Config.creditcardInfoPageTypeLabel",
+          "options": {
+            "defaultValue": "0",
+            "selectBoxValues": [
+              {
+                "value": "0",
+                "caption": "Config.creditcardInfoPageTypePossibleValue-0"
+              },
+              {
+                "value": "1",
+                "caption": "Config.creditcardInfoPageTypePossibleValue-1"
+              },
+              {
+                "value": "2",
+                "caption": "Config.creditcardInfoPageTypePossibleValue-2"
+              }
+            ]
+          }
+        },
+        "creditcard.infoPage.intern": {
+          "type": "categoryPicker",
+          "required": false,
+          "label": "Config.creditcardInfoPageInternLabel",
+          "options": {}
+        },
+        "creditcard.infoPage.extern": {
+          "type": "categoryPicker",
+          "required": false,
+          "label": "Config.creditcardInfoPageExternLabel",
+          "options": {}
+        },
+        "creditcard.doRegistration": {
+          "type": "checkBox",
+          "required": false,
+          "label": "Config.creditcardDoRegistrationLabel",
+          "options": {
+            "defaultValue": false
+          }
+        },
+        "creditcard.transactionType": {
+          "type": "selectBox",
+          "required": false,
+          "label": "Config.creditcardTransactionTypeLabel",
+          "options": {
+            "defaultValue": "0",
+            "selectBoxValues": [
+              {
+                "value": "0",
+                "caption": "Config.creditcardTransactionTypePossibleValue-0"
+              },
+              {
+                "value": "1",
+                "caption": "Config.creditcardTransactionTypePossibleValue-1"
+              }
+            ]
+          }
+        },
+        "creditcard.iframeCss": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.creditcardIframeCssLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        }
+      }
     },
-    "default": "0"
-  },
-  {
-    "tab": "Kreditkarte",
-    "key": "creditcard.infoPage.intern",
-    "label": "Internal Information Page",
-    "type": "category_select"
-  },
-  {
-    "tab": "Kreditkarte",
-    "key": "creditcard.infoPage.extern",
-    "label": "External Information Page",
-    "type": "category_select"
-  },
-  {
-    "tab": "Kreditkarte",
-    "key": "creditcard.doRegistration",
-    "label": "Registrierung verwenden",
-    "type": "checkbox",
-    "default": false
-  },
-  {
-    "tab": "Kreditkarte",
-    "key": "creditcard.transactionType",
-    "label": "Buchungsmodus",
-    "type": "dropdown",
-    "possibleValues": {
-      "0": "Direkte Buchung",
-      "1": "Reservierung mit Erfassung bei Rechnungserstellung"
+    "Config.SofortTab": {
+      "label": "Config.SofortTab",
+      "formFields": {
+        "sofort.isActive": {
+          "type": "checkBox",
+          "required": false,
+          "label": "Config.sofortIsActiveLabel",
+          "options": {
+            "defaultValue": false
+          }
+        },
+        "sofort.displayName": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.sofortDisplayNameLabel",
+          "options": {
+            "defaultValue": "Sofort."
+          }
+        },
+        "sofort.channelId": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.sofortChannelIdLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        },
+        "sofort.minAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.sofortMinAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "sofort.maxAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.sofortMaxAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        }
+      }
     },
-    "default": "0"
-  },
-  {
-    "tab": "Kreditkarte",
-    "key": "creditcard.iframeCss",
-    "label": "URL für Custom-CSS im iFrame",
-    "type": "text",
-    "default": ""
-  },
-
-  {
-    "tab": "Sofort.",
-    "key": "sofort.isActive",
-    "label": "Aktiv",
-    "type": "checkbox",
-    "default": false
-  },
-  {
-    "tab": "Sofort.",
-    "key": "sofort.displayName",
-    "label": "Anzeigename",
-    "type": "text",
-    "default": "Sofort."
-  },
-  {
-    "tab": "Sofort.",
-    "key": "sofort.channelId",
-    "label": "Channel-ID",
-    "type": "text",
-    "default": ""
-  },
-  {
-    "tab": "Sofort.",
-    "key": "sofort.minAmount",
-    "label": "Mindestbetrag (in Euro)",
-    "type": "text",
-    "default": "0,00"
-  },
-  {
-    "tab": "Sofort.",
-    "key": "sofort.maxAmount",
-    "label": "Höchstbetrag (in Euro)",
-    "type": "text",
-    "default": "0,00"
-  },
-
-  {
-    "tab": "PayPal",
-    "key": "paypal.isActive",
-    "label": "Aktiv",
-    "type": "checkbox",
-    "default": false
-  },
-  {
-    "tab": "PayPal",
-    "key": "paypal.displayName",
-    "label": "Anzeigename",
-    "type": "text",
-    "default": "PayPal"
-  },
-  {
-    "tab": "PayPal",
-    "key": "paypal.channelId",
-    "label": "Channel-ID",
-    "type": "text",
-    "default": ""
-  },
-  {
-    "tab": "PayPal",
-    "key": "paypal.minAmount",
-    "label": "Mindestbetrag (in Euro)",
-    "type": "text",
-    "default": "0,00"
-  },
-  {
-    "tab": "PayPal",
-    "key": "paypal.maxAmount",
-    "label": "Höchstbetrag (in Euro)",
-    "type": "text",
-    "default": "0,00"
-  },
-
-  {
-    "tab": "Vorkasse",
-    "key": "prepayment.isActive",
-    "label": "Aktiv",
-    "type": "checkbox",
-    "default": false
-  },
-  {
-    "tab": "Vorkasse",
-    "key": "prepayment.displayName",
-    "label": "Anzeigename",
-    "type": "text",
-    "default": "Vorkasse"
-  },
-  {
-    "tab": "Vorkasse",
-    "key": "prepayment.channelId",
-    "label": "Channel-ID",
-    "type": "text",
-    "default": ""
-  },
-  {
-    "tab": "Vorkasse",
-    "key": "prepayment.minAmount",
-    "label": "Mindestbetrag (in Euro)",
-    "type": "text",
-    "default": "0,00"
-  },
-  {
-    "tab": "Vorkasse",
-    "key": "prepayment.maxAmount",
-    "label": "Höchstbetrag (in Euro)",
-    "type": "text",
-    "default": "0,00"
-  },
-  {
-    "tab": "Vorkasse",
-    "key": "prepayment.infoPage.type",
-    "label": "Information Page",
-    "type": "dropdown",
-    "possibleValues": {
-      "0": "None",
-      "1": "External Content",
-      "2": "Internal Content"
+    "Config.PayPalTab": {
+      "label": "Config.PayPalTab",
+      "formFields": {
+        "paypal.isActive": {
+          "type": "checkBox",
+          "required": false,
+          "label": "Config.paypalIsActiveLabel",
+          "options": {
+            "defaultValue": false
+          }
+        },
+        "paypal.displayName": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.paypalDisplayNameLabel",
+          "options": {
+            "defaultValue": "PayPal"
+          }
+        },
+        "paypal.channelId": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.paypalChannelIdLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        },
+        "paypal.minAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.paypalMinAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "paypal.maxAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.paypalMaxAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        }
+      }
     },
-    "default": "0"
-  },
-  {
-    "tab": "Vorkasse",
-    "key": "prepayment.infoPage.intern",
-    "label": "Internal Information Page",
-    "type": "category_select"
-  },
-  {
-    "tab": "Vorkasse",
-    "key": "prepayment.infoPage.extern",
-    "label": "External Information Page",
-    "type": "category_select"
+    "Config.VorkasseTab": {
+      "label": "Config.VorkasseTab",
+      "formFields": {
+        "prepayment.isActive": {
+          "type": "checkBox",
+          "required": false,
+          "label": "Config.prepaymentIsActiveLabel",
+          "options": {
+            "defaultValue": false
+          }
+        },
+        "prepayment.displayName": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.prepaymentDisplayNameLabel",
+          "options": {
+            "defaultValue": "Vorkasse"
+          }
+        },
+        "prepayment.channelId": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.prepaymentChannelIdLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        },
+        "prepayment.minAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.prepaymentMinAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "prepayment.maxAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.prepaymentMaxAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "prepayment.infoPage.type": {
+          "type": "selectBox",
+          "required": false,
+          "label": "Config.prepaymentInfoPageTypeLabel",
+          "options": {
+            "defaultValue": "0",
+            "selectBoxValues": [
+              {
+                "value": "0",
+                "caption": "Config.prepaymentInfoPageTypePossibleValue-0"
+              },
+              {
+                "value": "1",
+                "caption": "Config.prepaymentInfoPageTypePossibleValue-1"
+              },
+              {
+                "value": "2",
+                "caption": "Config.prepaymentInfoPageTypePossibleValue-2"
+              }
+            ]
+          }
+        },
+        "prepayment.infoPage.intern": {
+          "type": "categoryPicker",
+          "required": false,
+          "label": "Config.prepaymentInfoPageInternLabel",
+          "options": {}
+        },
+        "prepayment.infoPage.extern": {
+          "type": "categoryPicker",
+          "required": false,
+          "label": "Config.prepaymentInfoPageExternLabel",
+          "options": {}
+        }
+      }
+    }
   }
-]
+}

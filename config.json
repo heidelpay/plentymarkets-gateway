@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "menu": {
-    "Config.heidelpayEinstellungenTab": {
-      "label": "Config.heidelpayEinstellungenTab",
+    "Config.heidelpaySettingsTab": {
+      "label": "Config.heidelpaySettingsTab",
       "formFields": {
         "main.environment": {
           "type": "selectBox",
@@ -50,8 +50,8 @@
         }
       }
     },
-    "Config.KreditkarteTab": {
-      "label": "Config.KreditkarteTab",
+    "Config.creditcardTab": {
+      "label": "Config.creditcardTab",
       "formFields": {
         "creditcard.isActive": {
           "type": "checkBox",
@@ -163,8 +163,8 @@
         }
       }
     },
-    "Config.SofortTab": {
-      "label": "Config.SofortTab",
+    "Config.sofortTab": {
+      "label": "Config.sofortTab",
       "formFields": {
         "sofort.isActive": {
           "type": "checkBox",
@@ -208,8 +208,8 @@
         }
       }
     },
-    "Config.PayPalTab": {
-      "label": "Config.PayPalTab",
+    "Config.paypalTab": {
+      "label": "Config.paypalTab",
       "formFields": {
         "paypal.isActive": {
           "type": "checkBox",
@@ -253,8 +253,8 @@
         }
       }
     },
-    "Config.VorkasseTab": {
-      "label": "Config.VorkasseTab",
+    "Config.prepaymentTab": {
+      "label": "Config.prepaymentTab",
       "formFields": {
         "prepayment.isActive": {
           "type": "checkBox",

@@ -9,6 +9,7 @@
           "required": false,
           "label": "Config.mainEnvironmentLabel",
           "options": {
+            "tooltip": "Config.mainEnvironmentTooltip",
             "defaultValue": "0",
             "selectBoxValues": [
               {

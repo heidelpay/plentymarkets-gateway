@@ -23,6 +23,8 @@ class TransactionService
 {
     use Loggable;
 
+    const NO_ORDER_ID = -1;
+
     /**
      * @var PaymentHelper
      */
@@ -46,6 +48,8 @@ class TransactionService
     }
 
     /**
+     * Creates a Transaction entity
+     *
      * @param array    $responseData
      * @param int|null $storeId
      * @param int|null $paymentMethodId
@@ -88,9 +92,8 @@ class TransactionService
         $data['uniqueId'] = $heidelpayResponse['IDENTIFICATION.UNIQUEID'];
         $data['createdAt'] = $heidelpayResponse['PROCESSING.TIMESTAMP'];
 
-        if ($orderId !== null) {
-            $data['orderId'] = $orderId;
-        }
+        // if the orderId is given, use this. else, use a dummy since null is not possible.
+        $data['orderId'] = $orderId ?? self::NO_ORDER_ID;
 
         $data['transactionDetails'] = $this->getTransactionDetails($heidelpayResponse);
 

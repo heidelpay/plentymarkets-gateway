@@ -50,7 +50,7 @@ class Transaction extends Model
     public $storeId;
     public $customerId;
     public $basketId;
-    public $orderId = -1;
+    public $orderId;
     public $paymentMethodId;
     public $status;
     public $transactionType = '';

@@ -94,40 +94,6 @@
             "defaultValue": "0,00"
           }
         },
-        "creditcard.infoPage.type": {
-          "type": "selectBox",
-          "required": false,
-          "label": "Config.creditcardInfoPageTypeLabel",
-          "options": {
-            "defaultValue": "0",
-            "selectBoxValues": [
-              {
-                "value": "0",
-                "caption": "Config.creditcardInfoPageTypePossibleValue0"
-              },
-              {
-                "value": "1",
-                "caption": "Config.creditcardInfoPageTypePossibleValue1"
-              },
-              {
-                "value": "2",
-                "caption": "Config.creditcardInfoPageTypePossibleValue2"
-              }
-            ]
-          }
-        },
-        "creditcard.infoPage.intern": {
-          "type": "categoryPicker",
-          "required": false,
-          "label": "Config.creditcardInfoPageInternLabel",
-          "options": {}
-        },
-        "creditcard.infoPage.extern": {
-          "type": "categoryPicker",
-          "required": false,
-          "label": "Config.creditcardInfoPageExternLabel",
-          "options": {}
-        },
         "creditcard.doRegistration": {
           "type": "checkBox",
           "required": false,
@@ -296,40 +262,6 @@
           "options": {
             "defaultValue": "0,00"
           }
-        },
-        "prepayment.infoPage.type": {
-          "type": "selectBox",
-          "required": false,
-          "label": "Config.prepaymentInfoPageTypeLabel",
-          "options": {
-            "defaultValue": "0",
-            "selectBoxValues": [
-              {
-                "value": "0",
-                "caption": "Config.prepaymentInfoPageTypePossibleValue0"
-              },
-              {
-                "value": "1",
-                "caption": "Config.prepaymentInfoPageTypePossibleValue1"
-              },
-              {
-                "value": "2",
-                "caption": "Config.prepaymentInfoPageTypePossibleValue2"
-              }
-            ]
-          }
-        },
-        "prepayment.infoPage.intern": {
-          "type": "categoryPicker",
-          "required": false,
-          "label": "Config.prepaymentInfoPageInternLabel",
-          "options": {}
-        },
-        "prepayment.infoPage.extern": {
-          "type": "categoryPicker",
-          "required": false,
-          "label": "Config.prepaymentInfoPageExternLabel",
-          "options": {}
         }
       }
     }

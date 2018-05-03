@@ -22,7 +22,7 @@
   "type": "payment",
   "dependencies": {
     "heidelpay/php-basket-api": "^1.0.0",
-    "heidelpay/php-payment-api": "^1.4.0"
+    "heidelpay/php-payment-api": "^1.5.0"
   },
   "runOnBuild": [
     "Heidelpay\\Migrations\\CreatePaymentMethods",

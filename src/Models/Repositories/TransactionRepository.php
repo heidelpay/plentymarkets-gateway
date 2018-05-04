@@ -109,14 +109,22 @@ class TransactionRepository implements TransactionRepositoryContract
     /**
      * @inheritdoc
      */
-    public function getTransactionsByBasketId(int $id): array
+    public function getTransactionByBasketId(int $id): Transaction
     {
         /** @var Transaction[] $result */
-        $result = $this->database->query(Transaction::class)
-            ->where('basketId', '=', $id)
-            ->get();
+        $result = $this->getTransactionsByBasketId($id);
 
         return $result[0];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTransactionsByBasketId(int $id): array
+    {
+        return $this->database->query(Transaction::class)
+            ->where('basketId', '=', $id)
+            ->get();
     }
 
     /**

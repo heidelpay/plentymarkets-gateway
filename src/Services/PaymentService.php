@@ -180,6 +180,7 @@ class PaymentService
         $transactions = $this->transactionRepository->getTransactionsByBasketId($basket->id);
 
         $this->getLogger(__METHOD__)->error('Transactions', $transactions);
+        $this->getLogger(__METHOD__)->error('Basket', $basket);
 
 
         // todo: call createPlentyPayment and create the payment

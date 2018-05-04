@@ -39,9 +39,9 @@ interface TransactionRepositoryContract
     /**
      * @param int $id
      *
-     * @return Transaction
+     * @return array
      */
-    public function getTransactionByBasketId(int $id): Transaction;
+    public function getTransactionsByBasketId(int $id): array;
 
     /**
      * @param int $customerId

@@ -11,6 +11,7 @@ use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
+use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Models\Basket;
@@ -92,19 +93,23 @@ class PaymentService
      * @var Twig
      */
     private $twig;
+    /**
+     * @var TransactionRepositoryContract
+     */
+    private $transactionRepository;
 
     /**
      * PaymentService constructor.
      *
-     * @param AddressRepositoryContract              $addressRepository
-     * @param CountryRepositoryContract              $countryRepository
-     * @param ConfigRepository                       $configRepository
-     * @param LibService                             $libraryService
-     * @param OrderRepositoryContract                $orderRepository
+     * @param AddressRepositoryContract $addressRepository
+     * @param CountryRepositoryContract $countryRepository
+     * @param ConfigRepository $configRepository
+     * @param LibService $libraryService
+     * @param OrderRepositoryContract $orderRepository
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository
-     * @param PaymentRepositoryContract              $paymentRepository
-     * @param PaymentHelper                          $paymentHelper
-     * @param Twig                                   $twig
+     * @param PaymentRepositoryContract $paymentRepository
+     * @param PaymentHelper $paymentHelper
+     * @param Twig $twig
      */
     public function __construct(
         AddressRepositoryContract $addressRepository,
@@ -114,6 +119,7 @@ class PaymentService
         OrderRepositoryContract $orderRepository,
         PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository,
         PaymentRepositoryContract $paymentRepository,
+        TransactionRepositoryContract $transactionRepository,
         PaymentHelper $paymentHelper,
         Twig $twig
     ) {
@@ -123,6 +129,7 @@ class PaymentService
         $this->orderRepository = $orderRepository;
         $this->paymentOrderRelationRepository = $paymentOrderRelationRepository;
         $this->paymentRepository = $paymentRepository;
+        $this->transactionRepository = $transactionRepository;
         $this->paymentHelper = $paymentHelper;
         $this->twig = $twig;
     }
@@ -169,7 +176,11 @@ class PaymentService
             'eventType' => $event->getType(),
         ]);
 
-        // todo: retrieve a heidelpay Transaction by basketId and paymentMethod-Id (Mop)
+        // todo: retrieve a heidelpay Transaction by basketId and paymentMethod-Id (Mop) to get values needed to create plenty payment (e.g. amount etc).
+        $transactions = $this->transactionRepository->getTransactionsByBasketId($basket->id);
+
+        $this->getLogger(__METHOD__)->error('Transactions', $transactions);
+
 
         // todo: call createPlentyPayment and create the payment
         // todo: if the payment is an instance of Payment, link it to the order.
@@ -370,9 +381,9 @@ class PaymentService
         $this->heidelpayRequest['CRITERION_PUSH_URL'] =
             $this->paymentHelper->getDomain() . '/' . Routes::PUSH_NOTIFICATION_URL;
 
-        $this->getLogger(__METHOD__)->error('prepareRequest', $this->heidelpayRequest);
-
         // TODO: Riskinformation for future payment methods
+
+        $this->getLogger(__METHOD__)->error('prepareRequest', $this->heidelpayRequest);
     }
 
     /**

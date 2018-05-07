@@ -187,7 +187,7 @@ class PaymentService
         foreach ($transactions as $transaction) {
             $this->getLogger(__METHOD__)->error('Transaction', $transaction);
             $allowedStatus = [TransactionStatus::ACK, TransactionStatus::PENDING];
-            if (\in_array($transaction->status, $allowedStatus, true)) {
+            if (\in_array($transaction->status, $allowedStatus, false)) {
                 $transactionDetails = $transaction->transactionDetails;
                 if (array_key_exists('PRESENTATION.AMOUNT', $transactionDetails)) {
                     $amount = (float)$transactionDetails['PRESENTATION.AMOUNT'];

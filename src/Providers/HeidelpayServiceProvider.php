@@ -9,8 +9,6 @@ use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Repositories\TransactionRepository;
 use Heidelpay\Services\PaymentService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
-use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
-use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
@@ -81,13 +79,6 @@ class HeidelpayServiceProvider extends ServiceProvider
             ) {
                 $mop = $event->getMop();
                 $basket = $basketRepository->load();
-                $this->getLogger(__METHOD__)->error('Basket in GetPaymentMethodContent', [
-                    $basket,
-                    $event->getMop(),
-                    $event->getParams(),
-                    $event->getType(),
-                    $event->getValue()
-                ]);
 
                 if ($mop === $paymentHelper->getPaymentMethodId(PayPal::class)) {
                     $event->setValue($paymentService->getPaymentMethodContent(PayPal::class, $basket, $mop));
@@ -111,6 +102,7 @@ class HeidelpayServiceProvider extends ServiceProvider
             ) {
                 $basket = $basketRepository->load();
                 $mop = $event->getMop();
+
                 if ($mop === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
                     $event->setValue($paymentService->executePayment(CreditCard::class, $basket, $event));
                     $event->setType($paymentService->getReturnType());
@@ -120,30 +112,6 @@ class HeidelpayServiceProvider extends ServiceProvider
                     $event->setValue($paymentService->executePayment(PayPal::class, $basket, $event));
                     $event->setType($paymentService->getReturnType());
                 }
-            }
-        );
-
-        $eventDispatcher->listen(
-            AfterBasketChanged::class,
-            function (AfterBasketChanged $event) use ($basketRepository) {
-                $basket = $basketRepository->load();
-                $this->getLogger(__METHOD__)->error(
-                    'Basket changed', [
-                        $basket, $event->getBasket(),
-                        $event->getInvoiceAddress(),
-                        $event->getLocationId(),
-                        $event->getMaxFsk(),
-                        $event->getShippingCosts()
-                    ]
-                );
-            }
-        );
-
-        $eventDispatcher->listen(
-            AfterBasketCreate::class,
-            function (AfterBasketCreate $event) use ($basketRepository) {
-                $basket = $basketRepository->load();
-                $this->getLogger(__METHOD__)->error('Basket created', [$basket, $event->getBasket()]);
             }
         );
     }

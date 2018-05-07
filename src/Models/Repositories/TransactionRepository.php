@@ -58,6 +58,7 @@ class TransactionRepository implements TransactionRepositoryContract
         $transaction->uniqueId = $data['uniqueId'];
         $transaction->transactionDetails = $data['transactionDetails'];
         $transaction->transactionProcessing = $data['transactionProcessing'];
+        $transaction->createdAt = $data['createdAt'];
 
         if (isset($data['isClosed']) && $data['isCloded'] === true) {
             $transaction->isClosed = true;

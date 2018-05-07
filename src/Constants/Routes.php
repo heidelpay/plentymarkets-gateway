@@ -16,12 +16,13 @@ namespace Heidelpay\Constants;
  */
 class Routes
 {
-    const API_TRANSACTION_BY_ID = 'payment/heidelpay/transactions/{transactionId}';
-    const API_TRANSACTION_BY_CUSTOMERID = 'payment/heidelpay/transactions/customer/{customerId}';
+    const BASE_URI = 'payment/' . Plugin::NAME . '/';
+    const API_TRANSACTION_BY_ID = self::BASE_URI . 'transactions/{transactionId}';
+    const API_TRANSACTION_BY_CUSTOMERID = self::BASE_URI . 'transactions/customer/{customerId}';
 
-    const RESPONSE_URL = 'payment/heidelpay/response';
-    const PUSH_NOTIFICATION_URL = 'payment/heidelpay/pushNotification';
+    const RESPONSE_URL = self::BASE_URI . 'response';
+    const PUSH_NOTIFICATION_URL = self::BASE_URI . 'pushNotification';
 
-    const CHECKOUT_SUCCESS = 'payment/heidelpay/checkoutSuccess';
-    const CHECKOUT_CANCEL = 'payment/heidelpay/checkoutCancel';
+    const CHECKOUT_SUCCESS = self::BASE_URI . 'checkoutSuccess';
+    const CHECKOUT_CANCEL = self::BASE_URI . 'checkoutCancel';
 }

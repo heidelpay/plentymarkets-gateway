@@ -58,10 +58,11 @@ class ResponseController extends Controller
     /**
      * ResponseController constructor.
      *
-     * @param Request        $request
-     * @param Response       $response
-     * @param PaymentHelper  $paymentHelper
-     * @param PaymentService $paymentService
+     * @param Request            $request
+     * @param Response           $response
+     * @param PaymentHelper      $paymentHelper
+     * @param PaymentService     $paymentService
+     * @param TransactionService $transactionService
      */
     public function __construct(
         Request $request,

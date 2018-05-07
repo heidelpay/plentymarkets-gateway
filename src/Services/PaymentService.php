@@ -108,6 +108,7 @@ class PaymentService
      * @param OrderRepositoryContract $orderRepository
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository
      * @param PaymentRepositoryContract $paymentRepository
+     * @param TransactionRepositoryContract $transactionRepository
      * @param PaymentHelper $paymentHelper
      * @param Twig $twig
      */

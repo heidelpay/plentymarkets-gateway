@@ -125,6 +125,7 @@ class TransactionRepository implements TransactionRepositoryContract
     {
         return $this->database->query(Transaction::class)
             ->where('basketId', '=', $id)
+            ->orderBy('id', 'desc')
             ->get();
     }
 

@@ -81,7 +81,13 @@ class HeidelpayServiceProvider extends ServiceProvider
             ) {
                 $mop = $event->getMop();
                 $basket = $basketRepository->load();
-                $this->getLogger(__METHOD__)->error('Basket in GetPaymentMethodContent', [$basket]);
+                $this->getLogger(__METHOD__)->error('Basket in GetPaymentMethodContent', [
+                    $basket,
+                    $event->getMop(),
+                    $event->getParams(),
+                    $event->getType(),
+                    $event->getValue()
+                ]);
 
                 if ($mop === $paymentHelper->getPaymentMethodId(PayPal::class)) {
                     $event->setValue($paymentService->getPaymentMethodContent(PayPal::class, $basket, $mop));
@@ -121,7 +127,15 @@ class HeidelpayServiceProvider extends ServiceProvider
             AfterBasketChanged::class,
             function (AfterBasketChanged $event) use ($basketRepository) {
                 $basket = $basketRepository->load();
-                $this->getLogger(__METHOD__)->error('Basket changed', [$basket, $event]);
+                $this->getLogger(__METHOD__)->error(
+                    'Basket changed', [
+                        $basket, $event->getBasket(),
+                        $event->getInvoiceAddress(),
+                        $event->getLocationId(),
+                        $event->getMaxFsk(),
+                        $event->getShippingCosts()
+                    ]
+                );
             }
         );
 
@@ -129,7 +143,7 @@ class HeidelpayServiceProvider extends ServiceProvider
             AfterBasketCreate::class,
             function (AfterBasketCreate $event) use ($basketRepository) {
                 $basket = $basketRepository->load();
-                $this->getLogger(__METHOD__)->error('Basket created', [$basket, $event]);
+                $this->getLogger(__METHOD__)->error('Basket created', [$basket, $event->getBasket()]);
             }
         );
     }

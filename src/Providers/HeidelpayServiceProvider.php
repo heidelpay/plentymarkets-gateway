@@ -79,16 +79,16 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $paymentHelper,
                 $paymentService
             ) {
-                if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPal::class)) {
-                    $mop = $event->getMop();
-                    $basket = $basketRepository->load();
+                $mop = $event->getMop();
+                $basket = $basketRepository->load();
+                $this->getLogger(__METHOD__)->error('Basket in GetPaymentMethodContent', [$basket]);
+
+                if ($mop === $paymentHelper->getPaymentMethodId(PayPal::class)) {
                     $event->setValue($paymentService->getPaymentMethodContent(PayPal::class, $basket, $mop));
                     $event->setType($paymentService->getReturnType());
                 }
 
-                if ($event->getMop() === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
-                    $mop = $event->getMop();
-                    $basket = $basketRepository->load();
+                if ($mop === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
                     $event->setValue($paymentService->getPaymentMethodContent(CreditCard::class, $basket, $mop));
                     $event->setType($paymentService->getReturnType());
                 }
@@ -103,14 +103,14 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $paymentHelper,
                 $paymentService
             ) {
-                if ($event->getMop() === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
-                    $basket = $basketRepository->load();
+                $basket = $basketRepository->load();
+                $mop = $event->getMop();
+                if ($mop === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
                     $event->setValue($paymentService->executePayment(CreditCard::class, $basket, $event));
                     $event->setType($paymentService->getReturnType());
                 }
 
-                if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPal::class)) {
-                    $basket = $basketRepository->load();
+                if ($mop === $paymentHelper->getPaymentMethodId(PayPal::class)) {
                     $event->setValue($paymentService->executePayment(PayPal::class, $basket, $event));
                     $event->setType($paymentService->getReturnType());
                 }
@@ -121,7 +121,7 @@ class HeidelpayServiceProvider extends ServiceProvider
             AfterBasketChanged::class,
             function (AfterBasketChanged $event) use ($basketRepository) {
                 $basket = $basketRepository->load();
-                $this->getLogger(__METHOD__)->error('Basket changed', [$basket]);
+                $this->getLogger(__METHOD__)->error('Basket changed', [$basket, $event]);
             }
         );
 
@@ -129,7 +129,7 @@ class HeidelpayServiceProvider extends ServiceProvider
             AfterBasketCreate::class,
             function (AfterBasketCreate $event) use ($basketRepository) {
                 $basket = $basketRepository->load();
-                $this->getLogger(__METHOD__)->error('Basket created', [$basket]);
+                $this->getLogger(__METHOD__)->error('Basket created', [$basket, $event]);
             }
         );
     }

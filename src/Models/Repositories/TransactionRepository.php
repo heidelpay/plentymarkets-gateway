@@ -136,6 +136,7 @@ class TransactionRepository implements TransactionRepositoryContract
         /** @var Transaction[] $result */
         $result = $this->database->query(Transaction::class)
             ->where('customerId', '=', $customerId)
+            ->orderBy('id', 'desc')
             ->get();
 
         return $result;

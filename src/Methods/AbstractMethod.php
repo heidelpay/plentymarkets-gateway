@@ -4,9 +4,7 @@ namespace Heidelpay\Methods;
 
 use Heidelpay\Helper\PaymentHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
-use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
-use Plenty\Plugin\ConfigRepository;
 
 /**
  * Abstract Payment Method Class

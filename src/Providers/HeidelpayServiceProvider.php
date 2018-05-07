@@ -9,6 +9,8 @@ use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Repositories\TransactionRepository;
 use Heidelpay\Services\PaymentService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
@@ -112,6 +114,22 @@ class HeidelpayServiceProvider extends ServiceProvider
                     $event->setValue($paymentService->executePayment(PayPal::class, $basket, $event));
                     $event->setType($paymentService->getReturnType());
                 }
+            }
+        );
+
+        $eventDispatcher->listen(
+            AfterBasketChanged::class,
+            function (AfterBasketChanged $event) use ($basketRepository) {
+                $basket = $basketRepository->load();
+                $this->getLogger(__METHOD__)->error('Basket changed', [$basket]);
+            }
+        );
+
+        $eventDispatcher->listen(
+            AfterBasketCreate::class,
+            function (AfterBasketCreate $event) use ($basketRepository) {
+                $basket = $basketRepository->load();
+                $this->getLogger(__METHOD__)->error('Basket created', [$basket]);
             }
         );
     }

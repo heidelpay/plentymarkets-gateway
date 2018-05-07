@@ -80,6 +80,8 @@ class TransactionService
             $paymentMethodId = (int) $heidelpayResponse['CRITERION.MOP'];
         }
 
+        $processingTimestamp = $heidelpayResponse['PROCESSING.TIMESTAMP'];
+
         $data = [];
         $data['basketId'] = (int) $heidelpayResponse['IDENTIFICATION.TRANSACTIONID'];
         $data['customerId'] = (int) $heidelpayResponse['IDENTIFICATION.SHOPPERID'];
@@ -90,7 +92,7 @@ class TransactionService
         $data['status'] = $this->paymentHelper->mapHeidelpayTransactionStatus($responseData);
         $data['shortId'] = $heidelpayResponse['IDENTIFICATION.SHORTID'];
         $data['uniqueId'] = $heidelpayResponse['IDENTIFICATION.UNIQUEID'];
-        $data['createdAt'] = $heidelpayResponse['PROCESSING.TIMESTAMP'];
+        $data['createdAt'] = $processingTimestamp;
 
         // if the orderId is given, use this. else, use a dummy since null is not possible.
         $data['orderId'] = $orderId ?? self::NO_ORDER_ID;
@@ -107,7 +109,7 @@ class TransactionService
             Transaction::PROCESSING_RETURN_CODE => $heidelpayResponse['PROCESSING.RETURN_CODE'],
             Transaction::PROCESSING_STATUS => $heidelpayResponse['PROCESSING.STATUS'],
             Transaction::PROCESSING_STATUS_CODE => $heidelpayResponse['PROCESSING.STATUS_CODE'],
-            Transaction::PROCESSING_TIMESTAMP => $heidelpayResponse['PROCESSING.TIMESTAMP'],
+            Transaction::PROCESSING_TIMESTAMP => $processingTimestamp,
         ];
 
         return $this->transactionRepository->createTransaction($data);

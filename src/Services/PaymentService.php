@@ -5,6 +5,7 @@ namespace Heidelpay\Services;
 use Heidelpay\Constants\Plugin;
 use Heidelpay\Constants\Routes;
 use Heidelpay\Constants\Salutation;
+use Heidelpay\Constants\TransactionStatus;
 use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\CreditCard;
@@ -177,12 +178,27 @@ class PaymentService
             'eventType' => $event->getType(),
         ]);
 
+        $amount = 0.0;
+        $currency = 'EUR';
+
         // todo: retrieve a heidelpay Transaction by basketId and paymentMethod-Id (Mop) to get values needed to create plenty payment (e.g. amount etc).
         $transactions = $this->transactionRepository->getTransactionsByBasketId($basket->id);
-
         $this->getLogger(__METHOD__)->error('Transactions', $transactions);
-        $this->getLogger(__METHOD__)->error('Basket', $basket);
+        foreach ($transactions as $transaction) {
+            $this->getLogger(__METHOD__)->error('Transaction', $transaction);
+            $allowedStatus = [TransactionStatus::ACK, TransactionStatus::PENDING];
+            if (\in_array($transaction->status, $allowedStatus, true)) {
+                $transactionDetails = $transaction->transactionDetails;
+                if (array_key_exists('PRESENTATION.AMOUNT', $transactionDetails)) {
+                    $amount = $transactionDetails['PRESENTATION.AMOUNT'];
+                }
+                if (array_key_exists('PRESENTATION.CURRENCY', $transactionDetails)) {
+                    $currency = $transactionDetails['PRESENTATION.CURRENCY'];
+                }
+            }
+        }
 
+        $this->getLogger(__METHOD__)->error('Amount: ', $amount . ' ' . $currency);
 
         // todo: call createPlentyPayment and create the payment
         // todo: if the payment is an instance of Payment, link it to the order.

@@ -185,11 +185,11 @@ class PaymentHelper
     public function getPaymentMethodEventList(): array
     {
         return [
-            AfterBasketChanged::class,
-            AfterBasketItemAdd::class,
-            AfterBasketCreate::class,
-            FrontendLanguageChanged::class,
-            FrontendShippingCountryChanged::class,
+//            AfterBasketChanged::class,
+//            AfterBasketItemAdd::class,
+//            AfterBasketCreate::class,
+//            FrontendLanguageChanged::class,
+//            FrontendShippingCountryChanged::class,
         ];
     }
 

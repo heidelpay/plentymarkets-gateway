@@ -7,7 +7,6 @@ use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\PaymentService;
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -55,35 +54,27 @@ class ResponseController extends Controller
      * @var TransactionService
      */
     private $transactionService;
-    /**
-     * @var BasketRepositoryContract
-     */
-    private $basketRepository;
 
     /**
      * ResponseController constructor.
      *
-     * @param Request $request
-     * @param Response $response
-     * @param PaymentHelper $paymentHelper
+     * @param Request        $request
+     * @param Response       $response
+     * @param PaymentHelper  $paymentHelper
      * @param PaymentService $paymentService
-     * @param TransactionService $transactionService
-     * @param BasketRepositoryContract $basketRepository
      */
     public function __construct(
         Request $request,
         Response $response,
         PaymentHelper $paymentHelper,
         PaymentService $paymentService,
-        TransactionService $transactionService,
-        BasketRepositoryContract $basketRepository
+        TransactionService $transactionService
     ) {
         $this->request = $request;
         $this->response = $response;
         $this->paymentHelper = $paymentHelper;
         $this->paymentService = $paymentService;
         $this->transactionService = $transactionService;
-        $this->basketRepository = $basketRepository;
     }
 
     /**
@@ -97,9 +88,6 @@ class ResponseController extends Controller
         // get all post parameters except the 'plentyMarkets' one injected by the plentymarkets core.
         // also scrap the 'lang' parameter which will be sent when e.g. PayPal is being used.
         $postResponse = $this->request->except(['plentyMarkets', 'lang']);
-
-        $basket = $this->basketRepository->load();
-        $this->getLogger(__METHOD__)->error('Basket in Response', $basket);
 
         $response = $this->paymentService->handleAsyncPaymentResponse(['response' => $postResponse]);
         $this->getLogger('heidelpay async response')->error('heidelpay::response.receivedResponse', [

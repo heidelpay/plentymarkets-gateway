@@ -190,11 +190,12 @@ class PaymentService
             if (\in_array($transaction->status, $allowedStatus, true)) {
                 $transactionDetails = $transaction->transactionDetails;
                 if (array_key_exists('PRESENTATION.AMOUNT', $transactionDetails)) {
-                    $amount = $transactionDetails['PRESENTATION.AMOUNT'];
+                    $amount = (float)$transactionDetails['PRESENTATION.AMOUNT'];
                 }
                 if (array_key_exists('PRESENTATION.CURRENCY', $transactionDetails)) {
                     $currency = $transactionDetails['PRESENTATION.CURRENCY'];
                 }
+                break;
             }
         }
 

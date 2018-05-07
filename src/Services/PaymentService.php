@@ -13,6 +13,7 @@ use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
+use Heidelpay\Models\Transaction;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Models\Basket;
@@ -180,6 +181,8 @@ class PaymentService
 
         $amount = 0.0;
         $currency = 'EUR';
+        $transactionDetails = [];
+        $transaction = null;
 
         // todo: retrieve a heidelpay Transaction by basketId and paymentMethod-Id (Mop) to get values needed to create plenty payment (e.g. amount etc).
         $transactions = $this->transactionRepository->getTransactionsByBasketId($basket->id);
@@ -199,17 +202,25 @@ class PaymentService
             }
         }
 
+        if (!($transaction instanceof Transaction) ||
+            !isset($transactionDetails['PRESENTATION.AMOUNT'], $transactionDetails['PRESENTATION.CURRENCY'])) {
+            $this->setReturnType('error');
+            return 'Error during payment execution!';
+        }
+
         $this->getLogger(__METHOD__)->error('Amount: ', $amount . ' ' . $currency);
+
+        $plentyPayment = $this->createPlentyPayment($transactionDetails, $transaction->paymentMethodId);
+        if (!($plentyPayment instanceof Payment)) {
+            $this->setReturnType('error');
+            return 'Error during payment execution!';
+        }
+
+        $this->paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $event->getOrderId());
 
         // todo: call createPlentyPayment and create the payment
         // todo: if the payment is an instance of Payment, link it to the order.
         // todo: ... if not, set returnType to 'error' and return a (user-friendly) message.
-
-        // TODO: just a test.
-        if (true) {
-            $this->setReturnType('error');
-            return 'Error during payment execution!';
-        }
 
         $this->setReturnType('success');
         return 'Payment was successful!';
@@ -502,6 +513,7 @@ class PaymentService
         $payment->origin = Payment::ORIGIN_PLUGIN;
         $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
         $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentData);
+        $payment->amount = $paymentData['PRESENTATION.AMOUNT'];
         $payment->currency = $paymentData['PRESENTATION.CURRENCY'];
 
         // create the payment

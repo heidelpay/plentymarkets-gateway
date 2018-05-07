@@ -13,12 +13,10 @@ use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
-use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
-use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
-use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
-use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
-use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Helper\Services\WebstoreHelper;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Order\Models\Order;
+use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Payment\Models\Payment;
@@ -86,19 +84,33 @@ class PaymentHelper
             self::ARRAY_KEY_DEFAULT_NAME => PayPal::DEFAULT_NAME,
         ],
     ];
+    /**
+     * @var OrderRepositoryContract
+     */
+    private $orderRepository;
+    /**
+     * @var PaymentOrderRelationRepositoryContract
+     */
+    private $paymentOrderRelationRepo;
 
     /**
      * AbstractHelper constructor.
      *
      * @param ConfigRepository $configRepository
      * @param PaymentMethodRepositoryContract $paymentMethodRepository
+     * @param OrderRepositoryContract $orderRepository
+     * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo
      */
     public function __construct(
         ConfigRepository $configRepository,
-        PaymentMethodRepositoryContract $paymentMethodRepository
+        PaymentMethodRepositoryContract $paymentMethodRepository,
+        OrderRepositoryContract $orderRepository,
+        PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo
     ) {
         $this->config = $configRepository;
         $this->paymentMethodRepository = $paymentMethodRepository;
+        $this->orderRepository = $orderRepository;
+        $this->paymentOrderRelationRepo = $paymentOrderRelationRepo;
     }
 
     /**
@@ -185,11 +197,6 @@ class PaymentHelper
     public function getPaymentMethodEventList(): array
     {
         return [
-//            AfterBasketChanged::class,
-//            AfterBasketItemAdd::class,
-//            AfterBasketCreate::class,
-//            FrontendLanguageChanged::class,
-//            FrontendShippingCountryChanged::class,
         ];
     }
 
@@ -644,5 +651,24 @@ class PaymentHelper
         }
 
         return $result;
+    }
+
+    /**
+     * Assign the payment to an order in plentymarkets
+     *
+     * @param Payment $payment
+     * @param int $orderId
+     */
+    public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId)
+    {
+        // Get the order by the given order ID
+        $order = $this->orderRepository->findOrderById($orderId);
+
+        // Check whether the order truly exists in plentymarkets
+        if(!is_null($order) && $order instanceof Order)
+        {
+            // Assign the given payment to the given order
+            $this->paymentOrderRelationRepo->createOrderRelation($payment, $order);
+        }
     }
 }

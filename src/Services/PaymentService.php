@@ -500,8 +500,8 @@ class PaymentService
     /**
      * Creates a plentymarkets payment entity.
      *
-     * @param array $paymentData
-     * @param int   $paymentMethodId
+     * @param Transaction $paymentData
+     * @param int $paymentMethodId
      *
      * @return Payment
      */
@@ -517,31 +517,32 @@ class PaymentService
         $payment->amount = $paymentDetails['PRESENTATION.AMOUNT'];
         $payment->currency = $paymentDetails['PRESENTATION.CURRENCY'];
         $payment->receivedAt = $paymentData->createdAt;
+        $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentData->transactionProcessing);
+        $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
 
-//        if(!empty($paymentData['type']))
-//        {
-//            $payment->type = $paymentData['type'];
-//        }
-//
-//        if(!empty($paymentData['parentId']))
-//        {
-//            $payment->parentId = $paymentData['parentId'];
-//        }
-//
-//        if(!empty($paymentData['unaccountable']))
-//        {
-//            $payment->unaccountable = $paymentData['unaccountable'];
-//        }
+
+        if (!empty($paymentData['type'])) {
+            $payment->type = Payment::PAYMENT_TYPE_DEBIT;
+        }
+
+        // todo: Keine Zuordnung möglich: unaccountable (kann das passieren?)
+////        if(!empty($paymentData['unaccountable']))
+////        {
+////            $payment->unaccountable = $paymentData['unaccountable'];
+////        }
 
         $paymentProperty = [];
         $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
             PaymentProperty::TYPE_ORIGIN,
             Payment::ORIGIN_PLUGIN
         );
+//        $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
+//            PaymentProperty::,
+//            Payment::ORIGIN_PLUGIN
+//        );
 
         // create the payment
         $payment->properties = $paymentProperty;
-        $payment->regenerateHash = true;
         $payment = $this->paymentRepository->createPayment($payment);
 
         return $payment;

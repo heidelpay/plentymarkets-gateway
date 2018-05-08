@@ -13,6 +13,11 @@ use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
+use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
+use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
+use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
+use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
+use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Helper\Services\WebstoreHelper;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
@@ -198,6 +203,11 @@ class PaymentHelper
     public function getPaymentMethodEventList(): array
     {
         return [
+            AfterBasketChanged::class,
+            AfterBasketItemAdd::class,
+            AfterBasketCreate::class,
+            FrontendLanguageChanged::class,
+            FrontendShippingCountryChanged::class
         ];
     }
 

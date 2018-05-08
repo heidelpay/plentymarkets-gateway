@@ -214,6 +214,9 @@ class PaymentService
         // todo: if the payment is an instance of Payment, link it to the order.
         // todo: ... if not, set returnType to 'error' and return a (user-friendly) message.
 
+
+        $this->getLogger(__METHOD__)->error('Basket', $basket);
+
         $this->setReturnType('success');
         return 'Payment was successful!';
     }

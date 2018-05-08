@@ -519,11 +519,7 @@ class PaymentService
         $payment->receivedAt = $paymentData->createdAt;
         $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentData->transactionProcessing);
         $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
-
-
-        if (!empty($paymentData['type'])) {
-            $payment->type = Payment::PAYMENT_TYPE_DEBIT;
-        }
+        $payment->type = Payment::PAYMENT_TYPE_DEBIT;
 
         // todo: Keine Zuordnung möglich: unaccountable (kann das passieren?)
 ////        if(!empty($paymentData['unaccountable']))

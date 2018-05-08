@@ -20,6 +20,7 @@ use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Payment\Models\Payment;
+use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Log\Loggable;
 
@@ -670,5 +671,23 @@ class PaymentHelper
             // Assign the given payment to the given order
             $this->paymentOrderRelationRepo->createOrderRelation($payment, $order);
         }
+    }
+
+    /**
+     * Returns a PaymentProperty with the given params
+     *
+     * @param $typeId
+     * @param $value
+     * @return PaymentProperty
+     */
+    public function getPaymentProperty($typeId, $value): PaymentProperty
+    {
+        /** @var PaymentProperty $paymentProperty */
+        $paymentProperty = pluginApp(PaymentProperty::class);
+
+        $paymentProperty->typeId = $typeId;
+        $paymentProperty->value = $value;
+
+        return $paymentProperty;
     }
 }

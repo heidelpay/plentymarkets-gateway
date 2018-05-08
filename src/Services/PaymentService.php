@@ -26,6 +26,7 @@ use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentOrderRelation;
+use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Templates\Twig;
@@ -210,7 +211,7 @@ class PaymentService
 
         $this->getLogger(__METHOD__)->error('Amount: ', $amount . ' ' . $currency);
 
-        $plentyPayment = $this->createPlentyPayment($transactionDetails, $transaction->paymentMethodId);
+        $plentyPayment = $this->createPlentyPayment($transaction, $transaction->paymentMethodId);
         if (!($plentyPayment instanceof Payment)) {
             $this->setReturnType('error');
             return 'Error during payment execution!';
@@ -504,19 +505,42 @@ class PaymentService
      *
      * @return Payment
      */
-    public function createPlentyPayment(array $paymentData, int $paymentMethodId): Payment
+    public function createPlentyPayment(Transaction $paymentData, int $paymentMethodId): Payment
     {
         /** @var Payment $payment */
         $payment = pluginApp(Payment::class);
 
         $payment->mopId = $paymentMethodId;
-        $payment->origin = Payment::ORIGIN_PLUGIN;
         $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
         $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentData);
-        $payment->amount = $paymentData['PRESENTATION.AMOUNT'];
-        $payment->currency = $paymentData['PRESENTATION.CURRENCY'];
+        $payment->amount = $paymentData->transactionDetails['PRESENTATION.AMOUNT'];
+        $payment->currency = $paymentData->transactionDetails['PRESENTATION.CURRENCY'];
+        $payment->receivedAt = $paymentData->createdAt;
+
+//        if(!empty($paymentData['type']))
+//        {
+//            $payment->type = $paymentData['type'];
+//        }
+//
+//        if(!empty($paymentData['parentId']))
+//        {
+//            $payment->parentId = $paymentData['parentId'];
+//        }
+//
+//        if(!empty($paymentData['unaccountable']))
+//        {
+//            $payment->unaccountable = $paymentData['unaccountable'];
+//        }
+
+        $paymentProperty = [];
+        $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
+            PaymentProperty::TYPE_ORIGIN,
+            Payment::ORIGIN_PLUGIN
+        );
 
         // create the payment
+        $payment->properties = $paymentProperty;
+        $payment->regenerateHash = true;
         $payment = $this->paymentRepository->createPayment($payment);
 
         return $payment;

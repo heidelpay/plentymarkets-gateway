@@ -512,9 +512,10 @@ class PaymentService
 
         $payment->mopId = $paymentMethodId;
         $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
-        $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentData);
-        $payment->amount = $paymentData->transactionDetails['PRESENTATION.AMOUNT'];
-        $payment->currency = $paymentData->transactionDetails['PRESENTATION.CURRENCY'];
+        $paymentDetails = $paymentData->transactionDetails;
+        $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentDetails);
+        $payment->amount = $paymentDetails['PRESENTATION.AMOUNT'];
+        $payment->currency = $paymentDetails['PRESENTATION.CURRENCY'];
         $payment->receivedAt = $paymentData->createdAt;
 
 //        if(!empty($paymentData['type']))

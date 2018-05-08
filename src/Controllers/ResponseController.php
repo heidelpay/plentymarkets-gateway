@@ -92,6 +92,7 @@ class ResponseController extends Controller
 
         $response = $this->paymentService->handleAsyncPaymentResponse(['response' => $postResponse]);
         $this->getLogger('heidelpay async response')->error('heidelpay::response.receivedResponse', [
+            'POST response' =>$postResponse,
             'response' => $response
         ]);
 

@@ -186,17 +186,12 @@ class PaymentService
         $transactions = $this->transactionRepository->getTransactionsByBasketId($basket->id);
         $this->getLogger(__METHOD__)->error('Transactions', $transactions);
         $this->getLogger(__METHOD__)->debug('log.transactions', $transactions);
+        $this->getLogger(__METHOD__)->debug('template.transactions', $transactions);
         foreach ($transactions as $transaction) {
             $this->getLogger(__METHOD__)->error('Transaction', $transaction);
             $allowedStatus = [TransactionStatus::ACK, TransactionStatus::PENDING];
             if (\in_array($transaction->status, $allowedStatus, false)) {
                 $transactionDetails = $transaction->transactionDetails;
-                if (array_key_exists('PRESENTATION.AMOUNT', $transactionDetails)) {
-                    $amount = (float)$transactionDetails['PRESENTATION.AMOUNT'];
-                }
-                if (array_key_exists('PRESENTATION.CURRENCY', $transactionDetails)) {
-                    $currency = $transactionDetails['PRESENTATION.CURRENCY'];
-                }
                 break;
             }
         }
@@ -206,8 +201,6 @@ class PaymentService
             $this->setReturnType('error');
             return 'Error during payment execution!';
         }
-
-        $this->getLogger(__METHOD__)->error('Amount: ', $amount . ' ' . $currency);
 
         $plentyPayment = $this->createPlentyPayment($transaction, $transaction->paymentMethodId);
         if (!($plentyPayment instanceof Payment)) {
@@ -537,6 +530,7 @@ class PaymentService
 
         // create the payment
         $payment->properties = $paymentProperty;
+        $payment->regenerateHash = true;
         $payment = $this->paymentRepository->createPayment($payment);
 
         return $payment;

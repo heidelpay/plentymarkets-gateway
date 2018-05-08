@@ -154,10 +154,7 @@ class PaymentService
      */
     private function setReturnType(string $type)
     {
-        $this->getLogger(__METHOD__)->error('Setting return type', [
-            'type' => $type
-        ]);
-
+        $this->getLogger(__METHOD__)->error('Setting return type', ['type' => $type]);
         $this->returnType = $type;
     }
 
@@ -188,6 +185,7 @@ class PaymentService
         // todo: retrieve a heidelpay Transaction by basketId and paymentMethod-Id (Mop) to get values needed to create plenty payment (e.g. amount etc).
         $transactions = $this->transactionRepository->getTransactionsByBasketId($basket->id);
         $this->getLogger(__METHOD__)->error('Transactions', $transactions);
+        $this->getLogger(__METHOD__)->debug('log.transactions', $transactions);
         foreach ($transactions as $transaction) {
             $this->getLogger(__METHOD__)->error('Transaction', $transaction);
             $allowedStatus = [TransactionStatus::ACK, TransactionStatus::PENDING];

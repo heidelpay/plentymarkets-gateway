@@ -177,13 +177,12 @@ class PaymentService
             'eventType' => $event->getType(),
         ]);
 
-        $amount = 0.0;
-        $currency = 'EUR';
         $transactionDetails = [];
         $transaction = null;
 
         // todo: retrieve a heidelpay Transaction by basketId and paymentMethod-Id (Mop) to get values needed to create plenty payment (e.g. amount etc).
         $transactions = $this->transactionRepository->getTransactionsByBasketId($basket->id);
+//        $transactions = $this->transactionRepository->getTransactionsByOrderId($basket->orderId);
         $this->getLogger(__METHOD__)->error('Transactions', $transactions);
         $this->getLogger(__METHOD__)->debug('log.transactions', $transactions);
         $this->getLogger(__METHOD__)->debug('template.transactions', $transactions);
@@ -209,11 +208,6 @@ class PaymentService
         }
 
         $this->paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $event->getOrderId());
-
-        // todo: call createPlentyPayment and create the payment
-        // todo: if the payment is an instance of Payment, link it to the order.
-        // todo: ... if not, set returnType to 'error' and return a (user-friendly) message.
-
 
         $this->getLogger(__METHOD__)->error('Basket', $basket);
 
@@ -373,7 +367,7 @@ class PaymentService
         // set basket information (amount, currency, orderId, ...)
         $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basket->basketAmount;
         $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basket->currency;
-        $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $basket->id;
+        $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $basket->orderId;
 
         // TODO: receive frontend language somehow.
         $this->heidelpayRequest['FRONTEND_ENABLED'] = $this->paymentHelper->getFrontendEnabled($paymentMethod);
@@ -403,6 +397,9 @@ class PaymentService
         $this->heidelpayRequest['CRITERION_MOP'] = $mopId;
         $this->heidelpayRequest['CRITERION_SHOP_TYPE'] = 'plentymarkets 7';
         $this->heidelpayRequest['CRITERION_SHOPMODULE_VERSION'] = Plugin::VERSION;
+        $this->heidelpayRequest['CRITERION_BASKET_ID'] = $basket->id;
+        $this->heidelpayRequest['CRITERION_ORDER_ID'] = $basket->orderId;
+        $this->heidelpayRequest['CRITERION_ORDER_TIMESTAMP'] = $basket->orderTimestamp;
         $this->heidelpayRequest['CRITERION_PUSH_URL'] =
             $this->paymentHelper->getDomain() . '/' . Routes::PUSH_NOTIFICATION_URL;
 

@@ -175,6 +175,7 @@ class PaymentService
             'mopId' => $event->getMop(),
             'orderId' => $event->getOrderId(),
             'eventType' => $event->getType(),
+            'order' => $this->orderRepository->findOrderById($event->getOrderId())
         ]);
 
         $transactionDetails = [];
@@ -233,6 +234,8 @@ class PaymentService
             'request' => $this->heidelpayRequest,
             'transactionType' => TransactionType::AUTHORIZE // TODO: change depending on payment method & step.
         ]);
+
+        $this->getLogger(__METHOD__)->error('GetHeidelpayURL Result: ', $result);
 
         return $result;
     }
@@ -367,7 +370,7 @@ class PaymentService
         // set basket information (amount, currency, orderId, ...)
         $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basket->basketAmount;
         $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basket->currency;
-        $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $basket->orderId;
+        $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $basket->id;
 
         // TODO: receive frontend language somehow.
         $this->heidelpayRequest['FRONTEND_ENABLED'] = $this->paymentHelper->getFrontendEnabled($paymentMethod);
@@ -498,12 +501,12 @@ class PaymentService
      */
     public function createPlentyPayment(Transaction $paymentData, int $paymentMethodId): Payment
     {
+        $paymentDetails = $paymentData->transactionDetails;
+
         /** @var Payment $payment */
         $payment = pluginApp(Payment::class);
-
         $payment->mopId = $paymentMethodId;
         $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
-        $paymentDetails = $paymentData->transactionDetails;
         $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentDetails);
         $payment->amount = $paymentDetails['PRESENTATION.AMOUNT'];
         $payment->currency = $paymentDetails['PRESENTATION.CURRENCY'];

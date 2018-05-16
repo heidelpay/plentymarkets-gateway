@@ -17,6 +17,7 @@ use Heidelpay\Models\Transaction;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Models\Basket;
+use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
@@ -100,6 +101,10 @@ class PaymentService
      * @var TransactionRepositoryContract
      */
     private $transactionRepository;
+    /**
+     * @var FrontendSessionStorageFactoryContract
+     */
+    private $sessionStorageFactory;
 
     /**
      * PaymentService constructor.
@@ -114,6 +119,7 @@ class PaymentService
      * @param TransactionRepositoryContract $transactionRepository
      * @param PaymentHelper $paymentHelper
      * @param Twig $twig
+     * @param FrontendSessionStorageFactoryContract $sessionStorageFactory
      */
     public function __construct(
         AddressRepositoryContract $addressRepository,
@@ -125,7 +131,8 @@ class PaymentService
         PaymentRepositoryContract $paymentRepository,
         TransactionRepositoryContract $transactionRepository,
         PaymentHelper $paymentHelper,
-        Twig $twig
+        Twig $twig,
+        FrontendSessionStorageFactoryContract $sessionStorageFactory
     ) {
         $this->addressRepository = $addressRepository;
         $this->countryRepository = $countryRepository;
@@ -136,6 +143,7 @@ class PaymentService
         $this->transactionRepository = $transactionRepository;
         $this->paymentHelper = $paymentHelper;
         $this->twig = $twig;
+        $this->sessionStorageFactory = $sessionStorageFactory;
     }
 
     /**
@@ -256,6 +264,12 @@ class PaymentService
         int $mopId
     ): string {
         $result = '';
+
+        $this->sessionStorageFactory->getPlugin()->setValue('heidelpay-transactionId', $basket->id . '.1234567890');
+        $this->getLogger(__METHOD__)->error('session value:', [
+            $this->sessionStorageFactory->getPlugin()->getValue('heidelpay-transactionId')
+        ]);
+
 
         switch ($paymentMethod) {
             case CreditCard::class:

@@ -5,6 +5,7 @@ namespace Heidelpay\Services;
 use Heidelpay\Constants\Plugin;
 use Heidelpay\Constants\Routes;
 use Heidelpay\Constants\Salutation;
+use Heidelpay\Constants\SessionKeys;
 use Heidelpay\Constants\TransactionStatus;
 use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\PaymentHelper;
@@ -265,7 +266,17 @@ class PaymentService
     ): string {
         $result = '';
 
-        $this->sessionStorageFactory->getPlugin()->setValue('heidelpay-transactionId', $basket->id . '.1234567890');
+        $this->sessionStorageFactory->getPlugin()->setValue(
+            SessionKeys::SESSION_KEY_TXN_ID,
+            uniqid($basket->id, true)
+        );
+
+        $this->getLogger(__METHOD__)->error('uniqueId', [
+            'normal' => uniqid($basket->id, false),
+            'more entropy' => uniqid($basket->id, true)
+        ]);
+
+
         $this->getLogger(__METHOD__)->error('session value:', [
             $this->sessionStorageFactory->getPlugin()->getValue('heidelpay-transactionId')
         ]);

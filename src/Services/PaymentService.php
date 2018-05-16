@@ -191,7 +191,10 @@ class PaymentService
         $transaction = null;
 
         // todo: retrieve a heidelpay Transaction by basketId and paymentMethod-Id (Mop) to get values needed to create plenty payment (e.g. amount etc).
-        $transactions = $this->transactionRepository->getTransactionsByBasketId($basket->id);
+        $transactionId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
+        $transactions = $this->transactionRepository->getTransactionsByTxnId($transactionId);
+        $this->getLogger(__METHOD__)->error('txnId', [$transactionId]);
+
 //        $transactions = $this->transactionRepository->getTransactionsByOrderId($basket->orderId);
         $this->getLogger(__METHOD__)->error('Transactions', $transactions);
         $this->getLogger(__METHOD__)->debug('log.transactions', $transactions);
@@ -266,21 +269,9 @@ class PaymentService
     ): string {
         $result = '';
 
-        $this->sessionStorageFactory->getPlugin()->setValue(
-            SessionKeys::SESSION_KEY_TXN_ID,
-            uniqid($basket->id, true)
-        );
-
-        $this->getLogger(__METHOD__)->error('uniqueId', [
-            'normal' => uniqid($basket->id, false),
-            'more entropy' => uniqid($basket->id, true)
-        ]);
-
-
-        $this->getLogger(__METHOD__)->error('session value:', [
-            $this->sessionStorageFactory->getPlugin()->getValue('heidelpay-transactionId')
-        ]);
-
+        // create transactionId and store it in the customer session to fetch the correct transaction later.
+        $transactionId = uniqid($basket->id . '.', true);
+        $this->sessionStorageFactory->getPlugin()->setValue(SessionKeys::SESSION_KEY_TXN_ID, $transactionId);
 
         switch ($paymentMethod) {
             case CreditCard::class:

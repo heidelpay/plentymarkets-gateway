@@ -49,9 +49,10 @@ class TransactionRepository implements TransactionRepositoryContract
 
         $transaction->storeId = $data['storeId'];
         $transaction->customerId = $data['customerId'];
-        $transaction->basketId = $data['basketId'];
+        $transaction->txnId = $data['txnId'];
         $transaction->orderId = $data['orderId'];
         $transaction->paymentMethodId = $data['paymentMethodId'];
+        $transaction->txnId = $data[''];
         $transaction->status = $data['status'];
         $transaction->transactionType = $data['transactionType'];
         $transaction->shortId = $data['shortId'];
@@ -110,23 +111,9 @@ class TransactionRepository implements TransactionRepositoryContract
     /**
      * @inheritdoc
      */
-    public function getTransactionByBasketId(int $id): Transaction
+    public function getTransactionsByTxnId(int $id): array
     {
-        /** @var Transaction[] $result */
-        $result = $this->getTransactionsByBasketId($id);
-
-        return $result[0];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getTransactionsByBasketId(int $id): array
-    {
-        return $this->database->query(Transaction::class)
-            ->where('basketId', '=', $id)
-            ->orderBy('id', 'desc')
-            ->get();
+        return $this->database->query(Transaction::class)->where('txnId', '=', $id)->orderBy('id', 'desc')->get();
     }
 
     /**

@@ -21,13 +21,13 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  * @property int $id
  * @property int $storeId
  * @property int $customerId
- * @property int $basketId
  * @property int $orderId
  * @property int $paymentMethodId
  * @property int $status
  * @property string $transactionType
  * @property string $shortId
  * @property string $uniqueId
+ * @property string $txnId
  * @property boolean $isClosed
  * @property array $transactionDetails
  * @property array $transactionProcessing
@@ -49,13 +49,13 @@ class Transaction extends Model
     public $id = 0;
     public $storeId;
     public $customerId;
-    public $basketId;
     public $orderId;
     public $paymentMethodId;
     public $status;
     public $transactionType = '';
     public $shortId = '';
     public $uniqueId = '';
+    public $txnId = '';
     public $isClosed = false;
     public $transactionDetails = [];
     public $transactionProcessing = [];

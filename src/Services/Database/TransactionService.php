@@ -83,7 +83,7 @@ class TransactionService
         $processingTimestamp = $heidelpayResponse['PROCESSING.TIMESTAMP'];
 
         $data = [];
-        $data['basketId'] = (int) $heidelpayResponse['IDENTIFICATION.TRANSACTIONID'];
+        $data['txnId'] = (int) $heidelpayResponse['IDENTIFICATION.TRANSACTIONID'];
         $data['customerId'] = (int) $heidelpayResponse['IDENTIFICATION.SHOPPERID'];
         $data['storeId'] = $storeId;
         $data['paymentMethodId'] = $paymentMethodId;

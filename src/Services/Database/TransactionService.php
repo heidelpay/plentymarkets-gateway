@@ -83,7 +83,8 @@ class TransactionService
         $processingTimestamp = $heidelpayResponse['PROCESSING.TIMESTAMP'];
 
         $data = [];
-        $data['txnId'] = (int) $heidelpayResponse['IDENTIFICATION.TRANSACTIONID'];
+        $data['txnId'] = $heidelpayResponse['IDENTIFICATION.TRANSACTIONID'];
+        $data['basketId'] = $heidelpayResponse['IDENTIFICATION.TRANSACTIONID'];
         $data['customerId'] = (int) $heidelpayResponse['IDENTIFICATION.SHOPPERID'];
         $data['storeId'] = $storeId;
         $data['paymentMethodId'] = $paymentMethodId;
@@ -109,7 +110,7 @@ class TransactionService
             Transaction::PROCESSING_RETURN_CODE => $heidelpayResponse['PROCESSING.RETURN_CODE'],
             Transaction::PROCESSING_STATUS => $heidelpayResponse['PROCESSING.STATUS'],
             Transaction::PROCESSING_STATUS_CODE => $heidelpayResponse['PROCESSING.STATUS_CODE'],
-            Transaction::PROCESSING_TIMESTAMP => $processingTimestamp,
+            Transaction::PROCESSING_TIMESTAMP => $processingTimestamp
         ];
 
         return $this->transactionRepository->createTransaction($data);

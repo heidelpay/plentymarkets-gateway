@@ -269,10 +269,6 @@ class PaymentService
     ): string {
         $result = '';
 
-        // create transactionId and store it in the customer session to fetch the correct transaction later.
-        $transactionId = uniqid($basket->id . '.', true);
-        $this->sessionStorageFactory->getPlugin()->setValue(SessionKeys::SESSION_KEY_TXN_ID, $transactionId);
-
         switch ($paymentMethod) {
             case CreditCard::class:
                 $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_HTML);
@@ -383,10 +379,14 @@ class PaymentService
             $this->heidelpayRequest['NAME_COMPANY'] = $addresses['billing']->companyName;
         }
 
+        // create transactionId and store it in the customer session to fetch the correct transaction later.
+        $transactionId = uniqid($basket->id . '.', true);
+        $this->sessionStorageFactory->getPlugin()->setValue(SessionKeys::SESSION_KEY_TXN_ID, $transactionId);
+        $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $transactionId;
+
         // set basket information (amount, currency, orderId, ...)
         $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basket->basketAmount;
         $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basket->currency;
-        $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $basket->id;
 
         // TODO: receive frontend language somehow.
         $this->heidelpayRequest['FRONTEND_ENABLED'] = $this->paymentHelper->getFrontendEnabled($paymentMethod);

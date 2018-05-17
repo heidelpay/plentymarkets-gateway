@@ -51,6 +51,7 @@ class TransactionRepository implements TransactionRepositoryContract
         $transaction->storeId = $data[TransactionFields::FIELD_SHOP_ID];
         $transaction->customerId = $data[TransactionFields::FIELD_CUSTOMER_ID];
         $transaction->txnId = $data[TransactionFields::FIELD_TRANSACTION_ID];
+        $transaction->basketId = $data[TransactionFields::FIELD_BASKET_ID];
         $transaction->orderId = $data[TransactionFields::FIELD_ORDER_ID];
         $transaction->paymentMethodId = $data[TransactionFields::FIELD_PAYMENT_METHOD_ID];
         $transaction->status = $data[TransactionFields::FIELD_STATUS];

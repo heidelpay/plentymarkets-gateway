@@ -37,11 +37,11 @@ interface TransactionRepositoryContract
     public function getTransactionById(int $id): Transaction;
 
     /**
-     * @param int $id
+     * @param string $txnId
      *
      * @return Transaction[]
      */
-    public function getTransactionsByTxnId(int $id): array;
+    public function getTransactionsByTxnId($txnId): array;
 
     /**
      * @param int $customerId

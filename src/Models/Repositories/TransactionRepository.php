@@ -112,10 +112,10 @@ class TransactionRepository implements TransactionRepositoryContract
     /**
      * @inheritdoc
      */
-    public function getTransactionsByTxnId(int $id): array
+    public function getTransactionsByTxnId($txnId): array
     {
         return $this->database->query(Transaction::class)
-            ->where(TransactionFields::FIELD_TRANSACTION_ID, '=', $id)
+            ->where(TransactionFields::FIELD_TRANSACTION_ID, '=', $txnId)
             ->orderBy(TransactionFields::FIELD_ID, 'desc')
             ->get();
     }

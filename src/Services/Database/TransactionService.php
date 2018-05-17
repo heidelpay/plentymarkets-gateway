@@ -95,6 +95,7 @@ class TransactionService
         $data[TransactionFields::FIELD_SHORT_ID] = $heidelpayResponse['IDENTIFICATION.SHORTID'];
         $data[TransactionFields::FIELD_UNIQUE_ID] = $heidelpayResponse['IDENTIFICATION.UNIQUEID'];
         $data[TransactionFields::FIELD_CREATED_AT] = $processingTimestamp;
+        $data[TransactionFields::FIELD_UPDATED_AT] = $processingTimestamp;
 
         // if the orderId is given, use this. else, use a dummy since null is not possible.
         $data[TransactionFields::FIELD_ORDER_ID] = $orderId ?? self::NO_ORDER_ID;

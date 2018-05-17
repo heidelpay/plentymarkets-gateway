@@ -2,6 +2,7 @@
 
 namespace Heidelpay\Services\Database;
 
+use Heidelpay\Constants\TransactionFields;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Transaction;
@@ -83,25 +84,25 @@ class TransactionService
         $processingTimestamp = $heidelpayResponse['PROCESSING.TIMESTAMP'];
 
         $data = [];
-        $data['txnId'] = $heidelpayResponse['IDENTIFICATION.TRANSACTIONID'];
-        $data['basketId'] = $heidelpayResponse['IDENTIFICATION.TRANSACTIONID'];
-        $data['customerId'] = (int) $heidelpayResponse['IDENTIFICATION.SHOPPERID'];
-        $data['storeId'] = $storeId;
-        $data['paymentMethodId'] = $paymentMethodId;
-        $data['transactionType'] =
+        $data[TransactionFields::FIELD_TRANSACTION_ID] = $heidelpayResponse['IDENTIFICATION.TRANSACTIONID'];
+        $data[TransactionFields::FIELD_BASKET_ID] = $heidelpayResponse['IDENTIFICATION.TRANSACTIONID'];
+        $data[TransactionFields::FIELD_CUSTOMER_ID] = (int) $heidelpayResponse['IDENTIFICATION.SHOPPERID'];
+        $data[TransactionFields::FIELD_SHOP_ID] = $storeId;
+        $data[TransactionFields::FIELD_PAYMENT_METHOD_ID] = $paymentMethodId;
+        $data[TransactionFields::FIELD_TRANSACTION_TYPE] =
             $this->paymentHelper->mapHeidelpayTransactionType($heidelpayResponse['PAYMENT.CODE']);
-        $data['status'] = $this->paymentHelper->mapHeidelpayTransactionStatus($responseData);
-        $data['shortId'] = $heidelpayResponse['IDENTIFICATION.SHORTID'];
-        $data['uniqueId'] = $heidelpayResponse['IDENTIFICATION.UNIQUEID'];
-        $data['createdAt'] = $processingTimestamp;
+        $data[TransactionFields::FIELD_STATUS] = $this->paymentHelper->mapHeidelpayTransactionStatus($responseData);
+        $data[TransactionFields::FIELD_SHORT_ID] = $heidelpayResponse['IDENTIFICATION.SHORTID'];
+        $data[TransactionFields::FIELD_UNIQUE_ID] = $heidelpayResponse['IDENTIFICATION.UNIQUEID'];
+        $data[TransactionFields::FIELD_CREATED_AT] = $processingTimestamp;
 
         // if the orderId is given, use this. else, use a dummy since null is not possible.
-        $data['orderId'] = $orderId ?? self::NO_ORDER_ID;
+        $data[TransactionFields::FIELD_ORDER_ID] = $orderId ?? self::NO_ORDER_ID;
 
-        $data['transactionDetails'] = $this->getTransactionDetails($heidelpayResponse);
+        $data[TransactionFields::FIELD_TRANSACTION_DETAILS] = $this->getTransactionDetails($heidelpayResponse);
 
         // transaction processing data
-        $data['transactionProcessing'] = [
+        $data[TransactionFields::FIELD_TRANSACTION_PROCESSING] = [
             Transaction::PROCESSING_CODE => $heidelpayResponse['PROCESSING.CODE'],
             Transaction::PROCESSING_REASON => $heidelpayResponse['PROCESSING.REASON'],
             Transaction::PROCESSING_REASON_CODE => $heidelpayResponse['PROCESSING.REASON_CODE'],

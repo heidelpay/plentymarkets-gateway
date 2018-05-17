@@ -2,6 +2,7 @@
 
 namespace Heidelpay\Models\Repositories;
 
+use Heidelpay\Constants\TransactionFields;
 use Heidelpay\Constants\TransactionType;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Transaction;
@@ -47,19 +48,19 @@ class TransactionRepository implements TransactionRepositoryContract
         /** @var Transaction $transaction */
         $transaction = pluginApp(Transaction::class);
 
-        $transaction->storeId = $data['storeId'];
-        $transaction->customerId = $data['customerId'];
-        $transaction->txnId = $data['txnId'];
-        $transaction->orderId = $data['orderId'];
-        $transaction->paymentMethodId = $data['paymentMethodId'];
-        $transaction->txnId = $data[''];
-        $transaction->status = $data['status'];
-        $transaction->transactionType = $data['transactionType'];
-        $transaction->shortId = $data['shortId'];
-        $transaction->uniqueId = $data['uniqueId'];
-        $transaction->transactionDetails = $data['transactionDetails'];
-        $transaction->transactionProcessing = $data['transactionProcessing'];
-        $transaction->createdAt = $transaction->updatedAt =  $data['createdAt'];
+        $transaction->storeId = $data[TransactionFields::FIELD_SHOP_ID];
+        $transaction->customerId = $data[TransactionFields::FIELD_CUSTOMER_ID];
+        $transaction->txnId = $data[TransactionFields::FIELD_TRANSACTION_ID];
+        $transaction->orderId = $data[TransactionFields::FIELD_ORDER_ID];
+        $transaction->paymentMethodId = $data[TransactionFields::FIELD_PAYMENT_METHOD_ID];
+        $transaction->status = $data[TransactionFields::FIELD_STATUS];
+        $transaction->transactionType = $data[TransactionFields::FIELD_TRANSACTION_TYPE];
+        $transaction->shortId = $data[TransactionFields::FIELD_SHORT_ID];
+        $transaction->uniqueId = $data[TransactionFields::FIELD_UNIQUE_ID];
+        $transaction->transactionDetails = $data[TransactionFields::FIELD_TRANSACTION_DETAILS];
+        $transaction->transactionProcessing = $data[TransactionFields::FIELD_TRANSACTION_PROCESSING];
+        $transaction->createdAt = $data[TransactionFields::FIELD_CREATED_AT];
+        $transaction->updatedAt = $data[TransactionFields::FIELD_UPDATED_AT];
 
         if (isset($data['isClosed']) && $data['isClosed'] === true) {
             $transaction->isClosed = true;
@@ -113,7 +114,10 @@ class TransactionRepository implements TransactionRepositoryContract
      */
     public function getTransactionsByTxnId(int $id): array
     {
-        return $this->database->query(Transaction::class)->where('txnId', '=', $id)->orderBy('id', 'desc')->get();
+        return $this->database->query(Transaction::class)
+            ->where(TransactionFields::FIELD_TRANSACTION_ID, '=', $id)
+            ->orderBy(TransactionFields::FIELD_ID, 'desc')
+            ->get();
     }
 
     /**
@@ -123,8 +127,8 @@ class TransactionRepository implements TransactionRepositoryContract
     {
         /** @var Transaction[] $result */
         $result = $this->database->query(Transaction::class)
-            ->where('customerId', '=', $customerId)
-            ->orderBy('id', 'desc')
+            ->where(TransactionFields::FIELD_CUSTOMER_ID, '=', $customerId)
+            ->orderBy(TransactionFields::FIELD_ID, 'desc')
             ->get();
 
         return $result;
@@ -137,7 +141,7 @@ class TransactionRepository implements TransactionRepositoryContract
     {
         /** @var Transaction[] $result */
         $result = $this->database->query(Transaction::class)
-            ->where('transactionType', '=', $transactionType)
+            ->where(TransactionFields::FIELD_TRANSACTION_TYPE, '=', $transactionType)
             ->get();
 
         return $result;

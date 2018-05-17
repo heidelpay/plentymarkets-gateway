@@ -26,6 +26,7 @@
   },
   "runOnBuild": [
     "Heidelpay\\Migrations\\CreatePaymentMethods",
-    "Heidelpay\\Migrations\\CreateHeidelpayTables"
+    "Heidelpay\\Migrations\\CreateHeidelpayTables",
+    "Heidelpay\\Migrations\\UpdateHeidelpayTablesAddTxnId"
   ]
 }

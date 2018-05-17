@@ -28,6 +28,7 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  * @property string $shortId
  * @property string $uniqueId
  * @property string $txnId
+ * @property int $basketId
  * @property boolean $isClosed
  * @property array $transactionDetails
  * @property array $transactionProcessing
@@ -56,6 +57,7 @@ class Transaction extends Model
     public $shortId = '';
     public $uniqueId = '';
     public $txnId = '';
+    public $basketId = '';
     public $isClosed = false;
     public $transactionDetails = [];
     public $transactionProcessing = [];

@@ -526,7 +526,7 @@ class PaymentService
         $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentDetails);
         $payment->amount = $paymentDetails['PRESENTATION.AMOUNT'];
         $payment->currency = $paymentDetails['PRESENTATION.CURRENCY'];
-        $payment->receivedAt = $paymentData->createdAt;
+        $payment->receivedAt = date('Y-m-d H:i:s');
         $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentData->transactionProcessing);
         $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
         $payment->type = Payment::PAYMENT_TYPE_CREDIT; // From Merchant point of view
@@ -542,6 +542,10 @@ class PaymentService
             PaymentProperty::TYPE_ORIGIN,
             Payment::ORIGIN_PLUGIN
         );
+        $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
+            PaymentProperty::TYPE_TRANSACTION_ID,
+            $paymentData->txnId
+        );
 //        $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
 //            PaymentProperty::,
 //            Payment::ORIGIN_PLUGIN
@@ -550,9 +554,9 @@ class PaymentService
         // create the payment
         $payment->properties = $paymentProperty;
         $payment->regenerateHash = true;
-        $payment = $this->paymentRepository->createPayment($payment);
+        $this->getLogger(__METHOD__)->error('plenty payment', [$payment]);
 
-        return $payment;
+        return $this->paymentRepository->createPayment($payment);
     }
 
     /**

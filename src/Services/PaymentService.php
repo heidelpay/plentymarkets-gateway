@@ -197,7 +197,7 @@ class PaymentService
 
 //        $transactions = $this->transactionRepository->getTransactionsByOrderId($basket->orderId);
         $this->getLogger(__METHOD__)->error('Transactions', $transactions);
-        $this->getLogger(__METHOD__)->debug('log.transactions', $transactions);
+        $this->getLogger(__METHOD__)->debug('heidelpay::payment.transactions', $transactions);
         $this->getLogger(__METHOD__)->debug('template.transactions', $transactions);
         foreach ($transactions as $transaction) {
             $this->getLogger(__METHOD__)->error('Transaction', $transaction);
@@ -381,8 +381,10 @@ class PaymentService
 
         // create transactionId and store it in the customer session to fetch the correct transaction later.
         $transactionId = uniqid('', false);
-
-        $this->getLogger(__METHOD__)->error('microtime', microtime());
+        $this->getLogger(__METHOD__)->error('transactionId', $transactionId);
+        $this->getLogger(__METHOD__)->error('microtime', microtime(false));
+        $this->getLogger(__METHOD__)->error('microtime', microtime(true));
+        $this->getLogger(__METHOD__)->error('time', time());
 
         $this->sessionStorageFactory->getPlugin()->setValue(SessionKeys::SESSION_KEY_TXN_ID, $transactionId);
         $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $transactionId;
@@ -545,10 +547,20 @@ class PaymentService
             PaymentProperty::TYPE_ORIGIN,
             Payment::ORIGIN_PLUGIN
         );
+
         $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
-            PaymentProperty::TYPE_BOOKING_TEXT,
-            'TransactionId: ' . $paymentData->txnId
+            PaymentProperty::TYPE_TRANSACTION_ID,
+            1234567
         );
+
+//        $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
+//            PaymentProperty::TYPE_TRANSACTION_ID,
+//            $paymentData->txnId
+//        );
+//        $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
+//            PaymentProperty::TYPE_BOOKING_TEXT,
+//            'TransactionId: ' . $paymentData->txnId
+//        );
 //        $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
 //            PaymentProperty::,
 //            Payment::ORIGIN_PLUGIN

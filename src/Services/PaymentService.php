@@ -380,7 +380,10 @@ class PaymentService
         }
 
         // create transactionId and store it in the customer session to fetch the correct transaction later.
-        $transactionId = uniqid($basket->id . '.', true);
+        $transactionId = uniqid('', false);
+
+        $this->getLogger(__METHOD__)->error('microtime', microtime());
+
         $this->sessionStorageFactory->getPlugin()->setValue(SessionKeys::SESSION_KEY_TXN_ID, $transactionId);
         $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $transactionId;
 
@@ -543,8 +546,8 @@ class PaymentService
             Payment::ORIGIN_PLUGIN
         );
         $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
-            PaymentProperty::TYPE_TRANSACTION_ID,
-            $paymentData->txnId
+            PaymentProperty::TYPE_BOOKING_TEXT,
+            'TransactionId: ' . $paymentData->txnId
         );
 //        $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
 //            PaymentProperty::,

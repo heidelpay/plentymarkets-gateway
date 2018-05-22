@@ -170,35 +170,26 @@ class PaymentService
     /**
      * Executes payment tasks after an order has been created.
      *
-     * @param Basket         $basket
      * @param string         $paymentMethod
      * @param ExecutePayment $event
      *
      * @return string
      */
-    public function executePayment(string $paymentMethod, Basket $basket, ExecutePayment $event): string
+    public function executePayment(string $paymentMethod, ExecutePayment $event): string
     {
         $this->getLogger(__METHOD__)->error('executePayment call', [
             'paymentMethod' => $paymentMethod,
-            'basketId' => $basket->id,
             'mopId' => $event->getMop(),
-            'orderId' => $event->getOrderId(),
-            'eventType' => $event->getType(),
-            'order' => $this->orderRepository->findOrderById($event->getOrderId())
+            'orderId' => $event->getOrderId()
         ]);
 
         $transactionDetails = [];
         $transaction = null;
 
-        // todo: retrieve a heidelpay Transaction by basketId and paymentMethod-Id (Mop) to get values needed to create plenty payment (e.g. amount etc).
+        // Retrieve heidelpay Transaction by txnId to get values needed for plenty payment (e.g. amount etc).
         $transactionId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
         $transactions = $this->transactionRepository->getTransactionsByTxnId($transactionId);
-        $this->getLogger(__METHOD__)->error('txnId', [$transactionId]);
-
-//        $transactions = $this->transactionRepository->getTransactionsByOrderId($basket->orderId);
         $this->getLogger(__METHOD__)->error('Transactions', $transactions);
-        $this->getLogger(__METHOD__)->debug('heidelpay::payment.transactions', $transactions);
-        $this->getLogger(__METHOD__)->debug('template.transactions', $transactions);
         foreach ($transactions as $transaction) {
             $this->getLogger(__METHOD__)->error('Transaction', $transaction);
             $allowedStatus = [TransactionStatus::ACK, TransactionStatus::PENDING];
@@ -221,8 +212,6 @@ class PaymentService
         }
 
         $this->paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $event->getOrderId());
-
-        $this->getLogger(__METHOD__)->error('Basket', $basket);
 
         $this->setReturnType('success');
         return 'Payment was successful!';

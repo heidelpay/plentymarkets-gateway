@@ -3,6 +3,7 @@
 namespace Heidelpay\Providers;
 
 use Heidelpay\Configs\MainConfig;
+use Heidelpay\Configs\MainConfigContract;
 use Heidelpay\Configs\MethodConfig;
 use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;

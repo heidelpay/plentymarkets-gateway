@@ -2,6 +2,8 @@
 
 namespace Heidelpay\Helper;
 
+use Heidelpay\Configs\MainConfigContract;
+use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Constants\Plugin;
 use Heidelpay\Constants\TransactionStatus;
 use Heidelpay\Constants\TransactionType;

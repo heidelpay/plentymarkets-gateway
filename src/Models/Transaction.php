@@ -37,6 +37,22 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  */
 class Transaction extends Model
 {
+    const FIELD_ID = 'id';
+    const FIELD_SHOP_ID = 'storeId';
+    const FIELD_CUSTOMER_ID = 'customerId';
+    const FIELD_TRANSACTION_ID = 'txnId';
+    const FIELD_BASKET_ID = 'basketId';
+    const FIELD_ORDER_ID = 'orderId';
+    const FIELD_PAYMENT_METHOD_ID = 'paymentMethodId';
+    const FIELD_STATUS = 'status';
+    const FIELD_TRANSACTION_TYPE = 'transactionType';
+    const FIELD_SHORT_ID = 'shortId';
+    const FIELD_UNIQUE_ID = 'uniqueId';
+    const FIELD_TRANSACTION_DETAILS = 'transactionDetails';
+    const FIELD_TRANSACTION_PROCESSING = 'transactionProcessing';
+    const FIELD_CREATED_AT = 'createdAt';
+    const FIELD_UPDATED_AT = 'updatedAt';
+
     const PROCESSING_CODE = 'code';
     const PROCESSING_REASON = 'reason';
     const PROCESSING_REASON_CODE = 'reason_code';

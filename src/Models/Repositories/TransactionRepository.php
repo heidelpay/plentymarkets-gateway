@@ -2,7 +2,6 @@
 
 namespace Heidelpay\Models\Repositories;
 
-use Heidelpay\Constants\TransactionFields;
 use Heidelpay\Constants\TransactionType;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Transaction;
@@ -48,20 +47,20 @@ class TransactionRepository implements TransactionRepositoryContract
         /** @var Transaction $transaction */
         $transaction = pluginApp(Transaction::class);
 
-        $transaction->storeId = $data[TransactionFields::FIELD_SHOP_ID];
-        $transaction->customerId = $data[TransactionFields::FIELD_CUSTOMER_ID];
-        $transaction->txnId = $data[TransactionFields::FIELD_TRANSACTION_ID];
-        $transaction->basketId = $data[TransactionFields::FIELD_BASKET_ID];
-        $transaction->orderId = $data[TransactionFields::FIELD_ORDER_ID];
-        $transaction->paymentMethodId = $data[TransactionFields::FIELD_PAYMENT_METHOD_ID];
-        $transaction->status = $data[TransactionFields::FIELD_STATUS];
-        $transaction->transactionType = $data[TransactionFields::FIELD_TRANSACTION_TYPE];
-        $transaction->shortId = $data[TransactionFields::FIELD_SHORT_ID];
-        $transaction->uniqueId = $data[TransactionFields::FIELD_UNIQUE_ID];
-        $transaction->transactionDetails = $data[TransactionFields::FIELD_TRANSACTION_DETAILS];
-        $transaction->transactionProcessing = $data[TransactionFields::FIELD_TRANSACTION_PROCESSING];
-        $transaction->createdAt = $data[TransactionFields::FIELD_CREATED_AT];
-        $transaction->updatedAt = $data[TransactionFields::FIELD_UPDATED_AT];
+        $transaction->storeId = $data[Transaction::FIELD_SHOP_ID];
+        $transaction->customerId = $data[Transaction::FIELD_CUSTOMER_ID];
+        $transaction->txnId = $data[Transaction::FIELD_TRANSACTION_ID];
+        $transaction->basketId = $data[Transaction::FIELD_BASKET_ID];
+        $transaction->orderId = $data[Transaction::FIELD_ORDER_ID];
+        $transaction->paymentMethodId = $data[Transaction::FIELD_PAYMENT_METHOD_ID];
+        $transaction->status = $data[Transaction::FIELD_STATUS];
+        $transaction->transactionType = $data[Transaction::FIELD_TRANSACTION_TYPE];
+        $transaction->shortId = $data[Transaction::FIELD_SHORT_ID];
+        $transaction->uniqueId = $data[Transaction::FIELD_UNIQUE_ID];
+        $transaction->transactionDetails = $data[Transaction::FIELD_TRANSACTION_DETAILS];
+        $transaction->transactionProcessing = $data[Transaction::FIELD_TRANSACTION_PROCESSING];
+        $transaction->createdAt = $data[Transaction::FIELD_CREATED_AT];
+        $transaction->updatedAt = $data[Transaction::FIELD_UPDATED_AT];
 
         if (isset($data['isClosed']) && $data['isClosed'] === true) {
             $transaction->isClosed = true;
@@ -116,8 +115,8 @@ class TransactionRepository implements TransactionRepositoryContract
     public function getTransactionsByTxnId($txnId): array
     {
         return $this->database->query(Transaction::class)
-            ->where(TransactionFields::FIELD_TRANSACTION_ID, '=', $txnId)
-            ->orderBy(TransactionFields::FIELD_ID, 'desc')
+            ->where(Transaction::FIELD_TRANSACTION_ID, '=', $txnId)
+            ->orderBy(Transaction::FIELD_ID, 'desc')
             ->get();
     }
 
@@ -128,8 +127,8 @@ class TransactionRepository implements TransactionRepositoryContract
     {
         /** @var Transaction[] $result */
         $result = $this->database->query(Transaction::class)
-            ->where(TransactionFields::FIELD_CUSTOMER_ID, '=', $customerId)
-            ->orderBy(TransactionFields::FIELD_ID, 'desc')
+            ->where(Transaction::FIELD_CUSTOMER_ID, '=', $customerId)
+            ->orderBy(Transaction::FIELD_ID, 'desc')
             ->get();
 
         return $result;
@@ -142,7 +141,7 @@ class TransactionRepository implements TransactionRepositoryContract
     {
         /** @var Transaction[] $result */
         $result = $this->database->query(Transaction::class)
-            ->where(TransactionFields::FIELD_TRANSACTION_TYPE, '=', $transactionType)
+            ->where(Transaction::FIELD_TRANSACTION_TYPE, '=', $transactionType)
             ->get();
 
         return $result;

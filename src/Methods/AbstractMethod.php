@@ -2,6 +2,7 @@
 
 namespace Heidelpay\Methods;
 
+use Heidelpay\Helper\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
@@ -33,19 +34,26 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      * @var BasketRepositoryContract $basketRepository
      */
     protected $basketRepository;
+    /**
+     * @var MethodConfigContract
+     */
+    private $config;
 
     /**
      * AbstractMethod constructor.
      *
-     * @param PaymentHelper          $paymentHelper
-     * @param BasketRepositoryContract $basketRepositoryContract
+     * @param PaymentHelper $paymentHelper
+     * @param BasketRepositoryContract $basketRepository
+     * @param MethodConfigContract $config
      */
     public function __construct(
         PaymentHelper $paymentHelper,
-        BasketRepositoryContract $basketRepositoryContract
+        BasketRepositoryContract $basketRepository,
+        MethodConfigContract $config
     ) {
         $this->helper = $paymentHelper;
-        $this->basketRepository = $basketRepositoryContract;
+        $this->basketRepository = $basketRepository;
+        $this->config = $config;
     }
 
     /**
@@ -54,7 +62,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     public function isActive(): bool
     {
         // return false if this method is not configured as active.
-        if (! $this->helper->getIsActive($this)) {
+        if (! $this->config->isActive($this)) {
             return false;
         }
 
@@ -62,14 +70,14 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
 
         // check the configured minimum cart amount and return false if an amount is configured
         // (which means > 0.00) and the cart amount is below the configured value.
-        $minAmount = $this->helper->getMinAmount($this);
+        $minAmount = $this->config->getMinAmount($this);
         if ($minAmount > 0.00 && $basket->basketAmount < $minAmount) {
             return false;
         }
 
         // check the configured maximum cart amount and return false if an amount is configured
         // (which means > 0.00) and the cart amount is above the configured value.
-        $maxAmount = $this->helper->getMaxAmount($this);
+        $maxAmount = $this->config->getMaxAmount($this);
         return !($maxAmount > 0.00 && $basket->basketAmount > $maxAmount);
     }
 
@@ -158,22 +166,24 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function getName(): string
     {
-        return $this->helper->getPaymentMethodName($this) ?: $this->getDefaultName();
+        return $this->config->getPaymentMethodName($this) ?: $this->getDefaultName();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getIcon(): string
-    {
-        return $this->helper->getMethodIcon($this);
-    }
+    // todo: remove?
+//    /**
+//     * @inheritdoc
+//     */
+//    public function getIcon(): string
+//    {
+//        return $this->helper->getMethodIcon($this);
+//    }
 
-    /**
-     * @inheritdoc
-     */
-    public function getDescription(): string
-    {
-        return $this->helper->getMethodDescription($this);
-    }
+    // todo: remove?
+//    /**
+//     * @inheritdoc
+//     */
+//    public function getDescription(): string
+//    {
+//        return $this->helper->getMethodDescription($this);
+//    }
 }

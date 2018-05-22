@@ -81,12 +81,13 @@ interface PaymentMethodContract
      */
     public function getDescription(): string;
 
-    /**
-     * Returns the configured icon logo, if logo usage is enabled for this payment method.
-     *
-     * @return string
-     */
-    public function getIcon(): string;
+    // todo: remove?
+//    /**
+//     * Returns the configured icon logo, if logo usage is enabled for this payment method.
+//     *
+//     * @return string
+//     */
+//    public function getIcon(): string;
 
     /**
      * Returns the key for the payment method.

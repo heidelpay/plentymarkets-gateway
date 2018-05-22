@@ -2,14 +2,10 @@
 
 namespace Heidelpay\Helper;
 
-use Heidelpay\Constants\ConfigKeys;
-use Heidelpay\Constants\DescriptionTypes;
 use Heidelpay\Constants\Plugin;
-use Heidelpay\Constants\TransactionMode;
 use Heidelpay\Constants\TransactionStatus;
 use Heidelpay\Constants\TransactionType;
 use Heidelpay\Methods\CreditCard;
-use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
@@ -26,7 +22,6 @@ use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
-use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -54,11 +49,6 @@ class PaymentHelper
     const NO_KEY_FOUND = 'no_key_found';
 
     const NO_PAYMENTMETHOD_FOUND = -1;
-
-    /**
-     * @var ConfigRepository
-     */
-    private $config;
 
     /**
      * @var PaymentMethodRepositoryContract
@@ -98,25 +88,36 @@ class PaymentHelper
      * @var PaymentOrderRelationRepositoryContract
      */
     private $paymentOrderRelationRepo;
+    /**
+     * @var MainConfigContract
+     */
+    private $mainConfig;
+    /**
+     * @var MethodConfigContract
+     */
+    private $methodConfig;
 
     /**
      * AbstractHelper constructor.
      *
-     * @param ConfigRepository $configRepository
      * @param PaymentMethodRepositoryContract $paymentMethodRepository
      * @param OrderRepositoryContract $orderRepository
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo
+     * @param MainConfigContract $mainConfig
+     * @param MethodConfigContract $methodConfig
      */
     public function __construct(
-        ConfigRepository $configRepository,
         PaymentMethodRepositoryContract $paymentMethodRepository,
         OrderRepositoryContract $orderRepository,
-        PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo
+        PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo,
+        MainConfigContract $mainConfig,
+        MethodConfigContract $methodConfig
     ) {
-        $this->config = $configRepository;
         $this->paymentMethodRepository = $paymentMethodRepository;
         $this->orderRepository = $orderRepository;
         $this->paymentOrderRelationRepo = $paymentOrderRelationRepo;
+        $this->mainConfig = $mainConfig;
+        $this->methodConfig = $methodConfig;
     }
 
     /**
@@ -182,18 +183,19 @@ class PaymentHelper
         return array_keys(static::$paymentMethods);
     }
 
-    /**
-     * Gets a certain key from a given payment method in the helper string array.
-     *
-     * @param string $paymentMethodClass
-     * @param string $key
-     *
-     * @return string
-     */
-    public function getPaymentMethodString(string $paymentMethodClass, string $key): string
-    {
-        return static::$paymentMethods[$paymentMethodClass][$key] ?? null;
-    }
+    // todo: remove?
+//    /**
+//     * Gets a certain key from a given payment method in the helper string array.
+//     *
+//     * @param string $paymentMethodClass
+//     * @param string $key
+//     *
+//     * @return string
+//     */
+//    public function getPaymentMethodString(string $paymentMethodClass, string $key): string
+//    {
+//        return static::$paymentMethods[$paymentMethodClass][$key] ?? null;
+//    }
 
     /**
      * Returns a list of events that should be observed.
@@ -234,16 +236,6 @@ class PaymentHelper
     }
 
     /**
-     * @param string $paymentMethod
-     *
-     * @return string
-     */
-    public function getFrontendEnabled(string $paymentMethod): string
-    {
-        return 'true';
-    }
-
-    /**
      * Returns the heidelpay authentication data (senderId, login, password, environment) as array.
      *
      * @param string $paymentMethod
@@ -253,175 +245,64 @@ class PaymentHelper
     public function getHeidelpayAuthenticationConfig(string $paymentMethod): array
     {
         return [
-            'SECURITY_SENDER' => $this->getSenderId(),
-            'TRANSACTION_CHANNEL' => $this->getTransactionChannel($paymentMethod),
-            'TRANSACTION_MODE' => $this->getEnvironment(),
-            'USER_LOGIN' => $this->getUserLogin(),
-            'USER_PWD' => $this->getUserPassword(),
+            'SECURITY_SENDER' => $this->mainConfig->getSenderId(),
+            'TRANSACTION_CHANNEL' => $this->methodConfig->getTransactionChannel($paymentMethod),
+            'TRANSACTION_MODE' => $this->mainConfig->getEnvironment(),
+            'USER_LOGIN' => $this->mainConfig->getUserLogin(),
+            'USER_PWD' => $this->mainConfig->getUserPassword(),
         ];
     }
 
-    /**
-     * Returns the senderId for authentification.
-     *
-     * @return string
-     */
-    private function getSenderId(): string
-    {
-        return $this->config->get($this->getConfigKey(ConfigKeys::AUTH_SENDER_ID));
-    }
 
-    /**
-     * Returns the user login for authentification.
-     *
-     * @return string
-     */
-    private function getUserLogin(): string
-    {
-        return $this->config->get($this->getConfigKey(ConfigKeys::AUTH_LOGIN));
-    }
 
-    /**
-     * Returns the user password for authentification.
-     *
-     * @return string
-     */
-    private function getUserPassword(): string
-    {
-        return $this->config->get($this->getConfigKey(ConfigKeys::AUTH_PASSWORD));
-    }
+    // todo: remove?
+//    /**
+//     * Returns the url to an icon for a payment method, if configured.
+//     *
+//     * @param PaymentMethodContract $paymentMethod
+//     *
+//     * @return string
+//     */
+//    public function getMethodIcon(PaymentMethodContract $paymentMethod): string
+//    {
+//        $useIcon = (bool) $this->config->get($this->getUseIconKey($paymentMethod));
+//        if ($useIcon === false) {
+//            return '';
+//        }
+//
+//        return $this->config->get($this->getIconUrlKey($paymentMethod)) ?: '';
+//    }
 
-    /**
-     * Returns the value for the transaction mode (which is the environment).
-     *
-     * @return string
-     */
-    private function getEnvironment(): string
-    {
-        $transactionMode = (int) $this->config->get($this->getConfigKey(ConfigKeys::ENVIRONMENT));
+//    /**
+//     * @param PaymentMethodContract $paymentMethod
+//     *
+//     * @return string
+//     */
+//    public function getMethodDescription(PaymentMethodContract $paymentMethod): string
+//    {
+//        $type = $this->getMethodDescriptionType($paymentMethod);
+//
+//        if ($type === DescriptionTypes::INTERNAL) {
+//            return $this->config->get($this->getDescriptionKey($paymentMethod, true));
+//        }
+//
+//        if ($type === DescriptionTypes::EXTERNAL) {
+//            return $this->config->get($this->getDescriptionKey($paymentMethod));
+//        }
+//
+//        // in case of DescriptionTypes::NONE
+//        return '';
+//    }
 
-        if ($transactionMode === 0) {
-            return TransactionMode::CONNECTOR_TEST;
-        }
-
-        return TransactionMode::LIVE;
-    }
-
-    /**
-     * @param string $paymentMethod
-     *
-     * @return string
-     */
-    private function getTransactionChannel(string $paymentMethod): string
-    {
-        return $this->config->get($this->getChannelIdKey($paymentMethod));
-    }
-
-    /**
-     * Returns if a payment method is enabled or disabled.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return bool
-     */
-    public function getIsActive(PaymentMethodContract $paymentMethod): bool
-    {
-        return $this->config->get($this->getIsActiveKey($paymentMethod)) === 'true';
-    }
-
-    /**
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    public function getPaymentMethodName(PaymentMethodContract $paymentMethod): string
-    {
-        return $this->config->get($this->getDisplayNameKey($paymentMethod));
-    }
-
-    /**
-     * Returns the configured minimum amount for the given payment method.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return float
-     */
-    public function getMinAmount(PaymentMethodContract $paymentMethod): float
-    {
-        return (float) str_replace(',', '.', $this->config->get($this->getMinAmountKey($paymentMethod)));
-    }
-
-    /**
-     * Returns the configured minimum amount for the given payment method.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return float
-     */
-    public function getMaxAmount(PaymentMethodContract $paymentMethod): float
-    {
-        return (float) str_replace(',', '.', $this->config->get($this->getMaxAmountKey($paymentMethod)));
-    }
-
-    /**
-     * Returns the url to an icon for a payment method, if configured.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    public function getMethodIcon(PaymentMethodContract $paymentMethod): string
-    {
-        $useIcon = (bool) $this->config->get($this->getUseIconKey($paymentMethod));
-        if ($useIcon === false) {
-            return '';
-        }
-
-        return $this->config->get($this->getIconUrlKey($paymentMethod)) ?: '';
-    }
-
-    /**
-     * Returns the iFrame Css Path for the payment method.
-     *
-     * @param PaymentMethodContract $paymentMethodContract
-     *
-     * @return string
-     */
-    public function getIFrameCssPath(PaymentMethodContract $paymentMethodContract): string
-    {
-        return $this->config->get($this->getIFrameCssPathKey($paymentMethodContract));
-    }
-
-    /**
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    public function getMethodDescription(PaymentMethodContract $paymentMethod): string
-    {
-        $type = $this->getMethodDescriptionType($paymentMethod);
-
-        if ($type === DescriptionTypes::INTERNAL) {
-            return $this->config->get($this->getDescriptionKey($paymentMethod, true));
-        }
-
-        if ($type === DescriptionTypes::EXTERNAL) {
-            return $this->config->get($this->getDescriptionKey($paymentMethod));
-        }
-
-        // in case of DescriptionTypes::NONE
-        return '';
-    }
-
-    /**
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    public function getMethodDescriptionType(PaymentMethodContract $paymentMethod): string
-    {
-        return $this->config->get($this->getDescriptionTypeKey($paymentMethod)) ?? DescriptionTypes::NONE;
-    }
+//    /**
+//     * @param PaymentMethodContract $paymentMethod
+//     *
+//     * @return string
+//     */
+//    public function getMethodDescriptionType(PaymentMethodContract $paymentMethod): string
+//    {
+//        return $this->config->get($this->getDescriptionTypeKey($paymentMethod)) ?? DescriptionTypes::NONE;
+//    }
 
     /**
      * @param string $paymentMethod
@@ -437,144 +318,46 @@ class PaymentHelper
         return $prefix . $name;
     }
 
-    /**
-     * Returns the complete config key (plugin name + config key) for a given key.
-     *
-     * @param string $key
-     *
-     * @return string
-     */
-    protected function getConfigKey(string $key): string
-    {
-        return Plugin::NAME . '.' . $key;
-    }
+//    /**
+//     * Returns the config key for the 'description/info page' configuration.
+//     *
+//     * @param PaymentMethodContract $paymentMethod
+//     * @param bool           $isInternal
+//     *
+//     * @return string
+//     */
+//    protected function getDescriptionKey(PaymentMethodContract $paymentMethod, bool $isInternal = false): string
+//    {
+//        if (!$isInternal) {
+//            return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_EXTERNAL);
+//        }
+//
+//        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_INTERNAL);
+//    }
 
-    /**
-     * Returns the payment method config key for the 'Channel-ID' configuration.
-     *
-     * @param string $paymentMethod
-     *
-     * @return string
-     */
-    protected function getChannelIdKey(string $paymentMethod): string
-    {
-        $paymentMethodKey = static::$paymentMethods[$paymentMethod][static::ARRAY_KEY_CONFIG_KEY];
-
-        return $this->getConfigKey($paymentMethodKey . '.' . ConfigKeys::CHANNEL_ID);
-    }
-
-    /**
-     * Returns the payment method config key for the 'Display name' configuration.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    protected function getDisplayNameKey(PaymentMethodContract $paymentMethod): string
-    {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DISPLAY_NAME);
-    }
-
-    /**
-     * Returns the config key for the iframe css url.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    protected function getIFrameCssPathKey(PaymentMethodContract $paymentMethod): string
-    {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::IFRAME_CSS_URL);
-    }
-
-    /**
-     * Returns the payment method config key for the 'description/info page type' configuration.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    protected function getDescriptionTypeKey(PaymentMethodContract $paymentMethod): string
-    {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_TYPE);
-    }
-
-    /**
-     * Returns the config key for the 'description/info page' configuration.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     * @param bool           $isInternal
-     *
-     * @return string
-     */
-    protected function getDescriptionKey(PaymentMethodContract $paymentMethod, bool $isInternal = false): string
-    {
-        if (!$isInternal) {
-            return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_EXTERNAL);
-        }
-
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_INTERNAL);
-    }
-
-    /**
-     * Returns the payment method config key for the 'is active' configuration.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    protected function getIsActiveKey(PaymentMethodContract $paymentMethod): string
-    {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::IS_ACTIVE);
-    }
-
-    /**
-     * Returns the minimum cart total amount for the given Payment method.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    protected function getMinAmountKey(PaymentMethodContract $paymentMethod): string
-    {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::MIN_AMOUNT);
-    }
-
-    /**
-     * Returns the maximum cart total amount for the given Payment method.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    protected function getMaxAmountKey(PaymentMethodContract $paymentMethod): string
-    {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::MAX_AMOUNT);
-    }
-
-    /**
-     * Returns the payment method config key for the 'use logo' configuration.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    protected function getUseIconKey(PaymentMethodContract $paymentMethod): string
-    {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::LOGO_USE);
-    }
-
-    /**
-     * Returns the payment method config key for the 'logo url' configuration.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    protected function getIconUrlKey(PaymentMethodContract $paymentMethod): string
-    {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::LOGO_URL);
-    }
+//    /**
+//     * Returns the payment method config key for the 'use logo' configuration.
+//     *
+//     * @param PaymentMethodContract $paymentMethod
+//     *
+//     * @return string
+//     */
+//    protected function getUseIconKey(PaymentMethodContract $paymentMethod): string
+//    {
+//        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::LOGO_USE);
+//    }
+//
+//    /**
+//     * Returns the payment method config key for the 'logo url' configuration.
+//     *
+//     * @param PaymentMethodContract $paymentMethod
+//     *
+//     * @return string
+//     */
+//    protected function getIconUrlKey(PaymentMethodContract $paymentMethod): string
+//    {
+//        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::LOGO_URL);
+//    }
 
     /**
      * @param string $paymentMethod
@@ -676,8 +459,7 @@ class PaymentHelper
         $order = $this->orderRepository->findOrderById($orderId);
 
         // Check whether the order truly exists in plentymarkets
-        if(!is_null($order) && $order instanceof Order)
-        {
+        if ($order instanceof Order) {
             // Assign the given payment to the given order
             $this->paymentOrderRelationRepo->createOrderRelation($payment, $order);
         }

@@ -2,6 +2,10 @@
 
 namespace Heidelpay\Providers;
 
+use Heidelpay\Helper\MainConfig;
+use Heidelpay\Helper\MainConfigContract;
+use Heidelpay\Helper\MethodConfig;
+use Heidelpay\Helper\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\PayPal;
@@ -39,6 +43,8 @@ class HeidelpayServiceProvider extends ServiceProvider
     {
         $this->getApplication()->register(HeidelpayRouteServiceProvider::class);
         $this->getApplication()->bind(TransactionRepositoryContract::class, TransactionRepository::class);
+        $this->getApplication()->bind(MainConfigContract::class, MainConfig::class);
+        $this->getApplication()->bind(MethodConfigContract::class, MethodConfig::class);
     }
 
     /**

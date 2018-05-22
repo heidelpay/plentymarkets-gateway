@@ -380,7 +380,7 @@ class PaymentService
         $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basket->currency;
 
         // TODO: receive frontend language somehow.
-        $this->heidelpayRequest['FRONTEND_ENABLED'] = $this->paymentHelper->getFrontendEnabled($paymentMethod);
+        $this->heidelpayRequest['FRONTEND_ENABLED'] = 'TRUE';
         $this->heidelpayRequest['FRONTEND_LANGUAGE'] = 'DE';
         $this->heidelpayRequest['FRONTEND_RESPONSE_URL'] =
             $this->paymentHelper->getDomain() . '/' . Routes::RESPONSE_URL;

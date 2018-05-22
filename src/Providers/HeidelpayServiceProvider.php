@@ -87,12 +87,12 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $basket = $basketRepository->load();
 
                 if ($mop === $paymentHelper->getPaymentMethodId(PayPal::class)) {
-                    $event->setValue($paymentService->getPaymentMethodContent(PayPal::class, $mop));
+                    $event->setValue($paymentService->getPaymentMethodContent(PayPal::class, $basket, $mop));
                     $event->setType($paymentService->getReturnType());
                 }
 
                 if ($mop === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
-                    $event->setValue($paymentService->getPaymentMethodContent(CreditCard::class, $mop));
+                    $event->setValue($paymentService->getPaymentMethodContent(CreditCard::class, $basket, $mop));
                     $event->setType($paymentService->getReturnType());
                 }
             }
@@ -102,20 +102,17 @@ class HeidelpayServiceProvider extends ServiceProvider
         $eventDispatcher->listen(
             ExecutePayment::class,
             function (ExecutePayment $event) use (
-                $basketRepository,
                 $paymentHelper,
                 $paymentService
             ) {
-                $basket = $basketRepository->load();
                 $mop = $event->getMop();
-
                 if ($mop === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
-                    $event->setValue($paymentService->executePayment(CreditCard::class, $basket, $event));
+                    $event->setValue($paymentService->executePayment(CreditCard::class, $event));
                     $event->setType($paymentService->getReturnType());
                 }
 
                 if ($mop === $paymentHelper->getPaymentMethodId(PayPal::class)) {
-                    $event->setValue($paymentService->executePayment(PayPal::class, $basket, $event));
+                    $event->setValue($paymentService->executePayment(PayPal::class, $event));
                     $event->setType($paymentService->getReturnType());
                 }
             }

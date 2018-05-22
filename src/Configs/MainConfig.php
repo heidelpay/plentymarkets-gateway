@@ -11,7 +11,7 @@
  *
  * @package  heidelpay/${Package}
  */
-namespace Heidelpay\Helper;
+namespace Heidelpay\Configs;
 
 use Heidelpay\Constants\ConfigKeys;
 use Heidelpay\Constants\TransactionMode;

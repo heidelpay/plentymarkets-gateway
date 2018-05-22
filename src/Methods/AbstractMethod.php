@@ -2,7 +2,7 @@
 
 namespace Heidelpay\Methods;
 
-use Heidelpay\Helper\MethodConfigContract;
+use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;

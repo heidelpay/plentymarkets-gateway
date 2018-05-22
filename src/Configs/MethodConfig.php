@@ -11,9 +11,10 @@
  *
  * @package  heidelpay/${Package}
  */
-namespace Heidelpay\Helper;
+namespace Heidelpay\Configs;
 
 use Heidelpay\Constants\ConfigKeys;
+use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\PaymentMethodContract;
 
 class MethodConfig extends BaseConfig implements MethodConfigContract

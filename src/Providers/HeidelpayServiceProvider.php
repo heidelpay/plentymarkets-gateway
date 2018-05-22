@@ -2,10 +2,9 @@
 
 namespace Heidelpay\Providers;
 
-use Heidelpay\Helper\MainConfig;
-use Heidelpay\Helper\MainConfigContract;
-use Heidelpay\Helper\MethodConfig;
-use Heidelpay\Helper\MethodConfigContract;
+use Heidelpay\Configs\MainConfig;
+use Heidelpay\Configs\MethodConfig;
+use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\PayPal;

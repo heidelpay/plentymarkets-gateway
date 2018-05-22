@@ -11,8 +11,7 @@
  *
  * @package  heidelpay/${Package}
  */
-
-namespace Heidelpay\Helper;
+namespace Heidelpay\Configs;
 
 interface MainConfigContract
 {

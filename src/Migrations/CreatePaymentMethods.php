@@ -2,6 +2,7 @@
 
 namespace Heidelpay\Migrations;
 
+use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
 
 /**
@@ -24,15 +25,23 @@ class CreatePaymentMethods
      * @var PaymentHelper
      */
     private $helper;
+    /**
+     * @var MethodConfigContract
+     */
+    private $methodConfig;
 
     /**
      * CreatePaymentMethods constructor.
      *
      * @param PaymentHelper $paymentHelper
+     * @param MethodConfigContract $methodConfig
      */
-    public function __construct(PaymentHelper $paymentHelper)
-    {
+    public function __construct(
+        PaymentHelper $paymentHelper,
+        MethodConfigContract $methodConfig
+    ) {
         $this->helper = $paymentHelper;
+        $this->methodConfig = $methodConfig;
     }
 
     /**
@@ -40,7 +49,7 @@ class CreatePaymentMethods
      */
     public function run()
     {
-        foreach ($this->helper::getPaymentMethods() as $paymentMethod) {
+        foreach ($this->methodConfig::getPaymentMethods() as $paymentMethod) {
             $this->helper->createMopIfNotExists($paymentMethod);
         }
     }

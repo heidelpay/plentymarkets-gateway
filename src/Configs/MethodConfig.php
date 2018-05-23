@@ -203,8 +203,10 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
     }
     //</editor-fold>
 
-    //<editor-fold desc="Keys">
+    //<editor-fold desc="Getters for config keys">
     /**
+     * This is also used within the PaymentHelper class, so it must be public.
+     *
      * @param string $paymentMethod
      *
      * @return string
@@ -262,7 +264,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      *
      * @return string
      */
-    public function getChannelIdKey(string $paymentMethod): string
+    protected function getChannelIdKey(string $paymentMethod): string
     {
         $paymentMethodKey = self::$paymentMethods[$paymentMethod][self::ARRAY_KEY_CONFIG_KEY];
 
@@ -276,7 +278,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      *
      * @return string
      */
-    public function getDisplayNameKey(PaymentMethodContract $paymentMethod): string
+    protected function getDisplayNameKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->get($paymentMethod->getConfigKey() . '.' . ConfigKeys::DISPLAY_NAME);
     }
@@ -288,7 +290,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      *
      * @return string
      */
-    public function getIFrameCssPathKey(PaymentMethodContract $paymentMethod): string
+    protected function getIFrameCssPathKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->get($paymentMethod->getConfigKey() . '.' . ConfigKeys::IFRAME_CSS_URL);
     }
@@ -300,7 +302,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      *
      * @return string
      */
-    public function getDescriptionTypeKey(PaymentMethodContract $paymentMethod): string
+    protected function getDescriptionTypeKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->get($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_TYPE);
     }
@@ -312,7 +314,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      *
      * @return string
      */
-    public function getIsActiveKey(PaymentMethodContract $paymentMethod): string
+    protected function getIsActiveKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::IS_ACTIVE);
     }
@@ -324,7 +326,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      *
      * @return string
      */
-    public function getMinAmountKey(PaymentMethodContract $paymentMethod): string
+    protected function getMinAmountKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::MIN_AMOUNT);
     }
@@ -336,7 +338,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      *
      * @return string
      */
-    public function getMaxAmountKey(PaymentMethodContract $paymentMethod): string
+    protected function getMaxAmountKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::MAX_AMOUNT);
     }

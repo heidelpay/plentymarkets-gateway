@@ -18,69 +18,23 @@ use Heidelpay\Methods\PaymentMethodContract;
 
 interface MethodConfigContract
 {
+    //<editor-fold desc="General/Helpers">
     /**
-     * Returns the payment method config key for the 'Channel-ID' configuration.
+     * Returns the available payment methods and their helper strings (config-key, payment-key, default name).
      *
+     * @return string[]
+     */
+    public static function getPaymentMethods(): array;
+
+    /**
      * @param string $paymentMethod
      *
      * @return string
      */
-    public function getChannelIdKey(string $paymentMethod): string;
+    public function getPaymentMethodDefaultName(string $paymentMethod): string;
+    //</editor-fold>
 
-    /**
-     * Returns the payment method config key for the 'Display name' configuration.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    public function getDisplayNameKey(PaymentMethodContract $paymentMethod): string;
-
-    /**
-     * Returns the config key for the iframe css url.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    public function getIFrameCssPathKey(PaymentMethodContract $paymentMethod): string;
-
-    /**
-     * Returns the payment method config key for the 'description/info page type' configuration.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    public function getDescriptionTypeKey(PaymentMethodContract $paymentMethod): string;
-
-    /**
-     * Returns the payment method config key for the 'is active' configuration.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    public function getIsActiveKey(PaymentMethodContract $paymentMethod): string;
-
-    /**
-     * Returns the minimum cart total amount for the given Payment method.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    public function getMinAmountKey(PaymentMethodContract $paymentMethod): string;
-
-    /**
-     * Returns the maximum cart total amount for the given Payment method.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    public function getMaxAmountKey(PaymentMethodContract $paymentMethod): string;
-
+    //<editor-fold desc="Getters for Payment parameters">
     /**
      * @param string $paymentMethod
      *
@@ -130,15 +84,9 @@ interface MethodConfigContract
      * @return string
      */
     public function getIFrameCssPath(PaymentMethodContract $paymentMethod): string;
+    //</editor-fold>
 
-    /**
-     * Returns the Methods description text.
-     *
-     * @param $paymentMethod
-     * @return mixed|string
-     */
-    public function getMethodDescription($paymentMethod);
-
+    //<editor-fold desc="Getters for Plenty payment parameters">
     /**
      * Returns the path of the payment method icon.
      *
@@ -148,16 +96,20 @@ interface MethodConfigContract
     public function getMethodIcon($paymentMethod): string;
 
     /**
-     * @param string $paymentMethod
+     * Returns the Methods description text.
      *
-     * @return string
+     * @param $paymentMethod
+     * @return mixed|string
      */
-    public function getPaymentMethodKey(string $paymentMethod): string;
+    public function getMethodDescription($paymentMethod);
+    //</editor-fold>
 
+    //<editor-fold desc="Public getters for config keys">
     /**
      * @param string $paymentMethod
      *
      * @return string
      */
-    public function getPaymentMethodDefaultName(string $paymentMethod): string;
+    public function getPaymentMethodKey(string $paymentMethod): string;
+    //</editor-fold>
 }

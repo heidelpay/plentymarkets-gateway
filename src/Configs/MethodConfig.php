@@ -119,7 +119,6 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function isActive(PaymentMethodContract $paymentMethod): bool
     {
-        $this->getLogger(__METHOD__)->error('');
         return $this->get($this->getIsActiveKey($paymentMethod)) === 'true';
     }
 

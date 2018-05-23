@@ -6,7 +6,6 @@ use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
-use Plenty\Plugin\Log\Loggable;
 
 /**
  * Abstract Payment Method Class
@@ -22,8 +21,6 @@ use Plenty\Plugin\Log\Loggable;
  */
 abstract class AbstractMethod extends PaymentMethodService implements PaymentMethodContract
 {
-    use Loggable;
-
     const CONFIG_KEY = 'abstract';
     const DEFAULT_NAME = 'Abstract Payment Method';
     const KEY = 'ABSTRACT';
@@ -65,7 +62,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     public function isActive(): bool
     {
         // return false if this method is not configured as active.
-        if (!$this->config->isActive($this)) {
+        if (! $this->config->isActive($this)) {
             return false;
         }
 
@@ -89,7 +86,6 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function isExpressCheckout(): bool
     {
-        $this->getLogger(__METHOD__)->error('');
         return false;
     }
 
@@ -98,7 +94,6 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function getFee(): float
     {
-        $this->getLogger(__METHOD__)->error('');
         return 0.00;
     }
 
@@ -107,7 +102,6 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function isSelectable(): bool
     {
-        $this->getLogger(__METHOD__)->error('');
         return true;
     }
 
@@ -116,7 +110,6 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function isSwitchableTo(): bool
     {
-        $this->getLogger(__METHOD__)->error('');
         return false;
     }
 
@@ -125,7 +118,6 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function isSwitchableFrom(): bool
     {
-        $this->getLogger(__METHOD__)->error('');
         return false;
     }
 
@@ -142,7 +134,6 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function getDefaultName(): string
     {
-        $this->getLogger(__METHOD__)->error('');
         return static::DEFAULT_NAME;
     }
 
@@ -175,7 +166,6 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function getName(): string
     {
-        $this->getLogger(__METHOD__)->error('');
         return $this->config->getPaymentMethodName($this) ?: $this->getDefaultName();
     }
 
@@ -184,7 +174,6 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function getIcon(): string
     {
-        $this->getLogger(__METHOD__)->error('');
         return $this->config->getMethodIcon($this);
     }
 
@@ -193,7 +182,6 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function getDescription(): string
     {
-        $this->getLogger(__METHOD__)->error('');
         return $this->config->getMethodDescription($this);
     }
 }

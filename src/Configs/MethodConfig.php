@@ -89,8 +89,6 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function getPaymentMethodDefaultName(string $paymentMethod): string
     {
-        $this->getLogger(__METHOD__)->error('');
-
         $prefix = Plugin::NAME . ' - ';
         $name = static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_DEFAULT_NAME] ?? self::NO_DEFAULT_NAME_FOUND;
 
@@ -106,7 +104,6 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function getTransactionChannel(string $paymentMethod): string
     {
-        $this->getLogger(__METHOD__)->error('');
         return $this->get($this->getChannelIdKey($paymentMethod));
     }
 
@@ -119,7 +116,6 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function isActive(PaymentMethodContract $paymentMethod): bool
     {
-        $this->getLogger(__METHOD__)->error('');
         return $this->get($this->getIsActiveKey($paymentMethod)) === 'true';
     }
 
@@ -145,7 +141,6 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function getMinAmount(PaymentMethodContract $paymentMethod): float
     {
-        $this->getLogger(__METHOD__)->error('');
         return $this->stringToFloat($this->getMinAmountKey($paymentMethod));
     }
 
@@ -158,7 +153,6 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function getMaxAmount(PaymentMethodContract $paymentMethod): float
     {
-        $this->getLogger(__METHOD__)->error('');
         return $this->stringToFloat($this->getMaxAmountKey($paymentMethod));
     }
 
@@ -171,7 +165,6 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function getIFrameCssPath(PaymentMethodContract $paymentMethod): string
     {
-        $this->getLogger(__METHOD__)->error('');
         return $this->get($this->getIFrameCssPathKey($paymentMethod));
     }
     //</editor-fold>
@@ -185,7 +178,6 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function getMethodIcon($paymentMethod): string
     {
-        $this->getLogger(__METHOD__)->error('');
         $useIcon = (bool) $this->get($this->getUseIconKey($paymentMethod));
         if ($useIcon === false) {
             return '';
@@ -202,7 +194,6 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function getMethodDescription($paymentMethod)
     {
-        $this->getLogger(__METHOD__)->error('');
         $type = $this->getMethodDescriptionType($paymentMethod);
 
         if ($type === DescriptionTypes::INTERNAL) {

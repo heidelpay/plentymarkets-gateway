@@ -52,10 +52,10 @@ class HeidelpayServiceProvider extends ServiceProvider
      * Register payment methods, add event listeners, ...
      *
      * @param BasketRepositoryContract $basketRepository
-     * @param PaymentHelper $paymentHelper
-     * @param PaymentMethodContainer $paymentMethodContainer
-     * @param PaymentService $paymentService
-     * @param Dispatcher $eventDispatcher
+     * @param PaymentHelper            $paymentHelper
+     * @param PaymentMethodContainer   $paymentMethodContainer
+     * @param PaymentService           $paymentService
+     * @param Dispatcher               $eventDispatcher
      */
     public function boot(
         BasketRepositoryContract $basketRepository,
@@ -84,7 +84,6 @@ class HeidelpayServiceProvider extends ServiceProvider
             );
         }
 
-        $this->getLogger(__METHOD__)->error('Init GetPaymentMethodContent Listener...');
         // listen for the event that gets the payment method content
         $eventDispatcher->listen(
             GetPaymentMethodContent::class,
@@ -94,8 +93,6 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $paymentService
             ) {
                 $mop = $event->getMop();
-                $this->getLogger(__METHOD__)->error('GetPaymentMethodCotent: ' . $mop);
-
                 $basket = $basketRepository->load();
 
                 if ($mop === $paymentHelper->getPaymentMethodId(PayPal::class)) {
@@ -110,8 +107,6 @@ class HeidelpayServiceProvider extends ServiceProvider
             }
         );
 
-
-        $this->getLogger(__METHOD__)->error('Init ExecutePayment Listener...');
         // listen for the event that executes the payment
         $eventDispatcher->listen(
             ExecutePayment::class,

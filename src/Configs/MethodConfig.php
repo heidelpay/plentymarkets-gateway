@@ -136,8 +136,6 @@ class MethodConfig implements MethodConfigContract
      */
     public function isActive(PaymentMethodContract $paymentMethod): bool
     {
-
-        $this->getLogger(__METHOD__)->error('Key: ' . $this->getIsActiveKey($paymentMethod));
         return $this->get($this->getIsActiveKey($paymentMethod)) === 'true';
     }
 

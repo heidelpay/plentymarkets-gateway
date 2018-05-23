@@ -326,6 +326,8 @@ class PaymentHelper
      */
     public function getIsActive(PaymentMethodContract $paymentMethod): bool
     {
+        $this->getLogger(__METHOD__)->error('Key: ' . $this->getIsActiveKey($paymentMethod));
+
         return $this->config->get($this->getIsActiveKey($paymentMethod)) === 'true';
     }
 

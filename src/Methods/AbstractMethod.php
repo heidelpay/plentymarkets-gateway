@@ -87,11 +87,8 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
             }
         }
 
-        $this->getLogger(__METHOD__)->error(\get_class($this) . '(' . ($isActive ? '1' : '0'). ')');
 
-
-        $active = $this->helper->getIsActive($this);
-        $this->getLogger(__METHOD__)->error(\get_class($this) . '(' . ($active ? '1' : '0'). ')');
+        $this->getLogger(__METHOD__)->error(\get_class($this) . '(' . $isActive . ')');
 
         return $isActive;
     }

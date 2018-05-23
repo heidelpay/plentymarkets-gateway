@@ -4,11 +4,9 @@ namespace Heidelpay\Helper;
 
 use Heidelpay\Configs\MainConfigContract;
 use Heidelpay\Configs\MethodConfigContract;
-use Heidelpay\Constants\ConfigKeys;
 use Heidelpay\Constants\Plugin;
 use Heidelpay\Constants\TransactionStatus;
 use Heidelpay\Constants\TransactionType;
-use Heidelpay\Methods\PaymentMethodContract;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
@@ -22,7 +20,6 @@ use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
-use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Log\Loggable;
 
 /**
@@ -63,10 +60,6 @@ class PaymentHelper
      * @var MethodConfigContract
      */
     private $methodConfig;
-    /**
-     * @var ConfigRepository
-     */
-    private $config;
 
     /**
      * AbstractHelper constructor.
@@ -76,22 +69,19 @@ class PaymentHelper
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRepo
      * @param MainConfigContract $mainConfig
      * @param MethodConfigContract $methodConfig
-     * @param ConfigRepository $configRepository
      */
     public function __construct(
         PaymentMethodRepositoryContract $paymentMethodRepo,
         OrderRepositoryContract $orderRepository,
         PaymentOrderRelationRepositoryContract $paymentOrderRepo,
         MainConfigContract $mainConfig,
-        MethodConfigContract $methodConfig,
-        ConfigRepository $configRepository
+        MethodConfigContract $methodConfig
     ) {
         $this->paymentMethodRepo = $paymentMethodRepo;
         $this->orderRepository = $orderRepository;
         $this->paymentOrderRelationRepo = $paymentOrderRepo;
         $this->mainConfig = $mainConfig;
         $this->methodConfig = $methodConfig;
-        $this->config = $configRepository;
     }
 
     /**
@@ -315,41 +305,5 @@ class PaymentHelper
         $paymentProperty->value = $value;
 
         return $paymentProperty;
-    }
-
-    /**
-     * Returns if a payment method is enabled or disabled.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return bool
-     */
-    public function getIsActive(PaymentMethodContract $paymentMethod): bool
-    {
-        return $this->config->get($this->getIsActiveKey($paymentMethod)) === 'true';
-    }
-
-    /**
-     * Returns the payment method config key for the 'is active' configuration.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    protected function getIsActiveKey(PaymentMethodContract $paymentMethod): string
-    {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::IS_ACTIVE);
-    }
-
-    /**
-     * Returns the complete config key (plugin name + config key) for a given key.
-     *
-     * @param string $key
-     *
-     * @return string
-     */
-    protected function getConfigKey(string $key): string
-    {
-        return Plugin::NAME . '.' . $key;
     }
 }

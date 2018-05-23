@@ -67,15 +67,6 @@ class HeidelpayServiceProvider extends ServiceProvider
         // loop through all of the plugin's available payment methods
         /** @var string $paymentMethodClass */
         foreach (MethodConfig::getPaymentMethods() as $paymentMethodClass) {
-            $this->getLogger(__METHOD__)->error(
-                "Registering Method: \'" . $paymentMethodClass . "\'",
-                [
-                    'payment method key' => $paymentHelper->getPluginPaymentMethodKey($paymentMethodClass),
-                    'method class' => $paymentMethodClass,
-                    'Event list' => $paymentHelper->getPaymentMethodEventList()
-                ]
-            );
-
             // register the payment method in the payment method container
             $paymentMethodContainer->register(
                 $paymentHelper->getPluginPaymentMethodKey($paymentMethodClass),

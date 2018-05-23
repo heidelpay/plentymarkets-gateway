@@ -65,32 +65,23 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     public function isActive(): bool
     {
         // return false if this method is not configured as active.
-        $isActive = $this->config->isActive($this);
+        if (!$this->config->isActive($this)) {
+            return false;
+        }
+
         $basket = $this->basketRepository->load();
 
-        if ($isActive) {
-            // check the configured minimum cart amount and return false if an amount is configured
-            // (which means > 0.00) and the cart amount is below the configured value.
-            $minAmount = $this->config->getMinAmount($this);
-            if ($minAmount > 0.00 && $basket->basketAmount < $minAmount) {
-                $isActive = false;
-            }
+        // check the configured minimum cart amount and return false if an amount is configured
+        // (which means > 0.00) and the cart amount is below the configured value.
+        $minAmount = $this->config->getMinAmount($this);
+        if ($minAmount > 0.00 && $basket->basketAmount < $minAmount) {
+            return false;
         }
 
-        if ($isActive) {
-            // check the configured maximum cart amount and return false if an amount is configured
-            // (which means > 0.00) and the cart amount is above the configured value.
-            $maxAmount = $this->config->getMaxAmount($this);
-
-            if ($maxAmount > 0.00 && $basket->basketAmount > $maxAmount) {
-                $isActive = false;
-            }
-        }
-
-
-        $this->getLogger(__METHOD__)->error(\get_class($this) . '(' . $isActive . ')');
-
-        return $isActive;
+        // check the configured maximum cart amount and return false if an amount is configured
+        // (which means > 0.00) and the cart amount is above the configured value.
+        $maxAmount = $this->config->getMaxAmount($this);
+        return !($maxAmount > 0.00 && $basket->basketAmount > $maxAmount);
     }
 
     /**

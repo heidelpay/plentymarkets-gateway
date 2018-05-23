@@ -39,7 +39,7 @@ class BaseConfig
      */
     protected function get(string $key)
     {
-        return $this->config->get($this->getConfigKey($key));
+        return $this->config->get($key);
     }
 
     /**

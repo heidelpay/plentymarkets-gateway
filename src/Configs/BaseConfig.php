@@ -15,9 +15,12 @@ namespace Heidelpay\Configs;
 
 use Heidelpay\Constants\Plugin;
 use Plenty\Plugin\ConfigRepository;
+use Plenty\Plugin\Log\Loggable;
 
 class BaseConfig
 {
+    use Loggable;
+
     /**
      * @var ConfigRepository
      */
@@ -29,6 +32,8 @@ class BaseConfig
      */
     public function __construct(ConfigRepository $configRepository)
     {
+        $this->getLogger(__METHOD__)->error(\get_class($configRepository));
+
         $this->config = $configRepository;
     }
 
@@ -39,7 +44,9 @@ class BaseConfig
      */
     protected function get(string $key)
     {
-        return $this->config->get($this->getConfigKey($key));
+        $value = $this->config->get($this->getConfigKey($key));
+        $this->getLogger(__METHOD__)->error($key . ': ' . $value);
+        return $value;
     }
 
     /**

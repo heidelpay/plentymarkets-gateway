@@ -94,7 +94,7 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $paymentService
             ) {
                 $mop = $event->getMop();
-                $this->getLogger(__METHOD__)->error('GetPaymentMethodContent: ' . $mop);
+                $this->getLogger(__METHOD__)->error('GetPaymentMethodCotent: ' . $mop);
 
                 $basket = $basketRepository->load();
 

@@ -14,11 +14,247 @@
 namespace Heidelpay\Configs;
 
 use Heidelpay\Constants\ConfigKeys;
-use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Constants\DescriptionTypes;
+use Heidelpay\Constants\Plugin;
+use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\PaymentMethodContract;
+use Heidelpay\Methods\PayPal;
+use Heidelpay\Methods\Prepayment;
+use Heidelpay\Methods\Sofort;
 
 class MethodConfig extends BaseConfig implements MethodConfigContract
 {
+    const ARRAY_KEY_CONFIG_KEY = 'config_key';
+    const ARRAY_KEY_DEFAULT_NAME = 'default_name';
+    const ARRAY_KEY_KEY = 'key';
+
+    const NO_CONFIG_KEY_FOUND = 'no_config_key_found';
+    const NO_DEFAULT_NAME_FOUND = 'no_default_name_found';
+    const NO_KEY_FOUND = 'no_key_found';
+
+    //<editor-fold desc="General/Helpers">
+    /**
+     * @var array
+     */
+    public static $paymentMethods = [
+        CreditCard::class => [
+            self::ARRAY_KEY_CONFIG_KEY => CreditCard::CONFIG_KEY,
+            self::ARRAY_KEY_KEY => CreditCard::KEY,
+            self::ARRAY_KEY_DEFAULT_NAME => CreditCard::DEFAULT_NAME,
+        ],
+        Prepayment::class => [
+            self::ARRAY_KEY_CONFIG_KEY => Prepayment::CONFIG_KEY,
+            self::ARRAY_KEY_KEY => Prepayment::KEY,
+            self::ARRAY_KEY_DEFAULT_NAME => Prepayment::DEFAULT_NAME,
+        ],
+        Sofort::class => [
+            self::ARRAY_KEY_CONFIG_KEY => Sofort::CONFIG_KEY,
+            self::ARRAY_KEY_KEY => Sofort::KEY,
+            self::ARRAY_KEY_DEFAULT_NAME => Sofort::DEFAULT_NAME,
+        ],
+        PayPal::class => [
+            self::ARRAY_KEY_CONFIG_KEY => PayPal::CONFIG_KEY,
+            self::ARRAY_KEY_KEY => PayPal::KEY,
+            self::ARRAY_KEY_DEFAULT_NAME => PayPal::DEFAULT_NAME,
+        ],
+    ];
+
+    /**
+     * Returns the available payment methods and their helper strings (config-key, payment-key, default name).
+     *
+     * @return string[]
+     */
+    public static function getPaymentMethods(): array
+    {
+        return array_keys(static::$paymentMethods);
+    }
+
+    /**
+     * @param PaymentMethodContract $paymentMethod
+     *
+     * @return string
+     */
+    protected function getMethodDescriptionType(PaymentMethodContract $paymentMethod): string
+    {
+        return $this->get($this->getDescriptionTypeKey($paymentMethod)) ?? DescriptionTypes::NONE;
+    }
+
+    /**
+     * @param string $paymentMethod
+     *
+     * @return string
+     */
+    public function getPaymentMethodDefaultName(string $paymentMethod): string
+    {
+        $prefix = Plugin::NAME . ' - ';
+        $name = static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_DEFAULT_NAME] ?? self::NO_DEFAULT_NAME_FOUND;
+
+        return $prefix . $name;
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Getters for Payment parameters">
+    /**
+     * @param string $paymentMethod
+     *
+     * @return string
+     */
+    public function getTransactionChannel(string $paymentMethod): string
+    {
+        return $this->get($this->getChannelIdKey($paymentMethod));
+    }
+
+    /**
+     * Returns if a payment method is enabled or disabled.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     *
+     * @return bool
+     */
+    public function isActive(PaymentMethodContract $paymentMethod): bool
+    {
+        return $this->get($this->getIsActiveKey($paymentMethod)) === 'true';
+    }
+
+    /**
+     * @param PaymentMethodContract $paymentMethod
+     *
+     * @return string
+     */
+    public function getPaymentMethodName(PaymentMethodContract $paymentMethod): string
+    {
+        return $this->get($this->getDisplayNameKey($paymentMethod));
+    }
+
+    /**
+     * Returns the configured minimum amount for the given payment method.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     *
+     * @return float
+     */
+    public function getMinAmount(PaymentMethodContract $paymentMethod): float
+    {
+        return $this->stringToFloat($this->getMinAmountKey($paymentMethod));
+    }
+
+    /**
+     * Returns the configured minimum amount for the given payment method.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     *
+     * @return float
+     */
+    public function getMaxAmount(PaymentMethodContract $paymentMethod): float
+    {
+        return $this->stringToFloat($this->getMaxAmountKey($paymentMethod));
+    }
+
+    /**
+     * Returns the iFrame Css Path for the payment method.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     *
+     * @return string
+     */
+    public function getIFrameCssPath(PaymentMethodContract $paymentMethod): string
+    {
+        return $this->get($this->getIFrameCssPathKey($paymentMethod));
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Getters for Plenty payment parameters">
+    /**
+     * Returns the path of the payment method icon.
+     *
+     * @param $paymentMethod
+     * @return string
+     */
+    public function getMethodIcon($paymentMethod): string
+    {
+        $useIcon = (bool) $this->get($this->getUseIconKey($paymentMethod));
+        if ($useIcon === false) {
+            return '';
+        }
+
+        return $this->get($this->getIconUrlKey($paymentMethod)) ?: '';
+    }
+
+    /**
+     * Returns the Methods description text.
+     *
+     * @param $paymentMethod
+     * @return mixed|string
+     */
+    public function getMethodDescription($paymentMethod)
+    {
+        $type = $this->getMethodDescriptionType($paymentMethod);
+
+        if ($type === DescriptionTypes::INTERNAL) {
+            return $this->get($this->getDescriptionKey($paymentMethod, true));
+        }
+
+        if ($type === DescriptionTypes::EXTERNAL) {
+            return $this->get($this->getDescriptionKey($paymentMethod));
+        }
+
+        // in case of DescriptionTypes::NONE
+        return '';
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Keys">
+    /**
+     * @param string $paymentMethod
+     *
+     * @return string
+     */
+    public function getPaymentMethodKey(string $paymentMethod): string
+    {
+        return static::$paymentMethods[$paymentMethod][self::ARRAY_KEY_KEY] ?? self::NO_KEY_FOUND;
+    }
+
+    /**
+     * Returns the config key for the 'description/info page' configuration.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     * @param bool           $isInternal
+     *
+     * @return string
+     */
+    protected function getDescriptionKey(PaymentMethodContract $paymentMethod, bool $isInternal = false): string
+    {
+        if (!$isInternal) {
+            return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_EXTERNAL);
+        }
+
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_INTERNAL);
+    }
+
+    /**
+     * Returns the payment method config key for the 'use logo' configuration.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     *
+     * @return string
+     */
+    protected function getUseIconKey(PaymentMethodContract $paymentMethod): string
+    {
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::LOGO_USE);
+    }
+
+    /**
+     * Returns the payment method config key for the 'logo url' configuration.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     *
+     * @return string
+     */
+    protected function getIconUrlKey(PaymentMethodContract $paymentMethod): string
+    {
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::LOGO_URL);
+    }
+
     /**
      * Returns the payment method config key for the 'Channel-ID' configuration.
      *
@@ -28,7 +264,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function getChannelIdKey(string $paymentMethod): string
     {
-        $paymentMethodKey = PaymentHelper::$paymentMethods[$paymentMethod][PaymentHelper::ARRAY_KEY_CONFIG_KEY];
+        $paymentMethodKey = self::$paymentMethods[$paymentMethod][self::ARRAY_KEY_CONFIG_KEY];
 
         return $this->get($paymentMethodKey . '.' . ConfigKeys::CHANNEL_ID);
     }
@@ -104,72 +340,5 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
     {
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::MAX_AMOUNT);
     }
-
-    /**
-     * @param string $paymentMethod
-     *
-     * @return string
-     */
-    public function getTransactionChannel(string $paymentMethod): string
-    {
-        return $this->get($this->getChannelIdKey($paymentMethod));
-    }
-
-    /**
-     * Returns if a payment method is enabled or disabled.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return bool
-     */
-    public function isActive(PaymentMethodContract $paymentMethod): bool
-    {
-        return $this->get($this->getIsActiveKey($paymentMethod)) === 'true';
-    }
-
-    /**
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    public function getPaymentMethodName(PaymentMethodContract $paymentMethod): string
-    {
-        return $this->get($this->getDisplayNameKey($paymentMethod));
-    }
-
-    /**
-     * Returns the configured minimum amount for the given payment method.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return float
-     */
-    public function getMinAmount(PaymentMethodContract $paymentMethod): float
-    {
-        return $this->stringToFloat($this->getMinAmountKey($paymentMethod));
-    }
-
-    /**
-     * Returns the configured minimum amount for the given payment method.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return float
-     */
-    public function getMaxAmount(PaymentMethodContract $paymentMethod): float
-    {
-        return $this->stringToFloat($this->getMaxAmountKey($paymentMethod));
-    }
-
-    /**
-     * Returns the iFrame Css Path for the payment method.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    public function getIFrameCssPath(PaymentMethodContract $paymentMethod): string
-    {
-        return $this->get($this->getIFrameCssPathKey($paymentMethod));
-    }
+    //</editor-fold>
 }

@@ -130,4 +130,34 @@ interface MethodConfigContract
      * @return string
      */
     public function getIFrameCssPath(PaymentMethodContract $paymentMethod): string;
+
+    /**
+     * Returns the Methods description text.
+     *
+     * @param $paymentMethod
+     * @return mixed|string
+     */
+    public function getMethodDescription($paymentMethod);
+
+    /**
+     * Returns the path of the payment method icon.
+     *
+     * @param $paymentMethod
+     * @return string
+     */
+    public function getMethodIcon($paymentMethod): string;
+
+    /**
+     * @param string $paymentMethod
+     *
+     * @return string
+     */
+    public function getPaymentMethodKey(string $paymentMethod): string;
+
+    /**
+     * @param string $paymentMethod
+     *
+     * @return string
+     */
+    public function getPaymentMethodDefaultName(string $paymentMethod): string;
 }

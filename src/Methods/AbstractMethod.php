@@ -169,21 +169,19 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
         return $this->config->getPaymentMethodName($this) ?: $this->getDefaultName();
     }
 
-    // todo: remove?
-//    /**
-//     * @inheritdoc
-//     */
-//    public function getIcon(): string
-//    {
-//        return $this->helper->getMethodIcon($this);
-//    }
+    /**
+     * @inheritdoc
+     */
+    public function getIcon(): string
+    {
+        return $this->config->getMethodIcon($this);
+    }
 
-    // todo: remove?
-//    /**
-//     * @inheritdoc
-//     */
-//    public function getDescription(): string
-//    {
-//        return $this->helper->getMethodDescription($this);
-//    }
+    /**
+     * @inheritdoc
+     */
+    public function getDescription(): string
+    {
+        return $this->config->getMethodDescription($this);
+    }
 }

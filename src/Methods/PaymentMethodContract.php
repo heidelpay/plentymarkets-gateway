@@ -81,20 +81,12 @@ interface PaymentMethodContract
      */
     public function getDescription(): string;
 
-    // todo: remove?
-//    /**
-//     * Returns the configured icon logo, if logo usage is enabled for this payment method.
-//     *
-//     * @return string
-//     */
-//    public function getIcon(): string;
-
     /**
-     * Returns the key for the payment method.
+     * Returns the configured icon logo, if logo usage is enabled for this payment method.
      *
      * @return string
      */
-    public function getMethodKey(): string;
+    public function getIcon(): string;
 
     /**
      * Returns the configured payment method display name.
@@ -109,11 +101,4 @@ interface PaymentMethodContract
      * @return string
      */
     public static function getPaymentMethodDefaultName(): string;
-
-    /**
-     * Returns the key for the payment method (static).
-     *
-     * @return string
-     */
-    public static function getPaymentMethodKey(): string;
 }

@@ -21,11 +21,28 @@ use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
+use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Log\Loggable;
 
-class MethodConfig extends BaseConfig implements MethodConfigContract
+class MethodConfig implements MethodConfigContract
 {
     use Loggable;
+
+    /**
+     * @var ConfigRepository
+     */
+    private $config;
+
+    /**
+     * MainConfig constructor.
+     * @param ConfigRepository $configRepository
+     */
+    public function __construct(ConfigRepository $configRepository)
+    {
+        $this->getLogger(__METHOD__)->error(\get_class($configRepository));
+
+        $this->config = $configRepository;
+    }
 
     const ARRAY_KEY_CONFIG_KEY = 'config_key';
     const ARRAY_KEY_DEFAULT_NAME = 'default_name';
@@ -357,4 +374,41 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::MAX_AMOUNT);
     }
     //</editor-fold>
+
+
+
+    /**
+     * Return the value of the passed key.
+     * @param string $key
+     * @return mixed
+     */
+    protected function get(string $key)
+    {
+        $value = $this->config->get($this->getConfigKey($key));
+        $this->getLogger(__METHOD__)->error($key . ': ' . $value);
+        return $value;
+    }
+
+    /**
+     * Returns the complete config key (plugin name + config key) for a given key.
+     *
+     * @param string $key
+     *
+     * @return string
+     */
+    protected function getConfigKey(string $key): string
+    {
+        return Plugin::NAME . '.' . $key;
+    }
+
+    /**
+     * Converts a string to float replacing comma with decimal point.
+     *
+     * @param $value
+     * @return float
+     */
+    public function stringToFloat($value): float
+    {
+        return (float)str_replace(',', '.', $value);
+    }
 }

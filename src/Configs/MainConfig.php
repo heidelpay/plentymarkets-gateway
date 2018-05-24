@@ -25,7 +25,7 @@ class MainConfig extends BaseConfig implements MainConfigContract
      */
     public function getSenderId(): string
     {
-        return $this->get(ConfigKeys::AUTH_SENDER_ID);
+        return $this->get($this->getConfigKey(ConfigKeys::AUTH_SENDER_ID));
     }
 
     /**
@@ -35,7 +35,7 @@ class MainConfig extends BaseConfig implements MainConfigContract
      */
     public function getUserLogin(): string
     {
-        return $this->get(ConfigKeys::AUTH_LOGIN);
+        return $this->get($this->getConfigKey(ConfigKeys::AUTH_LOGIN));
     }
 
     /**
@@ -45,7 +45,7 @@ class MainConfig extends BaseConfig implements MainConfigContract
      */
     public function getUserPassword(): string
     {
-        return $this->get(ConfigKeys::AUTH_PASSWORD);
+        return $this->get($this->getConfigKey(ConfigKeys::AUTH_PASSWORD));
     }
 
     /**
@@ -57,7 +57,7 @@ class MainConfig extends BaseConfig implements MainConfigContract
      */
     public function getEnvironment(): string
     {
-        $transactionMode = (int) $this->get(ConfigKeys::ENVIRONMENT);
+        $transactionMode = (int) $this->get($this->getConfigKey(ConfigKeys::ENVIRONMENT));
 
         if ($transactionMode === 0) {
             return TransactionMode::CONNECTOR_TEST;

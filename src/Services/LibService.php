@@ -75,6 +75,10 @@ class LibService
     protected function sendCreditCardTransactionRequest(array $params): array
     {
         $this->getLogger(__METHOD__)->error('creditcardTransactionRequest', $params);
+        $this->getLogger(__METHOD__)->info('Heidelpay::Payment.transactions', $params);
+        $this->getLogger(__METHOD__)->debug('Heidelpay::Payment.transactions', $params);
+        $this->getLogger(__METHOD__)->info('Payment.transactions', $params);
+        $this->getLogger(__METHOD__)->debug('Payment.transactions', $params);
         return $this->executeLibCall('creditcardTransactionRequest', $params);
     }
 

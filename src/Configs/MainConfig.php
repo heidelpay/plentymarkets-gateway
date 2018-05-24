@@ -72,9 +72,9 @@ class MainConfig extends BaseConfig implements MainConfigContract
     /**
      * Returns the value for the transaction mode (which is the environment).
      *
-     * @return int Config::VALUE_ENVIRONMENT_CONNECTOR_TEST | Config::VALUE_ENVIRONMENT_LIVE
+     * @return string Config::VALUE_ENVIRONMENT_CONNECTOR_TEST | Config::VALUE_ENVIRONMENT_LIVE
      */
-    public function getEnvironment(): int
+    public function getEnvironment(): string
     {
         return $this->isInSandboxMode() ? TransactionMode::CONNECTOR_TEST : TransactionMode::LIVE;
     }

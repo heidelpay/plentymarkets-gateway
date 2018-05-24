@@ -39,9 +39,9 @@ interface MainConfigContract
     /**
      * Returns the value for the transaction mode (which is the environment).
      *
-     * @return int
+     * @return string Config::VALUE_ENVIRONMENT_CONNECTOR_TEST | Config::VALUE_ENVIRONMENT_LIVE
      */
-    public function getEnvironment(): int;
+    public function getEnvironment(): string;
 
     /**
      * Returns true if the shop is configured to work in sandbox mode aka. connector-test mode.

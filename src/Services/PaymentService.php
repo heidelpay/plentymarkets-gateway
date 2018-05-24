@@ -10,6 +10,7 @@ use Heidelpay\Constants\SessionKeys;
 use Heidelpay\Constants\TransactionStatus;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\CreditCard;
+use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
@@ -223,21 +224,21 @@ class PaymentService
 
     /**
      * @param Basket $basket
-     * @param string $paymentMethod
+     * @param PaymentMethodContract $paymentMethod
      * @param int    $mopId
      *
      * @return array
      */
     private function sendGetPaymentMethodContentRequest(
         Basket $basket,
-        string $paymentMethod,
+        PaymentMethodContract $paymentMethod,
         int $mopId
     ): array {
         $this->prepareRequest($basket, $paymentMethod, $mopId);
 
         $result = $this->libService->sendTransactionRequest($paymentMethod, [
             'request' => $this->heidelpayRequest,
-            'transactionType' => $this->methodConfig->getTransactionType(pluginApp($paymentMethod))
+            'transactionType' => $this->methodConfig->getTransactionType($paymentMethod)
             // TransactionType::AUTHORIZE // TODO: change depending on payment method & step.
         ]);
 
@@ -265,14 +266,21 @@ class PaymentService
 
         switch ($paymentMethod) {
             case CreditCard::class:
+                $instance = pluginApp(CreditCard::class);
                 $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_HTML);
-                $result = $this->sendGetPaymentMethodContentRequest($basket, $paymentMethod, $mopId);
+                $result = $this->sendGetPaymentMethodContentRequest($basket, $instance, $mopId);
                 break;
 
             case PayPal::class:
-            case Sofort::class:
+                $instance = pluginApp(PayPal::class);
                 $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
-                $result = $this->sendGetPaymentMethodContentRequest($basket, $paymentMethod, $mopId);
+                $result = $this->sendGetPaymentMethodContentRequest($basket, $instance, $mopId);
+                break;
+
+            case Sofort::class:
+                $instance = pluginApp(Sofort::class);
+                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
+                $result = $this->sendGetPaymentMethodContentRequest($basket, $instance, $mopId);
                 break;
 
             case Prepayment::class:

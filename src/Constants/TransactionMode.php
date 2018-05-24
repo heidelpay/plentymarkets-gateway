@@ -16,9 +16,6 @@ namespace Heidelpay\Constants;
  */
 class TransactionMode
 {
-    const CONFIG_CONNECTOR_TEST = 0;
-    const CONFIG_LIVE = 1;
-
     const CONNECTOR_TEST = 'CONNECTOR_TEST';
     const LIVE = 'LIVE';
 }

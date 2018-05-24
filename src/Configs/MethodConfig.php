@@ -13,9 +13,10 @@
  */
 namespace Heidelpay\Configs;
 
-use Heidelpay\Constants\ConfigKeys;
+use Heidelpay\Constants\Config;
 use Heidelpay\Constants\DescriptionTypes;
 use Heidelpay\Constants\Plugin;
+use Heidelpay\Constants\TransactionType;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
@@ -161,6 +162,40 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
     {
         return $this->get($this->getIFrameCssPathKey($paymentMethod));
     }
+
+    /**
+     * Returns the configured booking mode as string.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     * @return string
+     */
+    public function getTransactionType(PaymentMethodContract $paymentMethod): string
+    {
+        return $this->hasBookingModeDebit($paymentMethod) ? TransactionType::HP_DEBIT : TransactionType::HP_AUTHORIZE;
+    }
+
+    /**
+     * Returns true if the configured booking mode is debit.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     * @return string
+     */
+    public function hasBookingModeDebit(PaymentMethodContract $paymentMethod): string
+    {
+        $mode = (int)$this->get($this->getBookingModeKey($paymentMethod));
+        return $mode === Config::VALUE_BOOKING_MODE_DEBIT;
+    }
+
+    /**
+     * Returns true if the configured booking mode is registration.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     * @return string
+     */
+    public function hasBookingModeRegistration(PaymentMethodContract $paymentMethod): string
+    {
+        return !$this->hasBookingModeDebit($paymentMethod);
+    }
     //</editor-fold>
 
     //<editor-fold desc="Getters for Plenty payment parameters">
@@ -227,10 +262,10 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
     protected function getDescriptionKey(PaymentMethodContract $paymentMethod, bool $isInternal = false): string
     {
         if (!$isInternal) {
-            return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_EXTERNAL);
+            return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_DESCRIPTION_EXTERNAL);
         }
 
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_INTERNAL);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_DESCRIPTION_INTERNAL);
     }
 
     /**
@@ -242,7 +277,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getUseIconKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::LOGO_USE);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_LOGO_USE);
     }
 
     /**
@@ -254,7 +289,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getIconUrlKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::LOGO_URL);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_LOGO_URL);
     }
 
     /**
@@ -268,7 +303,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
     {
         $paymentMethodKey = self::$paymentMethods[$paymentMethod][self::ARRAY_KEY_CONFIG_KEY];
 
-        return $this->getConfigKey($paymentMethodKey . '.' . ConfigKeys::CHANNEL_ID);
+        return $this->getConfigKey($paymentMethodKey . '.' . Config::KEY_CHANNEL_ID);
     }
 
     /**
@@ -280,7 +315,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getDisplayNameKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DISPLAY_NAME);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_DISPLAY_NAME);
     }
 
     /**
@@ -292,7 +327,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getIFrameCssPathKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::IFRAME_CSS_URL);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_IFRAME_CSS_URL);
     }
 
     /**
@@ -304,7 +339,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getDescriptionTypeKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_TYPE);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_DESCRIPTION_TYPE);
     }
 
     /**
@@ -316,7 +351,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getIsActiveKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::IS_ACTIVE);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_IS_ACTIVE);
     }
 
     /**
@@ -328,7 +363,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getMinAmountKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::MIN_AMOUNT);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_MIN_AMOUNT);
     }
 
     /**
@@ -340,7 +375,19 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getMaxAmountKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::MAX_AMOUNT);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_MAX_AMOUNT);
+    }
+
+    /**
+     * Returns the key of the booking mode parameter.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     *
+     * @return string
+     */
+    protected function getBookingModeKey(PaymentMethodContract $paymentMethod): string
+    {
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_BOOKING_MODE);
     }
     //</editor-fold>
 }

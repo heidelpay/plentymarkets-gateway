@@ -13,6 +13,8 @@
  */
 namespace Heidelpay\Configs;
 
+use Heidelpay\Constants\Config;
+
 interface MainConfigContract
 {
     /**
@@ -39,9 +41,9 @@ interface MainConfigContract
     /**
      * Returns the value for the transaction mode (which is the environment).
      *
-     * @return string
+     * @return int
      */
-    public function getEnvironment(): string;
+    public function getEnvironment(): int;
 
     /**
      * Returns true if the shop is configured to work in sandbox mode aka. connector-test mode.

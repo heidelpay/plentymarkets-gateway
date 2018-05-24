@@ -84,6 +84,7 @@ interface MethodConfigContract
      * @return string
      */
     public function getIFrameCssPath(PaymentMethodContract $paymentMethod): string;
+
     //</editor-fold>
 
     //<editor-fold desc="Getters for Plenty payment parameters">

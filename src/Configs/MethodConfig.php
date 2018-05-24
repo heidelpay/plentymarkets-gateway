@@ -174,7 +174,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function getTransactionType(PaymentMethodContract $paymentMethod): string
     {
-        return $this->hasBookingModeDebit($paymentMethod) ? TransactionType::HP_DEBIT : TransactionType::HP_AUTHORIZE;
+        return $this->hasBookingModeDebit($paymentMethod) ? TransactionType::DEBIT : TransactionType::AUTHORIZE;
     }
 
     /**

@@ -74,6 +74,7 @@ class LibService
      */
     protected function sendCreditCardTransactionRequest(array $params): array
     {
+        $this->getLogger(__METHOD__)->error('creditcardTransactionRequest', $params);
         return $this->executeLibCall('creditcardTransactionRequest', $params);
     }
 

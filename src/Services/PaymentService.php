@@ -240,7 +240,6 @@ class PaymentService
         $result = $this->libService->sendTransactionRequest($className, [
             'request' => $this->heidelpayRequest,
             'transactionType' => $this->methodConfig->getTransactionType($paymentMethod)
-            // TransactionType::AUTHORIZE // TODO: change depending on payment method & step.
         ]);
 
         $this->getLogger(__METHOD__)->error('GetHeidelpayURL Result: ', $result);

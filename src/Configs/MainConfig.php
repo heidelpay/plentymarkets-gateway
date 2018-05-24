@@ -19,7 +19,7 @@ use Heidelpay\Constants\TransactionMode;
 class MainConfig extends BaseConfig implements MainConfigContract
 {
     /**
-     * Returns the senderId for authentification.
+     * Returns the senderId for authentication.
      *
      * @return string
      */
@@ -29,7 +29,7 @@ class MainConfig extends BaseConfig implements MainConfigContract
     }
 
     /**
-     * Returns the user login for authentification.
+     * Returns the user login for authentication.
      *
      * @return string
      */
@@ -39,7 +39,7 @@ class MainConfig extends BaseConfig implements MainConfigContract
     }
 
     /**
-     * Returns the user password for authentification.
+     * Returns the user password for authentication.
      *
      * @return string
      */
@@ -49,20 +49,32 @@ class MainConfig extends BaseConfig implements MainConfigContract
     }
 
     /**
+     * Returns true if the shop is configured to work in sandbox mode aka. connector-test mode.
+     *
+     * @return bool
+     */
+    public function isInSandboxMode(): bool
+    {
+        return $this->getMode() === TransactionMode::CONFIG_CONNECTOR_TEST;
+    }
+
+    /**
+     * Fetches the mode from config.
+     *
+     * @return int
+     */
+    private function getMode(): int
+    {
+        return (int)$this->get($this->getConfigKey(ConfigKeys::ENVIRONMENT));
+    }
+
+    /**
      * Returns the value for the transaction mode (which is the environment).
      *
      * @return string
-     *
-     * todo: keine Magic numbers
      */
     public function getEnvironment(): string
     {
-        $transactionMode = (int) $this->get($this->getConfigKey(ConfigKeys::ENVIRONMENT));
-
-        if ($transactionMode === 0) {
-            return TransactionMode::CONNECTOR_TEST;
-        }
-
-        return TransactionMode::LIVE;
+        return $this->isInSandboxMode() ? TransactionMode::CONNECTOR_TEST : TransactionMode::LIVE;
     }
 }

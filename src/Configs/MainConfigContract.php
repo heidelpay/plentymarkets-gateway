@@ -40,8 +40,13 @@ interface MainConfigContract
      * Returns the value for the transaction mode (which is the environment).
      *
      * @return string
-     *
-     * todo: keine Magic numbers
      */
     public function getEnvironment(): string;
+
+    /**
+     * Returns true if the shop is configured to work in sandbox mode aka. connector-test mode.
+     *
+     * @return bool
+     */
+    public function isInSandboxMode(): bool;
 }

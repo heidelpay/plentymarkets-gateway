@@ -22,9 +22,12 @@ use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
+use Plenty\Plugin\Log\Loggable;
 
 class MethodConfig extends BaseConfig implements MethodConfigContract
 {
+    use Loggable;
+
     const ARRAY_KEY_CONFIG_KEY = 'config_key';
     const ARRAY_KEY_DEFAULT_NAME = 'default_name';
     const ARRAY_KEY_KEY = 'key';
@@ -261,6 +264,12 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getDescriptionKey(PaymentMethodContract $paymentMethod, bool $isInternal = false): string
     {
+        if ($paymentMethod instanceof PaymentMethodContract) {
+            $getClass = \get_class($paymentMethod);
+            $key = \call_user_func([$getClass, 'getConfigKey']);
+            $this->getLogger(__METHOD__)->error($key);
+        }
+
         if (!$isInternal) {
             return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_DESCRIPTION_EXTERNAL);
         }

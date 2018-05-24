@@ -13,7 +13,7 @@
  */
 namespace Heidelpay\Configs;
 
-use Heidelpay\Constants\Config;
+use Heidelpay\Constants\Configuration;
 use Heidelpay\Constants\DescriptionTypes;
 use Heidelpay\Constants\Plugin;
 use Heidelpay\Constants\TransactionType;
@@ -181,21 +181,21 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      * Returns true if the configured booking mode is debit.
      *
      * @param PaymentMethodContract $paymentMethod
-     * @return string
+     * @return bool
      */
-    public function hasBookingModeDebit(PaymentMethodContract $paymentMethod): string
+    public function hasBookingModeDebit(PaymentMethodContract $paymentMethod): bool
     {
         $mode = (int)$this->get($this->getBookingModeKey($paymentMethod));
-        return $mode === Config::VALUE_BOOKING_MODE_DEBIT;
+        return $mode === Configuration::VALUE_BOOKING_MODE_DEBIT;
     }
 
     /**
      * Returns true if the configured booking mode is registration.
      *
      * @param PaymentMethodContract $paymentMethod
-     * @return string
+     * @return bool
      */
-    public function hasBookingModeRegistration(PaymentMethodContract $paymentMethod): string
+    public function hasBookingModeRegistration(PaymentMethodContract $paymentMethod): bool
     {
         return !$this->hasBookingModeDebit($paymentMethod);
     }
@@ -271,10 +271,10 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
         }
 
         if (!$isInternal) {
-            return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_DESCRIPTION_EXTERNAL);
+            return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_DESCRIPTION_EXTERNAL);
         }
 
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_DESCRIPTION_INTERNAL);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_DESCRIPTION_INTERNAL);
     }
 
     /**
@@ -286,7 +286,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getUseIconKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_LOGO_USE);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_LOGO_USE);
     }
 
     /**
@@ -298,7 +298,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getIconUrlKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_LOGO_URL);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_LOGO_URL);
     }
 
     /**
@@ -312,7 +312,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
     {
         $paymentMethodKey = self::$paymentMethods[$paymentMethod][self::ARRAY_KEY_CONFIG_KEY];
 
-        return $this->getConfigKey($paymentMethodKey . '.' . Config::KEY_CHANNEL_ID);
+        return $this->getConfigKey($paymentMethodKey . '.' . Configuration::KEY_CHANNEL_ID);
     }
 
     /**
@@ -324,7 +324,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getDisplayNameKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_DISPLAY_NAME);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_DISPLAY_NAME);
     }
 
     /**
@@ -336,7 +336,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getIFrameCssPathKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_IFRAME_CSS_URL);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_IFRAME_CSS_URL);
     }
 
     /**
@@ -348,7 +348,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getDescriptionTypeKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_DESCRIPTION_TYPE);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_DESCRIPTION_TYPE);
     }
 
     /**
@@ -360,7 +360,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getIsActiveKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_IS_ACTIVE);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_IS_ACTIVE);
     }
 
     /**
@@ -372,7 +372,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getMinAmountKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_MIN_AMOUNT);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_MIN_AMOUNT);
     }
 
     /**
@@ -384,7 +384,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getMaxAmountKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_MAX_AMOUNT);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_MAX_AMOUNT);
     }
 
     /**
@@ -396,7 +396,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getBookingModeKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Config::KEY_BOOKING_MODE);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_BOOKING_MODE);
     }
     //</editor-fold>
 }

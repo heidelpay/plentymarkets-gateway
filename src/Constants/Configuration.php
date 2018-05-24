@@ -14,7 +14,7 @@ namespace Heidelpay\Constants;
  *
  * @package heidelpay\plentymarkets-gateway\constants
  */
-class Config
+class Configuration
 {
     //<editor-fold desc="Keys">
     const KEY_AUTH_SENDER_ID = 'main.senderId';

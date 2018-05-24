@@ -85,6 +85,30 @@ interface MethodConfigContract
      */
     public function getIFrameCssPath(PaymentMethodContract $paymentMethod): string;
 
+    /**
+     * Returns the configured booking mode as string.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     * @return string
+     */
+    public function getTransactionType(PaymentMethodContract $paymentMethod): string;
+
+    /**
+     * Returns true if the configured booking mode is debit.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     * @return bool
+     */
+    public function hasBookingModeDebit(PaymentMethodContract $paymentMethod): bool;
+
+    /**
+     * Returns true if the configured booking mode is registration.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     * @return bool
+     */
+    public function hasBookingModeRegistration(PaymentMethodContract $paymentMethod): bool;
+
     //</editor-fold>
 
     //<editor-fold desc="Getters for Plenty payment parameters">

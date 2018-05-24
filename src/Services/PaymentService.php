@@ -2,12 +2,12 @@
 
 namespace Heidelpay\Services;
 
+use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Constants\Plugin;
 use Heidelpay\Constants\Routes;
 use Heidelpay\Constants\Salutation;
 use Heidelpay\Constants\SessionKeys;
 use Heidelpay\Constants\TransactionStatus;
-use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\PayPal;
@@ -29,7 +29,6 @@ use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentOrderRelation;
 use Plenty\Modules\Payment\Models\PaymentProperty;
-use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Templates\Twig;
 
@@ -106,34 +105,38 @@ class PaymentService
      * @var FrontendSessionStorageFactoryContract
      */
     private $sessionStorageFactory;
+    /**
+     * @var MethodConfigContract
+     */
+    private $methodConfig;
 
     /**
      * PaymentService constructor.
      *
      * @param AddressRepositoryContract $addressRepository
      * @param CountryRepositoryContract $countryRepository
-     * @param ConfigRepository $configRepository
      * @param LibService $libraryService
      * @param OrderRepositoryContract $orderRepository
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository
      * @param PaymentRepositoryContract $paymentRepository
-     * @param TransactionRepositoryContract $transactionRepository
+     * @param TransactionRepositoryContract $transactionRepo
      * @param PaymentHelper $paymentHelper
      * @param Twig $twig
      * @param FrontendSessionStorageFactoryContract $sessionStorageFactory
+     * @param MethodConfigContract $methodConfig
      */
     public function __construct(
         AddressRepositoryContract $addressRepository,
         CountryRepositoryContract $countryRepository,
-        ConfigRepository $configRepository,
         LibService $libraryService,
         OrderRepositoryContract $orderRepository,
         PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository,
         PaymentRepositoryContract $paymentRepository,
-        TransactionRepositoryContract $transactionRepository,
+        TransactionRepositoryContract $transactionRepo,
         PaymentHelper $paymentHelper,
         Twig $twig,
-        FrontendSessionStorageFactoryContract $sessionStorageFactory
+        FrontendSessionStorageFactoryContract $sessionStorageFactory,
+        MethodConfigContract $methodConfig
     ) {
         $this->addressRepository = $addressRepository;
         $this->countryRepository = $countryRepository;
@@ -141,7 +144,7 @@ class PaymentService
         $this->orderRepository = $orderRepository;
         $this->paymentOrderRelationRepository = $paymentOrderRelationRepository;
         $this->paymentRepository = $paymentRepository;
-        $this->transactionRepository = $transactionRepository;
+        $this->transactionRepository = $transactionRepo;
         $this->paymentHelper = $paymentHelper;
         $this->twig = $twig;
         $this->sessionStorageFactory = $sessionStorageFactory;
@@ -234,7 +237,8 @@ class PaymentService
 
         $result = $this->libService->sendTransactionRequest($paymentMethod, [
             'request' => $this->heidelpayRequest,
-            'transactionType' => TransactionType::AUTHORIZE // TODO: change depending on payment method & step.
+            'transactionType' => $this->methodConfig->getTransactionType(pluginApp($paymentMethod))
+            // TransactionType::AUTHORIZE // TODO: change depending on payment method & step.
         ]);
 
         $this->getLogger(__METHOD__)->error('GetHeidelpayURL Result: ', $result);

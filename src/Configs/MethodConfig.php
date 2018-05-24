@@ -264,13 +264,6 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getDescriptionKey(PaymentMethodContract $paymentMethod, bool $isInternal = false): string
     {
-        if ($paymentMethod instanceof PaymentMethodContract) {
-            $getClass = \get_class($paymentMethod);
-            $method = 'getConfigKey';
-            $key = $getClass::$method();
-            $this->getLogger(__METHOD__)->error($key);
-        }
-
         if (!$isInternal) {
             return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_DESCRIPTION_EXTERNAL);
         }

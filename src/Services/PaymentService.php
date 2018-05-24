@@ -234,9 +234,10 @@ class PaymentService
         PaymentMethodContract $paymentMethod,
         int $mopId
     ): array {
-        $this->prepareRequest($basket, $paymentMethod, $mopId);
+        $className = \get_class($paymentMethod);
+        $this->prepareRequest($basket, $className, $mopId);
 
-        $result = $this->libService->sendTransactionRequest($paymentMethod, [
+        $result = $this->libService->sendTransactionRequest($className, [
             'request' => $this->heidelpayRequest,
             'transactionType' => $this->methodConfig->getTransactionType($paymentMethod)
             // TransactionType::AUTHORIZE // TODO: change depending on payment method & step.

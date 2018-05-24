@@ -13,26 +13,24 @@
  */
 namespace Heidelpay\Configs;
 
-use Heidelpay\Constants\Config;
-
 interface MainConfigContract
 {
     /**
-     * Returns the senderId for authentification.
+     * Returns the senderId for authentication.
      *
      * @return string
      */
     public function getSenderId(): string;
 
     /**
-     * Returns the user login for authentification.
+     * Returns the user login for authentication.
      *
      * @return string
      */
     public function getUserLogin(): string;
 
     /**
-     * Returns the user password for authentification.
+     * Returns the user password for authentication.
      *
      * @return string
      */

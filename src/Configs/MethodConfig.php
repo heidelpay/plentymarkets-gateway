@@ -268,7 +268,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
     {
         $paymentMethodKey = self::$paymentMethods[$paymentMethod][self::ARRAY_KEY_CONFIG_KEY];
 
-        return $this->get($paymentMethodKey . '.' . ConfigKeys::CHANNEL_ID);
+        return $this->getConfigKey($paymentMethodKey . '.' . ConfigKeys::CHANNEL_ID);
     }
 
     /**
@@ -280,7 +280,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getDisplayNameKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->get($paymentMethod->getConfigKey() . '.' . ConfigKeys::DISPLAY_NAME);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DISPLAY_NAME);
     }
 
     /**
@@ -292,7 +292,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getIFrameCssPathKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->get($paymentMethod->getConfigKey() . '.' . ConfigKeys::IFRAME_CSS_URL);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::IFRAME_CSS_URL);
     }
 
     /**
@@ -304,7 +304,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function getDescriptionTypeKey(PaymentMethodContract $paymentMethod): string
     {
-        return $this->get($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_TYPE);
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . ConfigKeys::DESCRIPTION_TYPE);
     }
 
     /**

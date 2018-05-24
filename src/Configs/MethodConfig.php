@@ -266,7 +266,8 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
     {
         if ($paymentMethod instanceof PaymentMethodContract) {
             $getClass = \get_class($paymentMethod);
-            $key = \call_user_func([$getClass, 'getConfigKey']);
+            $method = 'getConfigKey';
+            $key = $getClass::$method();
             $this->getLogger(__METHOD__)->error($key);
         }
 

@@ -124,7 +124,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     /**
      * @inheritdoc
      */
-    public function getConfigKey(): string
+    public static function getConfigKey(): string
     {
         return static::CONFIG_KEY;
     }

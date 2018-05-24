@@ -65,7 +65,7 @@ interface PaymentMethodContract
      *
      * @return string
      */
-    public function getConfigKey(): string;
+    public static function getConfigKey(): string;
 
     /**
      * Returns a default display name for the payment method.

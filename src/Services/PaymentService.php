@@ -145,6 +145,7 @@ class PaymentService
         $this->paymentHelper = $paymentHelper;
         $this->twig = $twig;
         $this->sessionStorageFactory = $sessionStorageFactory;
+        $this->methodConfig = $methodConfig;
     }
 
     /**

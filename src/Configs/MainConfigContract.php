@@ -49,4 +49,11 @@ interface MainConfigContract
      * @return bool
      */
     public function isInSandboxMode(): bool;
+
+    /**
+     * Returns true if the shop is configured to work in live mode.
+     *
+     * @return bool
+     */
+    public function isInLiveMode(): bool;
 }

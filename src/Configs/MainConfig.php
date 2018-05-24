@@ -59,6 +59,16 @@ class MainConfig extends BaseConfig implements MainConfigContract
     }
 
     /**
+     * Returns true if the shop is configured to work in live mode.
+     *
+     * @return bool
+     */
+    public function isInLiveMode(): bool
+    {
+        return !$this->isInSandboxMode();
+    }
+
+    /**
      * Fetches the mode from config.
      *
      * @return int

@@ -77,7 +77,7 @@ class TransactionRepository implements TransactionRepositoryContract
     /**
      * @inheritdoc
      */
-    public function updateTransaction(Transaction $transaction): Transaction
+    public function updateTransaction($transaction)
     {
         if ($transaction->id !== null) {
             $transaction = $this->database->save($transaction);
@@ -104,9 +104,9 @@ class TransactionRepository implements TransactionRepositoryContract
     /**
      * @inheritdoc
      */
-    public function getTransactionById(int $id): Transaction
+    public function getTransactionById(int $txnId)
     {
-        return $this->database->find(Transaction::class, $id);
+        return $this->database->find(Transaction::class, $txnId);
     }
 
     /**

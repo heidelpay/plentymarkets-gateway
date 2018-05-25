@@ -24,6 +24,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     const CONFIG_KEY = 'abstract';
     const DEFAULT_NAME = 'Abstract Payment Method';
     const KEY = 'ABSTRACT';
+    const ICON = '';
 
     /**
      * @var PaymentHelper $helper
@@ -174,7 +175,8 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function getIcon(): string
     {
-        return $this->config->getMethodIcon($this);
+        return static::ICON;
+//        return $this->config->getMethodIcon($this);
     }
 
     /**

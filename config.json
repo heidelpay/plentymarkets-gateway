@@ -57,7 +57,7 @@
         "creditcard.isActive": {
           "type": "checkBox",
           "required": false,
-          "label": "Config.creditcardIsActiveLabel",
+          "label": "Config.isActiveLabel",
           "options": {
             "defaultValue": false
           }
@@ -65,7 +65,7 @@
         "creditcard.displayName": {
           "type": "inputText",
           "required": false,
-          "label": "Config.creditcardDisplayNameLabel",
+          "label": "Config.displayNameLabel",
           "options": {
             "defaultValue": "Kreditkarte"
           }
@@ -73,7 +73,7 @@
         "creditcard.channelId": {
           "type": "inputText",
           "required": false,
-          "label": "Config.creditcardChannelIdLabel",
+          "label": "Config.channelIdLabel",
           "options": {
             "defaultValue": ""
           }
@@ -81,7 +81,7 @@
         "creditcard.minAmount": {
           "type": "inputText",
           "required": false,
-          "label": "Config.creditcardMinAmountLabel",
+          "label": "Config.minAmountLabel",
           "options": {
             "defaultValue": "0,00"
           }
@@ -89,7 +89,7 @@
         "creditcard.maxAmount": {
           "type": "inputText",
           "required": false,
-          "label": "Config.creditcardMaxAmountLabel",
+          "label": "Config.maxAmountLabel",
           "options": {
             "defaultValue": "0,00"
           }
@@ -97,7 +97,7 @@
         "creditcard.doRegistration": {
           "type": "checkBox",
           "required": false,
-          "label": "Config.creditcardDoRegistrationLabel",
+          "label": "Config.doRegistrationLabel",
           "options": {
             "defaultValue": false
           }
@@ -105,17 +105,17 @@
         "creditcard.transactionType": {
           "type": "selectBox",
           "required": false,
-          "label": "Config.creditcardTransactionTypeLabel",
+          "label": "Config.transactionTypeLabel",
           "options": {
             "defaultValue": "0",
             "selectBoxValues": [
               {
                 "value": "0",
-                "caption": "Config.creditcardTransactionTypePossibleValue0"
+                "caption": "Config.transactionTypePossibleValue0"
               },
               {
                 "value": "1",
-                "caption": "Config.creditcardTransactionTypePossibleValue1"
+                "caption": "Config.transactionTypePossibleValue1"
               }
             ]
           }
@@ -123,7 +123,86 @@
         "creditcard.iframeCss": {
           "type": "inputText",
           "required": false,
-          "label": "Config.creditcardIframeCssLabel",
+          "label": "Config.iframeCssLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        }
+      }
+    },
+    "Config.debitcardTab": {
+      "label": "Config.debitcardTab",
+      "formFields": {
+        "debitcard.isActive": {
+          "type": "checkBox",
+          "required": false,
+          "label": "Config.isActiveLabel",
+          "options": {
+            "defaultValue": false
+          }
+        },
+        "debitcard.displayName": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.displayNameLabel",
+          "options": {
+            "defaultValue": "Debitkarte"
+          }
+        },
+        "debitcard.channelId": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.channelIdLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        },
+        "debitcard.minAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.minAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "debitcard.maxAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.maxAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "debitcard.doRegistration": {
+          "type": "checkBox",
+          "required": false,
+          "label": "Config.doRegistrationLabel",
+          "options": {
+            "defaultValue": false
+          }
+        },
+        "debitcard.transactionType": {
+          "type": "selectBox",
+          "required": false,
+          "label": "Config.transactionTypeLabel",
+          "options": {
+            "defaultValue": "0",
+            "selectBoxValues": [
+              {
+                "value": "0",
+                "caption": "Config.transactionTypePossibleValue0"
+              },
+              {
+                "value": "1",
+                "caption": "Config.transactionTypePossibleValue1"
+              }
+            ]
+          }
+        },
+        "debitcard.iframeCss": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.iframeCssLabel",
           "options": {
             "defaultValue": ""
           }
@@ -136,7 +215,7 @@
         "sofort.isActive": {
           "type": "checkBox",
           "required": false,
-          "label": "Config.sofortIsActiveLabel",
+          "label": "Config.isActiveLabel",
           "options": {
             "defaultValue": false
           }
@@ -144,7 +223,7 @@
         "sofort.displayName": {
           "type": "inputText",
           "required": false,
-          "label": "Config.sofortDisplayNameLabel",
+          "label": "Config.displayNameLabel",
           "options": {
             "defaultValue": "Sofort."
           }
@@ -152,7 +231,7 @@
         "sofort.channelId": {
           "type": "inputText",
           "required": false,
-          "label": "Config.sofortChannelIdLabel",
+          "label": "Config.channelIdLabel",
           "options": {
             "defaultValue": ""
           }
@@ -160,7 +239,7 @@
         "sofort.minAmount": {
           "type": "inputText",
           "required": false,
-          "label": "Config.sofortMinAmountLabel",
+          "label": "Config.minAmountLabel",
           "options": {
             "defaultValue": "0,00"
           }
@@ -168,7 +247,7 @@
         "sofort.maxAmount": {
           "type": "inputText",
           "required": false,
-          "label": "Config.sofortMaxAmountLabel",
+          "label": "Config.maxAmountLabel",
           "options": {
             "defaultValue": "0,00"
           }
@@ -181,7 +260,7 @@
         "paypal.isActive": {
           "type": "checkBox",
           "required": false,
-          "label": "Config.paypalIsActiveLabel",
+          "label": "Config.isActiveLabel",
           "options": {
             "defaultValue": false
           }
@@ -189,7 +268,7 @@
         "paypal.displayName": {
           "type": "inputText",
           "required": false,
-          "label": "Config.paypalDisplayNameLabel",
+          "label": "Config.displayNameLabel",
           "options": {
             "defaultValue": "PayPal"
           }
@@ -197,7 +276,7 @@
         "paypal.channelId": {
           "type": "inputText",
           "required": false,
-          "label": "Config.paypalChannelIdLabel",
+          "label": "Config.channelIdLabel",
           "options": {
             "defaultValue": ""
           }
@@ -205,7 +284,7 @@
         "paypal.minAmount": {
           "type": "inputText",
           "required": false,
-          "label": "Config.paypalMinAmountLabel",
+          "label": "Config.minAmountLabel",
           "options": {
             "defaultValue": "0,00"
           }
@@ -213,7 +292,7 @@
         "paypal.maxAmount": {
           "type": "inputText",
           "required": false,
-          "label": "Config.paypalMaxAmountLabel",
+          "label": "Config.maxAmountLabel",
           "options": {
             "defaultValue": "0,00"
           }
@@ -226,7 +305,7 @@
         "prepayment.isActive": {
           "type": "checkBox",
           "required": false,
-          "label": "Config.prepaymentIsActiveLabel",
+          "label": "Config.isActiveLabel",
           "options": {
             "defaultValue": false
           }
@@ -234,7 +313,7 @@
         "prepayment.displayName": {
           "type": "inputText",
           "required": false,
-          "label": "Config.prepaymentDisplayNameLabel",
+          "label": "Config.displayNameLabel",
           "options": {
             "defaultValue": "Vorkasse"
           }
@@ -242,7 +321,7 @@
         "prepayment.channelId": {
           "type": "inputText",
           "required": false,
-          "label": "Config.prepaymentChannelIdLabel",
+          "label": "Config.channelIdLabel",
           "options": {
             "defaultValue": ""
           }
@@ -250,7 +329,7 @@
         "prepayment.minAmount": {
           "type": "inputText",
           "required": false,
-          "label": "Config.prepaymentMinAmountLabel",
+          "label": "Config.minAmountLabel",
           "options": {
             "defaultValue": "0,00"
           }
@@ -258,7 +337,7 @@
         "prepayment.maxAmount": {
           "type": "inputText",
           "required": false,
-          "label": "Config.prepaymentMaxAmountLabel",
+          "label": "Config.maxAmountLabel",
           "options": {
             "defaultValue": "0,00"
           }

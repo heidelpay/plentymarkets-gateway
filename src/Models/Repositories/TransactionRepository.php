@@ -100,9 +100,9 @@ class TransactionRepository implements TransactionRepositoryContract
     /**
      * @inheritdoc
      */
-    public function getTransactionById(int $txnId)
+    public function getTransactionById(int $id)
     {
-        return $this->database->find(Transaction::class, $txnId);
+        return $this->database->find(Transaction::class, $id);
     }
 
     /**

@@ -31,11 +31,11 @@ interface TransactionRepositoryContract
     /**
      * Searches for a Transaction by its ID and returns it, if present.
      *
-     * @param int $txnId
+     * @param int $id
      *
      * @return Transaction|Model
      */
-    public function getTransactionById(int $txnId);
+    public function getTransactionById(int $id);
 
     /**
      * @param string $txnId

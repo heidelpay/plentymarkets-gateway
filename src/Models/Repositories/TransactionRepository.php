@@ -66,10 +66,6 @@ class TransactionRepository implements TransactionRepositoryContract
             $transaction->isClosed = true;
         }
 
-        $this->getLogger(__METHOD__)->error('transaction data', [
-            'transaction' => $transaction
-        ]);
-
         $transaction = $this->database->save($transaction);
         return $transaction;
     }

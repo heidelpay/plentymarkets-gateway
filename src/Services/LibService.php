@@ -41,6 +41,41 @@ class LibService
         $this->libCall = $libraryCallContract;
     }
 
+    //<editor-fold desc="General">
+    /**
+     * Executes an external library call with the given parameters.
+     *
+     * @param string $libCall
+     * @param array  $params
+     * @param string $pluginName
+     *
+     * @return array
+     */
+    private function executeLibCall($libCall, array $params, $pluginName = Plugin::NAME): array
+    {
+        $libName = $pluginName . '::' . $libCall;
+        $result = $this->libCall->call($libName, $params);
+
+        $this->getLogger(__METHOD__)->debug('heidelpay::request.debugLibCallResult', [
+            'LibCall' => $libName,
+            'Parameters' => $params,
+            'Result' => $result
+        ]);
+
+        // if an exception/error occured when trying to call the external sdk, return
+        // the values from the assoc array containing the error details.
+        if ($result['error'] ?? false) {
+            return [
+                'exceptionCode' => $result['error_no'] ?? 500,
+                'exceptionMsg' => $result['error_msg'] ?? 'Internal error',
+            ];
+        }
+
+        return $result;
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Response Handlers">
     /**
      * Handles the asynchronous heidelpay POST Response and returns the Response array.
      *
@@ -64,6 +99,41 @@ class LibService
     {
         return $this->executeLibCall('handlePushNotification', $params);
     }
+    //</editor-fold>
+
+    //<editor-fold desc="Transaction Requests">
+    /**
+     * Calls a method depending on the given payment method
+     * for sending a transaction request.
+     *
+     * @param string $paymentMethod
+     * @param array  $params
+     *
+     * @return array
+     */
+    public function sendTransactionRequest(string $paymentMethod, array $params): array
+    {
+        switch ($paymentMethod) {
+            case CreditCard::class:
+                return $this->sendCreditCardTransactionRequest($params);
+                break;
+
+            case Sofort::class:
+                return $this->sendSofortTransactionRequest($params);
+                break;
+
+            case PayPal::class:
+                return $this->sendPayPalTransactionRequest($params);
+                break;
+
+            case Prepayment::class:
+                return $this->sendPrepaymentTransactionRequest($params);
+                break;
+
+            default:
+                return [];
+        }
+    }
 
     /**
      * Submits a request for a Credit Card transaction.
@@ -74,11 +144,6 @@ class LibService
      */
     protected function sendCreditCardTransactionRequest(array $params): array
     {
-        $this->getLogger(__METHOD__)->error('creditcardTransactionRequest', $params);
-        $this->getLogger(__METHOD__)->info('Heidelpay::Payment.transactions', $params);
-        $this->getLogger(__METHOD__)->debug('Heidelpay::Payment.transactions', $params);
-        $this->getLogger(__METHOD__)->info('Payment.transactions', $params);
-        $this->getLogger(__METHOD__)->debug('Payment.transactions', $params);
         return $this->executeLibCall('creditcardTransactionRequest', $params);
     }
 
@@ -117,40 +182,9 @@ class LibService
     {
         return $this->executeLibCall('prepaymentTransactionRequest', $params);
     }
+    //</editor-fold>
 
-    /**
-     * Calls a method depending on the given payment method
-     * for sending a transaction request.
-     *
-     * @param string $paymentMethod
-     * @param array  $params
-     *
-     * @return array
-     */
-    public function sendTransactionRequest(string $paymentMethod, array $params): array
-    {
-        switch ($paymentMethod) {
-            case CreditCard::class:
-                return $this->sendCreditCardTransactionRequest($params);
-                break;
-
-            case Sofort::class:
-                return $this->sendSofortTransactionRequest($params);
-                break;
-
-            case PayPal::class:
-                return $this->sendPayPalTransactionRequest($params);
-                break;
-
-            case Prepayment::class:
-                return $this->sendPrepaymentTransactionRequest($params);
-                break;
-
-            default:
-                return [];
-        }
-    }
-
+    //<editor-fold desc="Basket">
     /**
      * @param array $params
      *
@@ -160,33 +194,5 @@ class LibService
     {
         return $this->executeLibCall('submitBasket', $params);
     }
-
-    /**
-     * Executes an external library call with the given parameters.
-     *
-     * @param string $libCall
-     * @param array  $params
-     * @param string $pluginName
-     *
-     * @return array
-     */
-    private function executeLibCall($libCall, array $params, $pluginName = Plugin::NAME): array
-    {
-        $result = $this->libCall->call($pluginName . '::' . $libCall, $params);
-
-        $this->getLogger(__METHOD__)->error('LibCall result', [
-            'result' => $result
-        ]);
-
-        // if an exception/error occured when trying to call the external sdk, return
-        // the values from the assoc array containing the error details.
-        if ($result['error'] ?? false) {
-            return [
-                'exceptionCode' => $result['error_no'] ?? 500,
-                'exceptionMsg' => $result['error_msg'] ?? 'Internal error',
-            ];
-        }
-
-        return $result;
-    }
+    //</editor-fold>
 }

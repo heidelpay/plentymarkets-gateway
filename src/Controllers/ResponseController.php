@@ -84,14 +84,14 @@ class ResponseController extends Controller
      *
      * @return string
      */
-    public function processResponse(): string
+    public function processAsyncResponse(): string
     {
         // get all post parameters except the 'plentyMarkets' one injected by the plentymarkets core.
         // also scrap the 'lang' parameter which will be sent when e.g. PayPal is being used.
         $postResponse = $this->request->except(['plentyMarkets', 'lang']);
 
         $response = $this->paymentService->handleAsyncPaymentResponse(['response' => $postResponse]);
-        $this->getLogger('heidelpay async response')->error('heidelpay::response.receivedResponse', [
+        $this->getLogger(__METHOD__)->debug('heidelpay::response.debugReceivedResponse', [
             'POST response' =>$postResponse,
             'response' => $response
         ]);
@@ -105,7 +105,7 @@ class ResponseController extends Controller
         // create the transaction entity.
         $newTransaction = $this->transactionService->createTransaction($response);
         if ($newTransaction === null || ! $newTransaction instanceof Transaction) {
-            $this->getLogger(__METHOD__)->error('Transaction not created!', [
+            $this->getLogger(__METHOD__)->error('heidelpay::response.errorTransactionNotCreated', [
                 'data' => $response['response']
             ]);
 
@@ -121,15 +121,15 @@ class ResponseController extends Controller
     }
 
     /**
-     * When the processResponse cannot be accessed, or something went wrong during the process,
-     * the heidelpay API redirects to the processResponse url using GET instead of POST.
-     * This method is for handling this "emergency" behaviour.
+     * When the processAsyncResponse cannot be accessed, or something went wrong during the process,
+     * the heidelpay API redirects to the processAsyncResponse url using GET instead of POST.
+     * This method is for handling this behaviour.
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function emergencyRedirect(): \Symfony\Component\HttpFoundation\Response
     {
-        $this->getLogger(__METHOD__)->warning('heidelpay::response.emergency');
+        $this->getLogger(__METHOD__)->warning('heidelpay::response.warningResponseCalledInInvalidContext');
 
         return $this->response->redirectTo('checkout');
     }
@@ -140,15 +140,14 @@ class ResponseController extends Controller
     public function processPush(): Response
     {
         $postPayload = $this->request->getContent();
-        $this->getLogger(__METHOD__)->error('heidelpay::response.pushNotification', [
+        $this->getLogger(__METHOD__)->debug('heidelpay::response.debugPushNotificationReceived', [
             'content' => $postPayload,
         ]);
 
         $response = $this->paymentService->handlePushNotification(['xmlContent' => $postPayload]);
-        $this->getLogger(__METHOD__)->error('pushResponse content', $response);
 
         if (isset($response['exceptionCode'])) {
-            $this->getLogger('processPush')->error('Returning a non-200 HTTP code.');
+            $this->getLogger(__METHOD__)->error('heidelpay::error.errorResponseContainsErrorCode');
             return $this->response->make('Not Ok.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 

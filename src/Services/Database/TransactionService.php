@@ -63,13 +63,6 @@ class TransactionService
         int $paymentMethodId = null,
         int $orderId = null
     ): Transaction {
-        $this->getLogger(__METHOD__)->error('create Transaction', [
-            'response' => $responseData,
-            'storeId' => $storeId,
-            'paymentMethodId' => $paymentMethodId,
-            'orderId' => $orderId,
-        ]);
-
         $heidelpayResponse = $responseData['response'];
 
         if ($storeId === null) {

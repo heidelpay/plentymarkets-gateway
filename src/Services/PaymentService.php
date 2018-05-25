@@ -168,7 +168,7 @@ class PaymentService
      */
     private function setReturnType(string $type)
     {
-        $this->getLogger(__METHOD__)->error('Setting return type', ['type' => $type]);
+        $this->getLogger(__METHOD__)->debug('heidelpay::payment.debugSettingReturnType', ['type' => $type]);
         $this->returnType = $type;
     }
 
@@ -182,7 +182,7 @@ class PaymentService
      */
     public function executePayment(string $paymentMethod, ExecutePayment $event): string
     {
-        $this->getLogger(__METHOD__)->error('executePayment call', [
+        $this->getLogger(__METHOD__)->error('heidelpay::payment.debugExecutePayment', [
             'paymentMethod' => $paymentMethod,
             'mopId' => $event->getMop(),
             'orderId' => $event->getOrderId()
@@ -194,9 +194,9 @@ class PaymentService
         // Retrieve heidelpay Transaction by txnId to get values needed for plenty payment (e.g. amount etc).
         $transactionId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
         $transactions = $this->transactionRepository->getTransactionsByTxnId($transactionId);
-        $this->getLogger(__METHOD__)->error('Transactions', $transactions);
+        $this->getLogger(__METHOD__)->critical('Transactions', $transactions);
         foreach ($transactions as $transaction) {
-            $this->getLogger(__METHOD__)->error('Transaction', $transaction);
+            $this->getLogger(__METHOD__)->critical('Transaction', $transaction);
             $allowedStatus = [TransactionStatus::ACK, TransactionStatus::PENDING];
             if (\in_array($transaction->status, $allowedStatus, false)) {
                 $transactionDetails = $transaction->transactionDetails;
@@ -207,19 +207,19 @@ class PaymentService
         if (!($transaction instanceof Transaction) ||
             !isset($transactionDetails['PRESENTATION.AMOUNT'], $transactionDetails['PRESENTATION.CURRENCY'])) {
             $this->setReturnType('error');
-            return 'Error during payment execution!';
+            return 'heidelpay::error.errorDuringPaymentExecution';
         }
 
         $plentyPayment = $this->createPlentyPayment($transaction, $transaction->paymentMethodId);
         if (!($plentyPayment instanceof Payment)) {
             $this->setReturnType('error');
-            return 'Error during payment execution!';
+            return 'heidelpay::error.errorDuringPaymentExecution';
         }
 
         $this->paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $event->getOrderId());
 
         $this->setReturnType('success');
-        return 'Payment was successful!';
+        return 'heidelpay::info.infoPaymentSuccessful';
     }
 
     /**
@@ -241,8 +241,6 @@ class PaymentService
             'request' => $this->heidelpayRequest,
             'transactionType' => $this->methodConfig->getTransactionType($paymentMethod)
         ]);
-
-        $this->getLogger(__METHOD__)->error('GetHeidelpayURL Result: ', $result);
 
         return $result;
     }
@@ -326,12 +324,8 @@ class PaymentService
                     return $result['response']['PROCESSING.RETURN'];
                 }
 
+                // todo: extend for DebitCard
                 $urlKey = $paymentMethod === CreditCard::class ? 'FRONTEND.PAYMENT_FRAME_URL' : 'FRONTEND.REDIRECT_URL';
-
-                $this->getLogger(__METHOD__)->error('html return urlKey', [
-                    'urlKey' => $urlKey,
-                    'value' => $result['response'][$urlKey]
-                ]);
 
                 return $this->twig->render('heidelpay::externalCardForm', [
                     'paymentFrameUrl' => $result['response'][$urlKey]
@@ -428,7 +422,7 @@ class PaymentService
 
         // TODO: Riskinformation for future payment methods
 
-        $this->getLogger(__METHOD__)->error('prepareRequest', $this->heidelpayRequest);
+        $this->getLogger(__METHOD__)->debug('heidelpay::request.debugPreparingRequest', $this->heidelpayRequest);
     }
 
     /**
@@ -564,7 +558,7 @@ class PaymentService
         // create the payment
         $payment->properties = $paymentProperty;
         $payment->regenerateHash = true;
-        $this->getLogger(__METHOD__)->error('plenty payment', [$payment]);
+        $this->getLogger(__METHOD__)->debug('heidelpay::payment.debugCreatePlentyPayment', [$payment]);
 
         return $this->paymentRepository->createPayment($payment);
     }

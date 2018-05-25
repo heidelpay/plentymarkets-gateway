@@ -182,7 +182,7 @@ class PaymentService
      */
     public function executePayment(string $paymentMethod, ExecutePayment $event): string
     {
-        $this->getLogger(__METHOD__)->error('heidelpay::payment.debugExecutePayment', [
+        $this->getLogger(__METHOD__)->debug('heidelpay::payment.debugExecutePayment', [
             'paymentMethod' => $paymentMethod,
             'mopId' => $event->getMop(),
             'orderId' => $event->getOrderId()
@@ -287,7 +287,7 @@ class PaymentService
 
             default:
                 $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
-                $result = 'Internal Error. Please try again later.';
+                $result = 'heidelpay::payment.errorInternalErrorTryAgainLater';
                 break;
         }
 
@@ -297,8 +297,6 @@ class PaymentService
         ], true)) {
             return $result;
         }
-
-        $this->getLogger(__METHOD__)->error('getPaymentMethodContent result', [$result]);
 
         if (\is_array($result)) {
             // return the exception message, if present.

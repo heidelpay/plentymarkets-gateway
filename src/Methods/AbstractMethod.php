@@ -6,6 +6,7 @@ use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
+use Plenty\Plugin\Application;
 
 /**
  * Abstract Payment Method Class
@@ -175,7 +176,10 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function getIcon(): string
     {
-        return static::ICON;
+        /** @var Application */
+        $app = pluginApp(Application::class);
+        return $app->getUrlPath('heidelpay'). static::ICON;
+//        return $app static::ICON;
 //        return $this->config->getMethodIcon($this);
     }
 

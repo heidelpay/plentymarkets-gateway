@@ -113,14 +113,6 @@ interface MethodConfigContract
 
     //<editor-fold desc="Getters for Plenty payment parameters">
     /**
-     * Returns the path of the payment method icon.
-     *
-     * @param $paymentMethod
-     * @return string
-     */
-    public function getMethodIcon($paymentMethod): string;
-
-    /**
      * Returns the Methods description text.
      *
      * @param $paymentMethod

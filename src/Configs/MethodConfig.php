@@ -203,22 +203,6 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
 
     //<editor-fold desc="Getters for Plenty payment parameters">
     /**
-     * Returns the path of the payment method icon.
-     *
-     * @param $paymentMethod
-     * @return string
-     */
-    public function getMethodIcon($paymentMethod): string
-    {
-        $useIcon = (bool) $this->get($this->getUseIconKey($paymentMethod));
-        if ($useIcon === false) {
-            return '';
-        }
-
-        return $this->get($this->getIconUrlKey($paymentMethod)) ?: '';
-    }
-
-    /**
      * Returns the Methods description text.
      *
      * @param $paymentMethod
@@ -269,30 +253,6 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
         }
 
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_DESCRIPTION_INTERNAL);
-    }
-
-    /**
-     * Returns the payment method config key for the 'use logo' configuration.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    protected function getUseIconKey(PaymentMethodContract $paymentMethod): string
-    {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_LOGO_USE);
-    }
-
-    /**
-     * Returns the payment method config key for the 'logo url' configuration.
-     *
-     * @param PaymentMethodContract $paymentMethod
-     *
-     * @return string
-     */
-    protected function getIconUrlKey(PaymentMethodContract $paymentMethod): string
-    {
-        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_LOGO_URL);
     }
 
     /**

@@ -179,8 +179,6 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
         /** @var Application */
         $app = pluginApp(Application::class);
         return $app->getUrlPath('heidelpay'). static::ICON;
-//        return $app static::ICON;
-//        return $this->config->getMethodIcon($this);
     }
 
     /**

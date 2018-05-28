@@ -208,6 +208,141 @@
           }
         }
       }
+    },
+    "Config.sofortTab": {
+      "label": "Config.sofortTab",
+      "formFields": {
+        "sofort.isActive": {
+          "type": "checkBox",
+          "required": false,
+          "label": "Config.isActiveLabel",
+          "options": {
+            "defaultValue": false
+          }
+        },
+        "sofort.displayName": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.displayNameLabel",
+          "options": {
+            "defaultValue": "Sofort."
+          }
+        },
+        "sofort.channelId": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.channelIdLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        },
+        "sofort.minAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.minAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "sofort.maxAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.maxAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        }
+      }
+    },
+    "Config.paypalTab": {
+      "label": "Config.paypalTab",
+      "formFields": {
+        "paypal.isActive": {
+          "type": "checkBox",
+          "required": false,
+          "label": "Config.isActiveLabel",
+          "options": {
+            "defaultValue": false
+          }
+        },
+        "paypal.displayName": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.displayNameLabel",
+          "options": {
+            "defaultValue": "PayPal"
+          }
+        },
+        "paypal.channelId": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.channelIdLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        },
+        "paypal.minAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.minAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "paypal.maxAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.maxAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        }
+      }
+    },
+    "Config.prepaymentTab": {
+      "label": "Config.prepaymentTab",
+      "formFields": {
+        "prepayment.isActive": {
+          "type": "checkBox",
+          "required": false,
+          "label": "Config.isActiveLabel",
+          "options": {
+            "defaultValue": false
+          }
+        },
+        "prepayment.displayName": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.displayNameLabel",
+          "options": {
+            "defaultValue": "Vorkasse"
+          }
+        },
+        "prepayment.channelId": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.channelIdLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        },
+        "prepayment.minAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.minAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "prepayment.maxAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.maxAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        }
+      }
     }
   }
 }

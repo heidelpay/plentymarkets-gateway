@@ -10,6 +10,7 @@ use Heidelpay\Constants\SessionKeys;
 use Heidelpay\Constants\TransactionStatus;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\CreditCard;
+use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
@@ -48,6 +49,8 @@ use Plenty\Plugin\Templates\Twig;
 class PaymentService
 {
     use Loggable;
+
+    const METHODS_USING_IFRAME = [CreditCard::class, DebitCard::class];
 
     /**
      * @var string
@@ -269,6 +272,12 @@ class PaymentService
                 $result = $this->sendGetPaymentMethodContentRequest($basket, $instance, $mopId);
                 break;
 
+            case DebitCard::class:
+                $instance = pluginApp(DebitCard::class);
+                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_HTML);
+                $result = $this->sendGetPaymentMethodContentRequest($basket, $instance, $mopId);
+                break;
+
             case PayPal::class:
                 $instance = pluginApp(PayPal::class);
                 $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
@@ -323,7 +332,8 @@ class PaymentService
                 }
 
                 // todo: extend for DebitCard
-                $urlKey = $paymentMethod === CreditCard::class ? 'FRONTEND.PAYMENT_FRAME_URL' : 'FRONTEND.REDIRECT_URL';
+                $urlKey = \in_array($paymentMethod, self::METHODS_USING_IFRAME, true) ?
+                    'FRONTEND.PAYMENT_FRAME_URL' : 'FRONTEND.REDIRECT_URL';
 
                 return $this->twig->render('heidelpay::externalCardForm', [
                     'paymentFrameUrl' => $result['response'][$urlKey]
@@ -392,7 +402,7 @@ class PaymentService
 
         // add the origin domain, which is important for the CSP
         // set 'PREVENT_ASYNC_REDIRECT' to false, to ensure the customer is being redirected after submitting the form.
-        if ($paymentMethod === CreditCard::class) {
+        if (\in_array($paymentMethod, self::METHODS_USING_IFRAME, true)) {
             $this->heidelpayRequest['FRONTEND_PAYMENT_FRAME_ORIGIN'] = $this->paymentHelper->getDomain();
             $this->heidelpayRequest['FRONTEND_PREVENT_ASYNC_REDIRECT'] = 'false';
         }

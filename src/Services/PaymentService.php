@@ -265,8 +265,6 @@ class PaymentService
         Basket $basket,
         int $mopId
     ): string {
-        $result = '';
-
         switch ($paymentMethod) {
             case CreditCard::class:
                 $instance = pluginApp(CreditCard::class);
@@ -278,22 +276,6 @@ class PaymentService
                 $instance = pluginApp(DebitCard::class);
                 $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_HTML);
                 $result = $this->sendGetPaymentMethodContentRequest($basket, $instance, $mopId);
-                break;
-
-            case PayPal::class:
-                $instance = pluginApp(PayPal::class);
-                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
-                $result = $this->sendGetPaymentMethodContentRequest($basket, $instance, $mopId);
-                break;
-
-            case Sofort::class:
-                $instance = pluginApp(Sofort::class);
-                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
-                $result = $this->sendGetPaymentMethodContentRequest($basket, $instance, $mopId);
-                break;
-
-            case Prepayment::class:
-                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_CONTINUE);
                 break;
 
             default:

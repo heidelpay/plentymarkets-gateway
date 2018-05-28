@@ -91,6 +91,8 @@ class PaymentHelper
      */
     public function createMopIfNotExists(string $paymentMethodClass)
     {
+        $this->getLogger(__METHOD__)->debug('heidelpay:payment.debugCreateMopIfNotExists', [$paymentMethodClass]);
+
         if ($this->getPaymentMethodId($paymentMethodClass) === self::NO_PAYMENTMETHOD_FOUND) {
             $paymentMethodData = [
                 'pluginKey' => Plugin::KEY,

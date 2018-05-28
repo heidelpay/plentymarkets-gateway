@@ -65,6 +65,8 @@ class HeidelpayServiceProvider extends ServiceProvider
         PaymentService $paymentService,
         Dispatcher $eventDispatcher
     ) {
+        $paymentHelper->createMopIfNotExists($paymentMethodClass);
+
         // loop through all of the plugin's available payment methods
         /** @var string $paymentMethodClass */
         foreach (MethodConfig::getPaymentMethods() as $paymentMethodClass) {

@@ -129,6 +129,85 @@
           }
         }
       }
+    },
+    "Config.debitcardTab": {
+      "label": "Config.debitcardTab",
+      "formFields": {
+        "debitcard.isActive": {
+          "type": "checkBox",
+          "required": false,
+          "label": "Config.isActiveLabel",
+          "options": {
+            "defaultValue": false
+          }
+        },
+        "debitcard.displayName": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.displayNameLabel",
+          "options": {
+            "defaultValue": "Debitkarte"
+          }
+        },
+        "debitcard.channelId": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.channelIdLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        },
+        "debitcard.minAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.minAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "debitcard.maxAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.maxAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "debitcard.doRegistration": {
+          "type": "checkBox",
+          "required": false,
+          "label": "Config.doRegistrationLabel",
+          "options": {
+            "defaultValue": false
+          }
+        },
+        "debitcard.transactionType": {
+          "type": "selectBox",
+          "required": false,
+          "label": "Config.transactionTypeLabel",
+          "options": {
+            "defaultValue": "0",
+            "selectBoxValues": [
+              {
+                "value": "0",
+                "caption": "Config.transactionTypePossibleValue0"
+              },
+              {
+                "value": "1",
+                "caption": "Config.transactionTypePossibleValue1"
+              }
+            ]
+          }
+        },
+        "debitcard.iframeCss": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.iframeCssLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        }
+      }
     }
   }
 }

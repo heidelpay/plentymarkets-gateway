@@ -8,7 +8,6 @@ use Heidelpay\Configs\MethodConfig;
 use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\CreditCard;
-use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Repositories\TransactionRepository;
@@ -96,11 +95,6 @@ class HeidelpayServiceProvider extends ServiceProvider
                     $event->setValue($paymentService->getPaymentMethodContent(CreditCard::class, $basket, $mop));
                     $event->setType($paymentService->getReturnType());
                 }
-
-                if ($mop === $paymentHelper->getPaymentMethodId(DebitCard::class)) {
-                    $event->setValue($paymentService->getPaymentMethodContent(DebitCard::class, $basket, $mop));
-                    $event->setType($paymentService->getReturnType());
-                }
             }
         );
 
@@ -114,10 +108,6 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $mop = $event->getMop();
                 if ($mop === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
                     $event->setValue($paymentService->executePayment(CreditCard::class, $event));
-                    $event->setType($paymentService->getReturnType());
-                }
-                if ($mop === $paymentHelper->getPaymentMethodId(DebitCard::class)) {
-                    $event->setValue($paymentService->executePayment(DebitCard::class, $event));
                     $event->setType($paymentService->getReturnType());
                 }
 

@@ -197,8 +197,6 @@ class PaymentService
         // Retrieve heidelpay Transaction by txnId to get values needed for plenty payment (e.g. amount etc).
         $transactionId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
         $transactions = $this->transactionRepository->getTransactionsByTxnId($transactionId);
-
-        // todo: check if this works in each case.
         $this->getLogger(__METHOD__)->critical('Transactions', $transactions);
         foreach ($transactions as $transaction) {
             $this->getLogger(__METHOD__)->critical('Transaction', $transaction);

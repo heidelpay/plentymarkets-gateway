@@ -10,6 +10,7 @@ use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\PayPal;
+use Heidelpay\Methods\Sofort;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Repositories\TransactionRepository;
 use Heidelpay\Services\PaymentService;
@@ -91,10 +92,10 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $mop = $event->getMop();
                 $basket = $basketRepository->load();
 
-                if ($mop === $paymentHelper->getPaymentMethodId(PayPal::class)) {
-                    $event->setValue($paymentService->getPaymentMethodContent(PayPal::class, $basket, $mop));
-                    $event->setType($paymentService->getReturnType());
-                }
+//                if ($mop === $paymentHelper->getPaymentMethodId(PayPal::class)) {
+//                    $event->setValue($paymentService->getPaymentMethodContent(PayPal::class, $basket, $mop));
+//                    $event->setType($paymentService->getReturnType());
+//                }
 
                 if ($mop === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
                     $event->setValue($paymentService->getPaymentMethodContent(CreditCard::class, $basket, $mop));
@@ -103,6 +104,11 @@ class HeidelpayServiceProvider extends ServiceProvider
 
                 if ($mop === $paymentHelper->getPaymentMethodId(DebitCard::class)) {
                     $event->setValue($paymentService->getPaymentMethodContent(DebitCard::class, $basket, $mop));
+                    $event->setType($paymentService->getReturnType());
+                }
+
+                if ($mop === $paymentHelper->getPaymentMethodId(Sofort::class)) {
+                    $event->setValue($paymentService->getPaymentMethodContent(Sofort::class, $basket, $mop));
                     $event->setType($paymentService->getReturnType());
                 }
             }
@@ -126,10 +132,15 @@ class HeidelpayServiceProvider extends ServiceProvider
                     $event->setType($paymentService->getReturnType());
                 }
 
-                if ($mop === $paymentHelper->getPaymentMethodId(PayPal::class)) {
-                    $event->setValue($paymentService->executePayment(PayPal::class, $event));
+                if ($mop === $paymentHelper->getPaymentMethodId(Sofort::class)) {
+                    $event->setValue($paymentService->executePayment(Sofort::class, $event));
                     $event->setType($paymentService->getReturnType());
                 }
+
+//                if ($mop === $paymentHelper->getPaymentMethodId(PayPal::class)) {
+//                    $event->setValue($paymentService->executePayment(PayPal::class, $event));
+//                    $event->setType($paymentService->getReturnType());
+//                }
             }
         );
     }

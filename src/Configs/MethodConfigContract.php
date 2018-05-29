@@ -133,8 +133,8 @@ interface MethodConfigContract
      * Returns true if the given parameter exists and is not empty.
      *
      * @param PaymentMethodContract $paymentMethod
-     * @return string
+     * @return bool
      */
-    public function hasTransactionType(PaymentMethodContract $paymentMethod): string;
+    public function hasTransactionType(PaymentMethodContract $paymentMethod): bool;
     //</editor-fold>
 }

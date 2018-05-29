@@ -186,7 +186,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
     /**
      * {@inheritDoc}
      */
-    public function hasTransactionType(PaymentMethodContract $paymentMethod): string
+    public function hasTransactionType(PaymentMethodContract $paymentMethod): bool
     {
         $hasTransactionType = $this->has($this->getBookingModeKey($paymentMethod));
         return $hasTransactionType && !empty($this->getTransactionType($paymentMethod));

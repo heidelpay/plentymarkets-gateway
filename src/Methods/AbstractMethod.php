@@ -25,7 +25,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     const CONFIG_KEY = 'abstract';
     const DEFAULT_NAME = 'Abstract Payment Method';
     const KEY = 'ABSTRACT';
-    const ICON = '';
+    const DEFAULT_ICON_PATH = '/images/logos/default_payment_icon.png';
     const TRANSACTION_TYPE = '';
 
     /**
@@ -177,9 +177,14 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function getIcon(): string
     {
-        /** @var Application */
-        $app = pluginApp(Application::class);
-        return $app->getUrlPath('heidelpay'). static::ICON;
+        $iconPath = $this->config->getIcon($this);
+        if (empty($iconPath)) {
+            /** @var Application */
+            $app = pluginApp(Application::class);
+            $iconPath = $app->getUrlPath('heidelpay'). static::DEFAULT_ICON_PATH;
+        }
+
+        return $iconPath;
     }
 
     /**

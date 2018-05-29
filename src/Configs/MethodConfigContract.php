@@ -94,6 +94,14 @@ interface MethodConfigContract
     public function getTransactionType(PaymentMethodContract $paymentMethod): string;
 
     /**
+     * Returns the configured payment icon path.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     * @return string
+     */
+    public function getIcon(PaymentMethodContract $paymentMethod): string;
+
+    /**
      * Returns true if the configured booking mode is debit.
      *
      * @param PaymentMethodContract $paymentMethod

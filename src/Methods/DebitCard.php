@@ -19,5 +19,5 @@ class DebitCard extends AbstractMethod
     const CONFIG_KEY = 'debitcard';
     const KEY = 'DEBIT_CARD';
     const DEFAULT_NAME = 'Debit Card';
-    const ICON = '';
+    const DEFAULT_ICON_PATH = '/images/logos/card_payment_icon.png';
 }

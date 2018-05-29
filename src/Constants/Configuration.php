@@ -33,8 +33,7 @@ class Configuration
     const KEY_DESCRIPTION_INTERNAL = 'infoPage.intern';
     const KEY_DESCRIPTION_EXTERNAL = 'infoPage.extern';
 
-    const KEY_LOGO_USE = 'logo.use';
-    const KEY_LOGO_URL = 'logo.url';
+    const KEY_ICON_PATH = 'iconUrl';
 
     // credit card and debit card specific
     const KEY_DO_REGISTRATION = 'doRegistration';

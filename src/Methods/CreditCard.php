@@ -19,5 +19,5 @@ class CreditCard extends AbstractMethod
     const CONFIG_KEY = 'creditcard';
     const KEY = 'CREDIT_CARD';
     const DEFAULT_NAME = 'Credit Card';
-    const ICON = '/images/logos/cc_icon_xs.png';
+    const DEFAULT_ICON_PATH = '/images/logos/card_payment_icon.png';
 }

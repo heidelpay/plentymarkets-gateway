@@ -127,6 +127,14 @@
           "options": {
             "defaultValue": ""
           }
+        },
+        "creditcard.iconUrl": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.creditcardIconUrl",
+          "options": {
+            "defaultValue": ""
+          }
         }
       }
     },
@@ -206,6 +214,14 @@
           "options": {
             "defaultValue": ""
           }
+        },
+        "debitcard.iconUrl": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.debitcardIconUrl",
+          "options": {
+            "defaultValue": ""
+          }
         }
       }
     },
@@ -250,6 +266,14 @@
           "label": "Config.sofortMaxAmountLabel",
           "options": {
             "defaultValue": "0,00"
+          }
+        },
+        "sofort.iconUrl": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.sofortIconUrl",
+          "options": {
+            "defaultValue": ""
           }
         }
       }
@@ -296,6 +320,14 @@
           "options": {
             "defaultValue": "0,00"
           }
+        },
+        "paypal.iconUrl": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.paypalIconUrl",
+          "options": {
+            "defaultValue": ""
+          }
         }
       }
     },
@@ -340,6 +372,14 @@
           "label": "Config.prepaymentMaxAmountLabel",
           "options": {
             "defaultValue": "0,00"
+          }
+        },
+        "prepayment.iconUrl": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.prepaymentIconUrl",
+          "options": {
+            "defaultValue": ""
           }
         }
       }

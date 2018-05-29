@@ -186,6 +186,14 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
     /**
      * {@inheritDoc}
      */
+    public function getIcon(PaymentMethodContract $paymentMethod): string
+    {
+        return $this->get($this->getIconPathKey($paymentMethod));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function hasTransactionType(PaymentMethodContract $paymentMethod): bool
     {
         $hasTransactionType = $this->has($this->getBookingModeKey($paymentMethod));
@@ -366,6 +374,18 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
     protected function getBookingModeKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_BOOKING_MODE);
+    }
+
+    /**
+     * Returns the key of the icon path parameter.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     *
+     * @return string
+     */
+    protected function getIconPathKey(PaymentMethodContract $paymentMethod): string
+    {
+        return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_ICON_PATH);
     }
     //</editor-fold>
 }

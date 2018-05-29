@@ -28,7 +28,7 @@
           "required": false,
           "label": "Config.mainSenderIdLabel",
           "options": {
-            "defaultValue": ""
+            "defaultValue": "31HA07BC8142C5A171745D00AD63D182"
           }
         },
         "main.login": {
@@ -36,7 +36,7 @@
           "required": false,
           "label": "Config.mainLoginLabel",
           "options": {
-            "defaultValue": ""
+            "defaultValue": "31ha07bc8142c5a171744e5aef11ffd3"
           }
         },
         "main.password": {
@@ -44,7 +44,7 @@
           "required": false,
           "label": "Config.mainPasswordLabel",
           "options": {
-            "defaultValue": "",
+            "defaultValue": "93167DE7",
             "isPassword": true,
             "isIBAN": false
           }
@@ -75,7 +75,7 @@
           "required": false,
           "label": "Config.creditcardChannelIdLabel",
           "options": {
-            "defaultValue": ""
+            "defaultValue": "31HA07BC8142C5A171749A60D979B6E4"
           }
         },
         "creditcard.minAmount": {
@@ -154,7 +154,7 @@
           "required": false,
           "label": "Config.debitcardChannelIdLabel",
           "options": {
-            "defaultValue": ""
+            "defaultValue": "31HA07BC8142C5A171749A60D979B6E4"
           }
         },
         "debitcard.minAmount": {
@@ -233,7 +233,7 @@
           "required": false,
           "label": "Config.sofortChannelIdLabel",
           "options": {
-            "defaultValue": ""
+            "defaultValue": "31HA07BC8142C5A171749CDAA43365D2"
           }
         },
         "sofort.minAmount": {
@@ -278,7 +278,7 @@
           "required": false,
           "label": "Config.paypalChannelIdLabel",
           "options": {
-            "defaultValue": ""
+            "defaultValue": "31HA07BC8142C5A171749A60D979B6E4"
           }
         },
         "paypal.minAmount": {
@@ -323,7 +323,7 @@
           "required": false,
           "label": "Config.prepaymentChannelIdLabel",
           "options": {
-            "defaultValue": ""
+            "defaultValue": "31HA07BC8142C5A171749A60D979B6E4"
           }
         },
         "prepayment.minAmount": {

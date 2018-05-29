@@ -2,7 +2,6 @@
 
 namespace Heidelpay\Services;
 
-use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Constants\Plugin;
 use Heidelpay\Constants\Routes;
 use Heidelpay\Constants\Salutation;
@@ -109,10 +108,6 @@ class PaymentService
      * @var FrontendSessionStorageFactoryContract
      */
     private $sessionStorageFactory;
-    /**
-     * @var MethodConfigContract
-     */
-    private $methodConfig;
 
     /**
      * PaymentService constructor.
@@ -127,7 +122,6 @@ class PaymentService
      * @param PaymentHelper $paymentHelper
      * @param Twig $twig
      * @param FrontendSessionStorageFactoryContract $sessionStorageFactory
-     * @param MethodConfigContract $methodConfig
      */
     public function __construct(
         AddressRepositoryContract $addressRepository,
@@ -139,8 +133,7 @@ class PaymentService
         TransactionRepositoryContract $transactionRepo,
         PaymentHelper $paymentHelper,
         Twig $twig,
-        FrontendSessionStorageFactoryContract $sessionStorageFactory,
-        MethodConfigContract $methodConfig
+        FrontendSessionStorageFactoryContract $sessionStorageFactory
     ) {
         $this->addressRepository = $addressRepository;
         $this->countryRepository = $countryRepository;
@@ -152,7 +145,6 @@ class PaymentService
         $this->paymentHelper = $paymentHelper;
         $this->twig = $twig;
         $this->sessionStorageFactory = $sessionStorageFactory;
-        $this->methodConfig = $methodConfig;
     }
 
     /**
@@ -242,7 +234,7 @@ class PaymentService
 
         $result = $this->libService->sendTransactionRequest($className, [
             'request' => $this->heidelpayRequest,
-            'transactionType' => $this->methodConfig->getTransactionType($paymentMethod)
+            'transactionType' => $paymentMethod->getTransactionType()
         ]);
 
         return $result;

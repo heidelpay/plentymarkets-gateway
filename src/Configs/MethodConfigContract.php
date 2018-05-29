@@ -128,5 +128,13 @@ interface MethodConfigContract
      * @return string
      */
     public function getPaymentMethodKey(string $paymentMethod): string;
+
+    /**
+     * Returns true if the given parameter exists and is not empty.
+     *
+     * @param PaymentMethodContract $paymentMethod
+     * @return string
+     */
+    public function hasTransactionType(PaymentMethodContract $paymentMethod): string;
     //</editor-fold>
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace Heidelpay\Methods;
+use Heidelpay\Constants\TransactionType;
 
 /**
  * heidelpay Sofort. Payment Method
@@ -19,4 +20,5 @@ class Sofort extends AbstractMethod
     const CONFIG_KEY = 'sofort';
     const KEY = 'SOFORT';
     const DEFAULT_NAME = 'Sofort.';
+    const TRANSACTION_TYPE = TransactionType::AUTHORIZE;
 }

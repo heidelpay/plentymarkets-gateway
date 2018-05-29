@@ -49,6 +49,19 @@ class BaseConfig
     }
 
     /**
+     * Return true if the parameter exists.
+     * @param string $key
+     * @return mixed
+     */
+    protected function has(string $key)
+    {
+        $value = $this->config->has($key);
+        $this->getLogger(__METHOD__)
+            ->debug('heidelpay:payment.debugHasConfigKey', ['key' => $key, 'value' => $value ? 'true': 'false']);
+        return $value;
+    }
+
+    /**
      * Returns the complete config key (plugin name + config key) for a given key.
      *
      * @param string $key

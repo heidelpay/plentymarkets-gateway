@@ -26,6 +26,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     const DEFAULT_NAME = 'Abstract Payment Method';
     const KEY = 'ABSTRACT';
     const ICON = '';
+    const TRANSACTION_TYPE = '';
 
     /**
      * @var PaymentHelper $helper
@@ -187,5 +188,22 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     public function getDescription(): string
     {
         return $this->config->getMethodDescription($this);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @throws \RuntimeException
+     */
+    public function getTransactionType(): string
+    {
+        if (!empty(static::TRANSACTION_TYPE)) {
+            return static::TRANSACTION_TYPE;
+        }
+
+        if (!$this->config->hasTransactionType($this)) {
+            // todo: Add error message?
+            throw new \RuntimeException(self::class . ': Transaction type undefined!');
+        }
+        return $this->config->getTransactionType($this);
     }
 }

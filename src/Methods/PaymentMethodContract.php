@@ -101,4 +101,11 @@ interface PaymentMethodContract
      * @return string
      */
     public static function getPaymentMethodDefaultName(): string;
+
+    /**
+     * Returns the php-payment-api transaction method to be called.
+     *
+     * @return string
+     */
+    public function getTransactionType(): string;
 }

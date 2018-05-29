@@ -188,7 +188,14 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function getIcon(PaymentMethodContract $paymentMethod): string
     {
-        return $this->get($this->getIconPathKey($paymentMethod));
+        $iconPath = $this->get($this->getIconPathKey($paymentMethod));
+        $pathElements = explode('.', $iconPath);
+        $fileType = \is_array($pathElements) ? strtolower(end($pathElements)) : '';
+        if (\in_array($fileType, ['gif','jpg','png'])) {
+            return $iconPath;
+        }
+
+        return '';
     }
 
     /**

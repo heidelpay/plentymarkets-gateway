@@ -117,6 +117,7 @@ class ResponseController extends Controller
             return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_SUCCESS;
         }
 
+        // todo: add error message
         return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
     }
 

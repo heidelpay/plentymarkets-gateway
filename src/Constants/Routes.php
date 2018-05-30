@@ -25,4 +25,6 @@ class Routes
 
     const CHECKOUT_SUCCESS = self::BASE_URI . 'checkoutSuccess';
     const CHECKOUT_CANCEL = self::BASE_URI . 'checkoutCancel';
+
+    const SEND_PAYMENT_REQUEST = self::BASE_URI . 'sendPaymentRequest';
 }

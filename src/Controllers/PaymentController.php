@@ -6,6 +6,7 @@ use Heidelpay\Services\PaymentService;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * heidelpay Payment Controller
@@ -23,6 +24,8 @@ use Plenty\Plugin\Http\Response;
  */
 class PaymentController extends Controller
 {
+    use Loggable;
+
     /**
      * @var Request $request
      */
@@ -65,6 +68,21 @@ class PaymentController extends Controller
      */
     public function checkoutCancel(): \Symfony\Component\HttpFoundation\Response
     {
+        return $this->response->redirectTo('checkout');
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function sendPaymentRequest(): \Symfony\Component\HttpFoundation\Response
+    {
+        // perform request
+        // ack -> intern umleiten auf place-order
+        // nok -> intern umleiten auf checkout
+
+
+        $this->getLogger(__METHOD__)->error('Request', [$this->request]);
+
         return $this->response->redirectTo('checkout');
     }
 }

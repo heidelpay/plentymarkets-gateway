@@ -284,9 +284,8 @@ class PaymentService
                 break;
 
             case DirectDebit::class:
-                $instance = pluginApp(DirectDebit::class);
                 $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_HTML);
-                $result = $this->sendGetPaymentMethodContentRequest($basket, $instance, $mopId);
+                $result = $this->twig->render('heidelpay::directDebitForm');
                 break;
 
             case Prepayment::class:
@@ -331,17 +330,10 @@ class PaymentService
                 }
 
                 if (\in_array($paymentMethod, self::CARD_METHODS, true)) {
-                    $urlKey = 'FRONTEND.PAYMENT_FRAME_URL';
                     return $this->twig->render('heidelpay::externalCardForm', [
-                        'paymentFrameUrl' => $result['response'][$urlKey]
+                        'paymentFrameUrl' => $result['response']['FRONTEND.PAYMENT_FRAME_URL']
                     ]);
                 }
-
-                $urlKey = 'FRONTEND.REDIRECT_URL';
-                return $this->twig->render('heidelpay::directDebitForm', [
-                    'paymentFrameUrl' => $result['response'][$urlKey]
-                ]);
-
             }
 
             // return the redirect url, if present.

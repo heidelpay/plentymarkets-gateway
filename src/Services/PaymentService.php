@@ -285,7 +285,8 @@ class PaymentService
 
             case DirectDebit::class:
                 $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_HTML);
-                $result = $this->twig->render('heidelpay::directDebitForm');
+                $result = $this->twig
+                    ->render('heidelpay::directDebitForm', ['submitUrl' => Routes::SEND_PAYMENT_REQUEST]);
                 break;
 
             case Prepayment::class:

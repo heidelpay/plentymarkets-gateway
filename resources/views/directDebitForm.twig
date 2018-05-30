@@ -1,0 +1,33 @@
+<div id="heidelpayForm" class="container-fluid">
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+
+            {{ dump() }}
+
+            {#<iframe src="{{ paymentFrameUrl }}" id="heidelpayIFrame"></iframe>#}
+            {#<input#}
+                    {#type="text"#}
+                    {#name="AccountOwner"#}
+                    {#:value="paymentProvider.id"#}
+                    {#:checked="methodOfPaymentId === paymentProvider.id"#}
+                    {#:disabled="!paymentProvider.isSelectable"#}
+            {#>#}
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-3">
+            <a class="btn btn-secondary btn-block" id="heidelpayCancelBtn" role="button" href="/checkout">
+                {{ trans('heidelpay::template.cancel') }}
+            </a>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary btn-block" id="heidelpaySubmitBtn">
+                {{ trans('heidelpay::template.payNow') }}
+            </button>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>

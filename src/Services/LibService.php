@@ -5,6 +5,7 @@ namespace Heidelpay\Services;
 use Heidelpay\Constants\Plugin;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\DebitCard;
+use Heidelpay\Methods\DirectDebit;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
@@ -127,6 +128,10 @@ class LibService
                 return $this->sendSofortTransactionRequest($params);
                 break;
 
+            case DirectDebit::class:
+                return $this->sendDirectDebitTransactionRequest($params);
+                break;
+
             case PayPal::class:
                 return $this->sendPayPalTransactionRequest($params);
                 break;
@@ -174,6 +179,18 @@ class LibService
     protected function sendSofortTransactionRequest(array $params): array
     {
         return $this->executeLibCall('sofortTransactionRequest', $params);
+    }
+
+    /**
+     * Submits a request for a Direct Debit transaction.
+     *
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function sendDirectDebitTransactionRequest(array $params): array
+    {
+        return $this->executeLibCall('directdebitTransactionRequest', $params);
     }
 
     /**

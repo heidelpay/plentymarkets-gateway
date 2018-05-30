@@ -9,7 +9,7 @@ use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\DebitCard;
-use Heidelpay\Methods\PayPal;
+use Heidelpay\Methods\DirectDebit;
 use Heidelpay\Methods\Sofort;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Repositories\TransactionRepository;
@@ -111,6 +111,11 @@ class HeidelpayServiceProvider extends ServiceProvider
                     $event->setValue($paymentService->getPaymentMethodContent(Sofort::class, $basket, $mop));
                     $event->setType($paymentService->getReturnType());
                 }
+
+                if ($mop === $paymentHelper->getPaymentMethodId(DirectDebit::class)) {
+                    $event->setValue($paymentService->getPaymentMethodContent(DirectDebit::class, $basket, $mop));
+                    $event->setType($paymentService->getReturnType());
+                }
             }
         );
 
@@ -134,6 +139,11 @@ class HeidelpayServiceProvider extends ServiceProvider
 
                 if ($mop === $paymentHelper->getPaymentMethodId(Sofort::class)) {
                     $event->setValue($paymentService->executePayment(Sofort::class, $event));
+                    $event->setType($paymentService->getReturnType());
+                }
+
+                if ($mop === $paymentHelper->getPaymentMethodId(DirectDebit::class)) {
+                    $event->setValue($paymentService->executePayment(DirectDebit::class, $event));
                     $event->setType($paymentService->getReturnType());
                 }
 

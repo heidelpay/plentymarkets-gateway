@@ -1,0 +1,23 @@
+<?php
+
+namespace Heidelpay\Methods;
+
+/**
+ * heidelpay Direct Debit Payment Method
+ *
+ * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
+ * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
+ *
+ * @link http://dev.heidelpay.com/plentymarkets-gateway
+ *
+ * @author Simon Gabriel <development@heidelpay.com>
+ *
+ * @package heidelpay\plentymarkets-gateway\payment-methods
+ */
+class DirectDebit extends AbstractMethod
+{
+    const CONFIG_KEY = 'directdebit';
+    const KEY = 'DIRECT_DEBIT';
+    const DEFAULT_NAME = 'Direct Debit';
+    const ICON = '';
+}

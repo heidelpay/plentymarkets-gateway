@@ -19,6 +19,7 @@ use Heidelpay\Constants\Plugin;
 use Heidelpay\Constants\TransactionType;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\DebitCard;
+use Heidelpay\Methods\DirectDebit;
 use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
@@ -51,6 +52,11 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
             self::ARRAY_KEY_CONFIG_KEY => DebitCard::CONFIG_KEY,
             self::ARRAY_KEY_KEY => DebitCard::KEY,
             self::ARRAY_KEY_DEFAULT_NAME => DebitCard::DEFAULT_NAME,
+        ],
+        DirectDebit::class => [
+            self::ARRAY_KEY_CONFIG_KEY => DirectDebit::CONFIG_KEY,
+            self::ARRAY_KEY_KEY => DirectDebit::KEY,
+            self::ARRAY_KEY_DEFAULT_NAME => DirectDebit::DEFAULT_NAME,
         ],
         Prepayment::class => [
             self::ARRAY_KEY_CONFIG_KEY => Prepayment::CONFIG_KEY,

@@ -1,18 +1,29 @@
+<style>
+    #heidelpayForm iframe {
+        border: none;
+        height: 16rem;
+        width: 100%;
+    }
+</style>
+
 <div id="heidelpayForm" class="container-fluid">
     <div class="row">
         <div class="col-md-3"></div>
         <div class="col-md-6">
-
-            {{ dump() }}
-
-            {#<iframe src="{{ paymentFrameUrl }}" id="heidelpayIFrame"></iframe>#}
-            {#<input#}
-                    {#type="text"#}
-                    {#name="AccountOwner"#}
-                    {#:value="paymentProvider.id"#}
-                    {#:checked="methodOfPaymentId === paymentProvider.id"#}
-                    {#:disabled="!paymentProvider.isSelectable"#}
-            {#>#}
+            <div data-validate="text" class="input-unit">
+                <input name="accountOwner" autocomplete="fullname" id="txtAccountOwner" type="text">
+                <label for="txtAccountOwner">{{ trans('heidelpay::template.accountOwner') }}</label>
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div data-validate="text" class="input-unit">
+                <input name="iban" autocomplete="iban" id="txtIban" type="text">
+                <label for="txtIban">{{ trans('heidelpay::template.accountIban') }}</label>
+            </div>
         </div>
         <div class="col-md-3"></div>
     </div>

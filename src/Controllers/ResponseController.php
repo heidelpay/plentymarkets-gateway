@@ -89,6 +89,7 @@ class ResponseController extends Controller
         // get all post parameters except the 'plentyMarkets' one injected by the plentymarkets core.
         // also scrap the 'lang' parameter which will be sent when e.g. PayPal is being used.
         $postResponse = $this->request->except(['plentyMarkets', 'lang']);
+        ksort($postResponse);
 
         $response = $this->paymentService->handleAsyncPaymentResponse(['response' => $postResponse]);
         $this->getLogger(__METHOD__)->debug('heidelpay::response.debugReceivedResponse', [

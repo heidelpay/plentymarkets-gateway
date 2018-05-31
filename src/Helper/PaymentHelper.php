@@ -7,6 +7,13 @@ use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Constants\Plugin;
 use Heidelpay\Constants\TransactionStatus;
 use Heidelpay\Constants\TransactionType;
+use Heidelpay\Methods\CreditCard;
+use Heidelpay\Methods\DebitCard;
+use Heidelpay\Methods\DirectDebit;
+use Heidelpay\Methods\PaymentMethodContract;
+use Heidelpay\Methods\PayPal;
+use Heidelpay\Methods\Prepayment;
+use Heidelpay\Methods\Sofort;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
@@ -317,5 +324,71 @@ class PaymentHelper
         $paymentProperty->value = $value;
 
         return $paymentProperty;
+    }
+
+    /**
+     * @param $mop
+     * @return string
+     */
+    public function mapMopToPaymentMethod($mop): string
+    {
+        $paymentMethod = '';
+
+        if ($mop === $this->getPaymentMethodId(CreditCard::class)) {
+            $paymentMethod = CreditCard::class;
+        }
+
+        if ($mop === $this->getPaymentMethodId(DebitCard::class)) {
+            $paymentMethod = DebitCard::class;
+        }
+
+        if ($mop === $this->getPaymentMethodId(Sofort::class)) {
+            $paymentMethod = Sofort::class;
+        }
+
+        if ($mop === $this->getPaymentMethodId(DirectDebit::class)) {
+            $paymentMethod = DirectDebit::class;
+        }
+        return $paymentMethod;
+    }
+
+    /**
+     * @param string $paymentMethod
+     * @return PaymentMethodContract|null
+     */
+    public function getPaymentMethodInstance(string $paymentMethod)
+    {
+        /** @var PaymentMethodContract $instance */
+        $instance = null;
+
+        switch ($paymentMethod) {
+            case CreditCard::class:
+                $instance = pluginApp(CreditCard::class);
+                break;
+
+            case DebitCard::class:
+                $instance = pluginApp(DebitCard::class);
+                break;
+
+            case PayPal::class:
+                $instance = pluginApp(PayPal::class);
+                break;
+
+            case Sofort::class:
+                $instance = pluginApp(Sofort::class);
+                break;
+
+            case Prepayment::class:
+                $instance = pluginApp(Sofort::class);
+                break;
+
+            case DirectDebit::class:
+                $instance = pluginApp(Sofort::class);
+                break;
+
+            default:
+                break;
+        }
+        return $instance;
     }
 }

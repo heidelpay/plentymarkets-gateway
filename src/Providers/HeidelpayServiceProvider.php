@@ -7,10 +7,6 @@ use Heidelpay\Configs\MainConfigContract;
 use Heidelpay\Configs\MethodConfig;
 use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
-use Heidelpay\Methods\CreditCard;
-use Heidelpay\Methods\DebitCard;
-use Heidelpay\Methods\DirectDebit;
-use Heidelpay\Methods\Sofort;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Repositories\TransactionRepository;
 use Heidelpay\Services\PaymentService;
@@ -90,31 +86,11 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $paymentService
             ) {
                 $mop = $event->getMop();
-                $basket = $basketRepository->load();
-                $paymentMethod = '';
-
-                if ($mop === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
-                    $paymentMethod = CreditCard::class;
-                }
-
-                if ($mop === $paymentHelper->getPaymentMethodId(DebitCard::class)) {
-                    $paymentMethod = DebitCard::class;
-                }
-
-                if ($mop === $paymentHelper->getPaymentMethodId(Sofort::class)) {
-                    $paymentMethod = Sofort::class;
-                }
-
-                if ($mop === $paymentHelper->getPaymentMethodId(DirectDebit::class)) {
-                    $paymentMethod = DirectDebit::class;
-                }
+                $paymentMethod = $paymentHelper->mapMopToPaymentMethod($mop);
 
                 if (!empty($paymentMethod)) {
+                    $basket = $basketRepository->load();
                     list($type, $value) = $paymentService->getPaymentMethodContent($paymentMethod, $basket, $mop);
-                    $this->getLogger(__METHOD__)->debug(
-                        'heidelpay::payment.debugPaymentMethodContent',
-                        ['PaymentMethod' => $paymentMethod, 'value' => $value, 'type' => $type]
-                    );
 
                     $event->setValue($value);
                     $event->setType($type);
@@ -130,23 +106,7 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $paymentService
             ) {
                 $mop = $event->getMop();
-                $paymentMethod = '';
-
-                if ($mop === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
-                    $paymentMethod = CreditCard::class;
-                }
-
-                if ($mop === $paymentHelper->getPaymentMethodId(DebitCard::class)) {
-                    $paymentMethod = DebitCard::class;
-                }
-
-                if ($mop === $paymentHelper->getPaymentMethodId(Sofort::class)) {
-                    $paymentMethod = Sofort::class;
-                }
-
-                if ($mop === $paymentHelper->getPaymentMethodId(DirectDebit::class)) {
-                    $paymentMethod = DirectDebit::class;
-                }
+                $paymentMethod = $paymentHelper->mapMopToPaymentMethod($mop);
 
                 if (!empty($paymentMethod)) {
                     list($type, $value) = $paymentService->executePayment($paymentMethod, $event);

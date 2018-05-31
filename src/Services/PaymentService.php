@@ -11,11 +11,7 @@ use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\AbstractMethod;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\DebitCard;
-use Heidelpay\Methods\DirectDebit;
 use Heidelpay\Methods\PaymentMethodContract;
-use Heidelpay\Methods\PayPal;
-use Heidelpay\Methods\Prepayment;
-use Heidelpay\Methods\Sofort;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Transaction;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
@@ -236,7 +232,7 @@ class PaymentService
         $value = '';
 
         /** @var AbstractMethod $methodInstance */
-        $methodInstance = $this->getPaymentMethodInstance($paymentMethod);
+        $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
 
         if (!$methodInstance instanceof PaymentMethodContract) {
             $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
@@ -298,7 +294,11 @@ class PaymentService
             }
 
             // return the payment frame url, if it is needed
-            return $response['response']['FRONTEND.PAYMENT_FRAME_URL'];
+            if (\array_key_exists('FRONTEND.PAYMENT_FRAME_URL', $response['response'])) {
+                return $response['response']['FRONTEND.PAYMENT_FRAME_URL'];
+            }
+
+            return $response['response']['FRONTEND.REDIRECT_URL'];
         }
 
         // return the redirect url, if present.
@@ -547,62 +547,6 @@ class PaymentService
         }
 
         return false;
-    }
-
-    /**
-     * @param string $paymentMethod
-     * @return PaymentMethodContract|null
-     */
-    protected function getPaymentMethodInstance(string $paymentMethod)
-    {
-        /** @var PaymentMethodContract $instance */
-        $instance = null;
-
-        switch ($paymentMethod) {
-            case CreditCard::class:
-                $instance = pluginApp(CreditCard::class);
-                break;
-
-            case DebitCard::class:
-                $instance = pluginApp(DebitCard::class);
-                break;
-
-            case PayPal::class:
-                $instance = pluginApp(PayPal::class);
-                break;
-
-            case Sofort::class:
-                $instance = pluginApp(Sofort::class);
-                break;
-
-            case Prepayment::class:
-                $instance = pluginApp(Sofort::class);
-                break;
-
-            case DirectDebit::class:
-                $instance = pluginApp(Sofort::class);
-                break;
-
-            default:
-                break;
-        }
-        return $instance;
-    }
-
-    /**
-     * Returns the transaction type returned by the payment method.
-     *
-     * @param $paymentMethod
-     * @return string
-     * @throws \RuntimeException
-     */
-    public function getTransactionType($paymentMethod): string
-    {
-        $methodInstance = $this->getPaymentMethodInstance($paymentMethod);
-        if (!$methodInstance instanceof PaymentMethodContract) {
-            throw new \RuntimeException('Error creating payment instance.');
-        }
-        return $methodInstance->getTransactionType();
     }
 
     /**

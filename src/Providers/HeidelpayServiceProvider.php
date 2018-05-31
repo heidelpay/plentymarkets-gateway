@@ -111,6 +111,10 @@ class HeidelpayServiceProvider extends ServiceProvider
 
                 if (!empty($paymentMethod)) {
                     list($type, $value) = $paymentService->getPaymentMethodContent($paymentMethod, $basket, $mop);
+                    $this->getLogger(__METHOD__)->debug(
+                        'heidelpay::payment.debugPaymentMethodContent',
+                        ['PaymentMethod' => $paymentMethod, 'value' => $value, 'type' => $type]
+                    );
 
                     $event->setValue($value);
                     $event->setType($type);

@@ -241,16 +241,17 @@ class PaymentService
         if (!$methodInstance instanceof PaymentMethodContract) {
             $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
             $value = 'heidelpay::payment.errorInternalErrorTryAgainLater';
-            return ['type' => $type, 'value' => $value];
+            return [$type, $value];
         }
 
         $type = $methodInstance->getReturnType();
 
         if ($type === GetPaymentMethodContent::RETURN_TYPE_CONTINUE) {
-            return ['type' => $type, 'value' => $value];
+            return [$type, $value];
         }
 
         if ($methodInstance->hasToBeInitialized()) {
+            // todo: merge calls into one
             $result = $this->sendPaymentRequest($basket, $paymentMethod, $methodInstance->getTransactionType(), $mopId);
             try {
                 $value = $this->handleSyncResponse($type, $result);
@@ -280,7 +281,7 @@ class PaymentService
                 break;
         }
 
-        return ['type' => $type, 'value' => $value];
+        return array($type, $value);
     }
 
     /**
@@ -629,6 +630,8 @@ class PaymentService
      */
     protected function renderPaymentForm(string $template, array $parameters = []): string
     {
-        return $this->twig->render($template, $parameters);
+        $render = $this->twig->render($template, $parameters);
+        $this->getLogger(__METHOD__)->error($template, ['parameters' => $parameters, 'result' => $render]);
+        return $render;
     }
 }

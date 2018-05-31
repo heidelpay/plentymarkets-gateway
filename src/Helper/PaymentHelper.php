@@ -334,21 +334,24 @@ class PaymentHelper
     {
         $paymentMethod = '';
 
-        if ($mop === $this->getPaymentMethodId(CreditCard::class)) {
-            $paymentMethod = CreditCard::class;
+        switch ($mop) {
+            case $this->getPaymentMethodId(CreditCard::class):
+                $paymentMethod = CreditCard::class;
+                break;
+            case $this->getPaymentMethodId(DebitCard::class):
+                $paymentMethod = DebitCard::class;
+                break;
+            case $this->getPaymentMethodId(Sofort::class):
+                $paymentMethod = Sofort::class;
+                break;
+            case $this->getPaymentMethodId(DirectDebit::class):
+                $paymentMethod = DirectDebit::class;
+                break;
+            default:
+                // do nothing
+                break;
         }
 
-        if ($mop === $this->getPaymentMethodId(DebitCard::class)) {
-            $paymentMethod = DebitCard::class;
-        }
-
-        if ($mop === $this->getPaymentMethodId(Sofort::class)) {
-            $paymentMethod = Sofort::class;
-        }
-
-        if ($mop === $this->getPaymentMethodId(DirectDebit::class)) {
-            $paymentMethod = DirectDebit::class;
-        }
         return $paymentMethod;
     }
 
@@ -379,11 +382,11 @@ class PaymentHelper
                 break;
 
             case Prepayment::class:
-                $instance = pluginApp(Sofort::class);
+                $instance = pluginApp(Prepayment::class);
                 break;
 
             case DirectDebit::class:
-                $instance = pluginApp(Sofort::class);
+                $instance = pluginApp(DirectDebit::class);
                 break;
 
             default:

@@ -1,4 +1,4 @@
-{% extends "baseForm.html.twig" %}
+{% extends "baseForm.twig" %}
 
 {% block content %}
     <form id="paymentFrameForm" action="{{ paymentFrameUrl }}" method="post">
@@ -23,6 +23,6 @@
             <div class="col-md-3"></div>
         </div>
 
-        {% include "partials/cancelSubmitButtons.html.twig" %}
+        {% include "partials/cancelSubmitButtons.twig" %}
     </form>
 {% endblock %}

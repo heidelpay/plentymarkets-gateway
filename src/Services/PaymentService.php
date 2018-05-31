@@ -8,6 +8,7 @@ use Heidelpay\Constants\Salutation;
 use Heidelpay\Constants\SessionKeys;
 use Heidelpay\Constants\TransactionStatus;
 use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Methods\AbstractMethod;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\DirectDebit;
@@ -51,11 +52,6 @@ class PaymentService
     use Loggable;
 
     const CARD_METHODS = [CreditCard::class, DebitCard::class];
-
-    /**
-     * @var string
-     */
-    private $returnType;
 
     /**
      * @var array
@@ -149,34 +145,14 @@ class PaymentService
     }
 
     /**
-     * Returns the return type, which should be one of the following:
-     * redirectUrl, externalContentUrl, htmlContent, errorCode, continue
-     *
-     * @return string
-     */
-    public function getReturnType(): string
-    {
-        return $this->returnType;
-    }
-
-    /**
-     * @param string $type
-     */
-    private function setReturnType(string $type)
-    {
-        $this->getLogger(__METHOD__)->debug('heidelpay::payment.debugSettingReturnType', ['type' => $type]);
-        $this->returnType = $type;
-    }
-
-    /**
      * Executes payment tasks after an order has been created.
      *
      * @param string         $paymentMethod
      * @param ExecutePayment $event
      *
-     * @return string
+     * @return array
      */
-    public function executePayment(string $paymentMethod, ExecutePayment $event): string
+    public function executePayment(string $paymentMethod, ExecutePayment $event): array
     {
         $this->getLogger(__METHOD__)->debug('heidelpay::payment.debugExecutePayment', [
             'paymentMethod' => $paymentMethod,
@@ -202,40 +178,41 @@ class PaymentService
 
         if (!($transaction instanceof Transaction) ||
             !isset($transactionDetails['PRESENTATION.AMOUNT'], $transactionDetails['PRESENTATION.CURRENCY'])) {
-            $this->setReturnType('error');
-            return 'heidelpay::error.errorDuringPaymentExecution';
+            return ['error', 'heidelpay::error.errorDuringPaymentExecution'];
         }
 
         $plentyPayment = $this->createPlentyPayment($transaction, $transaction->paymentMethodId);
         if (!($plentyPayment instanceof Payment)) {
-            $this->setReturnType('error');
-            return 'heidelpay::error.errorDuringPaymentExecution';
+            return ['error', 'heidelpay::error.errorDuringPaymentExecution'];
         }
 
         $this->paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $event->getOrderId());
 
-        $this->setReturnType('success');
-        return 'heidelpay::info.infoPaymentSuccessful';
+        return ['success', 'heidelpay::info.infoPaymentSuccessful'];
     }
 
     /**
      * @param Basket $basket
-     * @param PaymentMethodContract $paymentMethod
-     * @param int    $mopId
+     * @param string $paymentMethod
+     * @param string $transactionType
+     * @param int $mopId
+     * @param array $parameters
      *
      * @return array
      */
-    private function sendGetPaymentMethodContentRequest(
+    public function sendPaymentRequest(
         Basket $basket,
-        PaymentMethodContract $paymentMethod,
-        int $mopId
+        string $paymentMethod,
+        string $transactionType,
+        int $mopId,
+        array $parameters = []
     ): array {
-        $className = \get_class($paymentMethod);
-        $this->prepareRequest($basket, $className, $mopId);
+        $this->prepareRequest($basket, $paymentMethod, $mopId);
 
-        $result = $this->libService->sendTransactionRequest($className, [
+        $result = $this->libService->sendTransactionRequest($paymentMethod, [
             'request' => $this->heidelpayRequest,
-            'transactionType' => $paymentMethod->getTransactionType()
+            'transactionType' => $transactionType,
+            'parameters' => $parameters
         ]);
 
         return $result;
@@ -249,106 +226,95 @@ class PaymentService
      * @param Basket $basket
      * @param int    $mopId
      *
-     * @return string
+     * @return array
      */
     public function getPaymentMethodContent(
         string $paymentMethod,
         Basket $basket,
         int $mopId
-    ): string {
-        $result = '';
+    ): array {
+        $value = '';
 
-        switch ($paymentMethod) {
-            case CreditCard::class:
-                $instance = pluginApp(CreditCard::class);
-                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_HTML);
-                $result = $this->sendGetPaymentMethodContentRequest($basket, $instance, $mopId);
+        /** @var AbstractMethod $methodInstance */
+        $methodInstance = $this->getPaymentMethodInstance($paymentMethod);
+
+        if (!$methodInstance instanceof PaymentMethodContract) {
+            $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
+            $value = 'heidelpay::payment.errorInternalErrorTryAgainLater';
+            return ['type' => $type, 'value' => $value];
+        }
+
+        $type = $methodInstance->getReturnType();
+
+        if ($type === GetPaymentMethodContent::RETURN_TYPE_CONTINUE) {
+            return ['type' => $type, 'value' => $value];
+        }
+
+        if ($methodInstance->hasToBeInitialized()) {
+            $result = $this->sendPaymentRequest($basket, $paymentMethod, $methodInstance->getTransactionType(), $mopId);
+            try {
+                $value = $this->handleSyncResponse($type, $result);
+            } catch (\RuntimeException $e) {
+                $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
+                $value = $e->getMessage();
+            }
+        }
+
+        switch ($type) {
+            case GetPaymentMethodContent::RETURN_TYPE_EXTERNAL_CONTENT_URL:
+                $value = $this->renderPaymentForm(
+                    $methodInstance->getFormTemplate(),
+                    ['paymentFrameUrl' => $value, 'paymentMethod' => $paymentMethod]
+                );
                 break;
-
-            case DebitCard::class:
-                $instance = pluginApp(DebitCard::class);
-                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_HTML);
-                $result = $this->sendGetPaymentMethodContentRequest($basket, $instance, $mopId);
+            case GetPaymentMethodContent::RETURN_TYPE_HTML:
+                $value = $this->renderPaymentForm(
+                    $methodInstance->getFormTemplate(),
+                    ['formSubmitUrl' => Routes::SEND_PAYMENT_REQUEST, 'mopId' => $mopId, 'paymentMethod' => $paymentMethod]
+                );
                 break;
-
-            case PayPal::class:
-                $instance = pluginApp(PayPal::class);
-                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
-                $result = $this->sendGetPaymentMethodContentRequest($basket, $instance, $mopId);
-                break;
-
-            case Sofort::class:
-                $instance = pluginApp(Sofort::class);
-                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL);
-                $result = $this->sendGetPaymentMethodContentRequest($basket, $instance, $mopId);
-                break;
-
-            case DirectDebit::class:
-                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_HTML);
-                $result = $this->twig
-                    ->render('heidelpay::directDebitForm', ['submitUrl' => Routes::SEND_PAYMENT_REQUEST]);
-                break;
-
-            case Prepayment::class:
-                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_CONTINUE);
-                break;
-
             default:
-                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
-                $result = 'heidelpay::payment.errorInternalErrorTryAgainLater';
+                // do nothing in any other case
                 break;
         }
 
-        if (\in_array($this->getReturnType(), [
-            GetPaymentMethodContent::RETURN_TYPE_ERROR,
-            GetPaymentMethodContent::RETURN_TYPE_CONTINUE
-        ], true)) {
-            return $result;
+        return ['type' => $type, 'value' => $value];
+    }
+
+    /**
+     * @param string $type
+     * @param $response
+     * @return mixed
+     * @throws \RuntimeException
+     */
+    private function handleSyncResponse(string $type, $response)
+    {
+        if (!\is_array($response)) {
+            return $response;
         }
 
-        if (\is_array($result)) {
-            // return the exception message, if present.
-            if (isset($result['exceptionCode'])) {
-                $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
-                return $result['exceptionMsg'];
-            }
-
-            // return the iFrame url, if present.
-            if ($this->getReturnType() === GetPaymentMethodContent::RETURN_TYPE_EXTERNAL_CONTENT_URL) {
-                if (!$result['isSuccess']) {
-                    $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
-                    return $result['response']['PROCESSING.RETURN'];
-                }
-
-                return $result['response']['FRONTEND.PAYMENT_FRAME_URL'];
-            }
-
-            // return rendered html content
-            if ($this->getReturnType() === GetPaymentMethodContent::RETURN_TYPE_HTML) {
-                if (!$result['isSuccess']) {
-                    $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
-                    return $result['response']['PROCESSING.RETURN'];
-                }
-
-                if (\in_array($paymentMethod, self::CARD_METHODS, true)) {
-                    return $this->twig->render('heidelpay::externalCardForm', [
-                        'paymentFrameUrl' => $result['response']['FRONTEND.PAYMENT_FRAME_URL']
-                    ]);
-                }
-            }
-
-            // return the redirect url, if present.
-            if ($this->getReturnType() === GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL) {
-                if (!$result['isSuccess']) {
-                    $this->setReturnType(GetPaymentMethodContent::RETURN_TYPE_ERROR);
-                    return $result['response']['PROCESSING.RETURN'];
-                }
-
-                return $result['response']['FRONTEND.REDIRECT_URL'];
-            }
+        // return the exception message, if present.
+        if (isset($response['exceptionCode'])) {
+            throw new \RuntimeException($response['exceptionCode']);
         }
 
-        return $result;
+        // return rendered html content
+        $haystack = [GetPaymentMethodContent::RETURN_TYPE_HTML, GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL];
+        if (!$response['isSuccess'] && \in_array($type, $haystack, true)) {
+            throw new \RuntimeException($response['response']['PROCESSING.RETURN']);
+        }
+
+        // return the payment frame url, if it is needed
+        if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
+            return $response['response']['FRONTEND.PAYMENT_FRAME_URL'];
+        }
+
+        // return the redirect url, if present.
+        if ($type === GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL) {
+            return $response['response']['FRONTEND.REDIRECT_URL'];
+        }
+
+        return $response;
     }
 
     /**
@@ -430,6 +396,7 @@ class PaymentService
         $this->getLogger(__METHOD__)->debug('heidelpay::request.debugPreparingRequest', $this->heidelpayRequest);
     }
 
+    //<editor-fold desc="Handlers">
     /**
      * Handles the asynchronous response coming from the heidelpay API.
      *
@@ -453,6 +420,7 @@ class PaymentService
     {
         return $this->libService->handlePushNotification($post);
     }
+    //</editor-fold>
 
     /**
      * Submits the Basket to the Basket-API and returns its ID.
@@ -587,5 +555,73 @@ class PaymentService
         }
 
         return false;
+    }
+
+    /**
+     * @param string $paymentMethod
+     * @return PaymentMethodContract|null
+     */
+    protected function getPaymentMethodInstance(string $paymentMethod)
+    {
+        /** @var PaymentMethodContract $instance */
+        $instance = null;
+
+        switch ($paymentMethod) {
+            case CreditCard::class:
+                $instance = pluginApp(CreditCard::class);
+                break;
+
+            case DebitCard::class:
+                $instance = pluginApp(DebitCard::class);
+                break;
+
+            case PayPal::class:
+                $instance = pluginApp(PayPal::class);
+                break;
+
+            case Sofort::class:
+                $instance = pluginApp(Sofort::class);
+                break;
+
+            case Prepayment::class:
+                $instance = pluginApp(Sofort::class);
+                break;
+
+            case DirectDebit::class:
+                $instance = pluginApp(Sofort::class);
+                break;
+
+            default:
+                break;
+        }
+        return $instance;
+    }
+
+    /**
+     * Returns the transaction type returned by the payment method.
+     *
+     * @param $paymentMethod
+     * @return string
+     * @throws \RuntimeException
+     */
+    public function getTransactionType($paymentMethod): string
+    {
+        $methodInstance = $this->getPaymentMethodInstance($paymentMethod);
+        if (!$methodInstance instanceof PaymentMethodContract) {
+            throw new \RuntimeException('Error creating payment instance.');
+        }
+        return $methodInstance->getTransactionType();
+    }
+
+    /**
+     * Renders the given template injecting the parameters
+     *
+     * @param string $template
+     * @param array $parameters
+     * @return string
+     */
+    protected function renderPaymentForm(string $template, array $parameters = []): string
+    {
+        return $this->twig->render($template, $parameters);
     }
 }

@@ -108,4 +108,18 @@ interface PaymentMethodContract
      * @return string
      */
     public function getTransactionType(): string;
+
+    /**
+     * Returns true if the payment has to be initialized with transaction (i.e. to fetch redirect url).
+     *
+     * @return bool
+     */
+    public function hasToBeInitialized(): bool;
+
+    /**
+     * Returns the template of the payment form.
+     *
+     * @return string
+     */
+    public function getFormTemplate(): string;
 }

@@ -1,7 +1,4 @@
 <?php
-
-namespace Heidelpay\Methods;
-
 /**
  * heidelpay Prepayment Payment Method
  *
@@ -14,9 +11,15 @@ namespace Heidelpay\Methods;
  *
  * @package heidelpay\plentymarkets-gateway\payment-methods
  */
+namespace Heidelpay\Methods;
+
+use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
+
 class PayPal extends AbstractMethod
 {
     const CONFIG_KEY = 'paypal';
     const KEY = 'PAYPAL';
     const DEFAULT_NAME = 'PayPal';
+    const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL;
+    const INITIALIZE_PAYMENT = true;
 }

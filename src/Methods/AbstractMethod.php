@@ -5,6 +5,7 @@ namespace Heidelpay\Methods;
 use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Plugin\Application;
 
@@ -27,6 +28,9 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     const KEY = 'ABSTRACT';
     const DEFAULT_ICON_PATH = '/images/logos/default_payment_icon.png';
     const TRANSACTION_TYPE = '';
+    const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL;
+    const INITIALIZE_PAYMENT = true;
+    const FORM_TEMPLATE = '';
 
     /**
      * @var PaymentHelper $helper
@@ -210,5 +214,35 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
             throw new \RuntimeException(self::class . ': Transaction type undefined!');
         }
         return $this->config->getTransactionType($this);
+    }
+
+    /**
+     * Returns the type of the result returned by the payment method initialization.
+     *
+     * @return string
+     */
+    public function getReturnType(): string
+    {
+        return static::RETURN_TYPE;
+    }
+
+    /**
+     * Returns true if the payment has to be initialized with transaction (i.e. to fetch redirect url).
+     *
+     * @return bool
+     */
+    public function hasToBeInitialized(): bool
+    {
+        return static::INITIALIZE_PAYMENT;
+    }
+
+    /**
+     * Returns the template of the payment form.
+     *
+     * @return string
+     */
+    public function getFormTemplate(): string
+    {
+        return static::FORM_TEMPLATE;
     }
 }

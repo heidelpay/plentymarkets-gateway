@@ -1,6 +1,7 @@
 <?php
 
 namespace Heidelpay\Methods;
+use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 
 /**
  * heidelpay Credit Card Payment Method
@@ -20,4 +21,7 @@ class CreditCard extends AbstractMethod
     const KEY = 'CREDIT_CARD';
     const DEFAULT_NAME = 'Credit Card';
     const DEFAULT_ICON_PATH = '/images/logos/card_payment_icon.png';
+    const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_HTML;
+    const INITIALIZE_PAYMENT = true;
+    const FORM_TEMPLATE = '';
 }

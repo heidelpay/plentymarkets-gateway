@@ -1,7 +1,4 @@
 <?php
-
-namespace Heidelpay\Methods;
-
 /**
  * heidelpay Debit Card Payment Method
  *
@@ -14,10 +11,17 @@ namespace Heidelpay\Methods;
  *
  * @package heidelpay\plentymarkets-gateway\payment-methods
  */
+namespace Heidelpay\Methods;
+
+use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
+
 class DebitCard extends AbstractMethod
 {
     const CONFIG_KEY = 'debitcard';
     const KEY = 'DEBIT_CARD';
     const DEFAULT_NAME = 'Debit Card';
     const DEFAULT_ICON_PATH = '/images/logos/card_payment_icon.png';
+    const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_HTML;
+    const INITIALIZE_PAYMENT = true;
+    const FORM_TEMPLATE = '';
 }

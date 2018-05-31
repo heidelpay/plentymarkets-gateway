@@ -3,6 +3,7 @@
 namespace Heidelpay\Controllers;
 
 use Heidelpay\Services\PaymentService;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -40,19 +41,29 @@ class PaymentController extends Controller
      * @var PaymentService
      */
     private $paymentService;
+    /**
+     * @var BasketRepositoryContract
+     */
+    private $basketRepo;
 
     /**
      * ResponseController constructor.
      *
-     * @param Request        $request
-     * @param Response       $response
+     * @param Request $request
+     * @param Response $response
      * @param PaymentService $paymentService
+     * @param BasketRepositoryContract $basketRepo
      */
-    public function __construct(Request $request, Response $response, PaymentService $paymentService)
-    {
+    public function __construct(
+        Request $request,
+        Response $response,
+        PaymentService $paymentService,
+        BasketRepositoryContract $basketRepo
+    ) {
         $this->request = $request;
         $this->response = $response;
         $this->paymentService = $paymentService;
+        $this->basketRepo = $basketRepo;
     }
 
     /**
@@ -73,15 +84,24 @@ class PaymentController extends Controller
 
     /**
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \RuntimeException
      */
     public function sendPaymentRequest(): \Symfony\Component\HttpFoundation\Response
     {
         // perform request
         // ack -> intern umleiten auf place-order
         // nok -> intern umleiten auf checkout
+        $postRequest = $this->request->except(['plentyMarkets', 'lang', 'mopId', 'paymentMethod']);
+        $mopId = $this->request->only(['mopId'])['mopId'];
+        $paymentMethod = $this->request->only(['paymentMethod'])['paymentMethod'];
+        $transactionType = $this->paymentService->getTransactionType($paymentMethod);
+        $basket = $this->basketRepo->load();
 
+        $this->getLogger(__METHOD__)
+            ->error('Request', [$postRequest, $mopId, $paymentMethod, $transactionType, $basket]);
 
-        $this->getLogger(__METHOD__)->error('Request', [$this->request]);
+        $this->paymentService->sendPaymentRequest($basket, $paymentMethod, $transactionType, $mopId);
+
 
         return $this->response->redirectTo('checkout');
     }

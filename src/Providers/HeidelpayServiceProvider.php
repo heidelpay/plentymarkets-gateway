@@ -55,14 +55,14 @@ class HeidelpayServiceProvider extends ServiceProvider
      *
      * @param BasketRepositoryContract $basketRepository
      * @param PaymentHelper            $paymentHelper
-     * @param PaymentMethodContainer   $paymentMethodContainer
+     * @param PaymentMethodContainer   $methodContainer
      * @param PaymentService           $paymentService
      * @param Dispatcher               $eventDispatcher
      */
     public function boot(
         BasketRepositoryContract $basketRepository,
         PaymentHelper $paymentHelper,
-        PaymentMethodContainer $paymentMethodContainer,
+        PaymentMethodContainer $methodContainer,
         PaymentService $paymentService,
         Dispatcher $eventDispatcher
     ) {
@@ -74,7 +74,7 @@ class HeidelpayServiceProvider extends ServiceProvider
             $this->getLogger(__METHOD__)->debug('heidelpay:payment.debugRegisterPaymentMethod', [$paymentMethodClass]);
 
             // register the payment method in the payment method container
-            $paymentMethodContainer->register(
+            $methodContainer->register(
                 $paymentHelper->getPluginPaymentMethodKey($paymentMethodClass),
                 $paymentMethodClass,
                 $paymentHelper->getPaymentMethodEventList()
@@ -91,30 +91,29 @@ class HeidelpayServiceProvider extends ServiceProvider
             ) {
                 $mop = $event->getMop();
                 $basket = $basketRepository->load();
-
-//                if ($mop === $paymentHelper->getPaymentMethodId(PayPal::class)) {
-//                    $event->setValue($paymentService->getPaymentMethodContent(PayPal::class, $basket, $mop));
-//                    $event->setType($paymentService->getReturnType());
-//                }
+                $paymentMethod = '';
 
                 if ($mop === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
-                    $event->setValue($paymentService->getPaymentMethodContent(CreditCard::class, $basket, $mop));
-                    $event->setType($paymentService->getReturnType());
+                    $paymentMethod = CreditCard::class;
                 }
 
                 if ($mop === $paymentHelper->getPaymentMethodId(DebitCard::class)) {
-                    $event->setValue($paymentService->getPaymentMethodContent(DebitCard::class, $basket, $mop));
-                    $event->setType($paymentService->getReturnType());
+                    $paymentMethod = DebitCard::class;
                 }
 
                 if ($mop === $paymentHelper->getPaymentMethodId(Sofort::class)) {
-                    $event->setValue($paymentService->getPaymentMethodContent(Sofort::class, $basket, $mop));
-                    $event->setType($paymentService->getReturnType());
+                    $paymentMethod = Sofort::class;
                 }
 
                 if ($mop === $paymentHelper->getPaymentMethodId(DirectDebit::class)) {
-                    $event->setValue($paymentService->getPaymentMethodContent(DirectDebit::class, $basket, $mop));
-                    $event->setType($paymentService->getReturnType());
+                    $paymentMethod = DirectDebit::class;
+                }
+
+                if (!empty($paymentMethod)) {
+                    list($type, $value) = $paymentService->getPaymentMethodContent($paymentMethod, $basket, $mop);
+
+                    $event->setValue($value);
+                    $event->setType($type);
                 }
             }
         );
@@ -127,30 +126,30 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $paymentService
             ) {
                 $mop = $event->getMop();
+                $paymentMethod = '';
+
                 if ($mop === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
-                    $event->setValue($paymentService->executePayment(CreditCard::class, $event));
-                    $event->setType($paymentService->getReturnType());
+                    $paymentMethod = CreditCard::class;
                 }
 
                 if ($mop === $paymentHelper->getPaymentMethodId(DebitCard::class)) {
-                    $event->setValue($paymentService->executePayment(DebitCard::class, $event));
-                    $event->setType($paymentService->getReturnType());
+                    $paymentMethod = DebitCard::class;
                 }
 
                 if ($mop === $paymentHelper->getPaymentMethodId(Sofort::class)) {
-                    $event->setValue($paymentService->executePayment(Sofort::class, $event));
-                    $event->setType($paymentService->getReturnType());
+                    $paymentMethod = Sofort::class;
                 }
 
                 if ($mop === $paymentHelper->getPaymentMethodId(DirectDebit::class)) {
-                    $event->setValue($paymentService->executePayment(DirectDebit::class, $event));
-                    $event->setType($paymentService->getReturnType());
+                    $paymentMethod = DirectDebit::class;
                 }
 
-//                if ($mop === $paymentHelper->getPaymentMethodId(PayPal::class)) {
-//                    $event->setValue($paymentService->executePayment(PayPal::class, $event));
-//                    $event->setType($paymentService->getReturnType());
-//                }
+                if (!empty($paymentMethod)) {
+                    list($type, $value) = $paymentService->executePayment($paymentMethod, $event);
+
+                    $event->setValue($value);
+                    $event->setType($type);
+                }
             }
         );
     }

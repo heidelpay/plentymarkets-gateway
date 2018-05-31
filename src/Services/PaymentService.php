@@ -260,28 +260,14 @@ class PaymentService
                 $this->getLogger(__METHOD__)->error('Error in response', [$type, $e->getMessage()]);
                 $value = $e->getMessage();
             }
+
+            if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
+                // $value should contain the payment frame url (also form url)
+                $value = $this->renderPaymentForm($methodInstance->getFormTemplate(), ['paymentFrameUrl' => $value]);
+            }
         }
 
-        switch ($paymentMethod) {
-            case CreditCard::class:
-            case DebitCard::class:
-                $value = $this->renderPaymentForm(
-                    $methodInstance->getFormTemplate(),
-                    ['paymentFrameUrl' => $value, 'paymentMethod' => $paymentMethod]
-                );
-                break;
-            case DirectDebit::class:
-                $value = $this->renderPaymentForm(
-                    $methodInstance->getFormTemplate(),
-                    ['formSubmitUrl' => Routes::SEND_PAYMENT_REQUEST, 'mopId' => $mopId, 'paymentMethod' => $paymentMethod]
-                );
-                break;
-            default:
-                // do nothing in any other case
-                break;
-        }
-
-        return array($type, $value);
+        return [$type, $value];
     }
 
     /**
@@ -311,14 +297,12 @@ class PaymentService
                 throw new \RuntimeException($response['response']['PROCESSING.RETURN']);
             }
 
-            $this->getLogger(__METHOD__)->error('paymentFrameUrl', [$response['response']['FRONTEND.PAYMENT_FRAME_URL']]);
             // return the payment frame url, if it is needed
             return $response['response']['FRONTEND.PAYMENT_FRAME_URL'];
         }
 
         // return the redirect url, if present.
         if ($type === GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL) {
-            $this->getLogger(__METHOD__)->error('Redirect url', [$response['response']['FRONTEND.REDIRECT_URL']]);
             return $response['response']['FRONTEND.REDIRECT_URL'];
         }
 

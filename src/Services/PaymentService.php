@@ -256,18 +256,20 @@ class PaymentService
                 $value = $this->handleSyncResponse($type, $result);
             } catch (\RuntimeException $e) {
                 $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
+                $this->getLogger(__METHOD__)->error('Error in response', [$type, $e->getMessage()]);
                 $value = $e->getMessage();
             }
         }
 
-        switch ($type) {
-            case GetPaymentMethodContent::RETURN_TYPE_EXTERNAL_CONTENT_URL:
+        switch ($paymentMethod) {
+            case CreditCard::class:
+            case DebitCard::class:
                 $value = $this->renderPaymentForm(
                     $methodInstance->getFormTemplate(),
                     ['paymentFrameUrl' => $value, 'paymentMethod' => $paymentMethod]
                 );
                 break;
-            case GetPaymentMethodContent::RETURN_TYPE_HTML:
+            case DirectDebit::class:
                 $value = $this->renderPaymentForm(
                     $methodInstance->getFormTemplate(),
                     ['formSubmitUrl' => Routes::SEND_PAYMENT_REQUEST, 'mopId' => $mopId, 'paymentMethod' => $paymentMethod]
@@ -289,7 +291,11 @@ class PaymentService
      */
     private function handleSyncResponse(string $type, $response)
     {
+        $this->getLogger(__METHOD__)->error('Response', [$type,$response]);
+
         if (!\is_array($response)) {
+            $this->getLogger(__METHOD__)->error('Not array');
+
             return $response;
         }
 
@@ -299,18 +305,19 @@ class PaymentService
         }
 
         // return rendered html content
-        $haystack = [GetPaymentMethodContent::RETURN_TYPE_HTML, GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL];
-        if (!$response['isSuccess'] && \in_array($type, $haystack, true)) {
-            throw new \RuntimeException($response['response']['PROCESSING.RETURN']);
-        }
-
-        // return the payment frame url, if it is needed
         if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
+            if (!$response['isSuccess']) {
+                throw new \RuntimeException($response['response']['PROCESSING.RETURN']);
+            }
+
+            $this->getLogger(__METHOD__)->error('paymentFrameUrl', [$response['response']['FRONTEND.PAYMENT_FRAME_URL']]);
+            // return the payment frame url, if it is needed
             return $response['response']['FRONTEND.PAYMENT_FRAME_URL'];
         }
 
         // return the redirect url, if present.
         if ($type === GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL) {
+            $this->getLogger(__METHOD__)->error('Redirect url', [$response['response']['FRONTEND.REDIRECT_URL']]);
             return $response['response']['FRONTEND.REDIRECT_URL'];
         }
 

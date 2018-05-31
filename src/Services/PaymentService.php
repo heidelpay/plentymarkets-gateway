@@ -251,6 +251,7 @@ class PaymentService
             $result = $this->sendPaymentRequest($basket, $paymentMethod, $methodInstance->getTransactionType(), $mopId);
             try {
                 $value = $this->handleSyncResponse($type, $result);
+                $this->getLogger(__METHOD__)->error('result', [$value]);
             } catch (\RuntimeException $e) {
                 $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
                 $this->getLogger(__METHOD__)->error('Error in response', [$type, $e->getMessage()]);
@@ -305,6 +306,7 @@ class PaymentService
         if ($type === GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL) {
             return $response['response']['FRONTEND.REDIRECT_URL'];
         }
+
 
         return $response;
     }

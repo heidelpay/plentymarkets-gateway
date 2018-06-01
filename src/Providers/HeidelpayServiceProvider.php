@@ -17,7 +17,6 @@ use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
 use Plenty\Plugin\Events\Dispatcher;
-use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\ServiceProvider;
 
 /**
@@ -34,8 +33,6 @@ use Plenty\Plugin\ServiceProvider;
  */
 class HeidelpayServiceProvider extends ServiceProvider
 {
-    use Loggable;
-
     /**
      * Register the heidelpay Service Providers.
      */
@@ -70,8 +67,6 @@ class HeidelpayServiceProvider extends ServiceProvider
         // loop through all of the plugin's available payment methods
         /** @var string $paymentMethodClass */
         foreach (MethodConfig::getPaymentMethods() as $paymentMethodClass) {
-            $this->getLogger(__METHOD__)->debug('heidelpay:payment.debugRegisterPaymentMethod', [$paymentMethodClass]);
-
             // register the payment method in the payment method container
             $methodContainer->register(
                 $paymentHelper->getPluginPaymentMethodKey($paymentMethodClass),

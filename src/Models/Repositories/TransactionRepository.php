@@ -6,7 +6,6 @@ use Heidelpay\Constants\TransactionType;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Transaction;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
-use Plenty\Plugin\Log\Loggable;
 
 /**
  * heidelpay Transaction repository class
@@ -22,8 +21,6 @@ use Plenty\Plugin\Log\Loggable;
  */
 class TransactionRepository implements TransactionRepositoryContract
 {
-    use Loggable;
-
     /**
      * @var DataBase
      */

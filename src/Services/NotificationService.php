@@ -133,7 +133,7 @@ class NotificationService implements NotificationServiceContract
      */
     protected function notify($level, $message, $method, array $logData)
     {
-        $message = $this->translator->trans(self::PREFIX . $message);
+        $message = $this->getTranslation($message);
 
         switch ($level) {
             case self::LEVEL_DEBUG:
@@ -151,15 +151,27 @@ class NotificationService implements NotificationServiceContract
                 $this->notifier->warn($message);
                 $this->getLogger($method)->warning($message, $logData);
                 break;
-            case self::LEVEL_CRITICAL:
-                $this->notifier->error($message);
-                $this->getLogger($method)->critical($message, $logData);
-                break;
-            case self::LEVEL_ERROR: // intended Fall-Through (handle unknown levels as Error)
-            default:
+            case self::LEVEL_ERROR:
                 $this->notifier->error($message);
                 $this->getLogger($method)->error($message, $logData);
                 break;
+            case self::LEVEL_CRITICAL: // intended Fall-Through (handle unknown levels as critical)
+            default:
+                // todo: send email to merchant as well?
+                // The client gets a general error message.
+                $this->notifier->error($this->getTranslation('general.errorGeneralErrorTryAgainLater'));
+                $this->getLogger($method)->critical($message, $logData);
+                break;
         }
+    }
+
+    /**
+     * @param $message
+     * @return mixed
+     */
+    protected function getTranslation($message)
+    {
+        $message = $this->translator->trans(self::PREFIX . $message);
+        return $message;
     }
 }

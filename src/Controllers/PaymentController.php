@@ -2,6 +2,7 @@
 
 namespace Heidelpay\Controllers;
 
+use IO\Services\NotificationService;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
@@ -28,16 +29,23 @@ class PaymentController extends Controller
      * @var Response
      */
     private $response;
+    /**
+     * @var NotificationService
+     */
+    private $notification;
 
     /**
      * ResponseController constructor.
      *
      * @param Response $response
+     * @param NotificationService $notification
      */
     public function __construct(
-        Response $response
+        Response $response,
+        NotificationService $notification
     ) {
         $this->response = $response;
+        $this->notification = $notification;
     }
 
     /**
@@ -45,6 +53,7 @@ class PaymentController extends Controller
      */
     public function checkoutSuccess(): \Symfony\Component\HttpFoundation\Response
     {
+        $this->notification->success('heidelpay::payment.infoPaymentSuccessful');
         return $this->response->redirectTo('place-order');
     }
 
@@ -53,6 +62,7 @@ class PaymentController extends Controller
      */
     public function checkoutCancel(): \Symfony\Component\HttpFoundation\Response
     {
+        $this->notification->error('heidelpay::payment.errorDuringPaymentExecution');
         return $this->response->redirectTo('checkout');
     }
 }

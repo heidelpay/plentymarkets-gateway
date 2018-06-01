@@ -42,14 +42,12 @@ class NotificationService implements NotificationServiceContract
 
     /**
      * NotificationService constructor.
-     * @param BaseNotificationService $notifier
      * @param Translator $translator
      */
     public function __construct(
-        BaseNotificationService $notifier,
         Translator $translator
     ) {
-        $this->notifier = $notifier;
+        $this->notifier = pluginApp(BaseNotificationService::class);
         $this->translator = $translator;
     }
 

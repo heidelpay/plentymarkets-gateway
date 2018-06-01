@@ -6,6 +6,7 @@ use IO\Services\NotificationService;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Log\Loggable;
+use Plenty\Plugin\Translation\Translator;
 
 /**
  * heidelpay Payment Controller
@@ -35,6 +36,11 @@ class PaymentController extends Controller
     private $notification;
 
     /**
+     * @var Translator
+     */
+    private $translator;
+
+    /**
      * ResponseController constructor.
      *
      * @param Response $response
@@ -46,6 +52,9 @@ class PaymentController extends Controller
     ) {
         $this->response = $response;
         $this->notification = $notification;
+
+        /** @var Translator $translator */
+        $this->translator = pluginApp(Translator::class);
     }
 
     /**
@@ -53,7 +62,7 @@ class PaymentController extends Controller
      */
     public function checkoutSuccess(): \Symfony\Component\HttpFoundation\Response
     {
-        $this->notification->success('heidelpay::payment.infoPaymentSuccessful');
+        $this->notification->success($this->translator->trans('heidelpay::payment.infoPaymentSuccessful'));
         return $this->response->redirectTo('place-order');
     }
 

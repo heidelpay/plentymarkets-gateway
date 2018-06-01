@@ -54,6 +54,30 @@ class NotificationService implements NotificationServiceContract
     }
 
     /**
+     * Add debug log
+     *
+     * @param string $message
+     * @param string $method
+     * @param array $logData
+     */
+    public function debug($message, $method = 'no method given', array $logData = [])
+    {
+        $this->notify(self::LEVEL_DEBUG, $message, $method, $logData);
+    }
+
+    /**
+     * Add info notification and log
+     *
+     * @param string $message
+     * @param string $method
+     * @param array $logData
+     */
+    public function info($message, $method = 'no method given', array $logData = [])
+    {
+        $this->notify(self::LEVEL_INFO, $message, $method, $logData);
+    }
+
+    /**
      * Add success notification and log
      *
      * @param string $message
@@ -66,6 +90,18 @@ class NotificationService implements NotificationServiceContract
     }
 
     /**
+     * Add warning notification and log
+     *
+     * @param string $message
+     * @param string $method
+     * @param array $logData
+     */
+    public function warning($message, $method = 'no context given', array $logData = [])
+    {
+        $this->notify(self::LEVEL_WARNING, $message, $method, $logData);
+    }
+
+    /**
      * Add error notification and log
      *
      * @param string $message
@@ -75,6 +111,18 @@ class NotificationService implements NotificationServiceContract
     public function error($message, $method = 'no context given', array $logData = [])
     {
         $this->notify(self::LEVEL_ERROR, $message, $method, $logData);
+    }
+
+    /**
+     * Add critical notification and log
+     *
+     * @param string $message
+     * @param string $method
+     * @param array $logData
+     */
+    public function critical($message, $method = 'no context given', array $logData = [])
+    {
+        $this->notify(self::LEVEL_CRITICAL, $message, $method, $logData);
     }
 
     /**

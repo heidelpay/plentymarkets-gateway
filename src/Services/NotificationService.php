@@ -16,6 +16,7 @@ namespace Heidelpay\Services;
 use Heidelpay\Constants\Plugin;
 use IO\Services\NotificationService as BaseNotificationService;
 use Plenty\Plugin\Log\Loggable;
+use Plenty\Plugin\Translation\Translator;
 
 class NotificationService implements NotificationServiceContract
 {
@@ -30,21 +31,26 @@ class NotificationService implements NotificationServiceContract
 
     const PREFIX = Plugin::NAME . '::';
 
-
     /**
      * @var BaseNotificationService
      */
     private $notifier;
-
+    /**
+     * @var Translator
+     */
+    private $translator;
 
     /**
      * NotificationService constructor.
      * @param BaseNotificationService $notifier
+     * @param Translator $translator
      */
     public function __construct(
-        BaseNotificationService $notifier
+        BaseNotificationService $notifier,
+        Translator $translator
     ) {
         $this->notifier = $notifier;
+        $this->translator = $translator;
     }
 
     /**
@@ -71,24 +77,6 @@ class NotificationService implements NotificationServiceContract
         $this->notify(self::LEVEL_ERROR, $message, $method, $logData);
     }
 
-//    /**
-//     * Adds a log message of the given level.
-//     *
-//     * @param $context
-//     * @param $message
-//     * @param $level
-//     * @param array $logData
-//     */
-//    public function justLog($context, $message, $level, array $logData = [])
-//    {
-//
-//
-////        switch ($level) {
-////            case self::LEVEL_DEBUG:
-////
-////        }
-//    }
-
     /**
      * @param $level
      * @param $message
@@ -99,12 +87,32 @@ class NotificationService implements NotificationServiceContract
     {
         $message = self::PREFIX . $message;
 
-        // add notification
-        $this->notifier->$level($message);
 
-        $this->getLogger($method)->$level($message, $logData);
-
-//        // add log
-//        $this->justLog($method, $message, $level, $logData);
+        switch ($level) {
+            case self::LEVEL_DEBUG:
+                $this->getLogger($method)->debug($message, $logData);
+                break;
+            case self::LEVEL_INFO:
+                $this->notifier->info($message);
+                $this->getLogger($method)->info($message, $logData);
+                break;
+            case self::LEVEL_SUCCESS:
+                $this->notifier->success($message);
+                $this->getLogger($method)->debug($message, $logData);
+                break;
+            case self::LEVEL_WARNING:
+                $this->notifier->warn($message);
+                $this->getLogger($method)->warning($message, $logData);
+                break;
+            case self::LEVEL_CRITICAL:
+                $this->notifier->error($message);
+                $this->getLogger($method)->critical($message, $logData);
+                break;
+            case self::LEVEL_ERROR: // intended Fall-Through (handle unknown levels as Error)
+            default:
+                $this->notifier->error($message);
+                $this->getLogger($method)->error($message, $logData);
+                break;
+        }
     }
 }

@@ -11,7 +11,6 @@
  *
  * @package  heidelpay/${Package}
  */
-
 namespace Heidelpay\Services;
 
 interface NotificationServiceContract

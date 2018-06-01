@@ -7,6 +7,7 @@ use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\PaymentService;
+use IO\Services\NotificationService;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -54,28 +55,35 @@ class ResponseController extends Controller
      * @var TransactionService
      */
     private $transactionService;
+    /**
+     * @var NotificationService
+     */
+    private $notification;
 
     /**
      * ResponseController constructor.
      *
-     * @param Request            $request
-     * @param Response           $response
-     * @param PaymentHelper      $paymentHelper
-     * @param PaymentService     $paymentService
+     * @param Request $request
+     * @param Response $response
+     * @param PaymentHelper $paymentHelper
+     * @param PaymentService $paymentService
      * @param TransactionService $transactionService
+     * @param NotificationService $notification
      */
     public function __construct(
         Request $request,
         Response $response,
         PaymentHelper $paymentHelper,
         PaymentService $paymentService,
-        TransactionService $transactionService
+        TransactionService $transactionService,
+        NotificationService $notification
     ) {
         $this->request = $request;
         $this->response = $response;
         $this->paymentHelper = $paymentHelper;
         $this->paymentService = $paymentService;
         $this->transactionService = $transactionService;
+        $this->notification = $notification;
     }
 
     /**
@@ -110,15 +118,17 @@ class ResponseController extends Controller
                 'data' => $response['response']
             ]);
 
+            $this->notification->error('heidelpay::payment.errorTransactionNotCreated');
             return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
         }
 
         // if the transaction is successful or pending, return the success url.
         if ($response['isSuccess'] || $response['isPending']) {
+            $this->notification->success('heidelpay::payment.infoPaymentSuccessful');
             return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_SUCCESS;
         }
 
-        // todo: add error message
+        $this->notification->error('heidelpay::payment.errorDuringPaymentExecution');
         return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
     }
 

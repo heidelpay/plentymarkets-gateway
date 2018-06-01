@@ -28,7 +28,6 @@ use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentOrderRelation;
 use Plenty\Modules\Payment\Models\PaymentProperty;
-use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Templates\Twig;
 
 /**
@@ -45,8 +44,6 @@ use Plenty\Plugin\Templates\Twig;
  */
 class PaymentService
 {
-    use Loggable;
-
     const CARD_METHODS = [CreditCard::class, DebitCard::class];
 
     /**
@@ -101,6 +98,10 @@ class PaymentService
      * @var FrontendSessionStorageFactoryContract
      */
     private $sessionStorageFactory;
+    /**
+     * @var NotificationServiceContract
+     */
+    private $notification;
 
     /**
      * PaymentService constructor.
@@ -109,35 +110,38 @@ class PaymentService
      * @param CountryRepositoryContract $countryRepository
      * @param LibService $libraryService
      * @param OrderRepositoryContract $orderRepository
-     * @param PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository
+     * @param PaymentOrderRelationRepositoryContract $paymentOrderRelRepo
      * @param PaymentRepositoryContract $paymentRepository
      * @param TransactionRepositoryContract $transactionRepo
      * @param PaymentHelper $paymentHelper
      * @param Twig $twig
-     * @param FrontendSessionStorageFactoryContract $sessionStorageFactory
+     * @param FrontendSessionStorageFactoryContract $sessionStorageFac
+     * @param NotificationServiceContract $notification
      */
     public function __construct(
         AddressRepositoryContract $addressRepository,
         CountryRepositoryContract $countryRepository,
         LibService $libraryService,
         OrderRepositoryContract $orderRepository,
-        PaymentOrderRelationRepositoryContract $paymentOrderRelationRepository,
+        PaymentOrderRelationRepositoryContract $paymentOrderRelRepo,
         PaymentRepositoryContract $paymentRepository,
         TransactionRepositoryContract $transactionRepo,
         PaymentHelper $paymentHelper,
         Twig $twig,
-        FrontendSessionStorageFactoryContract $sessionStorageFactory
+        FrontendSessionStorageFactoryContract $sessionStorageFac,
+        NotificationServiceContract $notification
     ) {
         $this->addressRepository = $addressRepository;
         $this->countryRepository = $countryRepository;
         $this->libService = $libraryService;
         $this->orderRepository = $orderRepository;
-        $this->paymentOrderRelationRepository = $paymentOrderRelationRepository;
+        $this->paymentOrderRelationRepository = $paymentOrderRelRepo;
         $this->paymentRepository = $paymentRepository;
         $this->transactionRepository = $transactionRepo;
         $this->paymentHelper = $paymentHelper;
         $this->twig = $twig;
-        $this->sessionStorageFactory = $sessionStorageFactory;
+        $this->sessionStorageFactory = $sessionStorageFac;
+        $this->notification = $notification;
     }
 
     /**
@@ -150,11 +154,8 @@ class PaymentService
      */
     public function executePayment(string $paymentMethod, ExecutePayment $event): array
     {
-        $this->getLogger(__METHOD__)->debug('heidelpay::payment.debugExecutePayment', [
-            'paymentMethod' => $paymentMethod,
-            'mopId' => $event->getMop(),
-            'orderId' => $event->getOrderId()
-        ]);
+        $logData = ['paymentMethod' => $paymentMethod, 'mopId' => $event->getMop(), 'orderId' => $event->getOrderId()];
+        $this->notification->debug('heidelpay::payment.debugExecutePayment', __METHOD__, $logData);
 
         $transactionDetails = [];
         $transaction = null;
@@ -162,9 +163,7 @@ class PaymentService
         // Retrieve heidelpay Transaction by txnId to get values needed for plenty payment (e.g. amount etc).
         $transactionId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
         $transactions = $this->transactionRepository->getTransactionsByTxnId($transactionId);
-        $this->getLogger(__METHOD__)->critical('Transactions', $transactions);
         foreach ($transactions as $transaction) {
-            $this->getLogger(__METHOD__)->critical('Transaction', $transaction);
             $allowedStatus = [TransactionStatus::ACK, TransactionStatus::PENDING];
             if (\in_array($transaction->status, $allowedStatus, false)) {
                 $transactionDetails = $transaction->transactionDetails;
@@ -247,14 +246,13 @@ class PaymentService
         }
 
         if ($methodInstance->hasToBeInitialized()) {
-            // todo: merge calls into one
             $result = $this->sendPaymentRequest($basket, $paymentMethod, $methodInstance->getTransactionType(), $mopId);
             try {
                 $value = $this->handleSyncResponse($type, $result);
-                $this->getLogger(__METHOD__)->error('result', [$value]);
             } catch (\RuntimeException $e) {
                 $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
-                $this->getLogger(__METHOD__)->error('Error in response', [$type, $e->getMessage()]);
+                $logData = [$type, $e->getMessage()];
+                $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__, $logData);
                 $value = $e->getMessage();
             }
 
@@ -275,11 +273,7 @@ class PaymentService
      */
     private function handleSyncResponse(string $type, $response)
     {
-        $this->getLogger(__METHOD__)->error('Response', [$type,$response]);
-
         if (!\is_array($response)) {
-            $this->getLogger(__METHOD__)->error('Not array');
-
             return $response;
         }
 
@@ -386,8 +380,6 @@ class PaymentService
             $this->paymentHelper->getDomain() . '/' . Routes::PUSH_NOTIFICATION_URL;
 
         // TODO: Riskinformation for future payment methods
-
-        $this->getLogger(__METHOD__)->debug('heidelpay::request.debugPreparingRequest', $this->heidelpayRequest);
     }
 
     //<editor-fold desc="Handlers">
@@ -525,7 +517,8 @@ class PaymentService
         // create the payment
         $payment->properties = $paymentProperty;
         $payment->regenerateHash = true;
-        $this->getLogger(__METHOD__)->debug('heidelpay::payment.debugCreatePlentyPayment', [$payment]);
+
+        $this->notification->debug('heidelpay::payment.debugCreatePlentyPayment', __METHOD__, ['Payment' => $payment]);
 
         return $this->paymentRepository->createPayment($payment);
     }
@@ -560,8 +553,6 @@ class PaymentService
      */
     protected function renderPaymentForm(string $template, array $parameters = []): string
     {
-        $render = $this->twig->render($template, $parameters);
-        $this->getLogger(__METHOD__)->error($template, ['parameters' => $parameters, 'result' => $render]);
-        return $render;
+        return $this->twig->render($template, $parameters);
     }
 }

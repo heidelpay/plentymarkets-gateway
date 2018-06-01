@@ -6,11 +6,11 @@ use Heidelpay\Constants\Routes;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
+use Heidelpay\Services\NotificationService;
 use Heidelpay\Services\PaymentService;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
-use Plenty\Plugin\Log\Loggable;
 
 /**
  * heidelpay Response Controller
@@ -28,8 +28,6 @@ use Plenty\Plugin\Log\Loggable;
  */
 class ResponseController extends Controller
 {
-    use Loggable;
-
     /**
      * @var Request $request
      */
@@ -54,6 +52,10 @@ class ResponseController extends Controller
      * @var TransactionService
      */
     private $transactionService;
+    /**
+     * @var NotificationService
+     */
+    private $notification;
 
     /**
      * ResponseController constructor.
@@ -63,19 +65,22 @@ class ResponseController extends Controller
      * @param PaymentHelper $paymentHelper
      * @param PaymentService $paymentService
      * @param TransactionService $transactionService
+     * @param NotificationService $notification
      */
     public function __construct(
         Request $request,
         Response $response,
         PaymentHelper $paymentHelper,
         PaymentService $paymentService,
-        TransactionService $transactionService
+        TransactionService $transactionService,
+        NotificationService $notification
     ) {
         $this->request = $request;
         $this->response = $response;
         $this->paymentHelper = $paymentHelper;
         $this->paymentService = $paymentService;
         $this->transactionService = $transactionService;
+        $this->notification = $notification;
     }
 
     /**
@@ -92,10 +97,9 @@ class ResponseController extends Controller
         ksort($postResponse);
 
         $response = $this->paymentService->handleAsyncPaymentResponse(['response' => $postResponse]);
-        $this->getLogger(__METHOD__)->debug('heidelpay::response.debugReceivedResponse', [
-            'POST response' =>$postResponse,
-            'response' => $response
-        ]);
+
+        $logData = ['POST response' => $postResponse, 'response' => $response];
+        $this->notification->debug('response.debugReceivedResponse', __METHOD__, $logData);
 
         // if something went wrong during the lib call, return the cancel url.
         // exceptionCode = problem inside of the lib, error = error during libCall.
@@ -106,9 +110,8 @@ class ResponseController extends Controller
         // create the transaction entity.
         $newTransaction = $this->transactionService->createTransaction($response);
         if ($newTransaction === null || ! $newTransaction instanceof Transaction) {
-            $this->getLogger(__METHOD__)->error('heidelpay::response.errorTransactionNotCreated', [
-                'data' => $response['response']
-            ]);
+            $logData1 = ['data' => $response['response']];
+            $this->notification->error('response.errorTransactionNotCreated', __METHOD__, $logData1);
 
             return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
         }
@@ -130,8 +133,7 @@ class ResponseController extends Controller
      */
     public function emergencyRedirect(): \Symfony\Component\HttpFoundation\Response
     {
-        $this->getLogger(__METHOD__)->warning('heidelpay::response.warningResponseCalledInInvalidContext');
-
+        $this->notification->warning('response.warningResponseCalledInInvalidContext', __METHOD__);
         return $this->response->redirectTo('checkout');
     }
 
@@ -141,14 +143,14 @@ class ResponseController extends Controller
     public function processPush(): Response
     {
         $postPayload = $this->request->getContent();
-        $this->getLogger(__METHOD__)->debug('heidelpay::response.debugPushNotificationReceived', [
-            'content' => $postPayload,
-        ]);
+
+        $this->notification->debug('response.debugPushNotificationReceived', __METHOD__, ['content' => $postPayload]);
 
         $response = $this->paymentService->handlePushNotification(['xmlContent' => $postPayload]);
 
         if (isset($response['exceptionCode'])) {
-            $this->getLogger(__METHOD__)->error('heidelpay::error.errorResponseContainsErrorCode');
+            $logData = ['Response' => $response];
+            $this->notification->critical('error.errorResponseContainsErrorCode', __METHOD__, $logData);
             return $this->response->make('Not Ok.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 

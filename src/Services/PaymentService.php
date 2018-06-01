@@ -231,7 +231,7 @@ class PaymentService
         $value = '';
 
         /** @var AbstractMethod $methodInstance */
-        $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
+        $methodInstance = $this->getPaymentMethodInstance($paymentMethod);
 
         if (!$methodInstance instanceof PaymentMethodContract) {
             $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
@@ -555,4 +555,43 @@ class PaymentService
     {
         return $this->twig->render($template, $parameters);
     }
+
+    //<editor-fold desc="PaymentHelper Wrapper">
+    /**
+     * Wraps the payment helpers method to enable notification
+     * since base notification service can not be injected into the helper.
+     *
+     * @param $mop
+     * @return string
+     */
+    public function mapMopToPaymentMethod($mop): string
+    {
+        $paymentMethod = $this->paymentHelper->mapMopToPaymentMethod($mop);
+
+        if (empty($paymentMethod)) {
+            $this->notification->critical('general.errorMethodNotFound', __METHOD__, ['mopId' => $mop]);
+        }
+
+        return $paymentMethod;
+    }
+
+    /**
+     * Wraps the payment helpers method to enable notification
+     * since base notification service can not be injected into the helper.
+     *
+     * @param string $paymentMethod
+     * @return PaymentMethodContract|null
+     */
+    public function getPaymentMethodInstance(string $paymentMethod)
+    {
+        $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
+
+        if (!$methodInstance instanceof PaymentMethodContract) {
+            $logData = ['PaymentMethod' => $paymentMethod];
+            $this->notification->critical('general.errorMethodNotFound', __METHOD__, $logData);
+        }
+
+        return $methodInstance;
+    }
+    //</editor-fold>
 }

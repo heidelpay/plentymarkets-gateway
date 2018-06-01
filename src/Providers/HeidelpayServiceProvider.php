@@ -80,11 +80,10 @@ class HeidelpayServiceProvider extends ServiceProvider
             GetPaymentMethodContent::class,
             function (GetPaymentMethodContent $event) use (
                 $basketRepository,
-                $paymentHelper,
                 $paymentService
             ) {
                 $mop = $event->getMop();
-                $paymentMethod = $paymentHelper->mapMopToPaymentMethod($mop);
+                $paymentMethod = $paymentService->mapMopToPaymentMethod($mop);
 
                 if (!empty($paymentMethod)) {
                     $basket = $basketRepository->load();
@@ -100,11 +99,10 @@ class HeidelpayServiceProvider extends ServiceProvider
         $eventDispatcher->listen(
             ExecutePayment::class,
             function (ExecutePayment $event) use (
-                $paymentHelper,
                 $paymentService
             ) {
                 $mop = $event->getMop();
-                $paymentMethod = $paymentHelper->mapMopToPaymentMethod($mop);
+                $paymentMethod = $paymentService->mapMopToPaymentMethod($mop);
 
                 if (!empty($paymentMethod)) {
                     list($type, $value) = $paymentService->executePayment($paymentMethod, $event);

@@ -42,14 +42,11 @@ class NotificationService implements NotificationServiceContract
 
     /**
      * NotificationService constructor.
-     * @param BaseNotificationService $notifier
      * @param Translator $translator
      */
     public function __construct(
-        BaseNotificationService $notifier,
         Translator $translator
     ) {
-        $this->notifier = $notifier;
         $this->translator = $translator;
     }
 
@@ -140,26 +137,26 @@ class NotificationService implements NotificationServiceContract
                 $this->getLogger($method)->debug($message, $logData);
                 break;
             case self::LEVEL_INFO:
-                $this->notifier->info($message);
+                $this->getNotifier()->info($message);
                 $this->getLogger($method)->info($message, $logData);
                 break;
             case self::LEVEL_SUCCESS:
-                $this->notifier->success($message);
+                $this->getNotifier()->success($message);
                 $this->getLogger($method)->debug($message, $logData);
                 break;
             case self::LEVEL_WARNING:
-                $this->notifier->warn($message);
+                $this->getNotifier()->warn($message);
                 $this->getLogger($method)->warning($message, $logData);
                 break;
             case self::LEVEL_ERROR:
-                $this->notifier->error($message);
+                $this->getNotifier()->error($message);
                 $this->getLogger($method)->error($message, $logData);
                 break;
             case self::LEVEL_CRITICAL: // intended Fall-Through (handle unknown levels as critical)
             default:
                 // todo: send email to merchant as well?
                 // The client gets a general error message.
-                $this->notifier->error($this->getTranslation('general.errorGeneralErrorTryAgainLater'));
+                $this->getNotifier()->error($this->getTranslation('general.errorGeneralErrorTryAgainLater'));
                 $this->getLogger($method)->critical($message, $logData);
                 break;
         }
@@ -173,5 +170,17 @@ class NotificationService implements NotificationServiceContract
     {
         $message = $this->translator->trans(self::PREFIX . $message);
         return $message;
+    }
+
+    /**
+     * @return BaseNotificationService
+     */
+    public function getNotifier(): BaseNotificationService
+    {
+        if (!$this->notifier instanceof BaseNotificationService) {
+            $this->notifier = pluginApp(BaseNotificationService::class);
+        }
+
+        return $this->notifier;
     }
 }

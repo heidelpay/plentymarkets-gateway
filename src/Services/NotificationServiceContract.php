@@ -16,6 +16,24 @@ namespace Heidelpay\Services;
 interface NotificationServiceContract
 {
     /**
+     * Add debug log
+     *
+     * @param string $message
+     * @param string $method
+     * @param array $logData
+     */
+    public function debug($message, $method = 'no method given', array $logData = []);
+
+    /**
+     * Add info notification and log
+     *
+     * @param string $message
+     * @param string $method
+     * @param array $logData
+     */
+    public function info($message, $method = 'no method given', array $logData = []);
+
+    /**
      * Add success notification and log
      *
      * @param string $message
@@ -25,6 +43,15 @@ interface NotificationServiceContract
     public function success($message, $method = 'no method given', array $logData = []);
 
     /**
+     * Add warning notification and log
+     *
+     * @param string $message
+     * @param string $method
+     * @param array $logData
+     */
+    public function warning($message, $method = 'no context given', array $logData = []);
+
+    /**
      * Add error notification and log
      *
      * @param string $message
@@ -32,4 +59,13 @@ interface NotificationServiceContract
      * @param array $logData
      */
     public function error($message, $method = 'no context given', array $logData = []);
+
+    /**
+     * Add critical notification and log
+     *
+     * @param string $message
+     * @param string $method
+     * @param array $logData
+     */
+    public function critical($message, $method = 'no context given', array $logData = []);
 }

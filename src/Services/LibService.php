@@ -1,17 +1,4 @@
 <?php
-
-namespace Heidelpay\Services;
-
-use Heidelpay\Constants\Plugin;
-use Heidelpay\Methods\CreditCard;
-use Heidelpay\Methods\DebitCard;
-use Heidelpay\Methods\DirectDebit;
-use Heidelpay\Methods\PayPal;
-use Heidelpay\Methods\Prepayment;
-use Heidelpay\Methods\Sofort;
-use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
-use Plenty\Plugin\Log\Loggable;
-
 /**
  * heidelpay Lib Service class
  *
@@ -24,23 +11,40 @@ use Plenty\Plugin\Log\Loggable;
  *
  * @package heidelpay\plentymarkets-gateway\services
  */
+namespace Heidelpay\Services;
+
+use Heidelpay\Constants\Plugin;
+use Heidelpay\Methods\CreditCard;
+use Heidelpay\Methods\DebitCard;
+use Heidelpay\Methods\DirectDebit;
+use Heidelpay\Methods\PayPal;
+use Heidelpay\Methods\Prepayment;
+use Heidelpay\Methods\Sofort;
+use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
+
 class LibService
 {
-    use Loggable;
-
     /**
      * @var LibraryCallContract
      */
     private $libCall;
+    /**
+     * @var NotificationServiceContract
+     */
+    private $notification;
 
     /**
      * LibService constructor.
      *
      * @param LibraryCallContract $libraryCallContract
+     * @param NotificationServiceContract $notification
      */
-    public function __construct(LibraryCallContract $libraryCallContract)
-    {
+    public function __construct(
+        LibraryCallContract $libraryCallContract,
+        NotificationServiceContract $notification
+    ) {
         $this->libCall = $libraryCallContract;
+        $this->notification = $notification;
     }
 
     //<editor-fold desc="General">
@@ -58,11 +62,8 @@ class LibService
         $libName = $pluginName . '::' . $libCall;
         $result = $this->libCall->call($libName, $params);
 
-        $this->getLogger(__METHOD__)->debug('heidelpay::request.debugLibCallResult', [
-            'LibCall' => $libName,
-            'Parameters' => $params,
-            'Result' => $result
-        ]);
+        $logData = ['LibCall' => $libName, 'Parameters' => $params, 'Result' => $result];
+        $this->notification->debug('request.debugLibCallResult', __METHOD__, $logData);
 
         // if an exception/error occurred when trying to call the external sdk, return
         // the values from the assoc array containing the error details.

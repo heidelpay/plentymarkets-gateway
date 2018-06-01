@@ -1,12 +1,4 @@
 <?php
-
-namespace Heidelpay\Services\Database;
-
-use Heidelpay\Helper\PaymentHelper;
-use Heidelpay\Models\Contracts\TransactionRepositoryContract;
-use Heidelpay\Models\Transaction;
-use Plenty\Plugin\Log\Loggable;
-
 /**
  * Transaction Service class
  *
@@ -19,10 +11,14 @@ use Plenty\Plugin\Log\Loggable;
  *
  * @package heidelpay\plentymarkets-gateway\services
  */
+namespace Heidelpay\Services\Database;
+
+use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Models\Contracts\TransactionRepositoryContract;
+use Heidelpay\Models\Transaction;
+
 class TransactionService
 {
-    use Loggable;
-
     const NO_ORDER_ID = -1;
 
     /**
@@ -38,13 +34,15 @@ class TransactionService
     /**
      * TransactionService constructor.
      *
-     * @param TransactionRepositoryContract $transactionRepository
+     * @param TransactionRepositoryContract $transactionRepo
      * @param PaymentHelper                 $helper
      */
-    public function __construct(TransactionRepositoryContract $transactionRepository, PaymentHelper $helper)
-    {
+    public function __construct(
+        TransactionRepositoryContract $transactionRepo,
+        PaymentHelper $helper
+    ) {
         $this->paymentHelper = $helper;
-        $this->transactionRepository = $transactionRepository;
+        $this->transactionRepository = $transactionRepo;
     }
 
     /**
@@ -111,13 +109,13 @@ class TransactionService
     }
 
     /**
-     * @param int $id
+     * @param int $objectId
      *
      * @return Transaction
      */
-    public function getTransactionById(int $id): Transaction
+    public function getTransactionById(int $objectId): Transaction
     {
-        return $this->transactionRepository->getTransactionById($id);
+        return $this->transactionRepository->getTransactionById($objectId);
     }
 
     /**

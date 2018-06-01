@@ -13,7 +13,7 @@
  */
 namespace Heidelpay\Services;
 
-interface HeidelpayNotificationServiceContract
+interface NotificationServiceContract
 {
     /**
      * Add debug log

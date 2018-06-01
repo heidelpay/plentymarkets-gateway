@@ -14,7 +14,7 @@ use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
-use Heidelpay\Services\HeidelpayNotificationServiceContract;
+use Heidelpay\Services\NotificationServiceContract;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
@@ -66,7 +66,7 @@ class PaymentHelper
      */
     private $methodConfig;
     /**
-     * @var HeidelpayNotificationServiceContract
+     * @var NotificationServiceContract
      */
     private $notification;
 
@@ -78,7 +78,7 @@ class PaymentHelper
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRepo
      * @param MainConfigContract $mainConfig
      * @param MethodConfigContract $methodConfig
-     * @param HeidelpayNotificationServiceContract $notification
+     * @param NotificationServiceContract $notification
      */
     public function __construct(
         PaymentMethodRepositoryContract $paymentMethodRepo,
@@ -86,7 +86,7 @@ class PaymentHelper
         PaymentOrderRelationRepositoryContract $paymentOrderRepo,
         MainConfigContract $mainConfig,
         MethodConfigContract $methodConfig,
-        HeidelpayNotificationServiceContract $notification
+        NotificationServiceContract $notification
     ) {
         $this->paymentMethodRepo = $paymentMethodRepo;
         $this->orderRepository = $orderRepository;

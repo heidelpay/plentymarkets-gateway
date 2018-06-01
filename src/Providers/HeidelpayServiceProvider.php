@@ -9,6 +9,7 @@ use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Repositories\TransactionRepository;
+use Heidelpay\Services\NotificationService;
 use Heidelpay\Services\PaymentService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
@@ -43,6 +44,7 @@ class HeidelpayServiceProvider extends ServiceProvider
         $this->getApplication()->bind(TransactionRepositoryContract::class, TransactionRepository::class);
         $this->getApplication()->bind(MainConfigContract::class, MainConfig::class);
         $this->getApplication()->bind(MethodConfigContract::class, MethodConfig::class);
+        $this->getApplication()->bind(NotificationServiceContract::class, NotificationService::class);
     }
 
     /**

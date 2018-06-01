@@ -2,11 +2,9 @@
 
 namespace Heidelpay\Controllers;
 
-use IO\Services\NotificationService;
+use Heidelpay\Services\NotificationServiceContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Response;
-use Plenty\Plugin\Log\Loggable;
-use Plenty\Plugin\Translation\Translator;
 
 /**
  * heidelpay Payment Controller
@@ -24,37 +22,27 @@ use Plenty\Plugin\Translation\Translator;
  */
 class PaymentController extends Controller
 {
-    use Loggable;
-
     /**
      * @var Response
      */
     private $response;
     /**
-     * @var NotificationService
+     * @var NotificationServiceContract
      */
     private $notification;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
 
     /**
      * ResponseController constructor.
      *
      * @param Response $response
-     * @param NotificationService $notification
+     * @param NotificationServiceContract $notification
      */
     public function __construct(
         Response $response,
-        NotificationService $notification
+        NotificationServiceContract $notification
     ) {
         $this->response = $response;
         $this->notification = $notification;
-
-        /** @var Translator $translator */
-        $this->translator = pluginApp(Translator::class);
     }
 
     /**
@@ -62,7 +50,7 @@ class PaymentController extends Controller
      */
     public function checkoutSuccess(): \Symfony\Component\HttpFoundation\Response
     {
-        $this->notification->success($this->translator->trans('heidelpay::payment.infoPaymentSuccessful'));
+        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__);
         return $this->response->redirectTo('place-order');
     }
 
@@ -71,7 +59,7 @@ class PaymentController extends Controller
      */
     public function checkoutCancel(): \Symfony\Component\HttpFoundation\Response
     {
-        $this->notification->error('heidelpay::payment.errorDuringPaymentExecution');
+        $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
         return $this->response->redirectTo('checkout');
     }
 }

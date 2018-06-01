@@ -1,4 +1,4 @@
-{% extends "baseForm.twig" %}
+{% extends "heidelpay::base" %}
 
 {% block content %}
     <div class="row">
@@ -8,7 +8,7 @@
         </div>
         <div class="col-md-3"></div>
     </div>
-    {% include "partials/cancelSubmitButtons.twig" %}
+    {% include "heidelpay::partials/cancelSubmitButtons" %}
 {% endblock %}
 
 {% block scritps %}

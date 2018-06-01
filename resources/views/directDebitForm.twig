@@ -1,4 +1,4 @@
-{% extends "baseForm.twig" %}
+{% extends "heidelpay::base" %}
 
 {% block content %}
     <form id="paymentFrameForm" action="{{ paymentFrameUrl }}" method="post">
@@ -22,7 +22,6 @@
             </div>
             <div class="col-md-3"></div>
         </div>
-
-        {% include "partials/cancelSubmitButtons.twig" %}
+        {% include "heidelpay::partials/cancelSubmitButtons" %}
     </form>
 {% endblock %}

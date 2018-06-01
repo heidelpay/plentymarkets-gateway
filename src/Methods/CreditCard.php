@@ -23,5 +23,5 @@ class CreditCard extends AbstractMethod
     const DEFAULT_ICON_PATH = '/images/logos/card_payment_icon.png';
     const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_HTML;
     const INITIALIZE_PAYMENT = true;
-    const FORM_TEMPLATE = 'heidelpay::externalCardForm.html';
+    const FORM_TEMPLATE = 'heidelpay::externalCardForm';
 }

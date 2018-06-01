@@ -24,12 +24,9 @@ use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
-use Plenty\Plugin\Log\Loggable;
 
 class MethodConfig extends BaseConfig implements MethodConfigContract
 {
-    use Loggable;
-
     const ARRAY_KEY_CONFIG_KEY = 'config_key';
     const ARRAY_KEY_DEFAULT_NAME = 'default_name';
     const ARRAY_KEY_KEY = 'key';

@@ -2,7 +2,7 @@
 
 namespace Heidelpay\Controllers;
 
-use Heidelpay\Services\NotificationServiceContract;
+use Heidelpay\Services\HeidelpayNotificationServiceContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Response;
 
@@ -27,7 +27,7 @@ class PaymentController extends Controller
      */
     private $response;
     /**
-     * @var NotificationServiceContract
+     * @var HeidelpayNotificationServiceContract
      */
     private $notification;
 
@@ -35,11 +35,11 @@ class PaymentController extends Controller
      * ResponseController constructor.
      *
      * @param Response $response
-     * @param NotificationServiceContract $notification
+     * @param HeidelpayNotificationServiceContract $notification
      */
     public function __construct(
         Response $response,
-        NotificationServiceContract $notification
+        HeidelpayNotificationServiceContract $notification
     ) {
         $this->response = $response;
         $this->notification = $notification;

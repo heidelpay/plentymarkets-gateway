@@ -29,7 +29,7 @@ class LibService
      */
     private $libCall;
     /**
-     * @var NotificationServiceContract
+     * @var HeidelpayNotificationServiceContract
      */
     private $notification;
 
@@ -37,11 +37,11 @@ class LibService
      * LibService constructor.
      *
      * @param LibraryCallContract $libraryCallContract
-     * @param NotificationServiceContract $notification
+     * @param HeidelpayNotificationServiceContract $notification
      */
     public function __construct(
         LibraryCallContract $libraryCallContract,
-        NotificationServiceContract $notification
+        HeidelpayNotificationServiceContract $notification
     ) {
         $this->libCall = $libraryCallContract;
         $this->notification = $notification;

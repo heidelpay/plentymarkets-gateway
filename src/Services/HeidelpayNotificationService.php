@@ -9,16 +9,16 @@
  *
  * @author  Simon Gabriel <development@heidelpay.de>
  *
- * @package  heidelpay/${Package}
+ * @package  heidelpay/plentymarkets-gateway
  */
 namespace Heidelpay\Services;
 
 use Heidelpay\Constants\Plugin;
-use IO\Services\NotificationService as BaseNotificationService;
+use IO\Services\NotificationService;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Translation\Translator;
 
-class NotificationService implements NotificationServiceContract
+class HeidelpayNotificationService implements HeidelpayNotificationServiceContract
 {
     use Loggable;
 
@@ -32,7 +32,7 @@ class NotificationService implements NotificationServiceContract
     const PREFIX = Plugin::NAME . '::';
 
     /**
-     * @var BaseNotificationService
+     * @var NotificationService
      */
     private $notifier;
     /**
@@ -42,11 +42,11 @@ class NotificationService implements NotificationServiceContract
 
     /**
      * NotificationService constructor.
-     * @param BaseNotificationService $notifier
+     * @param NotificationService $notifier
      * @param Translator $translator
      */
     public function __construct(
-        BaseNotificationService $notifier,
+        NotificationService $notifier,
         Translator $translator
     ) {
         $this->notifier = $notifier;

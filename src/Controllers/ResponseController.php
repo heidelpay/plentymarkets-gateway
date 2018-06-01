@@ -6,7 +6,7 @@ use Heidelpay\Constants\Routes;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
-use Heidelpay\Services\NotificationServiceContract;
+use Heidelpay\Services\HeidelpayNotificationServiceContract;
 use Heidelpay\Services\PaymentService;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
@@ -53,7 +53,7 @@ class ResponseController extends Controller
      */
     private $transactionService;
     /**
-     * @var NotificationServiceContract
+     * @var HeidelpayNotificationServiceContract
      */
     private $notification;
 
@@ -65,7 +65,7 @@ class ResponseController extends Controller
      * @param PaymentHelper $paymentHelper
      * @param PaymentService $paymentService
      * @param TransactionService $transactionService
-     * @param NotificationServiceContract $notification
+     * @param HeidelpayNotificationServiceContract $notification
      */
     public function __construct(
         Request $request,
@@ -73,7 +73,7 @@ class ResponseController extends Controller
         PaymentHelper $paymentHelper,
         PaymentService $paymentService,
         TransactionService $transactionService,
-        NotificationServiceContract $notification
+        HeidelpayNotificationServiceContract $notification
     ) {
         $this->request = $request;
         $this->response = $response;

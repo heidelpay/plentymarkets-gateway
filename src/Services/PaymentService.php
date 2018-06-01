@@ -99,7 +99,7 @@ class PaymentService
      */
     private $sessionStorageFactory;
     /**
-     * @var NotificationServiceContract
+     * @var HeidelpayNotificationServiceContract
      */
     private $notification;
 
@@ -116,7 +116,7 @@ class PaymentService
      * @param PaymentHelper $paymentHelper
      * @param Twig $twig
      * @param FrontendSessionStorageFactoryContract $sessionStorageFac
-     * @param NotificationServiceContract $notification
+     * @param HeidelpayNotificationServiceContract $notification
      */
     public function __construct(
         AddressRepositoryContract $addressRepository,
@@ -129,7 +129,7 @@ class PaymentService
         PaymentHelper $paymentHelper,
         Twig $twig,
         FrontendSessionStorageFactoryContract $sessionStorageFac,
-        NotificationServiceContract $notification
+        HeidelpayNotificationServiceContract $notification
     ) {
         $this->addressRepository = $addressRepository;
         $this->countryRepository = $countryRepository;

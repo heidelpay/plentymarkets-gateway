@@ -5,6 +5,7 @@ namespace Heidelpay\Controllers;
 use Heidelpay\Services\NotificationServiceContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Response;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
 /**
  * heidelpay Payment Controller
@@ -46,18 +47,18 @@ class PaymentController extends Controller
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return BaseResponse
      */
-    public function checkoutSuccess(): \Symfony\Component\HttpFoundation\Response
+    public function checkoutSuccess(): BaseResponse
     {
         $this->notification->success('payment.infoPaymentSuccessful', __METHOD__);
         return $this->response->redirectTo('place-order');
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return BaseResponse
      */
-    public function checkoutCancel(): \Symfony\Component\HttpFoundation\Response
+    public function checkoutCancel(): BaseResponse
     {
         $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
         return $this->response->redirectTo('checkout');

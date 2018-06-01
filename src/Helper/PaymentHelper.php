@@ -27,6 +27,7 @@ use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Heidelpay Payment Helper Class
@@ -38,10 +39,13 @@ use Plenty\Modules\Payment\Models\PaymentProperty;
  *
  * @author Stephano Vogel <development@heidelpay.com>
  *
- * @package heidelpay\plentymarkets-gateway\helper
+ * @package heidelpay\plentymarkets-gateway\helpr
  */
 class PaymentHelper
 {
+    // notification service won't work since the base service is not available on boot time
+    use Loggable;
+
     const NO_PAYMENTMETHOD_FOUND = -1;
 
     /**

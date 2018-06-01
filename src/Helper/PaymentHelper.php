@@ -27,7 +27,6 @@ use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
-use Plenty\Plugin\Log\Loggable;
 
 /**
  * Heidelpay Payment Helper Class
@@ -43,8 +42,6 @@ use Plenty\Plugin\Log\Loggable;
  */
 class PaymentHelper
 {
-    use Loggable;
-
     const NO_PAYMENTMETHOD_FOUND = -1;
 
     /**
@@ -108,8 +105,6 @@ class PaymentHelper
      */
     public function createMopIfNotExists(string $paymentMethodClass)
     {
-        $this->getLogger(__METHOD__)->debug('heidelpay:payment.debugCreateMopIfNotExists', [$paymentMethodClass]);
-
         if ($this->getPaymentMethodId($paymentMethodClass) === self::NO_PAYMENTMETHOD_FOUND) {
             $paymentMethodData = [
                 'pluginKey' => Plugin::KEY,

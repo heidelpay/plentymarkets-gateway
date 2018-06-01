@@ -14,6 +14,7 @@ use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
+use Heidelpay\Services\NotificationService;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
@@ -64,6 +65,10 @@ class PaymentHelper
      * @var MethodConfigContract
      */
     private $methodConfig;
+    /**
+     * @var NotificationService
+     */
+    private $notification;
 
     /**
      * AbstractHelper constructor.
@@ -73,19 +78,22 @@ class PaymentHelper
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRepo
      * @param MainConfigContract $mainConfig
      * @param MethodConfigContract $methodConfig
+     * @param NotificationService $notification
      */
     public function __construct(
         PaymentMethodRepositoryContract $paymentMethodRepo,
         OrderRepositoryContract $orderRepository,
         PaymentOrderRelationRepositoryContract $paymentOrderRepo,
         MainConfigContract $mainConfig,
-        MethodConfigContract $methodConfig
+        MethodConfigContract $methodConfig,
+        NotificationService $notification
     ) {
         $this->paymentMethodRepo = $paymentMethodRepo;
         $this->orderRepository = $orderRepository;
         $this->paymentOrderRelationRepo = $paymentOrderRepo;
         $this->mainConfig = $mainConfig;
         $this->methodConfig = $methodConfig;
+        $this->notification = $notification;
     }
 
     /**
@@ -344,6 +352,7 @@ class PaymentHelper
                 break;
             default:
                 // do nothing
+                $this->notification->critical('general.errorMethodNotFound', __METHOD__, ['mopId' => $mop]);
                 break;
         }
 
@@ -385,6 +394,8 @@ class PaymentHelper
                 break;
 
             default:
+                // do nothing
+                $this->notification->critical('general.errorMethodNotFound', __METHOD__, ['Method' => $paymentMethod]);
                 break;
         }
         return $instance;

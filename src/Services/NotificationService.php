@@ -85,8 +85,7 @@ class NotificationService implements NotificationServiceContract
      */
     protected function notify($level, $message, $method, array $logData)
     {
-        $message = self::PREFIX . $message;
-
+        $message = $this->translator->trans(self::PREFIX . $message);
 
         switch ($level) {
             case self::LEVEL_DEBUG:

@@ -155,7 +155,7 @@ class PaymentService
     public function executePayment(string $paymentMethod, ExecutePayment $event): array
     {
         $logData = ['paymentMethod' => $paymentMethod, 'mopId' => $event->getMop(), 'orderId' => $event->getOrderId()];
-        $this->notification->debug('heidelpay::payment.debugExecutePayment', __METHOD__, $logData);
+        $this->notification->debug('payment.debugExecutePayment', __METHOD__, $logData);
 
         $transactionDetails = [];
         $transaction = null;
@@ -517,7 +517,7 @@ class PaymentService
         $payment->properties = $paymentProperty;
         $payment->regenerateHash = true;
 
-        $this->notification->debug('heidelpay::payment.debugCreatePlentyPayment', __METHOD__, ['Payment' => $payment]);
+        $this->notification->debug('payment.debugCreatePlentyPayment', __METHOD__, ['Payment' => $payment]);
 
         return $this->paymentRepository->createPayment($payment);
     }

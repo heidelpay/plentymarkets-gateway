@@ -107,6 +107,7 @@ class NotificationService implements NotificationServiceContract
      */
     protected function notify($level, $message, $method, array $logData, $justLog = false)
     {
+        $message = self::PREFIX . $message;
         $translation = $this->getTranslation($message);
 
         switch ($level) {
@@ -153,8 +154,7 @@ class NotificationService implements NotificationServiceContract
      */
     protected function getTranslation($message)
     {
-        $message = $this->translator->trans(self::PREFIX . $message);
-        return $message;
+        return $this->translator->trans($message);
     }
 
     /**

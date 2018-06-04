@@ -116,6 +116,8 @@ class ResponseController extends Controller
             return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
         }
 
+        $this->notification->debug('response.debugCreatedTransaction', __METHOD__, ['Transaction' => $newTransaction]);
+
         // if the transaction is successful or pending, return the success url.
         if ($response['isSuccess'] || $response['isPending']) {
             return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_SUCCESS;

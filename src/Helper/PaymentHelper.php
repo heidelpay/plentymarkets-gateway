@@ -14,6 +14,7 @@ use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
+use Heidelpay\Models\Transaction;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
@@ -214,15 +215,17 @@ class PaymentHelper
     /**
      * Maps the transaction result into a plentymarkets Payment status ID.
      *
-     * @param array $paymentData
+     * @param Transaction $paymentData
      *
      * @return int
      */
-    public function mapToPlentyStatus(array $paymentData): int
+    public function mapToPlentyStatus(Transaction $paymentData): int
     {
         $paymentStatus = Payment::STATUS_CAPTURED;
+        $processing = $paymentData->transactionProcessing;
 
-        if (isset($paymentData['PROCESSING.STATUS_CODE']) && $paymentData['PROCESSING.STATUS_CODE'] === '80') {
+        if (TransactionType::AUTHORIZE === $paymentData->transactionType ||
+            (isset($processing['PROCESSING.STATUS_CODE']) && $processing['PROCESSING.STATUS_CODE'] === '80')) {
             $paymentStatus = Payment::STATUS_AWAITING_APPROVAL;
         }
 

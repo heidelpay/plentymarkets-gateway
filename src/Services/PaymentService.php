@@ -483,7 +483,7 @@ class PaymentService
         $payment->amount = $paymentDetails['PRESENTATION.AMOUNT'];
         $payment->currency = $paymentDetails['PRESENTATION.CURRENCY'];
         $payment->receivedAt = date('Y-m-d H:i:s');
-        $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentData->transactionProcessing);
+        $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentData);
         $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
         $payment->type = Payment::PAYMENT_TYPE_CREDIT; // From Merchant point of view
 

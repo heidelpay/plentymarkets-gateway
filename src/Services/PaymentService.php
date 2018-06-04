@@ -480,7 +480,6 @@ class PaymentService
         $payment = pluginApp(Payment::class);
         $payment->mopId = $paymentMethodId;
         $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
-        $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentDetails);
         $payment->amount = $paymentDetails['PRESENTATION.AMOUNT'];
         $payment->currency = $paymentDetails['PRESENTATION.CURRENCY'];
         $payment->receivedAt = date('Y-m-d H:i:s');

@@ -148,7 +148,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function getMinAmount(PaymentMethodContract $paymentMethod): float
     {
-        return $this->stringToFloat($this->getMinAmountKey($paymentMethod));
+        return $this->stringToFloat($this->get($this->getMinAmountKey($paymentMethod)));
     }
 
     /**
@@ -160,7 +160,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function getMaxAmount(PaymentMethodContract $paymentMethod): float
     {
-        return $this->stringToFloat($this->getMaxAmountKey($paymentMethod));
+        return $this->stringToFloat($this->get($this->getMaxAmountKey($paymentMethod)));
     }
 
     /**

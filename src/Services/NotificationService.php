@@ -63,7 +63,7 @@ class NotificationService implements NotificationServiceContract
      */
     public function info($message, $method = 'no method given', array $logData = [], $justLog = false)
     {
-        $this->notify(self::LEVEL_INFO, $message, $method, $logData);
+        $this->notify(self::LEVEL_INFO, $message, $method, $logData, $justLog);
     }
 
     /**
@@ -71,7 +71,7 @@ class NotificationService implements NotificationServiceContract
      */
     public function success($message, $method = 'no method given', array $logData = [], $justLog = false)
     {
-        $this->notify(self::LEVEL_SUCCESS, $message, $method, $logData);
+        $this->notify(self::LEVEL_SUCCESS, $message, $method, $logData, $justLog);
     }
 
     /**
@@ -79,7 +79,7 @@ class NotificationService implements NotificationServiceContract
      */
     public function warning($message, $method = 'no context given', array $logData = [], $justLog = false)
     {
-        $this->notify(self::LEVEL_WARNING, $message, $method, $logData);
+        $this->notify(self::LEVEL_WARNING, $message, $method, $logData, $justLog);
     }
 
     /**
@@ -87,13 +87,13 @@ class NotificationService implements NotificationServiceContract
      */
     public function error($message, $method = 'no context given', array $logData = [], $justLog = false)
     {
-        $this->notify(self::LEVEL_ERROR, $message, $method, $logData);
+        $this->notify(self::LEVEL_ERROR, $message, $method, $logData, $justLog);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function critical($message, $method = 'no context given', array $logData = [], $justLog = false)
+    public function critical($message, $method = 'no context given', array $logData = [])
     {
         $this->notify(self::LEVEL_CRITICAL, $message, $method, $logData);
     }
@@ -114,25 +114,25 @@ class NotificationService implements NotificationServiceContract
                 $this->getLogger($method)->debug($message, $logData);
                 break;
             case self::LEVEL_INFO:
-                if ($justLog) {
+                if (!$justLog) {
                     $this->getNotifier()->info($translation);
                 }
                 $this->getLogger($method)->info($message, $logData);
                 break;
             case self::LEVEL_SUCCESS:
-                if ($justLog) {
+                if (!$justLog) {
                     $this->getNotifier()->success($translation);
                 }
                 $this->getLogger($method)->debug($message, $logData);
                 break;
             case self::LEVEL_WARNING:
-                if ($justLog) {
+                if (!$justLog) {
                     $this->getNotifier()->warn($translation);
                 }
                 $this->getLogger($method)->warning($message, $logData);
                 break;
             case self::LEVEL_ERROR:
-                if ($justLog) {
+                if (!$justLog) {
                     $this->getNotifier()->error($translation);
                 }
                 $this->getLogger($method)->error($message, $logData);

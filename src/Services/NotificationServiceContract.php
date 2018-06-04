@@ -30,8 +30,9 @@ interface NotificationServiceContract
      * @param string $message
      * @param string $method
      * @param array $logData
+     * @param bool $justLog
      */
-    public function info($message, $method = 'no method given', array $logData = []);
+    public function info($message, $method = 'no method given', array $logData = [], $justLog = false);
 
     /**
      * Add success notification and log
@@ -39,8 +40,9 @@ interface NotificationServiceContract
      * @param string $message
      * @param string $method
      * @param array $logData
+     * @param bool $justLog
      */
-    public function success($message, $method = 'no method given', array $logData = []);
+    public function success($message, $method = 'no method given', array $logData = [], $justLog = false);
 
     /**
      * Add warning notification and log
@@ -48,8 +50,9 @@ interface NotificationServiceContract
      * @param string $message
      * @param string $method
      * @param array $logData
+     * @param bool $justLog
      */
-    public function warning($message, $method = 'no context given', array $logData = []);
+    public function warning($message, $method = 'no context given', array $logData = [], $justLog = false);
 
     /**
      * Add error notification and log
@@ -57,8 +60,9 @@ interface NotificationServiceContract
      * @param string $message
      * @param string $method
      * @param array $logData
+     * @param bool $justLog
      */
-    public function error($message, $method = 'no context given', array $logData = []);
+    public function error($message, $method = 'no context given', array $logData = [], $justLog = false);
 
     /**
      * Add critical notification and log

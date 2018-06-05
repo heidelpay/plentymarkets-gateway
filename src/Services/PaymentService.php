@@ -478,7 +478,7 @@ class PaymentService
         $paymentDetails = $paymentData->transactionDetails;
         $amount = 0.0;
         $receivedAt = null;
-        if ($paymentData->transactionType === TransactionType::AUTHORIZE) {
+        if ($paymentData->transactionType !== TransactionType::AUTHORIZE) {
             $amount = $paymentDetails['PRESENTATION.AMOUNT'];
             $receivedAt = date('Y-m-d H:i:s');
         }

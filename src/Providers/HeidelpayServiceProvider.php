@@ -8,6 +8,8 @@ use Heidelpay\Configs\MethodConfig;
 use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
+use Heidelpay\Models\Repositories\PaymentTxnIdRelationRepository;
+use Heidelpay\Models\Repositories\PaymentTxnIdRelationRepositoryContract;
 use Heidelpay\Models\Repositories\TransactionRepository;
 use Heidelpay\Services\NotificationService;
 use Heidelpay\Services\NotificationServiceContract;
@@ -38,11 +40,13 @@ class HeidelpayServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->getApplication()->register(HeidelpayRouteServiceProvider::class);
-        $this->getApplication()->bind(TransactionRepositoryContract::class, TransactionRepository::class);
-        $this->getApplication()->bind(MainConfigContract::class, MainConfig::class);
-        $this->getApplication()->bind(MethodConfigContract::class, MethodConfig::class);
-        $this->getApplication()->bind(NotificationServiceContract::class, NotificationService::class);
+        $app = $this->getApplication();
+        $app->register(HeidelpayRouteServiceProvider::class);
+        $app->bind(TransactionRepositoryContract::class, TransactionRepository::class);
+        $app->bind(MainConfigContract::class, MainConfig::class);
+        $app->bind(MethodConfigContract::class, MethodConfig::class);
+        $app->bind(NotificationServiceContract::class, NotificationService::class);
+        $app->bind(PaymentTxnIdRelationRepositoryContract::class, PaymentTxnIdRelationRepository::class);
     }
 
     /**

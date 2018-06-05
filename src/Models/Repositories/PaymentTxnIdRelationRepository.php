@@ -17,7 +17,7 @@ use Heidelpay\Models\PaymentTxnIdRelation;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
-class PaymentTxnIdRelationRepository
+class PaymentTxnIdRelationRepository implements PaymentTxnIdRelationRepositoryContract
 {
     /**
      * @var DataBase

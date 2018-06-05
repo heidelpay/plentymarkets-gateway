@@ -155,7 +155,9 @@ class PaymentService
      */
     public function executePayment(string $paymentMethod, ExecutePayment $event): array
     {
-        $logData = ['paymentMethod' => $paymentMethod, 'mopId' => $event->getMop(), 'orderId' => $event->getOrderId()];
+        $orderId = $event->getOrderId();
+        $logData = ['paymentMethod' => $paymentMethod, 'mopId' => $event->getMop(), 'orderId' => $orderId];
+
         $this->notification->debug('payment.debugExecutePayment', __METHOD__, $logData);
 
         $transactionDetails = [];
@@ -182,7 +184,8 @@ class PaymentService
             return ['error', 'heidelpay::error.errorDuringPaymentExecution'];
         }
 
-        $this->paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $event->getOrderId());
+        $this->paymentHelper->assignPlentyPaymentToHeidelpayTxnId($plentyPayment, $transaction->txnId);
+        $this->paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $orderId);
 
         return ['success', 'heidelpay::info.infoPaymentSuccessful'];
     }

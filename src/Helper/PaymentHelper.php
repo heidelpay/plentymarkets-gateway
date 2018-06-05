@@ -14,6 +14,8 @@ use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
+use Heidelpay\Models\PaymentTxnIdRelation;
+use Heidelpay\Models\Repositories\PaymentTxnIdRelationRepositoryContract;
 use Heidelpay\Models\Transaction;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
@@ -69,6 +71,10 @@ class PaymentHelper
      * @var MethodConfigContract
      */
     private $methodConfig;
+    /**
+     * @var PaymentTxnIdRelationRepositoryContract
+     */
+    private $paymentTxnIdRelRepo;
 
     /**
      * AbstractHelper constructor.
@@ -78,19 +84,22 @@ class PaymentHelper
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRepo
      * @param MainConfigContract $mainConfig
      * @param MethodConfigContract $methodConfig
+     * @param PaymentTxnIdRelationRepositoryContract $paymentTxnIdRelRepo
      */
     public function __construct(
         PaymentMethodRepositoryContract $paymentMethodRepo,
         OrderRepositoryContract $orderRepository,
         PaymentOrderRelationRepositoryContract $paymentOrderRepo,
         MainConfigContract $mainConfig,
-        MethodConfigContract $methodConfig
+        MethodConfigContract $methodConfig,
+        PaymentTxnIdRelationRepositoryContract $paymentTxnIdRelRepo
     ) {
         $this->paymentMethodRepo = $paymentMethodRepo;
         $this->orderRepository = $orderRepository;
         $this->paymentOrderRelationRepo = $paymentOrderRepo;
         $this->mainConfig = $mainConfig;
         $this->methodConfig = $methodConfig;
+        $this->paymentTxnIdRelRepo = $paymentTxnIdRelRepo;
     }
 
     /**
@@ -308,6 +317,27 @@ class PaymentHelper
             // Assign the given payment to the given order
             $this->paymentOrderRelationRepo->createOrderRelation($payment, $order);
         }
+    }
+
+    /**
+     * Assign the payment to the heidelpay txnId
+     *
+     * @param Payment $payment
+     * @param string $txnId
+     */
+    public function assignPlentyPaymentToHeidelpayTxnId(Payment $payment, string $txnId)
+    {
+        if (!$payment instanceof Payment || empty($txnId)) {
+            $this->getLogger(__METHOD__)
+                ->error('Could not create PaymentTxnIdRelation',['Payment' => $payment, 'txnId' => $txnId]);
+            return;
+        }
+
+        $data = [
+            PaymentTxnIdRelation::FIELD_PAYMENT_ID => $payment->id,
+            PaymentTxnIdRelation::FIELD_TRANSACTION_ID => $txnId
+        ];
+        $this->paymentTxnIdRelRepo->createPaymentTxnIdRelation($data);
     }
 
     /**

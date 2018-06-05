@@ -7,6 +7,7 @@ use Heidelpay\Constants\Routes;
 use Heidelpay\Constants\Salutation;
 use Heidelpay\Constants\SessionKeys;
 use Heidelpay\Constants\TransactionStatus;
+use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\AbstractMethod;
 use Heidelpay\Methods\CreditCard;
@@ -479,12 +480,12 @@ class PaymentService
         /** @var Payment $payment */
         $payment = pluginApp(Payment::class);
         $payment->mopId = $paymentMethodId;
-        $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
+        $payment->transactionType = $paymentData->transactionType === TransactionType::AUTHORIZE ?
+            Payment::TRANSACTION_TYPE_PROVISIONAL_POSTING : Payment::TRANSACTION_TYPE_BOOKED_POSTING;
         $payment->amount = $paymentDetails['PRESENTATION.AMOUNT'];
         $payment->currency = $paymentDetails['PRESENTATION.CURRENCY'];
         $payment->receivedAt = date('Y-m-d H:i:s');
         $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentData);
-        $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
         $payment->type = Payment::PAYMENT_TYPE_CREDIT; // From Merchant point of view
 
         // todo: Keine Zuordnung möglich: unaccountable (kann das passieren?)

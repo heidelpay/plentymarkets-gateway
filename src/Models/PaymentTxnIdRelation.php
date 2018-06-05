@@ -2,11 +2,12 @@
 namespace Heidelpay\Models;
 
 use Heidelpay\Constants\Plugin;
+use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
 /**
  * The payment order relation model
  */
-class PaymentTxnIdRelation
+class PaymentTxnIdRelation extends Model
 {
     const TABLE_NAME = 'transaction_payment_relation';
 

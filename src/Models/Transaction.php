@@ -31,8 +31,9 @@
 namespace Heidelpay\Models;
 
 use Heidelpay\Constants\Plugin;
+use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
-class Transaction
+class Transaction extends Model
 {
     const TABLE_NAME = 'transactions';
 

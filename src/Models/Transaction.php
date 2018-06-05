@@ -1,11 +1,4 @@
 <?php
-
-namespace Heidelpay\Models;
-
-use Heidelpay\Constants\Database;
-use Heidelpay\Constants\Plugin;
-use Plenty\Modules\Plugin\DataBase\Contracts\Model;
-
 /**
  * heidelpay Transaction model class
  *
@@ -35,8 +28,12 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  * @property string $createdAt
  * @property string $updatedAt
  */
-class Transaction extends Model
+namespace Heidelpay\Models;
+
+class Transaction extends BaseModel
 {
+    const TABLE_NAME = 'transactions';
+
     const FIELD_ID = 'id';
     const FIELD_SHOP_ID = 'storeId';
     const FIELD_CUSTOMER_ID = 'customerId';
@@ -79,12 +76,4 @@ class Transaction extends Model
     public $transactionProcessing = [];
     public $createdAt = '';
     public $updatedAt = '';
-
-    /**
-     * @return string
-     */
-    public function getTableName(): string
-    {
-        return Plugin::NAME . '::' . Database::TABLE_TRANSACTIONS;
-    }
 }

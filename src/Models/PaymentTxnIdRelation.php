@@ -9,7 +9,7 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  */
 class PaymentTxnIdRelation extends Model
 {
-    const TABLE_NAME = 'transaction_payment_relation';
+    const TABLE_NAME = 'transactionpaymentrelations';
 
     const FIELD_ID = 'id';
     const FIELD_CREATED_AT = 'createdAt';

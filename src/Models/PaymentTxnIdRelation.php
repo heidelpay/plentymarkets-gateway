@@ -4,7 +4,7 @@ namespace Heidelpay\Models;
 /**
  * The payment order relation model
  */
-abstract class PaymentTxnIdRelation extends BaseModel
+class PaymentTxnIdRelation extends BaseModel
 {
     const TABLE_NAME = 'transaction_payment_relation';
 

@@ -476,15 +476,20 @@ class PaymentService
     public function createPlentyPayment(Transaction $paymentData, int $paymentMethodId): Payment
     {
         $paymentDetails = $paymentData->transactionDetails;
+        $amount = 0.0;
+        $receivedAt = null;
+        if ($paymentData->transactionType === TransactionType::AUTHORIZE) {
+            $amount = $paymentDetails['PRESENTATION.AMOUNT'];
+            $receivedAt = date('Y-m-d H:i:s');
+        }
 
         /** @var Payment $payment */
         $payment = pluginApp(Payment::class);
         $payment->mopId = $paymentMethodId;
-        $payment->transactionType = $paymentData->transactionType === TransactionType::AUTHORIZE ?
-            Payment::TRANSACTION_TYPE_PROVISIONAL_POSTING : Payment::TRANSACTION_TYPE_BOOKED_POSTING;
-        $payment->amount = $paymentDetails['PRESENTATION.AMOUNT'];
+        $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
+        $payment->amount = $amount;
         $payment->currency = $paymentDetails['PRESENTATION.CURRENCY'];
-        $payment->receivedAt = date('Y-m-d H:i:s');
+        $payment->receivedAt = $receivedAt;
         $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentData);
         $payment->type = Payment::PAYMENT_TYPE_CREDIT; // From Merchant point of view
 
@@ -511,7 +516,7 @@ class PaymentService
 //        );
 //        $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
 //            PaymentProperty::TYPE_BOOKING_TEXT,
-//            'TransactionId: ' . $paymentData->txnId
+//            'Buchungsnummer: ' . $bookingId .', TransactionId: ' . $paymentData->txnId
 //        );
 
         // create the payment

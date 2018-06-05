@@ -1,10 +1,12 @@
 <?php
 namespace Heidelpay\Models;
 
+use Heidelpay\Constants\Plugin;
+
 /**
  * The payment order relation model
  */
-class PaymentTxnIdRelation extends BaseModel
+class PaymentTxnIdRelation
 {
     const TABLE_NAME = 'transaction_payment_relation';
 
@@ -19,4 +21,12 @@ class PaymentTxnIdRelation extends BaseModel
     public $paymentId;
     public $transactionId;
     public $assignedAt;
+
+    /**
+     * @return string
+     */
+    public function getTableName(): string
+    {
+        return Plugin::NAME . '::' . self::TABLE_NAME;
+    }
 }

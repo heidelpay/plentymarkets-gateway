@@ -30,7 +30,9 @@
  */
 namespace Heidelpay\Models;
 
-class Transaction extends BaseModel
+use Heidelpay\Constants\Plugin;
+
+class Transaction
 {
     const TABLE_NAME = 'transactions';
 
@@ -76,4 +78,12 @@ class Transaction extends BaseModel
     public $transactionProcessing = [];
     public $createdAt = '';
     public $updatedAt = '';
+
+    /**
+     * @return string
+     */
+    public function getTableName(): string
+    {
+        return Plugin::NAME . '::' . self::TABLE_NAME;
+    }
 }

@@ -102,9 +102,11 @@ class PaymentTxnIdRelationRepository implements PaymentTxnIdRelationRepositoryCo
      */
     public function getPaymentTxnIdRelationByTransactionId($txnId): array
     {
-        return $this->database->query(PaymentTxnIdRelation::class)
-            ->where(PaymentTxnIdRelation::FIELD_PAYMENT_ID, '=', $txnId)
+        $result =  $this->database->query(PaymentTxnIdRelation::class)
+            ->where(PaymentTxnIdRelation::FIELD_TRANSACTION_ID, '=', $txnId)
             ->orderBy(PaymentTxnIdRelation::FIELD_ID, 'desc')
             ->get();
+
+        return $result[0];
     }
 }

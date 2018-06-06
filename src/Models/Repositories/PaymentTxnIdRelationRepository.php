@@ -42,9 +42,10 @@ class PaymentTxnIdRelationRepository implements PaymentTxnIdRelationRepositoryCo
         /** @var PaymentTxnIdRelation $relation */
         $relation = pluginApp(PaymentTxnIdRelation::class);
 
+        $now = date('Y-m-d H:i:s');
         $relation->transactionId = $data[PaymentTxnIdRelation::FIELD_TRANSACTION_ID];
         $relation->paymentId = $data[PaymentTxnIdRelation::FIELD_PAYMENT_ID];
-        $relation->assignedAt = date('Y-m-d H:i:s');
+        $relation->assignedAt = $relation->createdAt = $relation->updatedAt = $now;
 
         $relation = $this->database->save($relation);
         return $relation;

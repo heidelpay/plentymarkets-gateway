@@ -2,6 +2,7 @@
 
 namespace Heidelpay\Migrations;
 
+use Heidelpay\Models\PaymentTxnIdRelation;
 use Heidelpay\Models\Transaction;
 use Plenty\Modules\Plugin\DataBase\Contracts\Migrate;
 

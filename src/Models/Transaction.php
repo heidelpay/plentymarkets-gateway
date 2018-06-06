@@ -86,6 +86,6 @@ class Transaction extends Model
      */
     public function getTableName(): string
     {
-        return Plugin::NAME . '::Transactions';
+        return Plugin::NAME . '::transactions';
     }
 }

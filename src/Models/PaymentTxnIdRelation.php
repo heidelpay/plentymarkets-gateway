@@ -47,6 +47,6 @@ class PaymentTxnIdRelation extends Model
      */
     public function getTableName(): string
     {
-        return Plugin::NAME . '::TransactionPaymentRelations';
+        return Plugin::NAME . '::transaction_payment_relations';
     }
 }

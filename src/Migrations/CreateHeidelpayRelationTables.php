@@ -2,7 +2,7 @@
 
 namespace Heidelpay\Migrations;
 
-use Heidelpay\Models\Transaction;
+use Heidelpay\Models\PaymentTxnIdRelation;
 use Plenty\Modules\Plugin\DataBase\Contracts\Migrate;
 
 /**
@@ -17,10 +17,10 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Migrate;
  *
  * @package heidelpay\plentymarkets-gateway\migrations
  */
-class CreateHeidelpayTables
+class CreateHeidelpayRelationTables
 {
     public function run(Migrate $migrate)
     {
-        $migrate->createTable(Transaction::class);
+        $migrate->createTable(PaymentTxnIdRelation::class);
     }
 }

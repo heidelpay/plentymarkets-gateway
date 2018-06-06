@@ -94,14 +94,6 @@
             "defaultValue": "0,00"
           }
         },
-        "creditcard.doRegistration": {
-          "type": "checkBox",
-          "required": false,
-          "label": "Config.creditcardDoRegistrationLabel",
-          "options": {
-            "defaultValue": false
-          }
-        },
         "creditcard.transactionType": {
           "type": "selectBox",
           "required": false,
@@ -179,14 +171,6 @@
           "label": "Config.debitcardMaxAmountLabel",
           "options": {
             "defaultValue": "0,00"
-          }
-        },
-        "debitcard.doRegistration": {
-          "type": "checkBox",
-          "required": false,
-          "label": "Config.debitcardDoRegistrationLabel",
-          "options": {
-            "defaultValue": false
           }
         },
         "debitcard.transactionType": {

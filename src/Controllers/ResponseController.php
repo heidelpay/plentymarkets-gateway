@@ -156,6 +156,22 @@ class ResponseController extends Controller
             return $this->response->make('Not Ok.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+        if ($response['isSuccess'] && !$response['isPending'] && array_key_exists('response', $response))
+        {
+            // todo: if it is a capture to a PA get the payment using txnId and set receicedAt and amount
+            // todo: what if there are several captures?
+            // todo: save transaction?
+
+            $responseObject = $response['response'];
+
+            $code = $responseObject['PAYMENT.CODE'];
+            $txnId = $responseObject['IDENTIFICATION.TRANSACTIONID'];
+
+
+            $this->notification->error('data', __METHOD__, [$txnId, $code]);
+
+        }
+
         return $this->response->make('OK', Response::HTTP_OK);
     }
 }

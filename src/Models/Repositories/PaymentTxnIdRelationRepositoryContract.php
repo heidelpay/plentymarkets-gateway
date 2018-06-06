@@ -14,51 +14,59 @@
 
 namespace Heidelpay\Models\Repositories;
 
-use Plenty\Modules\Plugin\DataBase\Contracts\Model;
+use Heidelpay\Models\PaymentTxnIdRelation;
 
 interface PaymentTxnIdRelationRepositoryContract
 {
     /**
-     * @inheritdoc
+     * Creates existing PaymentTxnIdRelation object
+     *
+     * @param array $data
+     * @return PaymentTxnIdRelation
      */
-    public function createPaymentTxnIdRelation(array $data): Model;
+    public function createPaymentTxnIdRelation(array $data): PaymentTxnIdRelation;
 
     /**
-     * @inheritdoc
+     * Updates existing PaymentTxnIdRelation object
+     *
+     * @param $paymentTxnIdRelation
+     * @return PaymentTxnIdRelation
      */
-    public function updatePaymentTxnIdRelation($paymentTxnIdRelationRelation): Model;
+    public function updatePaymentTxnIdRelation($paymentTxnIdRelation): PaymentTxnIdRelation;
 
     /**
+     * Returns the PaymentTxnIdRelation object with the given property value.
+     *
      * @param string $key
      * @param        $value
      *
-     * @return Model
+     * @return PaymentTxnIdRelation
      */
-    public function getPaymentTxnIdRelationByKeyValue(string $key, $value): Model;
+    public function getPaymentTxnIdRelationByKeyValue(string $key, $value): PaymentTxnIdRelation;
 
     /**
      * Returns the relation object stored with this id.
      *
-     * @param int $id
-     * @return Model
+     * @param int $objectId
+     * @return PaymentTxnIdRelation
      */
-    public function getPaymentTxnIdRelationById(int $id): Model;
+    public function getPaymentTxnIdRelationById($objectId): PaymentTxnIdRelation;
 
     /**
      * Returns the relation object stored with this payment id.
      *
      * @param $paymentId
-     * @return Model
+     * @return PaymentTxnIdRelation
      */
-    public function getPaymentTxnIdRelationByPaymentId($paymentId): Model;
+    public function getPaymentTxnIdRelationByPaymentId($paymentId): PaymentTxnIdRelation;
 
     /**
      * Return the relation object stored with this txnId
      *
      * @param $txnId
-     * @return Model
+     * @return PaymentTxnIdRelation
      */
-    public function getPaymentTxnIdRelationByTxnId($txnId): Model;
+    public function getPaymentTxnIdRelationByTxnId($txnId): PaymentTxnIdRelation;
 
     /**
      * Return the payment id associated to the given txn id.

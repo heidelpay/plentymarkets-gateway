@@ -15,7 +15,6 @@ namespace Heidelpay\Models\Repositories;
 
 use Heidelpay\Models\PaymentTxnIdRelation;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
-use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
 class PaymentTxnIdRelationRepository implements PaymentTxnIdRelationRepositoryContract
 {
@@ -37,7 +36,7 @@ class PaymentTxnIdRelationRepository implements PaymentTxnIdRelationRepositoryCo
     /**
      * @inheritdoc
      */
-    public function createPaymentTxnIdRelation(array $data): Model
+    public function createPaymentTxnIdRelation(array $data): PaymentTxnIdRelation
     {
         /** @var PaymentTxnIdRelation $relation */
         $relation = pluginApp(PaymentTxnIdRelation::class);
@@ -54,13 +53,16 @@ class PaymentTxnIdRelationRepository implements PaymentTxnIdRelationRepositoryCo
     /**
      * @inheritdoc
      */
-    public function updatePaymentTxnIdRelation($paymentTxnIdRelationRelation): Model
+    public function updatePaymentTxnIdRelation($paymentTxnIdRelation): PaymentTxnIdRelation
     {
-        if ($paymentTxnIdRelationRelation->id !== null) {
-            $paymentTxnIdRelationRelation = $this->database->save($paymentTxnIdRelationRelation);
+        if ($paymentTxnIdRelation->id !== null) {
+            $paymentTxnIdRelation = $this->database->save($paymentTxnIdRelation);
         }
 
-        return $paymentTxnIdRelationRelation;
+        /**
+         * @var PaymentTxnIdRelation $paymentTxnIdRelation
+         */
+        return $paymentTxnIdRelation;
     }
 
     /**
@@ -69,7 +71,7 @@ class PaymentTxnIdRelationRepository implements PaymentTxnIdRelationRepositoryCo
      *
      * @return PaymentTxnIdRelation
      */
-    public function getPaymentTxnIdRelationByKeyValue(string $key, $value): Model
+    public function getPaymentTxnIdRelationByKeyValue(string $key, $value): PaymentTxnIdRelation
     {
         $result = $this->database->query(PaymentTxnIdRelation::class)
             ->where($key, '=', $value)
@@ -81,15 +83,15 @@ class PaymentTxnIdRelationRepository implements PaymentTxnIdRelationRepositoryCo
     /**
      * @inheritdoc
      */
-    public function getPaymentTxnIdRelationById(int $id): Model
+    public function getPaymentTxnIdRelationById($objectId): PaymentTxnIdRelation
     {
-        return $this->database->find(PaymentTxnIdRelation::class, $id);
+        return $this->database->find(PaymentTxnIdRelation::class, $objectId);
     }
 
     /**
      * @inheritdoc
      */
-    public function getPaymentTxnIdRelationByPaymentId($paymentId): Model
+    public function getPaymentTxnIdRelationByPaymentId($paymentId): PaymentTxnIdRelation
     {
         $result = $this->database->query(PaymentTxnIdRelation::class)
             ->where(PaymentTxnIdRelation::FIELD_PAYMENT_ID, '=', $paymentId)
@@ -102,7 +104,7 @@ class PaymentTxnIdRelationRepository implements PaymentTxnIdRelationRepositoryCo
     /**
      * @inheritdoc
      */
-    public function getPaymentTxnIdRelationByTxnId($txnId): Model
+    public function getPaymentTxnIdRelationByTxnId($txnId): PaymentTxnIdRelation
     {
         $result =  $this->database->query(PaymentTxnIdRelation::class)
             ->where(PaymentTxnIdRelation::FIELD_TRANSACTION_ID, '=', $txnId)

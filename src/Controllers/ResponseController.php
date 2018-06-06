@@ -172,9 +172,8 @@ class ResponseController extends Controller
             return $this->response->make('Not Ok.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        if ($response['isSuccess'] && !$response['isPending'] && array_key_exists('response', $response))
-        {
-            // todo: if it is a capture to a PA get the payment using txnId and set receicedAt and amount
+        if ($response['isSuccess'] && !$response['isPending'] && array_key_exists('response', $response)) {
+            // todo: if it is a capture to a PA get the payment using txnId and set receivedAt and amount
             // todo: what if there are several captures?
             // todo: save transaction?
 
@@ -186,7 +185,11 @@ class ResponseController extends Controller
             $paymentCodeParts = explode('.', $code);
             if (\count($paymentCodeParts) > 1 && $paymentCodeParts[1] === 'CP') {
                 $payment = $this->paymentRepo->getPaymentById($this->paymentTxnIdRelRepo->getPaymentIdByTxnId($txnId));
-                $this->notification->error('payment', __METHOD__, [$payment]);
+                $payment->receivedAt = $responseObject['PROCESSING.TIMESTAMP'];
+                $payment->amount = $responseObject['PRESENTATION.AMOUNT'];
+                $this->paymentRepo->updatePayment($payment);
+
+                $this->notification->error('payment', __METHOD__, [$payment], true);
             }
 
 

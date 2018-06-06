@@ -10,6 +10,14 @@
  * @author Stephano Vogel <development@heidelpay.com>
  *
  * @package heidelpay\plentymarkets-gateway\models
+ */
+namespace Heidelpay\Models;
+
+use Heidelpay\Constants\Plugin;
+use Plenty\Modules\Plugin\DataBase\Contracts\Model;
+
+/**
+ * heidelpay Transaction model class
  *
  * @property int $id
  * @property int $storeId
@@ -28,11 +36,6 @@
  * @property string $createdAt
  * @property string $updatedAt
  */
-namespace Heidelpay\Models;
-
-use Heidelpay\Constants\Plugin;
-use Plenty\Modules\Plugin\DataBase\Contracts\Model;
-
 class Transaction extends Model
 {
     const FIELD_ID = 'id';
@@ -83,6 +86,6 @@ class Transaction extends Model
      */
     public function getTableName(): string
     {
-        return Plugin::NAME . '::transactions';
+        return Plugin::NAME . '::Transactions';
     }
 }

@@ -10,13 +10,6 @@
  * @author Simon Gabriel <development@heidelpay.com>
  *
  * @package heidelpay\plentymarkets-gateway\models
- *
- * @property int $id
- * @property string $paymentId
- * @property string $transactionId
- * @property string $createdAt
- * @property string $updatedAt
- * @property string $assignedAt
  */
 namespace Heidelpay\Models;
 
@@ -24,7 +17,14 @@ use Heidelpay\Constants\Plugin;
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
 /**
- * The payment order relation model
+ * heidelpay PaymentTxnIdRelation model class
+ *
+ * @property int $id
+ * @property int $paymentId
+ * @property string $transactionId
+ * @property string $createdAt
+ * @property string $updatedAt
+ * @property string $assignedAt
  */
 class PaymentTxnIdRelation extends Model
 {

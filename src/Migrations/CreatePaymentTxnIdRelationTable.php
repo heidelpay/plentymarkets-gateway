@@ -16,7 +16,7 @@ namespace Heidelpay\Migrations;
 use Heidelpay\Models\PaymentTxnIdRelation;
 use Plenty\Modules\Plugin\DataBase\Contracts\Migrate;
 
-class AddPaymentTxnIdRelationTable
+class CreatePaymentTxnIdRelationTable
 {
     public function run(Migrate $migrate)
     {

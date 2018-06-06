@@ -12,8 +12,8 @@
  * @package heidelpay\plentymarkets-gateway\models
  *
  * @property int $id
- * @property string $txnId
  * @property string $paymentId
+ * @property string $transactionId
  * @property string $createdAt
  * @property string $updatedAt
  * @property string $assignedAt
@@ -41,6 +41,8 @@ class PaymentTxnIdRelation extends Model
     public $paymentId;
     public $transactionId;
     public $assignedAt;
+    public $createdAt;
+    public $updatedAt;
 
     /**
      * @return string

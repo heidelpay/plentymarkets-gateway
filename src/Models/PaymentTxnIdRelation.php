@@ -28,7 +28,7 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  */
 class PaymentTxnIdRelation extends Model
 {
-    const TABLE_NAME = 'transaction_payment_relations';
+    const TABLE_NAME = 'transactionpaymentrelations';
 
     const FIELD_ID = 'id';
     const FIELD_CREATED_AT = 'createdAt';
@@ -37,7 +37,7 @@ class PaymentTxnIdRelation extends Model
     const FIELD_PAYMENT_ID = 'paymentId';
     const FIELD_TRANSACTION_ID = 'transactionId';
 
-    public $id;
+    public $id = 0;
     public $paymentId;
     public $transactionId;
     public $assignedAt;

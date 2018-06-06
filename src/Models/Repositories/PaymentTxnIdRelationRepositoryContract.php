@@ -14,7 +14,6 @@
 
 namespace Heidelpay\Models\Repositories;
 
-use Heidelpay\Models\PaymentTxnIdRelation;
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
 interface PaymentTxnIdRelationRepositoryContract
@@ -22,7 +21,7 @@ interface PaymentTxnIdRelationRepositoryContract
     /**
      * @inheritdoc
      */
-    public function createPaymentTxnIdRelation(array $data): PaymentTxnIdRelation;
+    public function createPaymentTxnIdRelation(array $data): Model;
 
     /**
      * @inheritdoc
@@ -33,22 +32,39 @@ interface PaymentTxnIdRelationRepositoryContract
      * @param string $key
      * @param        $value
      *
-     * @return PaymentTxnIdRelation
+     * @return Model
      */
-    public function getPaymentTxnIdRelationByKeyValue(string $key, $value): PaymentTxnIdRelation;
+    public function getPaymentTxnIdRelationByKeyValue(string $key, $value): Model;
 
     /**
-     * @inheritdoc
+     * Returns the relation object stored with this id.
+     *
+     * @param int $id
+     * @return Model
      */
     public function getPaymentTxnIdRelationById(int $id): Model;
 
     /**
-     * @inheritdoc
+     * Returns the relation object stored with this payment id.
+     *
+     * @param $paymentId
+     * @return Model
      */
-    public function getPaymentTxnIdRelationByPaymentId($paymentId): array;
+    public function getPaymentTxnIdRelationByPaymentId($paymentId): Model;
 
     /**
-     * @inheritdoc
+     * Return the relation object stored with this txnId
+     *
+     * @param $txnId
+     * @return Model
      */
-    public function getPaymentTxnIdRelationByTransactionId($txnId): array;
+    public function getPaymentTxnIdRelationByTxnId($txnId): Model;
+
+    /**
+     * Return the payment id associated to the given txn id.
+     *
+     * @param $txnId
+     * @return int
+     */
+    public function getPaymentIdByTxnId($txnId): int;
 }

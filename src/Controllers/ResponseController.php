@@ -4,10 +4,12 @@ namespace Heidelpay\Controllers;
 
 use Heidelpay\Constants\Routes;
 use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Models\Repositories\PaymentTxnIdRelationRepositoryContract;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
+use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -56,6 +58,14 @@ class ResponseController extends Controller
      * @var NotificationServiceContract
      */
     private $notification;
+    /**
+     * @var PaymentTxnIdRelationRepositoryContract
+     */
+    private $paymentTxnIdRelRepo;
+    /**
+     * @var PaymentRepositoryContract
+     */
+    private $paymentRepo;
 
     /**
      * ResponseController constructor.
@@ -66,6 +76,8 @@ class ResponseController extends Controller
      * @param PaymentService $paymentService
      * @param TransactionService $transactionService
      * @param NotificationServiceContract $notification
+     * @param PaymentTxnIdRelationRepositoryContract $paymentTxnIdRelRepo
+     * @param PaymentRepositoryContract $paymentRepo
      */
     public function __construct(
         Request $request,
@@ -73,7 +85,9 @@ class ResponseController extends Controller
         PaymentHelper $paymentHelper,
         PaymentService $paymentService,
         TransactionService $transactionService,
-        NotificationServiceContract $notification
+        NotificationServiceContract $notification,
+        PaymentTxnIdRelationRepositoryContract $paymentTxnIdRelRepo,
+        PaymentRepositoryContract $paymentRepo
     ) {
         $this->request = $request;
         $this->response = $response;
@@ -81,6 +95,8 @@ class ResponseController extends Controller
         $this->paymentService = $paymentService;
         $this->transactionService = $transactionService;
         $this->notification = $notification;
+        $this->paymentTxnIdRelRepo = $paymentTxnIdRelRepo;
+        $this->paymentRepo = $paymentRepo;
     }
 
     /**
@@ -167,8 +183,12 @@ class ResponseController extends Controller
             $code = $responseObject['PAYMENT.CODE'];
             $txnId = $responseObject['IDENTIFICATION.TRANSACTIONID'];
 
+            $paymentCodeParts = explode('.', $code);
+            if (\count($paymentCodeParts) > 1 && $paymentCodeParts[1] === 'CP') {
+                $payment = $this->paymentRepo->getPaymentById($this->paymentTxnIdRelRepo->getPaymentIdByTxnId($txnId));
+                $this->notification->error('payment', __METHOD__, [$payment]);
+            }
 
-            $this->notification->error('data', __METHOD__, [$txnId, $code]);
 
         }
 

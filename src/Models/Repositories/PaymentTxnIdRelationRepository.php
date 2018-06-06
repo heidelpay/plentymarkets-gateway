@@ -37,7 +37,7 @@ class PaymentTxnIdRelationRepository implements PaymentTxnIdRelationRepositoryCo
     /**
      * @inheritdoc
      */
-    public function createPaymentTxnIdRelation(array $data): PaymentTxnIdRelation
+    public function createPaymentTxnIdRelation(array $data): Model
     {
         /** @var PaymentTxnIdRelation $relation */
         $relation = pluginApp(PaymentTxnIdRelation::class);
@@ -69,7 +69,7 @@ class PaymentTxnIdRelationRepository implements PaymentTxnIdRelationRepositoryCo
      *
      * @return PaymentTxnIdRelation
      */
-    public function getPaymentTxnIdRelationByKeyValue(string $key, $value): PaymentTxnIdRelation
+    public function getPaymentTxnIdRelationByKeyValue(string $key, $value): Model
     {
         $result = $this->database->query(PaymentTxnIdRelation::class)
             ->where($key, '=', $value)
@@ -89,18 +89,20 @@ class PaymentTxnIdRelationRepository implements PaymentTxnIdRelationRepositoryCo
     /**
      * @inheritdoc
      */
-    public function getPaymentTxnIdRelationByPaymentId($paymentId): array
+    public function getPaymentTxnIdRelationByPaymentId($paymentId): Model
     {
-        return $this->database->query(PaymentTxnIdRelation::class)
+        $result = $this->database->query(PaymentTxnIdRelation::class)
             ->where(PaymentTxnIdRelation::FIELD_PAYMENT_ID, '=', $paymentId)
             ->orderBy(PaymentTxnIdRelation::FIELD_ID, 'desc')
             ->get();
+
+        return $result[0];
     }
 
     /**
      * @inheritdoc
      */
-    public function getPaymentTxnIdRelationByTransactionId($txnId): array
+    public function getPaymentTxnIdRelationByTxnId($txnId): Model
     {
         $result =  $this->database->query(PaymentTxnIdRelation::class)
             ->where(PaymentTxnIdRelation::FIELD_TRANSACTION_ID, '=', $txnId)
@@ -108,5 +110,16 @@ class PaymentTxnIdRelationRepository implements PaymentTxnIdRelationRepositoryCo
             ->get();
 
         return $result[0];
+    }
+
+    /**
+     * Return the payment id associated to the given txn id.
+     *
+     * @param $txnId
+     * @return int
+     */
+    public function getPaymentIdByTxnId($txnId): int
+    {
+        return $this->getPaymentTxnIdRelationByTxnId($txnId)->paymentId;
     }
 }

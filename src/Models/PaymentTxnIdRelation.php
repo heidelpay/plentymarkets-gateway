@@ -28,8 +28,6 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  */
 class PaymentTxnIdRelation extends Model
 {
-    const TABLE_NAME = 'transactionpaymentrelations';
-
     const FIELD_ID = 'id';
     const FIELD_CREATED_AT = 'createdAt';
     const FIELD_UPDATED_AT = 'updatedAt';
@@ -49,6 +47,6 @@ class PaymentTxnIdRelation extends Model
      */
     public function getTableName(): string
     {
-        return Plugin::NAME . '::' . self::TABLE_NAME;
+        return Plugin::NAME . '::TransactionPaymentRelations';
     }
 }

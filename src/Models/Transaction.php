@@ -35,8 +35,6 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
 class Transaction extends Model
 {
-    const TABLE_NAME = 'transactions';
-
     const FIELD_ID = 'id';
     const FIELD_SHOP_ID = 'storeId';
     const FIELD_CUSTOMER_ID = 'customerId';
@@ -85,6 +83,6 @@ class Transaction extends Model
      */
     public function getTableName(): string
     {
-        return Plugin::NAME . '::' . self::TABLE_NAME;
+        return Plugin::NAME . '::transactions';
     }
 }

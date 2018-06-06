@@ -25,8 +25,6 @@
     "heidelpay/php-payment-api": "^1.5.0"
   },
   "runOnBuild": [
-    "Heidelpay\\Migrations\\CreateHeidelpayTables",
-    "Heidelpay\\Migrations\\UpdateHeidelpayTablesAddTxnId",
-    "Heidelpay\\Migrations\\CreatePaymentTxnIdRelationTable"
+    "Heidelpay\\Migrations\\CreateHeidelpayTables"
   ]
 }

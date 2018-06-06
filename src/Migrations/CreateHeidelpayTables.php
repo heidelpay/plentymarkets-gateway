@@ -22,5 +22,6 @@ class CreateHeidelpayTables
     public function run(Migrate $migrate)
     {
         $migrate->createTable(Transaction::class);
+        $migrate->createTable(PaymentTxnIdRelation::class);
     }
 }

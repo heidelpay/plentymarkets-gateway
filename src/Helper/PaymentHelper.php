@@ -418,12 +418,12 @@ class PaymentHelper
     /**
      * Create relation between order and txn id.
      *
-     * @param $orderId
-     * @param $txnId
-     * @param $payment
+     * @param int $orderId
+     * @param string $txnId
+     * @param int $mopId
      */
-    public function createOrderTxnIdRelation($orderId, $txnId, $payment)
+    public function createOrderTxnIdRelation(int $orderId, string $txnId, int $mopId)
     {
-        $this->orderTxnIdRepo->createOrderTxnIdRelation($orderId, $txnId, $payment->mopId);
+        $this->orderTxnIdRepo->createOrderTxnIdRelation($orderId, $txnId, $mopId);
     }
 }

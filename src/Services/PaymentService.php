@@ -147,7 +147,8 @@ class PaymentService
     public function executePayment(string $paymentMethod, ExecutePayment $event): array
     {
         $orderId = $event->getOrderId();
-        $logData = ['paymentMethod' => $paymentMethod, 'mopId' => $event->getMop(), 'orderId' => $orderId];
+        $mopId = $event->getMop();
+        $logData = ['paymentMethod' => $paymentMethod, 'mopId' => $mopId, 'orderId' => $orderId];
 
         $this->notification->debug('payment.debugExecutePayment', __METHOD__, $logData);
 
@@ -179,6 +180,8 @@ class PaymentService
 
             $this->paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $orderId, $txnId);
         }
+
+        $this->paymentHelper->createOrderTxnIdRelation($orderId, $txnId, $mopId);
 
         $this->assignTxnIdToOrder($txnId, $orderId);
 

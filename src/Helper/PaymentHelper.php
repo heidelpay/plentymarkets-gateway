@@ -321,7 +321,6 @@ class PaymentHelper
         }
 
         $this->paymentOrderRelationRepo->createOrderRelation($payment, $order);
-        $this->orderTxnIdRepo->createOrderTxnIdRelation($orderId, $txnId, $payment->mopId);
 
         return $order;
     }
@@ -414,5 +413,17 @@ class PaymentHelper
                 break;
         }
         return $instance;
+    }
+
+    /**
+     * Create relation between order and txn id.
+     *
+     * @param $orderId
+     * @param $txnId
+     * @param $payment
+     */
+    public function createOrderTxnIdRelation($orderId, $txnId, $payment)
+    {
+        $this->orderTxnIdRepo->createOrderTxnIdRelation($orderId, $txnId, $payment->mopId);
     }
 }

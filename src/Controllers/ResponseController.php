@@ -3,14 +3,14 @@
 namespace Heidelpay\Controllers;
 
 use Heidelpay\Constants\Routes;
+use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\PaymentHelper;
-use Heidelpay\Models\Contracts\PaymentTxnIdRelationRepositoryContract;
+use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
+use Heidelpay\Models\OrderTxnIdRelation;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
-use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
-use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -60,13 +60,9 @@ class ResponseController extends Controller
      */
     private $notification;
     /**
-     * @var PaymentTxnIdRelationRepositoryContract
+     * @var OrderTxnIdRelationRepositoryContract
      */
-    private $paymentTxnIdRelRepo;
-    /**
-     * @var PaymentRepositoryContract
-     */
-    private $paymentRepo;
+    private $orderTxnIdRepo;
 
     /**
      * ResponseController constructor.
@@ -77,8 +73,7 @@ class ResponseController extends Controller
      * @param PaymentService $paymentService
      * @param TransactionService $transactionService
      * @param NotificationServiceContract $notification
-     * @param PaymentTxnIdRelationRepositoryContract $paymentTxnIdRelRepo
-     * @param PaymentRepositoryContract $paymentRepo
+     * @param OrderTxnIdRelationRepositoryContract $orderTxnIdRepo
      */
     public function __construct(
         Request $request,
@@ -87,8 +82,7 @@ class ResponseController extends Controller
         PaymentService $paymentService,
         TransactionService $transactionService,
         NotificationServiceContract $notification,
-        PaymentTxnIdRelationRepositoryContract $paymentTxnIdRelRepo,
-        PaymentRepositoryContract $paymentRepo
+        OrderTxnIdRelationRepositoryContract $orderTxnIdRepo
     ) {
         $this->request = $request;
         $this->response = $response;
@@ -96,8 +90,7 @@ class ResponseController extends Controller
         $this->paymentService = $paymentService;
         $this->transactionService = $transactionService;
         $this->notification = $notification;
-        $this->paymentTxnIdRelRepo = $paymentTxnIdRelRepo;
-        $this->paymentRepo = $paymentRepo;
+        $this->orderTxnIdRepo = $orderTxnIdRepo;
     }
 
     /**
@@ -124,16 +117,15 @@ class ResponseController extends Controller
             return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
         }
 
-        // create the transaction entity.
-        $newTransaction = $this->transactionService->createTransaction($response);
-        if ($newTransaction === null || ! $newTransaction instanceof Transaction) {
-            $logData1 = ['data' => $response['response']];
-            $this->notification->error('response.errorTransactionNotCreated', __METHOD__, $logData1);
-
+        // create transaction
+        try {
+            $newTransaction = $this->transactionService->createTransaction($response);
+            $this->notification
+                ->debug('response.debugCreatedTransaction', __METHOD__, ['Transaction' => $newTransaction]);
+        } catch (\Exception $e) {
+            $this->notification->error($e->getMessage(), __METHOD__, ['data' => ['data' => $response['response']]]);
             return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
         }
-
-        $this->notification->debug('response.debugCreatedTransaction', __METHOD__, ['Transaction' => $newTransaction]);
 
         // if the transaction is successful or pending, return the success url.
         if ($response['isSuccess'] || $response['isPending']) {
@@ -163,6 +155,11 @@ class ResponseController extends Controller
     {
         $postPayload = $this->request->getContent();
 
+        /**
+         * @var Transaction $txn
+         */
+        $txn = null;
+
         $this->notification->debug('response.debugPushNotificationReceived', __METHOD__, ['content' => $postPayload]);
 
         $response = $this->paymentService->handlePushNotification(['xmlContent' => $postPayload]);
@@ -178,22 +175,33 @@ class ResponseController extends Controller
             // todo: what if there are several captures?
             // todo: save transaction?
 
-            $responseObject = $response['response'];
-
-            $code = $responseObject['PAYMENT.CODE'];
-            $txnId = $responseObject['IDENTIFICATION.TRANSACTIONID'];
-
-            $paymentCodeParts = explode('.', $code);
-            if (\count($paymentCodeParts) > 1 && $paymentCodeParts[1] === 'CP') {
-                $payment = $this->paymentRepo->getPaymentById($this->paymentTxnIdRelRepo->getPaymentIdByTxnId($txnId));
-                $payment->receivedAt = $responseObject['PROCESSING.TIMESTAMP'];
-                $payment->amount = $responseObject['PRESENTATION.AMOUNT'];
-                $this->paymentRepo->updatePayment($payment);
-
-                $this->notification->error('payment', __METHOD__, [$payment], true);
+            // create transaction
+            try {
+                $txn = $this->transactionService->createTransaction($response);
+                $this->notification
+                    ->debug('response.debugCreatedTransaction', __METHOD__, ['Transaction' => $txn]);
+            } catch (\Exception $e) {
+                $this->notification->error($e->getMessage(), __METHOD__, ['data' => ['data' => $response['response']]]);
+                return $this->response->make($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
+            $responseObject = $response['response'];
+            $code = $responseObject['PAYMENT.CODE'];
+            $txnId = $responseObject['IDENTIFICATION.TRANSACTIONID'];
+            $paymentCodeParts = explode('.', $code);
+            if (\count($paymentCodeParts) > 1 && $paymentCodeParts[1] === TransactionType::HP_CAPTURE) {
+                $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txnId);
 
+                if (!$relation instanceof OrderTxnIdRelation) {
+                    // todo: replace translation
+                    $this->notification
+                        ->error('could not retrieve order txnId relation', __METHOD__, ['txnId' => $txnId], true);
+                    return $this->response
+                        ->make('could not retrieve order txnId relation', Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
+
+                $this->paymentService->createPlentyPayment($txn, $relation->mopId, $relation->orderId);
+            }
         }
 
         return $this->response->make('OK', Response::HTTP_OK);

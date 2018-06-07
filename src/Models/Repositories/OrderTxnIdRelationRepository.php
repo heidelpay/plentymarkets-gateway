@@ -37,15 +37,15 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
     /**
      * @inheritdoc
      */
-    public function createOrderTxnIdRelation(array $data): OrderTxnIdRelation
+    public function createOrderTxnIdRelation(int $orderId, string $txnId, int $mopId): OrderTxnIdRelation
     {
         /** @var OrderTxnIdRelation $relation */
         $relation = pluginApp(OrderTxnIdRelation::class);
 
         $now = date('Y-m-d H:i:s');
-        $relation->txnId = $data[OrderTxnIdRelation::FIELD_TXN_ID];
-        $relation->orderId = $data[OrderTxnIdRelation::FIELD_ORDER_ID];
-        $relation->mopId = $data[OrderTxnIdRelation::FIELD_MOP_ID];
+        $relation->txnId = $txnId;
+        $relation->orderId = $orderId;
+        $relation->mopId = $mopId;
         $relation->assignedAt = $relation->createdAt = $relation->updatedAt = $now;
 
         $relation = $this->database->save($relation);

@@ -105,7 +105,12 @@ class TransactionService
             Transaction::PROCESSING_TIMESTAMP => $processingTimestamp
         ];
 
-        return $this->transactionRepository->createTransaction($data);
+        $transaction = $this->transactionRepository->createTransaction($data);
+        if ($transaction === null || ! $transaction instanceof Transaction) {
+            throw new \RuntimeException('response.errorTransactionNotCreated');
+        }
+
+        return $transaction;
     }
 
     /**

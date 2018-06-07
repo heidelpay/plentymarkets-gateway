@@ -20,14 +20,13 @@ use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
-use Plenty\Modules\Order\Models\Order;
+use Plenty\Modules\Order\Property\Models\OrderProperty;
+use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
-use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Models\Payment;
-use Plenty\Modules\Payment\Models\PaymentOrderRelation;
 use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Plugin\Templates\Twig;
 
@@ -68,11 +67,6 @@ class PaymentService
     private $orderRepository;
 
     /**
-     * @var PaymentOrderRelationRepositoryContract
-     */
-    private $paymentOrderRelationRepository;
-
-    /**
      * @var PaymentRepositoryContract
      */
     private $paymentRepository;
@@ -111,7 +105,6 @@ class PaymentService
      * @param CountryRepositoryContract $countryRepository
      * @param LibService $libraryService
      * @param OrderRepositoryContract $orderRepository
-     * @param PaymentOrderRelationRepositoryContract $paymentOrderRelRepo
      * @param PaymentRepositoryContract $paymentRepository
      * @param TransactionRepositoryContract $transactionRepo
      * @param PaymentHelper $paymentHelper
@@ -124,7 +117,6 @@ class PaymentService
         CountryRepositoryContract $countryRepository,
         LibService $libraryService,
         OrderRepositoryContract $orderRepository,
-        PaymentOrderRelationRepositoryContract $paymentOrderRelRepo,
         PaymentRepositoryContract $paymentRepository,
         TransactionRepositoryContract $transactionRepo,
         PaymentHelper $paymentHelper,
@@ -136,7 +128,6 @@ class PaymentService
         $this->countryRepository = $countryRepository;
         $this->libService = $libraryService;
         $this->orderRepository = $orderRepository;
-        $this->paymentOrderRelationRepository = $paymentOrderRelRepo;
         $this->paymentRepository = $paymentRepository;
         $this->transactionRepository = $transactionRepo;
         $this->paymentHelper = $paymentHelper;
@@ -164,8 +155,8 @@ class PaymentService
         $transaction = null;
 
         // Retrieve heidelpay Transaction by txnId to get values needed for plenty payment (e.g. amount etc).
-        $transactionId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
-        $transactions = $this->transactionRepository->getTransactionsByTxnId($transactionId);
+        $txnId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
+        $transactions = $this->transactionRepository->getTransactionsByTxnId($txnId);
         foreach ($transactions as $transaction) {
             $allowedStatus = [TransactionStatus::ACK, TransactionStatus::PENDING];
             if (\in_array($transaction->status, $allowedStatus, false)) {
@@ -179,13 +170,17 @@ class PaymentService
             return ['error', 'heidelpay::error.errorDuringPaymentExecution'];
         }
 
-        $plentyPayment = $this->createPlentyPayment($transaction, $transaction->paymentMethodId);
-        if (!($plentyPayment instanceof Payment)) {
-            return ['error', 'heidelpay::error.errorDuringPaymentExecution'];
+        // create payment transaction type is not authorize, in this case it will be created if a CP is pushed.
+        if (TransactionType::AUTHORIZE !== $transaction->transactionType) {
+            $plentyPayment = $this->createPlentyPayment($transaction, $transaction->paymentMethodId, $orderId);
+            if (!($plentyPayment instanceof Payment)) {
+                return ['error', 'heidelpay::error.errorDuringPaymentExecution'];
+            }
+
+            $this->paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $orderId, $txnId);
         }
 
-        $this->paymentHelper->assignPlentyPaymentToHeidelpayTxnId($plentyPayment, $transaction->txnId);
-        $this->paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $orderId);
+        $this->assignTxnIdToOrder($txnId, $orderId);
 
         return ['success', 'heidelpay::info.infoPaymentSuccessful'];
     }
@@ -471,17 +466,18 @@ class PaymentService
     /**
      * Creates a plentymarkets payment entity.
      *
-     * @param Transaction $paymentData
+     * @param Transaction $txnData
      * @param int $paymentMethodId
      *
+     * @param int $orderId
      * @return Payment
      */
-    public function createPlentyPayment(Transaction $paymentData, int $paymentMethodId): Payment
+    public function createPlentyPayment(Transaction $txnData, int $paymentMethodId, int $orderId): Payment
     {
-        $paymentDetails = $paymentData->transactionDetails;
+        $paymentDetails = $txnData->transactionDetails;
         $amount = 0.0;
         $receivedAt = null;
-        if ($paymentData->transactionType !== TransactionType::AUTHORIZE) {
+        if ($txnData->transactionType !== TransactionType::AUTHORIZE) {
             $amount = $paymentDetails['PRESENTATION.AMOUNT'];
             $receivedAt = date('Y-m-d H:i:s');
         }
@@ -493,7 +489,7 @@ class PaymentService
         $payment->amount = $amount;
         $payment->currency = $paymentDetails['PRESENTATION.CURRENCY'];
         $payment->receivedAt = $receivedAt;
-        $payment->status = $this->paymentHelper->mapToPlentyStatus($paymentData);
+        $payment->status = $this->paymentHelper->mapToPlentyStatus($txnData);
         $payment->type = Payment::PAYMENT_TYPE_CREDIT; // From Merchant point of view
 
         // todo: Keine Zuordnung möglich: unaccountable (kann das passieren?)
@@ -510,7 +506,7 @@ class PaymentService
 
         $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
             PaymentProperty::TYPE_TRANSACTION_ID,
-            (int)$paymentData->txnId
+            (int)$txnData->txnId
         );
 
 //        $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
@@ -528,28 +524,13 @@ class PaymentService
 
         $this->notification->debug('payment.debugCreatePlentyPayment', __METHOD__, ['Payment' => $payment]);
 
-        return $this->paymentRepository->createPayment($payment);
-    }
+        $payment = $this->paymentRepository->createPayment($payment);
 
-    /**
-     * Assigns a payment to an order.
-     *
-     * @param Payment $payment
-     * @param int     $orderId
-     *
-     * @return bool
-     */
-    public function assignPaymentToOrder(Payment $payment, int $orderId): bool
-    {
-        $order = $this->orderRepository->findOrderById($orderId);
-
-        if ($order instanceof Order) {
-            $paymentOrderRelation = $this->paymentOrderRelationRepository->createOrderRelation($payment, $order);
-
-            return $paymentOrderRelation instanceof PaymentOrderRelation;
+        if ($payment instanceof Payment) {
+            $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $orderId);
         }
 
-        return false;
+        return $payment;
     }
 
     /**
@@ -562,5 +543,24 @@ class PaymentService
     protected function renderPaymentForm(string $template, array $parameters = []): string
     {
         return $this->twig->render($template, $parameters);
+    }
+
+    /**
+     * Adds the txnId to the order as external orderId.
+     *
+     * @param string $txnId
+     * @param int $orderId
+     */
+    protected function assignTxnIdToOrder(string $txnId, int $orderId)
+    {
+        $order = $this->orderRepository->findOrderById($orderId);
+
+        /** @var OrderProperty $orderProperty */
+        $orderProperty = pluginApp(OrderProperty::class);
+        $orderProperty->typeId = OrderPropertyType::EXTERNAL_ORDER_ID;
+        $orderProperty->value = $txnId;
+        $order->properties[] = $orderProperty;
+
+        $this->orderRepository->updateOrder($order->toArray(), $order->id);
     }
 }

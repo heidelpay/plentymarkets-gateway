@@ -527,7 +527,7 @@ class PaymentService
         $payment = $this->paymentRepository->createPayment($payment);
 
         if ($payment instanceof Payment) {
-            $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $orderId);
+            $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $orderId, $txnData->txnId);
         }
 
         return $payment;

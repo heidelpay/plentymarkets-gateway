@@ -148,8 +148,8 @@ class PaymentService
     {
         $orderId = $event->getOrderId();
         $mopId = $event->getMop();
-        $logData = ['paymentMethod' => $paymentMethod, 'mopId' => $mopId, 'orderId' => $orderId];
 
+        $logData = ['paymentMethod' => $paymentMethod, 'mopId' => $mopId, 'orderId' => $orderId];
         $this->notification->debug('payment.debugExecutePayment', __METHOD__, $logData);
 
         $transactionDetails = [];
@@ -157,6 +157,8 @@ class PaymentService
 
         // Retrieve heidelpay Transaction by txnId to get values needed for plenty payment (e.g. amount etc).
         $txnId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
+        $this->paymentHelper->createOrderTxnIdRelation($orderId, $txnId, $mopId);
+
         $transactions = $this->transactionRepository->getTransactionsByTxnId($txnId);
         foreach ($transactions as $transaction) {
             $allowedStatus = [TransactionStatus::ACK, TransactionStatus::PENDING];
@@ -181,7 +183,6 @@ class PaymentService
             $this->paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $orderId, $txnId);
         }
 
-        $this->paymentHelper->createOrderTxnIdRelation($orderId, $txnId, $mopId);
 
         $this->assignTxnIdToOrder($txnId, $orderId);
 

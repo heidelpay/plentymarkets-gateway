@@ -42,14 +42,7 @@ class OrderTxnIdRelation extends Model
     public $createdAt;
     public $updatedAt;
 
-    /**
-     * OrderTxnIdRelation constructor.
-     */
-    public function __construct()
-    {
-        // replace default primary key field 'id' with the orderId
-        $this->primaryKeyFieldName = self::FIELD_ORDER_ID;
-    }
+    protected $primaryKeyFieldName = self::FIELD_ORDER_ID;
 
     /**
      * @return string

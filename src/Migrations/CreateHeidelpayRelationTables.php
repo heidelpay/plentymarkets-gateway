@@ -1,8 +1,7 @@
 <?php
-
 namespace Heidelpay\Migrations;
 
-use Heidelpay\Models\PaymentTxnIdRelation;
+use Heidelpay\Models\OrderTxnIdRelation;
 use Plenty\Modules\Plugin\DataBase\Contracts\Migrate;
 
 /**
@@ -21,6 +20,6 @@ class CreateHeidelpayRelationTables
 {
     public function run(Migrate $migrate)
     {
-        $migrate->createTable(PaymentTxnIdRelation::class);
+        $migrate->createTable(OrderTxnIdRelation::class);
     }
 }

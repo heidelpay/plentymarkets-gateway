@@ -7,9 +7,9 @@ use Heidelpay\Configs\MainConfigContract;
 use Heidelpay\Configs\MethodConfig;
 use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
-use Heidelpay\Models\Contracts\PaymentTxnIdRelationRepositoryContract;
+use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
-use Heidelpay\Models\Repositories\PaymentTxnIdRelationRepository;
+use Heidelpay\Models\Repositories\OrderTxnIdRelationRepository;
 use Heidelpay\Models\Repositories\TransactionRepository;
 use Heidelpay\Services\NotificationService;
 use Heidelpay\Services\NotificationServiceContract;
@@ -46,7 +46,7 @@ class HeidelpayServiceProvider extends ServiceProvider
         $app->bind(MainConfigContract::class, MainConfig::class);
         $app->bind(MethodConfigContract::class, MethodConfig::class);
         $app->bind(NotificationServiceContract::class, NotificationService::class);
-        $app->bind(PaymentTxnIdRelationRepositoryContract::class, PaymentTxnIdRelationRepository::class);
+        $app->bind(OrderTxnIdRelationRepositoryContract::class, OrderTxnIdRelationRepository::class);
     }
 
     /**

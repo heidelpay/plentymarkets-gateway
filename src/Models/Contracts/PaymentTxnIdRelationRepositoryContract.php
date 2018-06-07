@@ -12,7 +12,7 @@
  * @package  heidelpay/${Package}
  */
 
-namespace Heidelpay\Models\Repositories;
+namespace Heidelpay\Models\Contracts;
 
 use Heidelpay\Models\PaymentTxnIdRelation;
 

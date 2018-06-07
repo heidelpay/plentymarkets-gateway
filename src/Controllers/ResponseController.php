@@ -4,12 +4,13 @@ namespace Heidelpay\Controllers;
 
 use Heidelpay\Constants\Routes;
 use Heidelpay\Helper\PaymentHelper;
-use Heidelpay\Models\Repositories\PaymentTxnIdRelationRepositoryContract;
+use Heidelpay\Models\Contracts\PaymentTxnIdRelationRepositoryContract;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
+use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;

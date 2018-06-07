@@ -13,6 +13,7 @@
  */
 namespace Heidelpay\Models\Repositories;
 
+use Heidelpay\Models\Contracts\PaymentTxnIdRelationRepositoryContract;
 use Heidelpay\Models\PaymentTxnIdRelation;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 

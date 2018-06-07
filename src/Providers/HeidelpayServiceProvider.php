@@ -7,9 +7,9 @@ use Heidelpay\Configs\MainConfigContract;
 use Heidelpay\Configs\MethodConfig;
 use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Models\Contracts\PaymentTxnIdRelationRepositoryContract;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Repositories\PaymentTxnIdRelationRepository;
-use Heidelpay\Models\Repositories\PaymentTxnIdRelationRepositoryContract;
 use Heidelpay\Models\Repositories\TransactionRepository;
 use Heidelpay\Services\NotificationService;
 use Heidelpay\Services\NotificationServiceContract;
@@ -50,7 +50,7 @@ class HeidelpayServiceProvider extends ServiceProvider
     }
 
     /**
-     * Boot the heidelpay Service Prodiver
+     * Boot the heidelpay Service Provider
      * Register payment methods, add event listeners, ...
      *
      * @param BasketRepositoryContract $basketRepository

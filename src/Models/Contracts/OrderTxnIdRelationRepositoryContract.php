@@ -41,31 +41,31 @@ interface OrderTxnIdRelationRepositoryContract
      * @param string $key
      * @param        $value
      *
-     * @return OrderTxnIdRelation
+     * @return OrderTxnIdRelation|null
      */
-    public function getOrderTxnIdRelationByKeyValue(string $key, $value): OrderTxnIdRelation;
+    public function getOrderTxnIdRelationByKeyValue(string $key, $value);
 
     /**
      * Returns relation object by order id.
      *
      * @param int $orderId
-     * @return OrderTxnIdRelation
+     * @return OrderTxnIdRelation|null
      */
-    public function getOrderTxnIdRelationByOrderId(int $orderId): OrderTxnIdRelation;
+    public function getOrderTxnIdRelationByOrderId(int $orderId);
 
     /**
      * Returns relation object by heidelpay transaction id.
      *
      * @param string $txnId
-     * @return OrderTxnIdRelation
+     * @return OrderTxnIdRelation|null
      */
-    public function getOrderTxnIdRelationByTxnId(string $txnId): OrderTxnIdRelation;
+    public function getOrderTxnIdRelationByTxnId(string $txnId);
 
     /**
      * Return the order id associated to the given txn id.
      *
      * @param $txnId
-     * @return int
+     * @return int|null
      */
-    public function getOrderIdByTxnId($txnId): int;
+    public function getOrderIdByTxnId($txnId);
 }

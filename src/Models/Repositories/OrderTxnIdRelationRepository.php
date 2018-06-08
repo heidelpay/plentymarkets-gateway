@@ -67,13 +67,11 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
         return $orderTxnIdRelation;
     }
 
+
     /**
-     * @param string $key
-     * @param        $value
-     *
-     * @return OrderTxnIdRelation
+     * {@inheritDoc}
      */
-    public function getOrderTxnIdRelationByKeyValue(string $key, $value): OrderTxnIdRelation
+    public function getOrderTxnIdRelationByKeyValue(string $key, $value)
     {
         $result = $this->database->query(OrderTxnIdRelation::class)
             ->where($key, '=', $value)
@@ -85,7 +83,7 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
     /**
      * @inheritdoc
      */
-    public function getOrderTxnIdRelationByOrderId(int $orderId): OrderTxnIdRelation
+    public function getOrderTxnIdRelationByOrderId(int $orderId)
     {
         $result = $this->database->query(OrderTxnIdRelation::class)
             ->where(OrderTxnIdRelation::FIELD_ORDER_ID, '=', $orderId)
@@ -97,7 +95,7 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
     /**
      * @inheritdoc
      */
-    public function getOrderTxnIdRelationByTxnId(string $txnId): OrderTxnIdRelation
+    public function getOrderTxnIdRelationByTxnId(string $txnId)
     {
         $result =  $this->database->query(OrderTxnIdRelation::class)
             ->where(OrderTxnIdRelation::FIELD_TXN_ID, '=', $txnId)
@@ -107,10 +105,7 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
     }
 
     /**
-     * Return the order id associated to the given txn id.
-     *
-     * @param $txnId
-     * @return int
+     * {@inheritDoc}
      */
     public function getOrderIdByTxnId($txnId): int
     {

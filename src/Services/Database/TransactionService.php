@@ -63,15 +63,16 @@ class TransactionService
     ): Transaction {
         $heidelpayResponse = $responseData['response'];
 
-        if ($storeId === null) {
-            $storeId = (int) $heidelpayResponse['CRITERION.STORE_ID'];
+        // make sure the transaction does not already exist
+        $txn = $this->transactionRepository->getTransactionsByShortId($heidelpayResponse['IDENTIFICATION.SHORTID']);
+        if ($txn instanceof Transaction) {
+            throw new \RuntimeException('Transaction already exists');
         }
 
-        if ($paymentMethodId === null) {
-            $paymentMethodId = (int) $heidelpayResponse['CRITERION.MOP'];
-        }
-
+        $storeId = $storeId ?? (int)$heidelpayResponse['CRITERION.STORE_ID'];
+        $paymentMethodId = $paymentMethodId ?? (int) $heidelpayResponse['CRITERION.MOP'];
         $processingTimestamp = $heidelpayResponse['PROCESSING.TIMESTAMP'];
+        $transactionType = $this->paymentHelper->mapHeidelpayTransactionType($heidelpayResponse['PAYMENT.CODE']);
 
         $data = [];
         $data[Transaction::FIELD_TRANSACTION_ID] = $heidelpayResponse['IDENTIFICATION.TRANSACTIONID'];
@@ -79,8 +80,7 @@ class TransactionService
         $data[Transaction::FIELD_CUSTOMER_ID] = (int) $heidelpayResponse['IDENTIFICATION.SHOPPERID'];
         $data[Transaction::FIELD_SHOP_ID] = $storeId;
         $data[Transaction::FIELD_PAYMENT_METHOD_ID] = $paymentMethodId;
-        $data[Transaction::FIELD_TRANSACTION_TYPE] =
-            $this->paymentHelper->mapHeidelpayTransactionType($heidelpayResponse['PAYMENT.CODE']);
+        $data[Transaction::FIELD_TRANSACTION_TYPE] = $transactionType;
         $data[Transaction::FIELD_STATUS] = $this->paymentHelper->mapHeidelpayTransactionStatus($responseData);
         $data[Transaction::FIELD_SHORT_ID] = $heidelpayResponse['IDENTIFICATION.SHORTID'];
         $data[Transaction::FIELD_UNIQUE_ID] = $heidelpayResponse['IDENTIFICATION.UNIQUEID'];
@@ -105,12 +105,12 @@ class TransactionService
             Transaction::PROCESSING_TIMESTAMP => $processingTimestamp
         ];
 
-        $transaction = $this->transactionRepository->createTransaction($data);
-        if ($transaction === null || ! $transaction instanceof Transaction) {
+        $txn = $this->transactionRepository->createTransaction($data);
+        if ($txn === null || ! $txn instanceof Transaction) {
             throw new \RuntimeException('response.errorTransactionNotCreated');
         }
 
-        return $transaction;
+        return $txn;
     }
 
     /**

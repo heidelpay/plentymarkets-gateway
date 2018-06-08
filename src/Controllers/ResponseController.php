@@ -178,8 +178,7 @@ class ResponseController extends Controller
             // create transaction
             try {
                 $txn = $this->transactionService->createTransaction($response);
-                $this->notification
-                    ->debug('response.debugCreatedTransaction', __METHOD__, ['Transaction' => $txn]);
+                $this->notification->debug('response.debugCreatedTransaction', __METHOD__, ['Transaction' => $txn]);
             } catch (\Exception $e) {
                 $this->notification->error($e->getMessage(), __METHOD__, ['data' => ['data' => $response['response']]]);
                 return $this->response->make($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -201,9 +200,10 @@ class ResponseController extends Controller
                 }
 
                 $this->paymentService->createPlentyPayment($txn, $relation->mopId, $relation->orderId);
+                return $this->response->make('Success!');
             }
         }
 
-        return $this->response->make('OK', Response::HTTP_OK);
+        return $this->response->make('Success!');
     }
 }

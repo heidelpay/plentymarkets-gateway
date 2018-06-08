@@ -45,6 +45,13 @@ interface TransactionRepositoryContract
     public function getTransactionsByTxnId($txnId): array;
 
     /**
+     * @param string $shortId
+     *
+     * @return Transaction|null
+     */
+    public function getTransactionsByShortId($shortId);
+
+    /**
      * @param int $customerId
      *
      * @return Transaction[]

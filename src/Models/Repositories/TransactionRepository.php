@@ -116,6 +116,18 @@ class TransactionRepository implements TransactionRepositoryContract
     /**
      * @inheritdoc
      */
+    public function getTransactionsByShortId($shortId)
+    {
+        $result = $this->database->query(Transaction::class)
+            ->where(Transaction::FIELD_SHORT_ID, '=', $shortId)
+            ->get();
+
+        return $result[0];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getTransactionsByCustomerId(int $customerId): array
     {
         /** @var Transaction[] $result */

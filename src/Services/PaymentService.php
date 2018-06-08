@@ -179,8 +179,6 @@ class PaymentService
             if (!($plentyPayment instanceof Payment)) {
                 return ['error', 'heidelpay::error.errorDuringPaymentExecution'];
             }
-
-            $this->paymentHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $orderId, $txnId);
         }
 
 
@@ -479,59 +477,32 @@ class PaymentService
     public function createPlentyPayment(Transaction $txnData, int $paymentMethodId, int $orderId): Payment
     {
         $paymentDetails = $txnData->transactionDetails;
-        $amount = 0.0;
-        $receivedAt = null;
-        if ($txnData->transactionType !== TransactionType::AUTHORIZE) {
-            $amount = $paymentDetails['PRESENTATION.AMOUNT'];
-            $receivedAt = date('Y-m-d H:i:s');
-        }
+        $txnId = $txnData->txnId;
 
         /** @var Payment $payment */
         $payment = pluginApp(Payment::class);
         $payment->mopId = $paymentMethodId;
         $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
-        $payment->amount = $amount;
+        $payment->amount = $paymentDetails['PRESENTATION.AMOUNT'];
         $payment->currency = $paymentDetails['PRESENTATION.CURRENCY'];
-        $payment->receivedAt = $receivedAt;
+        $payment->receivedAt = date('Y-m-d H:i:s');
         $payment->status = $this->paymentHelper->mapToPlentyStatus($txnData);
         $payment->type = Payment::PAYMENT_TYPE_CREDIT; // From Merchant point of view
 
-        // todo: Keine Zuordnung möglich: unaccountable (kann das passieren?)
-////        if(!empty($paymentData['unaccountable']))
-////        {
-////            $payment->unaccountable = $paymentData['unaccountable'];
-////        }
-
-        $paymentProperty = [];
-        $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
-            PaymentProperty::TYPE_ORIGIN,
-            Payment::ORIGIN_PLUGIN
-        );
-
-        $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
-            PaymentProperty::TYPE_TRANSACTION_ID,
-            (int)$txnData->txnId
-        );
-
-//        $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
-//            PaymentProperty::TYPE_TRANSACTION_ID,
-//            $paymentData->txnId
-//        );
-//        $paymentProperty[] = $this->paymentHelper->getPaymentProperty(
-//            PaymentProperty::TYPE_BOOKING_TEXT,
-//            'Buchungsnummer: ' . $bookingId .', TransactionId: ' . $paymentData->txnId
-//        );
+        $properties = [];
+        $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_ORIGIN, Payment::ORIGIN_PLUGIN);
+        $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, (int)$txnId);
+        $bookingText = 'Buchungsnummer: ' . $orderId . ', TransactionId: ' . $txnId;
+        $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $bookingText);
+        $payment->properties = $properties;
 
         // create the payment
-        $payment->properties = $paymentProperty;
         $payment->regenerateHash = true;
-
         $this->notification->debug('payment.debugCreatePlentyPayment', __METHOD__, ['Payment' => $payment]);
-
         $payment = $this->paymentRepository->createPayment($payment);
 
         if ($payment instanceof Payment) {
-            $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $orderId, $txnData->txnId);
+            $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $orderId, $txnId);
         }
 
         return $payment;

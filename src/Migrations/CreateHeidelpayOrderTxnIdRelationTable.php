@@ -16,7 +16,7 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Migrate;
  *
  * @package heidelpay\plentymarkets-gateway\migrations
  */
-class CreateHeidelpayRelationTables
+class CreateHeidelpayOrderTxnIdRelationTable
 {
     public function run(Migrate $migrate)
     {

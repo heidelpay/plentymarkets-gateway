@@ -63,12 +63,6 @@ class TransactionService
     ): Transaction {
         $heidelpayResponse = $responseData['response'];
 
-        // make sure the transaction does not already exist
-        $txn = $this->transactionRepository->getTransactionsByShortId($heidelpayResponse['IDENTIFICATION.SHORTID']);
-        if ($txn instanceof Transaction) {
-            throw new \RuntimeException('Transaction already exists');
-        }
-
         $storeId = $storeId ?? (int)$heidelpayResponse['CRITERION.STORE_ID'];
         $paymentMethodId = $paymentMethodId ?? (int) $heidelpayResponse['CRITERION.MOP'];
         $processingTimestamp = $heidelpayResponse['PROCESSING.TIMESTAMP'];
@@ -162,5 +156,16 @@ class TransactionService
         }
 
         return $heidelpayData;
+    }
+
+    /**
+     * @param $heidelpayResponse
+     * @return boolean
+     */
+    public function checkTransactionAlreadyExists($heidelpayResponse): bool
+    {
+        $txn = $this->transactionRepository->getTransactionsByShortId($heidelpayResponse['IDENTIFICATION.SHORTID']);
+
+        return $txn instanceof Transaction;
     }
 }

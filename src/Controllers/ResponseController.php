@@ -155,14 +155,13 @@ class ResponseController extends Controller
     {
         $postPayload = $this->request->getContent();
 
-        /**
-         * @var Transaction $txn
-         */
+        /** @var Transaction $txn */
         $txn = null;
 
         $this->notification->debug('response.debugPushNotificationReceived', __METHOD__, ['content' => $postPayload]);
 
         $response = $this->paymentService->handlePushNotification(['xmlContent' => $postPayload]);
+        $responseObject = $response['response'];
 
         if (isset($response['exceptionCode'])) {
             $logData = ['Response' => $response];
@@ -173,7 +172,14 @@ class ResponseController extends Controller
         if ($response['isSuccess'] && !$response['isPending'] && array_key_exists('response', $response)) {
             // todo: if it is a capture to a PA get the payment using txnId and set receivedAt and amount
             // todo: what if there are several captures?
-            // todo: save transaction?
+            // todo: Müssen Noks auch gespeichert werden?
+
+            // return success, if transaction already exists, to avoid endless pushing
+            if ($this->transactionService->checkTransactionAlreadyExists($responseObject)) {
+                $this->notification
+                    ->debug('response.debugTransactionAlreadyExists', __METHOD__, ['Transaction' => $response]);
+                return $this->response->make('Transaction already exists');
+            }
 
             // create transaction
             try {
@@ -184,7 +190,6 @@ class ResponseController extends Controller
                 return $this->response->make($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
-            $responseObject = $response['response'];
             $code = $responseObject['PAYMENT.CODE'];
             $txnId = $responseObject['IDENTIFICATION.TRANSACTIONID'];
             $paymentCodeParts = explode('.', $code);

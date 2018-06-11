@@ -319,6 +319,8 @@ class PaymentHelper
             $this->getLogger(__METHOD__)->error('Could not create OrderTxnIdRelation', $logData);
             return $order;
         }
+        $additionalInfo = ['Order' => $order, 'Payment' => $payment];
+        $this->getLogger(__METHOD__)->debug('payment.debugAssignPaymentToOrder', $additionalInfo);
 
         $this->paymentOrderRelationRepo->createOrderRelation($payment, $order);
 
@@ -328,11 +330,11 @@ class PaymentHelper
     /**
      * Returns a PaymentProperty with the given params
      *
-     * @param $typeId
+     * @param int $typeId
      * @param $value
      * @return PaymentProperty
      */
-    public function getPaymentProperty($typeId, $value): PaymentProperty
+    public function getPaymentProperty(int $typeId, $value): PaymentProperty
     {
         /** @var PaymentProperty $paymentProperty */
         $paymentProperty = pluginApp(PaymentProperty::class);

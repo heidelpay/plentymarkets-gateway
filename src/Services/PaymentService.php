@@ -491,7 +491,7 @@ class PaymentService
 
         $properties = [];
         $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_ORIGIN, Payment::ORIGIN_PLUGIN);
-        $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, (int)$txnId);
+        $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $txnId);
 //        $bookingText = 'Buchungsnummer: ' . $orderId . ', TransactionId: ' . $txnId;
 //        $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $bookingText);
         $payment->properties = $properties;

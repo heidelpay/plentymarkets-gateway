@@ -20,8 +20,6 @@ use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
-use Plenty\Modules\Order\Property\Models\OrderProperty;
-use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
@@ -180,9 +178,6 @@ class PaymentService
                 return ['error', 'heidelpay::error.errorDuringPaymentExecution'];
             }
         }
-
-
-        $this->assignTxnIdToOrder($txnId, $orderId);
 
         return ['success', 'heidelpay::info.infoPaymentSuccessful'];
     }
@@ -518,24 +513,5 @@ class PaymentService
     protected function renderPaymentForm(string $template, array $parameters = []): string
     {
         return $this->twig->render($template, $parameters);
-    }
-
-    /**
-     * Adds the txnId to the order as external orderId.
-     *
-     * @param string $txnId
-     * @param int $orderId
-     */
-    protected function assignTxnIdToOrder(string $txnId, int $orderId)
-    {
-        $order = $this->orderRepository->findOrderById($orderId);
-
-        /** @var OrderProperty $orderProperty */
-        $orderProperty = pluginApp(OrderProperty::class);
-        $orderProperty->typeId = OrderPropertyType::EXTERNAL_ORDER_ID;
-        $orderProperty->value = $txnId;
-        $order->properties[] = $orderProperty;
-
-        $this->orderRepository->updateOrder($order->toArray(), $order->id);
     }
 }

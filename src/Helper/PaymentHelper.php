@@ -24,6 +24,8 @@ use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Helper\Services\WebstoreHelper;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
+use Plenty\Modules\Order\Property\Models\OrderProperty;
+use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
@@ -427,5 +429,25 @@ class PaymentHelper
     public function createOrderTxnIdRelation(int $orderId, string $txnId, int $mopId)
     {
         $this->orderTxnIdRepo->createOrderTxnIdRelation($orderId, $txnId, $mopId);
+        $this->assignTxnIdToOrder($txnId, $orderId);
+    }
+
+    /**
+     * Adds the txnId to the order as external orderId.
+     *
+     * @param string $txnId
+     * @param int $orderId
+     */
+    protected function assignTxnIdToOrder(string $txnId, int $orderId)
+    {
+        $order = $this->orderRepository->findOrderById($orderId);
+
+        /** @var OrderProperty $orderProperty */
+        $orderProperty = pluginApp(OrderProperty::class);
+        $orderProperty->typeId = OrderPropertyType::EXTERNAL_ORDER_ID;
+        $orderProperty->value = $txnId;
+        $order->properties[] = $orderProperty;
+
+        $this->orderRepository->updateOrder($order->toArray(), $order->id);
     }
 }

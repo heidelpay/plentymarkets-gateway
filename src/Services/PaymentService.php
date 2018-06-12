@@ -485,10 +485,10 @@ class PaymentService
         $payment->type = Payment::PAYMENT_TYPE_CREDIT; // From Merchant point of view
 
         $properties = [];
-        $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_ORIGIN, Payment::ORIGIN_PLUGIN);
+        $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_ORIGIN, (string) Payment::ORIGIN_PLUGIN);
         $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $txnId);
-//        $bookingText = 'Buchungsnummer: ' . $orderId . ', TransactionId: ' . $txnId;
-//        $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $bookingText);
+        $bookingText = 'Buchungsnummer: ' . $orderId . ', TransactionId: ' . $txnId;
+        $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $bookingText);
         $payment->properties = $properties;
 
         // create the payment

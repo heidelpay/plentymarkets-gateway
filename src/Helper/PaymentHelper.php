@@ -16,6 +16,7 @@ use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
 use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
 use Heidelpay\Models\Transaction;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
@@ -312,11 +313,22 @@ class PaymentHelper
      */
     public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId, string $txnId): Order
     {
+        $order = null;
+
         // Get the order by the given order ID
         try {
-            $order = $this->orderRepository->findOrderById($orderId);
+            /** @var AuthHelper $authHelper */
+            $authHelper = pluginApp(AuthHelper::class);
+            /** @var OrderRepositoryContract $orderRepo */
+            $orderRepo = $this->orderRepository;
+            $order = $authHelper->processUnguarded(
+                function () use ($orderRepo, $orderId) {
+                    return $orderRepo->findOrderById($orderId);
+                }
+            );
         } catch (\Exception $e) {
-            $this->getLogger(__METHOD__)->error('Error loading Order', ['OrderId' => $orderId, 'Exception' => $e]);
+            $additionalInfo1 = ['OrderId' => $orderId, 'Exception' => $e->getMessage()];
+            $this->getLogger(__METHOD__)->error('Error loading Order', $additionalInfo1);
         }
 
         // Check whether the order truly exists in plentymarkets

@@ -331,9 +331,7 @@ class PaymentService
         }
 
         // create transactionId and store it in the customer session to fetch the correct transaction later.
-//        $transactionId = uniqid('', false);
-        // todo: ersetzen durch noch eindeutigere id
-        $transactionId = time();
+        $transactionId = $transactionId = uniqid($basket->id, true);
         $this->sessionStorageFactory->getPlugin()->setValue(SessionKeys::SESSION_KEY_TXN_ID, $transactionId);
         $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $transactionId;
 
@@ -498,6 +496,9 @@ class PaymentService
         $payment = $this->paymentRepository->createPayment($payment);
 
         if ($payment instanceof Payment) {
+            $order = $this->orderRepository->findOrderById($orderId);
+            $this->notification->error('Order', __METHOD__, ['Order' => $order, 'orderid' => $orderId]);
+
             $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $orderId, $txnId);
         }
 

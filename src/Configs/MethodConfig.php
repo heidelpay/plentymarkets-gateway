@@ -21,8 +21,6 @@ use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\DirectDebit;
 use Heidelpay\Methods\PaymentMethodContract;
-use Heidelpay\Methods\PayPal;
-use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
 
 class MethodConfig extends BaseConfig implements MethodConfigContract
@@ -55,21 +53,21 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
             self::ARRAY_KEY_KEY => DirectDebit::KEY,
             self::ARRAY_KEY_DEFAULT_NAME => DirectDebit::DEFAULT_NAME,
         ],
-        Prepayment::class => [
-            self::ARRAY_KEY_CONFIG_KEY => Prepayment::CONFIG_KEY,
-            self::ARRAY_KEY_KEY => Prepayment::KEY,
-            self::ARRAY_KEY_DEFAULT_NAME => Prepayment::DEFAULT_NAME,
-        ],
+//        Prepayment::class => [
+//            self::ARRAY_KEY_CONFIG_KEY => Prepayment::CONFIG_KEY,
+//            self::ARRAY_KEY_KEY => Prepayment::KEY,
+//            self::ARRAY_KEY_DEFAULT_NAME => Prepayment::DEFAULT_NAME,
+//        ],
         Sofort::class => [
             self::ARRAY_KEY_CONFIG_KEY => Sofort::CONFIG_KEY,
             self::ARRAY_KEY_KEY => Sofort::KEY,
             self::ARRAY_KEY_DEFAULT_NAME => Sofort::DEFAULT_NAME,
         ],
-        PayPal::class => [
-            self::ARRAY_KEY_CONFIG_KEY => PayPal::CONFIG_KEY,
-            self::ARRAY_KEY_KEY => PayPal::KEY,
-            self::ARRAY_KEY_DEFAULT_NAME => PayPal::DEFAULT_NAME,
-        ],
+//        PayPal::class => [
+//            self::ARRAY_KEY_CONFIG_KEY => PayPal::CONFIG_KEY,
+//            self::ARRAY_KEY_KEY => PayPal::KEY,
+//            self::ARRAY_KEY_DEFAULT_NAME => PayPal::DEFAULT_NAME,
+//        ],
     ];
 
     /**
@@ -136,7 +134,13 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function getPaymentMethodName(PaymentMethodContract $paymentMethod): string
     {
-        return $this->get($this->getDisplayNameKey($paymentMethod));
+        $name = $this->get($this->getDisplayNameKey($paymentMethod));
+
+        if (null === $name) {
+            return 'Error loading payment method: ' . \get_class($paymentMethod);
+        }
+
+        return $name;
     }
 
     /**

@@ -331,7 +331,7 @@ class PaymentService
         }
 
         // create transactionId and store it in the customer session to fetch the correct transaction later.
-        $transactionId = $transactionId = uniqid($basket->id, true);
+        $transactionId = $transactionId = uniqid($basket->id . '.', true);
         $this->sessionStorageFactory->getPlugin()->setValue(SessionKeys::SESSION_KEY_TXN_ID, $transactionId);
         $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $transactionId;
 

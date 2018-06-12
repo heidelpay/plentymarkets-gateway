@@ -313,7 +313,11 @@ class PaymentHelper
     public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId, string $txnId): Order
     {
         // Get the order by the given order ID
-        $order = $this->orderRepository->findOrderById($orderId);
+        try {
+            $order = $this->orderRepository->findOrderById($orderId);
+        } catch (\Exception $e) {
+            $this->getLogger(__METHOD__)->error('Error loading Order', ['OrderId' => $orderId, 'Exception' => $e]);
+        }
 
         // Check whether the order truly exists in plentymarkets
         if (!$order instanceof Order || !$payment instanceof Payment || empty($txnId)) {

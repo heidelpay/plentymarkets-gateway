@@ -333,10 +333,10 @@ class PaymentHelper
      * Returns a PaymentProperty with the given params
      *
      * @param int $typeId
-     * @param $value
+     * @param string $value
      * @return PaymentProperty
      */
-    public function getPaymentProperty(int $typeId, $value): PaymentProperty
+    public function getPaymentProperty(int $typeId, string $value): PaymentProperty
     {
         /** @var PaymentProperty $paymentProperty */
         $paymentProperty = pluginApp(PaymentProperty::class);

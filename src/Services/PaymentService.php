@@ -2,6 +2,7 @@
 
 namespace Heidelpay\Services;
 
+use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Constants\Plugin;
 use Heidelpay\Constants\Routes;
 use Heidelpay\Constants\Salutation;
@@ -19,7 +20,6 @@ use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
-use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
@@ -60,11 +60,6 @@ class PaymentService
     private $countryRepository;
 
     /**
-     * @var OrderRepositoryContract
-     */
-    private $orderRepository;
-
-    /**
      * @var PaymentRepositoryContract
      */
     private $paymentRepository;
@@ -95,6 +90,10 @@ class PaymentService
      * @var NotificationServiceContract
      */
     private $notification;
+    /**
+     * @var MethodConfigContract
+     */
+    private $config;
 
     /**
      * PaymentService constructor.
@@ -102,36 +101,36 @@ class PaymentService
      * @param AddressRepositoryContract $addressRepository
      * @param CountryRepositoryContract $countryRepository
      * @param LibService $libraryService
-     * @param OrderRepositoryContract $orderRepository
      * @param PaymentRepositoryContract $paymentRepository
      * @param TransactionRepositoryContract $transactionRepo
      * @param PaymentHelper $paymentHelper
      * @param Twig $twig
      * @param FrontendSessionStorageFactoryContract $sessionStorageFac
      * @param NotificationServiceContract $notification
+     * @param MethodConfigContract $config
      */
     public function __construct(
         AddressRepositoryContract $addressRepository,
         CountryRepositoryContract $countryRepository,
         LibService $libraryService,
-        OrderRepositoryContract $orderRepository,
         PaymentRepositoryContract $paymentRepository,
         TransactionRepositoryContract $transactionRepo,
         PaymentHelper $paymentHelper,
         Twig $twig,
         FrontendSessionStorageFactoryContract $sessionStorageFac,
-        NotificationServiceContract $notification
+        NotificationServiceContract $notification,
+        MethodConfigContract $config
     ) {
         $this->addressRepository = $addressRepository;
         $this->countryRepository = $countryRepository;
         $this->libService = $libraryService;
-        $this->orderRepository = $orderRepository;
         $this->paymentRepository = $paymentRepository;
         $this->transactionRepository = $transactionRepo;
         $this->paymentHelper = $paymentHelper;
         $this->twig = $twig;
         $this->sessionStorageFactory = $sessionStorageFac;
         $this->notification = $notification;
+        $this->config = $config;
     }
 
     /**
@@ -372,6 +371,12 @@ class PaymentService
         $this->heidelpayRequest['CRITERION_ORDER_TIMESTAMP'] = $basket->orderTimestamp;
         $this->heidelpayRequest['CRITERION_PUSH_URL'] =
             $this->paymentHelper->getDomain() . '/' . Routes::PUSH_NOTIFICATION_URL;
+
+        // general
+        $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
+        if (null !== $methodInstance) {
+            $this->heidelpayRequest['FRONTEND.CSS_PATH'] = $this->config->getIFrameCssPath($methodInstance);
+        }
 
         // TODO: Riskinformation for future payment methods
     }

@@ -280,12 +280,12 @@ class PaymentService
             throw new \RuntimeException($response['exceptionCode']);
         }
 
+        if (!$response['isSuccess']) {
+            throw new \RuntimeException($response['response']['PROCESSING.RETURN']);
+        }
+
         // return rendered html content
         if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
-            if (!$response['isSuccess']) {
-                throw new \RuntimeException($response['response']['PROCESSING.RETURN']);
-            }
-
             // return the payment frame url, if it is needed
             if (\array_key_exists('FRONTEND.PAYMENT_FRAME_URL', $response['response'])) {
                 return $response['response']['FRONTEND.PAYMENT_FRAME_URL'];

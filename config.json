@@ -289,24 +289,6 @@
             "defaultValue": "31HA07BC8142C5A171749A60D979B6E4"
           }
         },
-        "directdebit.transactionType": {
-          "type": "selectBox",
-          "required": false,
-          "label": "Config.directdebitTransactionTypeLabel",
-          "options": {
-            "defaultValue": "0",
-            "selectBoxValues": [
-              {
-                "value": "0",
-                "caption": "Config.directdebitTransactionTypePossibleValue0"
-              },
-              {
-                "value": "1",
-                "caption": "Config.directdebitTransactionTypePossibleValue1"
-              }
-            ]
-          }
-        },
         "directdebit.minAmount": {
           "type": "inputText",
           "required": false,

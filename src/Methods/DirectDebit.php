@@ -1,6 +1,7 @@
 <?php
 
 namespace Heidelpay\Methods;
+use Heidelpay\Constants\TransactionType;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 
 /**
@@ -24,4 +25,5 @@ class DirectDebit extends AbstractMethod
     const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_HTML;
     const INITIALIZE_PAYMENT = true;
     const FORM_TEMPLATE = 'heidelpay::directDebitForm';
+    const TRANSACTION_TYPE = TransactionType::DEBIT;
 }

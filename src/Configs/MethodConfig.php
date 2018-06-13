@@ -176,7 +176,8 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     public function getIFrameCssPath(PaymentMethodContract $paymentMethod): string
     {
-        return $this->get($this->getIFrameCssPathKey($paymentMethod));
+        $stylePath = $this->get($this->getIFrameCssPathKey($paymentMethod));
+        return $this->returnVerifiedUrlToFile($stylePath, ['css']);
     }
 
     /**
@@ -196,13 +197,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
     public function getIcon(PaymentMethodContract $paymentMethod): string
     {
         $iconPath = $this->get($this->getIconPathKey($paymentMethod));
-        $pathElements = explode('.', $iconPath);
-        $fileType = \is_array($pathElements) ? strtolower(end($pathElements)) : '';
-        if (\in_array($fileType, ['gif','jpg','png'])) {
-            return $iconPath;
-        }
-
-        return '';
+        return $this->returnVerifiedUrlToFile($iconPath, ['gif', 'jpg', 'png']);
     }
 
     /**
@@ -400,6 +395,20 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
     protected function getIconPathKey(PaymentMethodContract $paymentMethod): string
     {
         return $this->getConfigKey($paymentMethod->getConfigKey() . '.' . Configuration::KEY_ICON_PATH);
+    }
+
+    /**
+     * @param string $path
+     * @param array $allowedExtensions
+     * @return string
+     */
+    protected function returnVerifiedUrlToFile($path, array $allowedExtensions): string
+    {
+        $preg = '#^(http|https)://.*\.(' . implode('|', $allowedExtensions) . ')#i';
+        if (preg_match($preg, $path)) {
+            return $path;
+        }
+        return '';
     }
     //</editor-fold>
 }

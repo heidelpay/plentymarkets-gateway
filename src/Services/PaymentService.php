@@ -496,9 +496,6 @@ class PaymentService
         $payment = $this->paymentRepository->createPayment($payment);
 
         if ($payment instanceof Payment) {
-            $order = $this->orderRepository->findOrderById($orderId);
-            $this->notification->error('Order', __METHOD__, ['Order' => $order, 'orderid' => $orderId]);
-
             $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $orderId, $txnId);
         }
 

@@ -179,11 +179,11 @@ class ResponseController extends Controller
      * Handles the given transaction by type
      *
      * @param Transaction $txn
-     * @param Response $responseObject
+     * @param $responseObject
      *
      * @throws \RuntimeException
      */
-    protected function handleTransaction(Transaction $txn, Response $responseObject)
+    protected function handleTransaction(Transaction $txn, $responseObject)
     {
         $transactionCode = $this->paymentHelper->getTransactionCode($responseObject);
 

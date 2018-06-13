@@ -466,4 +466,21 @@ class PaymentHelper
 
         $this->orderRepository->updateOrder($order->toArray(), $order->id);
     }
+
+    /**
+     * Returns the transaction part of the payment code.
+     *
+     * @param $txnObject
+     * @return mixed
+     * @throws \RuntimeException
+     */
+    public function getTransactionCode($txnObject)
+    {
+        $paymentCodeParts = explode('.', $txnObject['PAYMENT.CODE']);
+        if (\count($paymentCodeParts) < 2) {
+            throw new \RuntimeException('general.errorUnknownPaymentCode');
+        }
+        list(, $txnCode) = $paymentCodeParts;
+        return $txnCode;
+    }
 }

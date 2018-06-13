@@ -34,37 +34,25 @@ class ResponseController extends Controller
 {
     use Translator;
 
-    /**
-     * @var Request $request
-     */
+    /** @var Request $request */
     private $request;
 
-    /**
-     * @var Response
-     */
+    /** @var Response */
     private $response;
 
-    /**
-     * @var PaymentHelper
-     */
+    /** @var PaymentHelper */
     private $paymentHelper;
 
-    /**
-     * @var PaymentService
-     */
+    /** @var PaymentService */
     private $paymentService;
 
-    /**
-     * @var TransactionService
-     */
+    /** @var TransactionService*/
     private $transactionService;
-    /**
-     * @var NotificationServiceContract
-     */
+
+    /** @var NotificationServiceContract */
     private $notification;
-    /**
-     * @var OrderTxnIdRelationRepositoryContract
-     */
+
+    /** @var OrderTxnIdRelationRepositoryContract */
     private $orderTxnIdRepo;
 
     /**
@@ -96,6 +84,7 @@ class ResponseController extends Controller
         $this->orderTxnIdRepo = $orderTxnIdRepo;
     }
 
+    //<editor-fold desc="Handlers">
     /**
      * Processes the incoming POST response and returns
      * an action url depending on the response result.
@@ -139,6 +128,39 @@ class ResponseController extends Controller
     }
 
     /**
+     * @return Response
+     */
+    public function processPush(): Response
+    {
+        $postPayload = $this->request->getContent();
+        $this->notification->debug('response.debugPushNotificationReceived', __METHOD__, ['content' => $postPayload]);
+        $response = $this->paymentService->handlePushNotification(['xmlContent' => $postPayload]);
+        $responseObject = $response['response'];
+
+        if (isset($response['exceptionCode'])) {
+            return $this->makeError('error.errorResponseContainsErrorCode', ['Response' => $response]);
+        }
+
+        // return success, if transaction already exists, to avoid endless pushing
+        if ($this->transactionService->checkTransactionAlreadyExists($responseObject)) {
+            return $this->makeSuccess('response.debugTransactionAlreadyExists', ['Transaction' => $response]);
+        }
+
+        try {
+            $txn = $this->transactionService->createTransaction($response);
+            $this->notification->debug('response.debugCreatedTransaction', __METHOD__, ['Transaction' => $txn]);
+
+            if ($response['isSuccess'] && !$response['isPending']) {
+                $this->handleTransaction($txn, $responseObject);
+            }
+        } catch (\RuntimeException $e) {
+            return $this->makeError($e->getMessage(), [$responseObject]);
+        }
+
+        return $this->makeSuccess('general.debugSuccess', []);
+    }
+
+    /**
      * When the processAsyncResponse cannot be accessed, or something went wrong during the process,
      * the heidelpay API redirects to the processAsyncResponse url using GET instead of POST.
      * This method is for handling this behaviour.
@@ -150,62 +172,52 @@ class ResponseController extends Controller
         $this->notification->warning('response.warningResponseCalledInInvalidContext', __METHOD__);
         return $this->response->redirectTo('checkout');
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Helpers">
     /**
-     * @return Response
+     * Handles the given transaction by type
+     *
+     * @param Transaction $txn
+     * @param Response $responseObject
+     *
+     * @throws \RuntimeException
      */
-    public function processPush(): Response
+    protected function handleTransaction(Transaction $txn, Response $responseObject)
     {
-        $postPayload = $this->request->getContent();
+        $transactionCode = $this->paymentHelper->getTransactionCode($responseObject);
 
-        /** @var Transaction $txn */
-        $txn = null;
-
-        $this->notification->debug('response.debugPushNotificationReceived', __METHOD__, ['content' => $postPayload]);
-
-        $response = $this->paymentService->handlePushNotification(['xmlContent' => $postPayload]);
-        $responseObject = $response['response'];
-
-        if (isset($response['exceptionCode'])) {
-            $logData = ['Response' => $response];
-            $this->notification->critical('error.errorResponseContainsErrorCode', __METHOD__, $logData);
-            return $this->response->make('Not Ok.', Response::HTTP_INTERNAL_SERVER_ERROR);
+        switch ($transactionCode) {
+            case TransactionType::HP_CAPTURE:
+                $this->handleCapturePush($txn);
+                break;
+            case TransactionType::HP_AUTHORIZE:         // intended fall-through
+            case TransactionType::HP_REGISTRATION:      // intended fall-through
+            case TransactionType::HP_DEBIT:             // intended fall-through
+            case TransactionType::HP_CHARGEBACK:        // intended fall-through
+            case TransactionType::HP_CREDIT:            // intended fall-through
+            case TransactionType::HP_DEREGISTRATION:    // intended fall-through
+            case TransactionType::HP_FINALIZE:          // intended fall-through
+            case TransactionType::HP_INITIALIZE:        // intended fall-through
+            case TransactionType::HP_REBILL:            // intended fall-through
+            case TransactionType::HP_RECEIPT:           // intended fall-through
+            case TransactionType::HP_REFUND:            // intended fall-through
+            case TransactionType::HP_REREGISTRATION:    // intended fall-through
+            case TransactionType::HP_REVERSAL:          // intended fall-through
+            default:
+                // do nothing if the given Transaction needs no handling
+                break;
         }
-
-        if ($response['isSuccess'] && !$response['isPending'] && array_key_exists('response', $response)) {
-            // todo: if it is a capture to a PA get the payment using txnId and set receivedAt and amount
-            // todo: Müssen Noks auch gespeichert werden?
-
-            // return success, if transaction already exists, to avoid endless pushing
-            if ($this->transactionService->checkTransactionAlreadyExists($responseObject)) {
-                return $this->makeSuccess('response.debugTransactionAlreadyExists', ['Transaction' => $response]);
-            }
-
-            try {
-                // create transaction
-                $txn = $this->transactionService->createTransaction($response);
-                $this->notification->debug('response.debugCreatedTransaction', __METHOD__, ['Transaction' => $txn]);
-
-                // handle transaction
-                $transactionCode = $this->getTransactionCode($responseObject);
-                if ($transactionCode === TransactionType::HP_CAPTURE) {
-                    $this->handleCapturePush($txn);
-                }
-            } catch (\RuntimeException $e) {
-                return $this->makeError($e->getMessage(), [$responseObject]);
-            }
-        }
-
-        return $this->makeSuccess('general.debugSuccess', []);
     }
 
     /**
      * @param $txn
+     *
+     * @throws \RuntimeException
      */
     protected function handleCapturePush($txn)
     {
-        $txnId = $txn->txnId;
-        $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txnId);
+        $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txn->txnId);
 
         if (!$relation instanceof OrderTxnIdRelation) {
             throw new \RuntimeException('response.errorOrderTxnIdRelationNotFound');
@@ -213,6 +225,7 @@ class ResponseController extends Controller
 
         $this->paymentService->createPlentyPayment($txn, $relation->mopId, $relation->orderId);
     }
+    //</editor-fold>
 
     //<editor-fold desc="Responses">
     /**
@@ -247,19 +260,4 @@ class ResponseController extends Controller
         return $this->makeResponse($message, Response::HTTP_INTERNAL_SERVER_ERROR);
     }
     //</editor-fold>
-
-    /**
-     * @param $responseObject
-     * @return mixed
-     */
-    protected function getTransactionCode($responseObject)
-    {
-        $code = $responseObject['PAYMENT.CODE'];
-        $paymentCodeParts = explode('.', $code);
-        if (\count($paymentCodeParts) < 2) {
-            throw new \RuntimeException('errorUnknownPaymentCode');
-        }
-        list(, $transactionCode) = $paymentCodeParts;
-        return $transactionCode;
-    }
 }

@@ -7,7 +7,7 @@
             <div class="col-md-6">
                 <div id="accountHolderContainer" data-validate="text" class="input-unit">
                     <label for="accountHolder">{{ trans('heidelpay::template.accountHolder') }}</label>
-                    <input tabindex="1" id="accountHolder" name="ACCOUNT.HOLDER" minlength="4" maxlength="60" autocomplete="off" type="text">
+                    <input tabindex="1" id="accountHolder" name="ACCOUNT.HOLDER" minlength="4" maxlength="60" autocomplete="off" type="text" required>
                 </div>
             </div>
             <div class="col-md-3"></div>
@@ -17,7 +17,7 @@
             <div class="col-md-6">
                 <div id="accountIbanContainer" data-validate="text" class="input-unit">
                     <label for="accountIban">{{ trans('heidelpay::template.accountIban') }}</label>
-                    <input tabindex="2" id="accountIban" name="ACCOUNT.IBAN" minlength="3" maxlength="64" autocomplete="off" type="text">
+                    <input tabindex="2" id="accountIban" name="ACCOUNT.IBAN" minlength="3" maxlength="64" autocomplete="off" type="text" required>
                 </div>
             </div>
             <div class="col-md-3"></div>

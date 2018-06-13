@@ -11,6 +11,7 @@ use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
+use Heidelpay\Traits\Translator;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -31,6 +32,8 @@ use Plenty\Plugin\Http\Response;
  */
 class ResponseController extends Controller
 {
+    use Translator;
+
     /**
      * @var Request $request
      */
@@ -171,44 +174,92 @@ class ResponseController extends Controller
 
         if ($response['isSuccess'] && !$response['isPending'] && array_key_exists('response', $response)) {
             // todo: if it is a capture to a PA get the payment using txnId and set receivedAt and amount
-            // todo: what if there are several captures?
             // todo: Müssen Noks auch gespeichert werden?
 
             // return success, if transaction already exists, to avoid endless pushing
             if ($this->transactionService->checkTransactionAlreadyExists($responseObject)) {
-                $this->notification
-                    ->debug('response.debugTransactionAlreadyExists', __METHOD__, ['Transaction' => $response]);
-                return $this->response->make('Transaction already exists');
+                return $this->makeSuccess('response.debugTransactionAlreadyExists', ['Transaction' => $response]);
             }
 
-            // create transaction
             try {
+                // create transaction
                 $txn = $this->transactionService->createTransaction($response);
                 $this->notification->debug('response.debugCreatedTransaction', __METHOD__, ['Transaction' => $txn]);
-            } catch (\Exception $e) {
-                $this->notification->error($e->getMessage(), __METHOD__, ['data' => ['data' => $response['response']]]);
-                return $this->response->make($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
 
-            $code = $responseObject['PAYMENT.CODE'];
-            $txnId = $responseObject['IDENTIFICATION.TRANSACTIONID'];
-            $paymentCodeParts = explode('.', $code);
-            if (\count($paymentCodeParts) > 1 && $paymentCodeParts[1] === TransactionType::HP_CAPTURE) {
-                $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txnId);
-
-                if (!$relation instanceof OrderTxnIdRelation) {
-                    // todo: replace translation
-                    $this->notification
-                        ->error('could not retrieve order txnId relation', __METHOD__, ['txnId' => $txnId], true);
-                    return $this->response
-                        ->make('could not retrieve order txnId relation', Response::HTTP_INTERNAL_SERVER_ERROR);
+                // handle transaction
+                $transactionCode = $this->getTransactionCode($responseObject);
+                if ($transactionCode === TransactionType::HP_CAPTURE) {
+                    $this->handleCapturePush($txn);
                 }
-
-                $this->paymentService->createPlentyPayment($txn, $relation->mopId, $relation->orderId);
-                return $this->response->make('Success!');
+            } catch (\RuntimeException $e) {
+                return $this->makeError($e->getMessage(), [$responseObject]);
             }
         }
 
-        return $this->response->make('Success!');
+        return $this->makeSuccess('general.debugSuccess', []);
+    }
+
+    /**
+     * @param $txn
+     */
+    protected function handleCapturePush($txn)
+    {
+        $txnId = $txn->txnId;
+        $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txnId);
+
+        if (!$relation instanceof OrderTxnIdRelation) {
+            throw new \RuntimeException('response.errorOrderTxnIdRelationNotFound');
+        }
+
+        $this->paymentService->createPlentyPayment($txn, $relation->mopId, $relation->orderId);
+    }
+
+    //<editor-fold desc="Responses">
+    /**
+     * @param $message
+     * @param int $code
+     * @return Response
+     */
+    protected function makeResponse($message, $code = Response::HTTP_OK): Response
+    {
+        return $this->response->make($this->getTranslator()->trans($message), $code);
+    }
+
+    /**
+     * @param $message
+     * @param $logData
+     * @return Response
+     */
+    protected function makeSuccess($message, $logData): Response
+    {
+        $this->notification->debug($message, __METHOD__, $logData);
+        return $this->makeResponse($message);
+    }
+
+    /**
+     * @param $message
+     * @param $logData
+     * @return Response
+     */
+    protected function makeError($message, $logData): Response
+    {
+        $this->notification->error($message, __METHOD__, $logData, true);
+        return $this->makeResponse($message, Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+    //</editor-fold>
+
+    /**
+     * @param $responseObject
+     * @return mixed
+     */
+    protected function getTransactionCode($responseObject)
+    {
+        $code = $responseObject['PAYMENT.CODE'];
+        $paymentCodeParts = explode('.', $code);
+        if (\count($paymentCodeParts) < 2) {
+            throw new \RuntimeException('errorUnknownPaymentCode');
+        }
+        list(, $transactionCode) = $paymentCodeParts;
+        return $transactionCode;
     }
 }

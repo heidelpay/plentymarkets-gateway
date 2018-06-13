@@ -404,11 +404,12 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
      */
     protected function returnVerifiedUrlToFile($path, array $allowedExtensions): string
     {
+        $returnPath = $path;
         $preg = '#^(http|https)://.*\.(' . implode('|', $allowedExtensions) . ')#i';
-        if (preg_match($preg, $path)) {
-            return $path;
+        if (!preg_match($preg, $path)) {
+            $returnPath = '';
         }
-        return '';
+        return $returnPath;
     }
     //</editor-fold>
 }

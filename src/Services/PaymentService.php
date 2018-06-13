@@ -375,7 +375,7 @@ class PaymentService
         // general
         $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
         if (null !== $methodInstance) {
-            $this->heidelpayRequest['FRONTEND.CSS_PATH'] = $this->config->getIFrameCssPath($methodInstance);
+            $this->heidelpayRequest['FRONTEND_CSS_PATH'] = $this->config->getIFrameCssPath($methodInstance);
         }
 
         // TODO: Riskinformation for future payment methods

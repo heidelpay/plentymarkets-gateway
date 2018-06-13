@@ -48,6 +48,11 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
             self::ARRAY_KEY_KEY => DebitCard::KEY,
             self::ARRAY_KEY_DEFAULT_NAME => DebitCard::DEFAULT_NAME,
         ],
+        Sofort::class => [
+            self::ARRAY_KEY_CONFIG_KEY => Sofort::CONFIG_KEY,
+            self::ARRAY_KEY_KEY => Sofort::KEY,
+            self::ARRAY_KEY_DEFAULT_NAME => Sofort::DEFAULT_NAME,
+        ],
         DirectDebit::class => [
             self::ARRAY_KEY_CONFIG_KEY => DirectDebit::CONFIG_KEY,
             self::ARRAY_KEY_KEY => DirectDebit::KEY,
@@ -58,11 +63,6 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
 //            self::ARRAY_KEY_KEY => Prepayment::KEY,
 //            self::ARRAY_KEY_DEFAULT_NAME => Prepayment::DEFAULT_NAME,
 //        ],
-        Sofort::class => [
-            self::ARRAY_KEY_CONFIG_KEY => Sofort::CONFIG_KEY,
-            self::ARRAY_KEY_KEY => Sofort::KEY,
-            self::ARRAY_KEY_DEFAULT_NAME => Sofort::DEFAULT_NAME,
-        ],
 //        PayPal::class => [
 //            self::ARRAY_KEY_CONFIG_KEY => PayPal::CONFIG_KEY,
 //            self::ARRAY_KEY_KEY => PayPal::KEY,

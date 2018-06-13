@@ -304,6 +304,14 @@
           "options": {
             "defaultValue": "0,00"
           }
+        },
+        "directdebit.iconUrl": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.directdebitIconUrl",
+          "options": {
+            "defaultValue": ""
+          }
         }
       }
     }

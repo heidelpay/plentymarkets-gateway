@@ -16,6 +16,7 @@ use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Transaction;
+use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Models\Basket;
@@ -42,6 +43,8 @@ use Plenty\Plugin\Templates\Twig;
  */
 class PaymentService
 {
+    use Translator;
+
     const CARD_METHODS = [CreditCard::class, DebitCard::class];
 
     /**
@@ -224,13 +227,14 @@ class PaymentService
         int $mopId
     ): array {
         $value = '';
+        $clientErrorMessage = 'heidelpay::payment.errorInternalErrorTryAgainLater';
 
         /** @var AbstractMethod $methodInstance */
         $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
 
         if (!$methodInstance instanceof PaymentMethodContract) {
             $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
-            $value = 'heidelpay::payment.errorInternalErrorTryAgainLater';
+            $value = $clientErrorMessage;
             return [$type, $value];
         }
 
@@ -245,10 +249,9 @@ class PaymentService
             try {
                 $value = $this->handleSyncResponse($type, $result);
             } catch (\RuntimeException $e) {
+                $this->notification->error($clientErrorMessage, __METHOD__, [$type, $e->getMessage()]);
                 $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
-                $logData = [$type, $e->getMessage()];
-                $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__, $logData);
-                $value = $e->getMessage();
+                $value = $this->getTranslator()->trans($clientErrorMessage);
             }
 
             if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {

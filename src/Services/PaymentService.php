@@ -157,7 +157,7 @@ class PaymentService
 
         // Retrieve heidelpay Transaction by txnId to get values needed for plenty payment (e.g. amount etc).
         $txnId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
-        $this->paymentHelper->createOrderTxnIdRelation($orderId, $txnId, $mopId);
+        $this->paymentHelper->createOrUpdateRelation($txnId, $mopId, $orderId);
 
         $transactions = $this->transactionRepository->getTransactionsByTxnId($txnId);
         foreach ($transactions as $transaction) {
@@ -201,7 +201,10 @@ class PaymentService
         int $mopId,
         array $parameters = []
     ): array {
-        $this->prepareRequest($basket, $paymentMethod, $mopId);
+
+        $txnId = $this->createNewTxnId($basket);
+        $this->paymentHelper->createOrUpdateRelation($mopId, $txnId);
+        $this->prepareRequest($basket, $paymentMethod, $mopId, $txnId);
 
         $result = $this->libService->sendTransactionRequest($paymentMethod, [
             'request' => $this->heidelpayRequest,
@@ -307,9 +310,10 @@ class PaymentService
     /**
      * @param Basket $basket
      * @param string $paymentMethod
-     * @param int    $mopId
+     * @param int $mopId
+     * @param string $transactionId
      */
-    private function prepareRequest(Basket $basket, string $paymentMethod, int $mopId)
+    private function prepareRequest(Basket $basket, string $paymentMethod, int $mopId, string $transactionId)
     {
         // set authentification data
         $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($paymentMethod);
@@ -333,9 +337,6 @@ class PaymentService
             $this->heidelpayRequest['NAME_COMPANY'] = $addresses['billing']->companyName;
         }
 
-        // create transactionId and store it in the customer session to fetch the correct transaction later.
-        $transactionId = $transactionId = uniqid($basket->id . '.', true);
-        $this->sessionStorageFactory->getPlugin()->setValue(SessionKeys::SESSION_KEY_TXN_ID, $transactionId);
         $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $transactionId;
 
         // set basket information (amount, currency, orderId, ...)
@@ -523,5 +524,18 @@ class PaymentService
     protected function renderPaymentForm(string $template, array $parameters = []): string
     {
         return $this->twig->render($template, $parameters);
+    }
+
+    /**
+     * Creates transactionId and store it in the customer session to fetch the correct transaction later.
+     *
+     * @param Basket $basket
+     * @return string
+     */
+    private function createNewTxnId(Basket $basket): string
+    {
+        $transactionId = $transactionId = uniqid($basket->id . '.', true);
+        $this->sessionStorageFactory->getPlugin()->setValue(SessionKeys::SESSION_KEY_TXN_ID, $transactionId);
+        return $transactionId;
     }
 }

@@ -15,6 +15,7 @@ use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
 use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
+use Heidelpay\Models\OrderTxnIdRelation;
 use Heidelpay\Models\Transaction;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
@@ -436,19 +437,6 @@ class PaymentHelper
     }
 
     /**
-     * Create relation between order and txn id.
-     *
-     * @param int $orderId
-     * @param string $txnId
-     * @param int $mopId
-     */
-    public function createOrderTxnIdRelation(int $orderId, string $txnId, int $mopId)
-    {
-        $this->orderTxnIdRepo->createOrderTxnIdRelation($orderId, $txnId, $mopId);
-        $this->assignTxnIdToOrder($txnId, $orderId);
-    }
-
-    /**
      * Adds the txnId to the order as external orderId.
      *
      * @param string $txnId
@@ -465,6 +453,20 @@ class PaymentHelper
         $order->properties[] = $orderProperty;
 
         $this->orderRepository->updateOrder($order->toArray(), $order->id);
+    }
+
+    /**
+     * @param int $mopId
+     * @param $txnId
+     * @param int $orderId
+     */
+    public function createOrUpdateRelation(int $mopId, $txnId, int $orderId = 0)
+    {
+        $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txnId);
+        if (!$relation instanceof OrderTxnIdRelation) {
+            $this->orderTxnIdRepo->createOrderTxnIdRelation($orderId, $txnId, $mopId);
+            $this->assignTxnIdToOrder($txnId, $orderId);
+        }
     }
 
     /**

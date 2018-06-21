@@ -204,7 +204,7 @@ class PaymentService
     ): array {
 
         $txnId = $this->createNewTxnId($basket);
-        $this->paymentHelper->createOrUpdateRelation($mopId, $txnId);
+        $this->paymentHelper->createOrUpdateRelation($txnId, $mopId);
         $this->prepareRequest($basket, $paymentMethod, $mopId, $txnId);
 
         $result = $this->libService->sendTransactionRequest($paymentMethod, [
@@ -220,7 +220,6 @@ class PaymentService
      * Depending on the given payment method, return some information
      * regarding the payment method, or just continue the process.
      *
-     * @param OrderService $orderService
      * @param string $paymentMethod
      * @param Basket $basket
      * @param int $mopId
@@ -228,12 +227,15 @@ class PaymentService
      * @return array
      */
     public function getPaymentMethodContent(
-        OrderService $orderService,
         string $paymentMethod,
         Basket $basket,
         int $mopId
     ): array {
         $value = '';
+
+        /** @var OrderService $orderService */
+        $orderService = pluginApp(OrderService::class);
+
         $clientErrorMessage = 'heidelpay::payment.errorInternalErrorTryAgainLater';
 
         /** @var AbstractMethod $methodInstance */

@@ -64,8 +64,8 @@ interface OrderTxnIdRelationRepositoryContract
     /**
      * Return the order id associated to the given txn id.
      *
-     * @param $txnId
+     * @param string $txnId
      * @return int|null
      */
-    public function getOrderIdByTxnId($txnId);
+    public function getOrderIdByTxnId(string $txnId);
 }

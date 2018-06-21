@@ -107,7 +107,7 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
     /**
      * {@inheritDoc}
      */
-    public function getOrderIdByTxnId($txnId): int
+    public function getOrderIdByTxnId(string $txnId): int
     {
         return $this->getOrderTxnIdRelationByTxnId($txnId)->orderId;
     }

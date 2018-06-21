@@ -456,11 +456,11 @@ class PaymentHelper
     }
 
     /**
+     * @param string $txnId
      * @param int $mopId
-     * @param $txnId
      * @param int $orderId
      */
-    public function createOrUpdateRelation(int $mopId, $txnId, int $orderId = 0)
+    public function createOrUpdateRelation(string $txnId, int $mopId, int $orderId = 0)
     {
         $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txnId);
         if (!$relation instanceof OrderTxnIdRelation) {

@@ -173,11 +173,12 @@ class PaymentService
             return ['error', 'heidelpay::error.errorDuringPaymentExecution'];
         }
 
-        // create payment transaction type is not authorize, in this case it will be created if a CP is pushed.
+        // create payment transaction if type is not authorize, in this case it will be created if a CP is pushed.
         if (TransactionType::AUTHORIZE !== $transaction->transactionType) {
-            $plentyPayment = $this->createPlentyPayment($transaction, $transaction->paymentMethodId, $orderId);
-            if (!($plentyPayment instanceof Payment)) {
-                return ['error', 'heidelpay::error.errorDuringPaymentExecution'];
+            try {
+                $this->createPlentyPayment($transaction, $transaction->paymentMethodId, $orderId);
+            } catch (\RuntimeException $e) {
+                return ['error', $e->getMessage()];
             }
         }
 
@@ -505,6 +506,8 @@ class PaymentService
 
         if ($payment instanceof Payment) {
             $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $orderId, $txnId);
+        } else {
+            throw new \RuntimeException('heidelpay::error.errorDuringPaymentExecution');
         }
 
         return $payment;

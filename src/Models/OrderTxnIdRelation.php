@@ -19,6 +19,7 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 /**
  * heidelpay OrderTxnIdRelation model class
  *
+ * @property int $id
  * @property int $orderId
  * @property string $txnId
  * @property int $mopId
@@ -29,20 +30,20 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 class OrderTxnIdRelation extends Model
 {
     const FIELD_ORDER_ID = 'orderId';
+    const FIELD_ENTITY_ID = 'id';
     const FIELD_TXN_ID = 'txnId';
     const FIELD_MOP_ID = 'mopId';
     const FIELD_ASSIGNED_AT = 'assignedAt';
     const FIELD_CREATED_AT = 'createdAt';
     const FIELD_UPDATED_AT = 'updatedAt';
 
+    public $id;
     public $orderId;
     public $txnId;
     public $mopId;
     public $assignedAt;
     public $createdAt;
     public $updatedAt;
-
-    protected $primaryKeyFieldName = self::FIELD_ORDER_ID;
 
     /**
      * @return string

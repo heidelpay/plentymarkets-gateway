@@ -31,6 +31,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL;
     const INITIALIZE_PAYMENT = true;
     const FORM_TEMPLATE = '';
+    const CREATE_ORDER_BEFORE_REDIRECT = false;
 
     /**
      * @var PaymentHelper $helper
@@ -244,5 +245,15 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     public function getFormTemplate(): string
     {
         return static::FORM_TEMPLATE;
+    }
+
+    /**
+     * Returns flag indicating whether the order should be created prior to the redirect or after.
+     *
+     * @return mixed
+     */
+    public function createOrderBeforeRedirect()
+    {
+        return static::CREATE_ORDER_BEFORE_REDIRECT;
     }
 }

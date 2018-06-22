@@ -3,6 +3,7 @@ namespace Heidelpay\Migrations;
 
 use Heidelpay\Models\OrderTxnIdRelation;
 use Plenty\Modules\Plugin\DataBase\Contracts\Migrate;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Transactions table migration class
@@ -18,9 +19,13 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Migrate;
  */
 class CreateHeidelpayOrderTxnIdRelationTable
 {
+    use Loggable;
+
     public function run(Migrate $migrate)
     {
+        $this->getLogger(__METHOD__)->error('Run Migration: ' . self::class);
+
         $migrate->deleteTable(OrderTxnIdRelation::class);
-        $migrate->createTable(OrderTxnIdRelation::class);
+//        $migrate->createTable(OrderTxnIdRelation::class);
     }
 }

@@ -27,6 +27,7 @@
   "runOnBuild": [
     "Heidelpay\\Migrations\\CreateHeidelpayTables",
     "Heidelpay\\Migrations\\CreateHeidelpayOrderTxnIdRelationTable",
-    "Heidelpay\\Migrations\\DeleteOrderTxnIdRelationTable"
+    "Heidelpay\\Migrations\\DeleteOrderTxnIdRelationTable",
+    "Heidelpay\\Migrations\\CreateOrderTxnIdRelationTableWithIdAsPrimaryKey"
   ]
 }

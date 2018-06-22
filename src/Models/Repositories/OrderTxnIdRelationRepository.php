@@ -111,4 +111,20 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
     {
         return $this->getOrderTxnIdRelationByTxnId($txnId)->orderId;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function createOrUpdateRelation(string $txnId, int $mopId, int $orderId = 0)
+    {
+        $relation = $this->getOrderTxnIdRelationByTxnId($txnId);
+        if (!$relation instanceof OrderTxnIdRelation) {
+            $relation = $this->createOrderTxnIdRelation($orderId, $txnId, $mopId);
+        } else {
+            $relation->orderId = $orderId;
+            $relation->mopId = $orderId;
+            $relation = $this->updateOrderTxnIdRelation($relation);
+        }
+        return $relation;
+    }
 }

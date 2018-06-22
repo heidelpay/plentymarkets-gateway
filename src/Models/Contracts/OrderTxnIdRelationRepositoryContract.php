@@ -68,4 +68,14 @@ interface OrderTxnIdRelationRepositoryContract
      * @return int|null
      */
     public function getOrderIdByTxnId(string $txnId);
+
+    /**
+     * Return updated or created object.
+     *
+     * @param string $txnId
+     * @param int $mopId
+     * @param int $orderId
+     * @return OrderTxnIdRelation|null
+     */
+    public function createOrUpdateRelation(string $txnId, int $mopId, int $orderId = 0);
 }

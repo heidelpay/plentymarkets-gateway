@@ -463,14 +463,9 @@ class PaymentHelper
      */
     public function createOrUpdateRelation(string $txnId, int $mopId, int $orderId = 0)
     {
-        $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txnId);
-        if (!$relation instanceof OrderTxnIdRelation) {
-            $relation = $this->orderTxnIdRepo->createOrderTxnIdRelation($orderId, $txnId, $mopId);
+        $relation =  $this->orderTxnIdRepo->createOrUpdateRelation($txnId, $mopId, $orderId);
+        if ($orderId !== 0) {
             $this->assignTxnIdToOrder($txnId, $orderId);
-        } else {
-            $relation->orderId = $orderId;
-            $relation->mopId = $orderId;
-            $relation = $this->orderTxnIdRepo->updateOrderTxnIdRelation($relation);
         }
         return $relation;
     }

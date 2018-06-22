@@ -29,8 +29,8 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Model;
  */
 class OrderTxnIdRelation extends Model
 {
+    const FIELD_ID = 'id';
     const FIELD_ORDER_ID = 'orderId';
-    const FIELD_ENTITY_ID = 'id';
     const FIELD_TXN_ID = 'txnId';
     const FIELD_MOP_ID = 'mopId';
     const FIELD_ASSIGNED_AT = 'assignedAt';

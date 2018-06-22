@@ -26,7 +26,6 @@
   },
   "runOnBuild": [
     "Heidelpay\\Migrations\\CreateHeidelpayTables",
-    "Heidelpay\\Migrations\\CreateHeidelpayOrderTxnIdRelationTable",
-    "Heidelpay\\Migrations\\UpdateOrderTxnIdRelationTable"
+    "Heidelpay\\Migrations\\CreateHeidelpayOrderTxnIdRelationTable"
   ]
 }

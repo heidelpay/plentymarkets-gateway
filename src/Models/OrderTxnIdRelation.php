@@ -37,7 +37,7 @@ class OrderTxnIdRelation extends Model
     const FIELD_CREATED_AT = 'createdAt';
     const FIELD_UPDATED_AT = 'updatedAt';
 
-    public $id;
+    public $id = 0;
     public $orderId;
     public $txnId;
     public $mopId;

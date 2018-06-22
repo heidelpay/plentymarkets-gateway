@@ -4,6 +4,7 @@ namespace Heidelpay\Migrations;
 
 use Heidelpay\Models\Transaction;
 use Plenty\Modules\Plugin\DataBase\Contracts\Migrate;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Transactions table migration class
@@ -19,8 +20,11 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Migrate;
  */
 class CreateHeidelpayTables
 {
+    use Loggable;
+
     public function run(Migrate $migrate)
     {
+        $this->getLogger(__METHOD__)->error('Run Migration: ' . self::class);
         $migrate->createTable(Transaction::class);
     }
 }

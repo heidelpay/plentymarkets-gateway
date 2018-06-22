@@ -20,6 +20,7 @@ class CreateHeidelpayOrderTxnIdRelationTable
 {
     public function run(Migrate $migrate)
     {
+        $migrate->deleteTable(OrderTxnIdRelation::class);
         $migrate->createTable(OrderTxnIdRelation::class);
     }
 }

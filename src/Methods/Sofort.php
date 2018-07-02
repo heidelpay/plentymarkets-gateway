@@ -24,5 +24,4 @@ class Sofort extends AbstractMethod
     const TRANSACTION_TYPE = TransactionType::AUTHORIZE;
     const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL;
     const INITIALIZE_PAYMENT = true;
-    const CREATE_ORDER_BEFORE_REDIRECT = true;
 }

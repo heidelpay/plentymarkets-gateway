@@ -17,7 +17,6 @@ use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Traits\Translator;
-use IO\Services\OrderService;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Models\Basket;
@@ -222,7 +221,7 @@ class PaymentService
      *
      * @param string $paymentMethod
      * @param Basket $basket
-     * @param int $mopId
+     * @param int    $mopId
      *
      * @return array
      */
@@ -266,23 +265,6 @@ class PaymentService
             if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
                 // $value should contain the payment frame url (also form url)
                 $value = $this->renderPaymentForm($methodInstance->getFormTemplate(), ['paymentFrameUrl' => $value]);
-            }
-        }
-
-        // some payments are marked paid immediately after the redirect (e.g. Sofort)
-        // if the redirect fails the payment knows about the payment but the shop has no order.
-        // this creates the order prior to the redirect to avoid the problem.
-        // todo: no redirect to place-order but to execute_payment Url in this case
-        // todo: redirect to place-order in other cases
-        // todo: replace error log with actual log
-        if ($methodInstance->createOrderBeforeRedirect()) {
-            try {
-                $orderData = $orderService->placeOrder();
-                $this->notification->error('Place order prior to redirect', __METHOD__, [$orderData], true);
-            } catch (\Exception $exception) {
-                $this->notification->error($exception->getMessage(), __METHOD__, [$exception], true);
-                $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
-                $value = $clientErrorMessage;
             }
         }
 

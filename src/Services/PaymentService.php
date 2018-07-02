@@ -3,7 +3,6 @@
 namespace Heidelpay\Services;
 
 use Heidelpay\Configs\MethodConfigContract;
-use Heidelpay\Constants\OrderStatus;
 use Heidelpay\Constants\Plugin;
 use Heidelpay\Constants\Routes;
 use Heidelpay\Constants\Salutation;
@@ -23,8 +22,6 @@ use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
-use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
-use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
@@ -227,14 +224,12 @@ class PaymentService
      * @param Basket $basket
      * @param int $mopId
      *
-     * @param OrderRepositoryContract $orderRepo
      * @return array
      */
     public function getPaymentMethodContent(
         string $paymentMethod,
         Basket $basket,
-        int $mopId,
-        OrderRepositoryContract $orderRepo
+        int $mopId
     ): array {
         $value = '';
 
@@ -282,17 +277,8 @@ class PaymentService
         // todo: replace error log with actual log
         if ($methodInstance->createOrderBeforeRedirect()) {
             try {
-                /** @var Order $order */
-                $order = $orderService->placeOrder()->order;
-
-                // deactivate order
-                $orderRepo->updateOrder(['statusId'=> OrderStatus::WAITING_FOR_PAYMENT_AND_ACTIVATION], $order->id);
-
-                // activate order on ack or ack push
-                // cancel order on nok or nock push
-
-
-                $this->notification->error('Placed order prior to redirect', __METHOD__, [$order], true);
+                $orderData = $orderService->placeOrder();
+                $this->notification->error('Place order prior to redirect', __METHOD__, [$orderData], true);
             } catch (\Exception $exception) {
                 $this->notification->error($exception->getMessage(), __METHOD__, [$exception], true);
                 $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;

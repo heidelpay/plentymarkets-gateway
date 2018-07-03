@@ -232,9 +232,6 @@ class PaymentService
     ): array {
         $value = '';
 
-        /** @var OrderService $orderService */
-        $orderService = pluginApp(OrderService::class);
-
         $clientErrorMessage = 'heidelpay::payment.errorInternalErrorTryAgainLater';
 
         /** @var AbstractMethod $methodInstance */

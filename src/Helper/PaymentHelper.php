@@ -508,12 +508,15 @@ class PaymentHelper
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
 
-        // Get the order by the given order ID
-        $order = $authHelper->processUnguarded(
-            function () use ($orderId) {
-                return $this->orderRepo->findOrderById($orderId);
-            }
-        );
+        try {// Get the order by the given order ID
+            $order = $authHelper->processUnguarded(
+                function () use ($orderId) {
+                    return $this->orderRepo->findOrderById($orderId);
+                }
+            );
+        } catch (\Exception $e) {
+            // no need to handle here
+        }
 
         // Check whether the order exists
         if (!$order instanceof Order) {

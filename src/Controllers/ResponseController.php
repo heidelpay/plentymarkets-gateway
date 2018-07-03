@@ -143,7 +143,7 @@ class ResponseController extends Controller
 
         // return success, if transaction already exists, to avoid endless pushing
         if ($this->transactionService->checkTransactionAlreadyExists($responseObject)) {
-            return $this->makeSuccess('response.debugTransactionAlreadyExists', ['Transaction' => $response]);
+            return $this->makeSuccess('response.debugTransactionAlreadyExists', ['Response' => $response]);
         }
 
         try {
@@ -259,7 +259,7 @@ class ResponseController extends Controller
     protected function makeError($message, $logData): Response
     {
         $this->notification->error($message, __METHOD__, $logData, true);
-        return $this->makeResponse($message, Response::HTTP_INTERNAL_SERVER_ERROR);
+        return $this->makeResponse($message);
     }
     //</editor-fold>
 }

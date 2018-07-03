@@ -188,8 +188,9 @@ class ResponseController extends Controller
         $transactionCode = $this->paymentHelper->getTransactionCode($responseObject);
 
         switch ($transactionCode) {
-            case TransactionType::HP_CAPTURE:
-                $this->handleCapturePush($txn);
+            case TransactionType::HP_CAPTURE:           // intended fall-through
+            case TransactionType::HP_RECEIPT:
+                $this->handleIncomingPaymentPush($txn);
                 break;
             case TransactionType::HP_AUTHORIZE:         // intended fall-through
             case TransactionType::HP_REGISTRATION:      // intended fall-through
@@ -200,7 +201,6 @@ class ResponseController extends Controller
             case TransactionType::HP_FINALIZE:          // intended fall-through
             case TransactionType::HP_INITIALIZE:        // intended fall-through
             case TransactionType::HP_REBILL:            // intended fall-through
-            case TransactionType::HP_RECEIPT:           // intended fall-through
             case TransactionType::HP_REFUND:            // intended fall-through
             case TransactionType::HP_REREGISTRATION:    // intended fall-through
             case TransactionType::HP_REVERSAL:          // intended fall-through
@@ -211,18 +211,20 @@ class ResponseController extends Controller
     }
 
     /**
+     * Handles Capture(CAP) and Receipt(REC) push messages.
+     *
      * @param $txn
      *
      * @throws \RuntimeException
      */
-    protected function handleCapturePush($txn)
+    protected function handleIncomingPaymentPush($txn)
     {
         $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txn->txnId);
-
         if (!$relation instanceof OrderTxnIdRelation) {
             throw new \RuntimeException('response.errorOrderTxnIdRelationNotFound');
         }
 
+        // don't handle RuntimeExeption
         $this->paymentService->createPlentyPayment($txn, $relation->mopId, $relation->orderId);
     }
     //</editor-fold>

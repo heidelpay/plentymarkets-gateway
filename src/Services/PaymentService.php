@@ -500,7 +500,7 @@ class PaymentService
         $properties[] = $this->paymentHelper
             ->getPaymentProperty(PaymentProperty::TYPE_ORIGIN, (string) Payment::ORIGIN_PLUGIN);
         $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $txnId);
-        $bookingText = 'Buchungsnummer: ' . $orderId . ', TransactionId: ' . $txnId;
+        $bookingText = 'Heidelpay Txn-ID: ' . $txnId;
         $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $bookingText);
         $payment->properties = $properties;
 
@@ -509,9 +509,16 @@ class PaymentService
         $this->notification->debug('payment.debugCreatePlentyPayment', __METHOD__, ['Payment' => $payment]);
         $payment = $this->paymentRepository->createPayment($payment);
 
-        if ($payment instanceof Payment) {
-            $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $orderId, $txnId);
-        } else {
+        if (!$payment instanceof Payment) {
+            throw new \RuntimeException('heidelpay::error.errorDuringPaymentExecution');
+        }
+
+        try {
+            $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $orderId);
+        } catch (\RuntimeException $e) {
+            $logData = ['Payment' => $payment, 'txnId' => $txnId];
+            $this->notification->error($e->getMessage(), __METHOD__, $logData);
+            $this->paymentHelper->prependPaymentBookingText($payment, $e->getMessage());
             throw new \RuntimeException('heidelpay::error.errorDuringPaymentExecution');
         }
 

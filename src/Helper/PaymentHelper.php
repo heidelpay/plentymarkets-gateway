@@ -29,6 +29,7 @@ use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
+use Plenty\Modules\Payment\Contracts\PaymentPropertyRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Payment\Models\Payment;
@@ -61,7 +62,7 @@ class PaymentHelper
     /**
      * @var OrderRepositoryContract
      */
-    private $orderRepository;
+    private $orderRepo;
     /**
      * @var PaymentOrderRelationRepositoryContract
      */
@@ -78,6 +79,10 @@ class PaymentHelper
      * @var OrderTxnIdRelationRepositoryContract
      */
     private $orderTxnIdRepo;
+    /**
+     * @var PaymentPropertyRepositoryContract
+     */
+    private $paymentPropertyRepo;
 
     /**
      * AbstractHelper constructor.
@@ -88,6 +93,7 @@ class PaymentHelper
      * @param MainConfigContract $mainConfig
      * @param MethodConfigContract $methodConfig
      * @param OrderTxnIdRelationRepositoryContract $orderTxnIdRepo
+     * @param PaymentPropertyRepositoryContract $propertyRepo
      */
     public function __construct(
         PaymentMethodRepositoryContract $paymentMethodRepo,
@@ -95,14 +101,16 @@ class PaymentHelper
         PaymentOrderRelationRepositoryContract $paymentOrderRepo,
         MainConfigContract $mainConfig,
         MethodConfigContract $methodConfig,
-        OrderTxnIdRelationRepositoryContract $orderTxnIdRepo
+        OrderTxnIdRelationRepositoryContract $orderTxnIdRepo,
+        PaymentPropertyRepositoryContract $propertyRepo
     ) {
         $this->paymentMethodRepo = $paymentMethodRepo;
-        $this->orderRepository = $orderRepository;
+        $this->orderRepo = $orderRepository;
         $this->paymentOrderRelationRepo = $paymentOrderRepo;
         $this->mainConfig = $mainConfig;
         $this->methodConfig = $methodConfig;
         $this->orderTxnIdRepo = $orderTxnIdRepo;
+        $this->paymentPropertyRepo = $propertyRepo;
     }
 
     /**
@@ -309,35 +317,14 @@ class PaymentHelper
      *
      * @param Payment $payment
      * @param int $orderId
-     * @param string $txnId
      * @return Order
+     * @throws \RuntimeException
      */
-    public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId, string $txnId): Order
+    public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId): Order
     {
-        $order = null;
+        /** @var Order $order */
+        $order = $this->getOrder($orderId);
 
-        // Get the order by the given order ID
-        try {
-            /** @var AuthHelper $authHelper */
-            $authHelper = pluginApp(AuthHelper::class);
-            /** @var OrderRepositoryContract $orderRepo */
-            $orderRepo = $this->orderRepository;
-            $order = $authHelper->processUnguarded(
-                function () use ($orderRepo, $orderId) {
-                    return $orderRepo->findOrderById($orderId);
-                }
-            );
-        } catch (\Exception $e) {
-            $additionalInfo1 = ['OrderId' => $orderId, 'Exception' => $e->getMessage()];
-            $this->getLogger(__METHOD__)->error('Error loading Order', $additionalInfo1);
-        }
-
-        // Check whether the order truly exists in plentymarkets
-        if (!$order instanceof Order || !$payment instanceof Payment || empty($txnId)) {
-            $logData = ['Order' => $order, 'Payment' => $payment, 'txnId' => $txnId];
-            $this->getLogger(__METHOD__)->error('Could not create OrderTxnIdRelation', $logData);
-            return $order;
-        }
         $additionalInfo = ['Order' => $order, 'Payment' => $payment];
         $this->getLogger(__METHOD__)->debug('payment.debugAssignPaymentToOrder', $additionalInfo);
 
@@ -444,7 +431,7 @@ class PaymentHelper
      */
     protected function assignTxnIdToOrder(string $txnId, int $orderId)
     {
-        $order = $this->orderRepository->findOrderById($orderId);
+        $order = $this->orderRepo->findOrderById($orderId);
 
         /** @var OrderProperty $orderProperty */
         $orderProperty = pluginApp(OrderProperty::class);
@@ -452,7 +439,7 @@ class PaymentHelper
         $orderProperty->value = $txnId;
         $order->properties[] = $orderProperty;
 
-        $this->orderRepository->updateOrder($order->toArray(), $order->id);
+        $this->orderRepo->updateOrder($order->toArray(), $order->id);
     }
 
     /**
@@ -485,5 +472,53 @@ class PaymentHelper
         }
         list(, $txnCode) = $paymentCodeParts;
         return $txnCode;
+    }
+
+    /**
+     * Add a text before the current payment booking text.
+     *
+     * @param Payment $paymentObject
+     * @param string $bookingText
+     * @return $this
+     */
+    public function prependPaymentBookingText(Payment $paymentObject, string $bookingText): self
+    {
+        /** @var PaymentProperty $bookingTextProperty */
+        $bookingTextProperty = $paymentObject->properties[PaymentProperty::TYPE_BOOKING_TEXT];
+        $oldBookingText = $bookingTextProperty->value;
+        $bookingText .= !empty($oldBookingText) ? ', ' . $oldBookingText : '';
+
+        $bookingTextProperty->value = $bookingText;
+        $this->paymentPropertyRepo->changeProperty($bookingTextProperty);
+
+        return $this;
+    }
+
+    /**
+     * Fetches the Order object to the given orderId.
+     *
+     * @param int $orderId
+     * @return Order
+     * @throws \RuntimeException
+     */
+    private function getOrder(int $orderId): Order
+    {
+        $order = null;
+
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+
+        // Get the order by the given order ID
+        $order = $authHelper->processUnguarded(
+            function () use ($orderId) {
+                return $this->orderRepo->findOrderById($orderId);
+            }
+        );
+
+        // Check whether the order exists
+        if (!$order instanceof Order) {
+            throw new \RuntimeException('Order #' . $orderId . ' not found!');
+        }
+        return $order;
     }
 }

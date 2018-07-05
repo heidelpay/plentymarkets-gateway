@@ -489,7 +489,7 @@ class PaymentHelper
         $bookingText .= !empty($oldBookingText) ? ', ' . $oldBookingText : '';
 
         $bookingTextProperty->value = $bookingText;
-        $this->paymentPropertyRepo->changeProperty((array) $bookingTextProperty);
+        $this->paymentPropertyRepo->changeProperty($bookingTextProperty);
 
         return $this;
     }
@@ -508,12 +508,14 @@ class PaymentHelper
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
 
-        if (!empty($orderId)) { // Get the order by the given order ID
+        try {// Get the order by the given order ID
             $order = $authHelper->processUnguarded(
                 function () use ($orderId) {
                     return $this->orderRepo->findOrderById($orderId);
                 }
             );
+        } catch (\Exception $e) {
+            // no need to handle here
         }
 
         // Check whether the order exists

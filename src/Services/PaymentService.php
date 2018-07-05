@@ -515,7 +515,8 @@ class PaymentService
         } catch (\RuntimeException $e) {
             $logData = ['Payment' => $payment, 'txnId' => $txnId];
             $this->notification->error($e->getMessage(), __METHOD__, $logData);
-            $this->paymentHelper->prependPaymentBookingText($payment, $e->getMessage());
+            // todo: Enable when plenty fix exists.
+//            $this->paymentHelper->prependPaymentBookingText($payment, $e->getMessage());
             throw new \RuntimeException('heidelpay::error.errorDuringPaymentExecution');
         }
 

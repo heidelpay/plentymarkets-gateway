@@ -168,8 +168,15 @@ class PaymentService
             }
         }
 
-        if (!($transaction instanceof Transaction) ||
-            !isset($transactionDetails['PRESENTATION.AMOUNT'], $transactionDetails['PRESENTATION.CURRENCY'])) {
+        if (!$transaction instanceof Transaction) {
+            $this->notification
+                ->error('Transaction is of unexpected Type', __METHOD__, ['Transaction' => $transaction], true);
+            return ['error', 'heidelpay::error.errorDuringPaymentExecution'];
+        }
+
+        if (!isset($transactionDetails['PRESENTATION.AMOUNT'], $transactionDetails['PRESENTATION.CURRENCY'])) {
+            $this->notification
+                ->error('Amount or currency is empty', __METHOD__, ['Transactiondetails' => $transactionDetails], true);
             return ['error', 'heidelpay::error.errorDuringPaymentExecution'];
         }
 

@@ -99,10 +99,11 @@ class TransactionService
             Transaction::PROCESSING_TIMESTAMP => $processingTimestamp
         ];
 
-        // temporary fields
-        $data[Transaction::TEMP_FIELD_ACCOUNT_HOLDER_NAME] = $heidelpayResponse['ACCOUNT.HOLDER'];
-
         $txn = $this->transactionRepository->createTransaction($data);
+
+        // temporary fields
+//        $data[Transaction::TEMP_FIELD_ACCOUNT_HOLDER_NAME] = $heidelpayResponse['ACCOUNT.HOLDER'];
+
         if ($txn === null || ! $txn instanceof Transaction) {
             throw new \RuntimeException('response.errorTransactionNotCreated');
         }

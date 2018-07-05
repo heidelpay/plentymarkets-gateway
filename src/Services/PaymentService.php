@@ -316,7 +316,7 @@ class PaymentService
      */
     private function prepareRequest(Basket $basket, string $paymentMethod, int $mopId, string $transactionId)
     {
-        // set authentification data
+        // set authentication data
         $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($paymentMethod);
         $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
 
@@ -492,6 +492,7 @@ class PaymentService
         $payment->receivedAt = date('Y-m-d H:i:s');
         $payment->status = $this->paymentHelper->mapToPlentyStatus($txnData);
         $payment->type = Payment::PAYMENT_TYPE_CREDIT; // From Merchant point of view
+        $payment->method = $this->paymentHelper->getPaymentMethodInstance($paymentMethodId);
 
         $properties = [];
         $properties[] = $this->paymentHelper
@@ -499,6 +500,8 @@ class PaymentService
         $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $txnId);
         $bookingText = 'Heidelpay Txn-ID: ' . $txnId;
         $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $bookingText);
+        $properties[] = $this->paymentHelper
+            ->getPaymentProperty(PaymentProperty::TYPE_ACCOUNT_HOLDER_OF_SENDER, $txnData->accountHolderName);
         $payment->properties = $properties;
 
         // create the payment

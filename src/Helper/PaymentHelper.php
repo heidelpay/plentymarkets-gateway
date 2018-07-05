@@ -382,6 +382,17 @@ class PaymentHelper
     }
 
     /**
+     * Instantiates payment method class identified by mopId.
+     *
+     * @param int $mopId
+     * @return PaymentMethodContract|null
+     */
+    public function getPaymentMethodInstanceByMopId(int $mopId)
+    {
+        return $this->getPaymentMethodInstance($this->mapMopToPaymentMethod($mopId));
+    }
+
+    /**
      * @param string $paymentMethod
      * @return PaymentMethodContract|null
      */

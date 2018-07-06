@@ -22,6 +22,7 @@ use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
+use Plenty\Modules\Payment\Contracts\ExtPaymentPropertyRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
@@ -97,6 +98,10 @@ class PaymentService
      * @var MethodConfigContract
      */
     private $config;
+    /**
+     * @var ExtPaymentPropertyRepositoryContract
+     */
+    private $ExtPaymentPropertyRepo;
 
     /**
      * PaymentService constructor.
@@ -111,6 +116,7 @@ class PaymentService
      * @param FrontendSessionStorageFactoryContract $sessionStorageFac
      * @param NotificationServiceContract $notification
      * @param MethodConfigContract $config
+     * @param ExtPaymentPropertyRepositoryContract $ePaymentPropertyRepo
      */
     public function __construct(
         AddressRepositoryContract $addressRepository,
@@ -122,7 +128,8 @@ class PaymentService
         Twig $twig,
         FrontendSessionStorageFactoryContract $sessionStorageFac,
         NotificationServiceContract $notification,
-        MethodConfigContract $config
+        MethodConfigContract $config,
+        ExtPaymentPropertyRepositoryContract $ePaymentPropertyRepo
     ) {
         $this->addressRepository = $addressRepository;
         $this->countryRepository = $countryRepository;
@@ -134,6 +141,7 @@ class PaymentService
         $this->sessionStorageFactory = $sessionStorageFac;
         $this->notification = $notification;
         $this->config = $config;
+        $this->ExtPaymentPropertyRepo = $ePaymentPropertyRepo;
     }
 
     /**
@@ -180,10 +188,12 @@ class PaymentService
             return ['error', 'heidelpay::error.errorDuringPaymentExecution'];
         }
 
-        // create payment transaction if type is not authorize, in this case it will be created if a CP is pushed.
+        // Create payment transaction if type is not authorize.
+        // If it is authorize the payment will be created when the capture is pushed.
         if (TransactionType::AUTHORIZE !== $transaction->transactionType) {
             try {
-                $this->createPlentyPayment($transaction, $transaction->paymentMethodId, $orderId);
+                $payment = $this->createPlentyPayment($transaction);
+                $this->assignPlentyPayment($payment, $orderId);
             } catch (\RuntimeException $e) {
                 return ['error', $e->getMessage()];
             }
@@ -480,33 +490,43 @@ class PaymentService
      * Create a plentymarkets payment entity.
      *
      * @param Transaction $txnData
-     * @param int $paymentMethodId
      *
-     * @param int $orderId
      * @return Payment
+     *
+     * @throws \RuntimeException
      */
-    public function createPlentyPayment(Transaction $txnData, int $paymentMethodId, int $orderId): Payment
+    public function createPlentyPayment(Transaction $txnData): Payment
     {
-        $paymentDetails = $txnData->transactionDetails;
-        $txnId = $txnData->txnId;
+        // todo: Create BookingtextHelper class to use the Array Serializer there.
+        // todo: Move prepend method as well.
+        /** @var ArraySerializerService $serializer */
+        $serializer = pluginApp(ArraySerializerService::class);
 
+        // Payment might have already been created before (e.g. in response controller)
+        $payment = $this->getPaymentByTransactionId($txnData);
+        if ($payment instanceof Payment) {
+            return $payment;
+        }
+
+        // Create payment if it does not exist yet
         /** @var Payment $payment */
         $payment = pluginApp(Payment::class);
-        $payment->mopId = $paymentMethodId;
+        $payment->mopId = $txnData->paymentMethodId;
         $payment->transactionType = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
-        $payment->amount = $paymentDetails['PRESENTATION.AMOUNT'];
-        $payment->currency = $paymentDetails['PRESENTATION.CURRENCY'];
+        $payment->amount = $txnData->transactionDetails['PRESENTATION.AMOUNT'];
+        $payment->currency = $txnData->transactionDetails['PRESENTATION.CURRENCY'];
         $payment->receivedAt = date('Y-m-d H:i:s');
         $payment->status = $this->paymentHelper->mapToPlentyStatus($txnData);
         $payment->type = Payment::PAYMENT_TYPE_CREDIT; // From Merchant point of view
 
+        $bookingTextArray = ['Origin' => 'Heidelpay', 'TxnId' => $txnData->txnId, 'ShortId' => $txnData->shortId];
+        $bookingText = $serializer->serializeKeyValue($bookingTextArray);
         $payment->properties = [
             $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_ORIGIN, (string) Payment::ORIGIN_PLUGIN),
-            $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $txnId),
-            $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, 'Heidelpay Txn-ID: ' . $txnId),
+            $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $txnData->txnId),
+            $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $bookingText),
         ];
 
-        // create the payment
         $payment->regenerateHash = true;
         $this->notification->debug('payment.debugCreatePlentyPayment', __METHOD__, ['Payment' => $payment]);
         $payment = $this->paymentRepository->createPayment($payment);
@@ -515,16 +535,26 @@ class PaymentService
             throw new \RuntimeException('heidelpay::error.errorDuringPaymentExecution');
         }
 
+        return $payment;
+    }
+
+    /**
+     * Attach plenty payment to plenty order (if it exists).
+     *
+     * @param Payment $payment
+     * @param int $orderId
+     */
+    public function assignPlentyPayment(Payment $payment, int $orderId)
+    {
         try {
             $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $orderId);
         } catch (\RuntimeException $e) {
-            $logData = ['Payment' => $payment, 'txnId' => $txnId];
+            $logData = ['Payment' => $payment, 'orderId' => $orderId];
             $this->notification->error($e->getMessage(), __METHOD__, $logData);
+            // todo: move to booking text helper
             $this->paymentHelper->prependPaymentBookingText($payment, $e->getMessage());
             throw new \RuntimeException('heidelpay::error.errorDuringPaymentExecution');
         }
-
-        return $payment;
     }
 
     /**
@@ -550,5 +580,37 @@ class PaymentService
         $transactionId = $transactionId = uniqid($basket->id . '.', true);
         $this->sessionStorageFactory->getPlugin()->setValue(SessionKeys::SESSION_KEY_TXN_ID, $transactionId);
         return $transactionId;
+    }
+
+    /**
+     * Fetch the payment by its TransactionId.
+     *
+     * @param Transaction $txnData
+     * @return Payment|null
+     */
+    private function getPaymentByTransactionId(Transaction $txnData)
+    {
+        /** @var ArraySerializerService $serializer */
+        $serializer = pluginApp(ArraySerializerService::class);
+        $txnId = $txnData->txnId;
+
+        // check whether a payment has already been created for this transaction
+        $paymentProperties = $this->ExtPaymentPropertyRepo->allByTypeIdAndValue(
+            PaymentProperty::TYPE_TRANSACTION_ID,
+            $txnId
+        );
+
+        /** @var PaymentProperty $paymentProperty */
+        foreach ($paymentProperties as $paymentProperty) {
+            $payment = $this->paymentRepository->getPaymentById($paymentProperty->paymentId);
+
+            $bookingText = $this->paymentHelper->getPaymentProperty($payment, PaymentProperty::TYPE_BOOKING_TEXT);
+            $shortId = $serializer->deserializeKeyValue($bookingText)['ShortId'];
+
+            if ($txnData->shortId === $shortId) {
+                return $payment;
+            }
+        }
+        return null;
     }
 }

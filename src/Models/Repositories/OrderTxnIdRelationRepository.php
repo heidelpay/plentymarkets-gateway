@@ -95,11 +95,15 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
     /**
      * @inheritdoc
      */
-    public function getOrderTxnIdRelationByTxnId(string $txnId)
+    public function getOrderTxnIdRelationByTxnId(string $txnId): OrderTxnIdRelation
     {
         $result =  $this->database->query(OrderTxnIdRelation::class)
             ->where(OrderTxnIdRelation::FIELD_TXN_ID, '=', $txnId)
             ->get();
+
+        if (!$result[0] instanceof OrderTxnIdRelation) {
+            throw new \RuntimeException('response.errorOrderTxnIdRelationNotFound');
+        }
 
         return $result[0];
     }

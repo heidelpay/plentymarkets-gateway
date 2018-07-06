@@ -53,6 +53,8 @@ class TransactionService
      * @param int|null $paymentMethodId
      * @param int|null $orderId
      *
+     * @throws \RuntimeException
+     *
      * @return Transaction
      */
     public function createTransaction(
@@ -99,9 +101,15 @@ class TransactionService
             Transaction::PROCESSING_TIMESTAMP => $processingTimestamp
         ];
 
-        $txn = $this->transactionRepository->createTransaction($data);
+        $txn = null;
 
-        if ($txn === null || ! $txn instanceof Transaction) {
+        try {
+            $txn = $this->transactionRepository->createTransaction($data);
+        } catch (\Exception $e) {
+            // no need to handle
+        }
+
+        if (!$txn instanceof Transaction) {
             throw new \RuntimeException('response.errorTransactionNotCreated');
         }
 

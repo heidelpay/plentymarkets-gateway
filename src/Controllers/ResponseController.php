@@ -6,7 +6,6 @@ use Heidelpay\Constants\Routes;
 use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
-use Heidelpay\Models\OrderTxnIdRelation;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\NotificationServiceContract;
@@ -86,8 +85,7 @@ class ResponseController extends Controller
 
     //<editor-fold desc="Handlers">
     /**
-     * Processes the incoming POST response and returns
-     * an action url depending on the response result.
+     * Process the incoming POST response and return the redirect url depending on the response result.
      *
      * @return string
      */
@@ -99,6 +97,7 @@ class ResponseController extends Controller
         ksort($postResponse);
 
         $response = $this->paymentService->handleAsyncPaymentResponse(['response' => $postResponse]);
+        $responseObject = $response['response'];
 
         $logData = ['POST response' => $postResponse, 'response' => $response];
         $this->notification->debug('response.debugReceivedResponse', __METHOD__, $logData);
@@ -109,25 +108,19 @@ class ResponseController extends Controller
             return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
         }
 
-        // create transaction
-        try {
-            $newTransaction = $this->transactionService->createTransaction($response);
-            $this->notification
-                ->debug('response.debugCreatedTransaction', __METHOD__, ['Transaction' => $newTransaction]);
-        } catch (\Exception $e) {
-            $this->notification->error($e->getMessage(), __METHOD__, ['data' => ['data' => $response['response']]]);
-            return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
-        }
-
-        // if the transaction is successful or pending, return the success url.
-        if ($response['isSuccess'] || $response['isPending']) {
-            return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_SUCCESS;
+        if ($this->createAndHandleTransaction($response, $responseObject)) {
+            // if the transaction is successful or pending, return the success url.
+            if ($response['isSuccess'] || $response['isPending']) {
+                return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_SUCCESS;
+            }
         }
 
         return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
     }
 
     /**
+     * Always returns success to avoid endless pushing.
+     *
      * @return Response
      */
     public function processPush(): Response
@@ -141,21 +134,8 @@ class ResponseController extends Controller
             return $this->makeError('error.errorResponseContainsErrorCode', ['Response' => $response]);
         }
 
-        // return success, if transaction already exists, to avoid endless pushing
-        if ($this->transactionService->checkTransactionAlreadyExists($responseObject)) {
-            return $this->makeSuccess('response.debugTransactionAlreadyExists', ['Response' => $response]);
-        }
-
-        try {
-            $txn = $this->transactionService->createTransaction($response);
-            $this->notification->debug('response.debugCreatedTransaction', __METHOD__, ['Transaction' => $txn]);
-
-            if ($response['isSuccess'] && !$response['isPending']) {
-                $this->handleTransaction($txn, $responseObject);
-            }
-        } catch (\RuntimeException $e) {
-            return $this->makeError($e->getMessage(), [$responseObject]);
-        }
+        // do not handle error (always return success)
+        $this->createAndHandleTransaction($response, $responseObject);
 
         return $this->makeSuccess('general.debugSuccess', []);
     }
@@ -190,7 +170,7 @@ class ResponseController extends Controller
         switch ($transactionCode) {
             case TransactionType::HP_CAPTURE:           // intended fall-through
             case TransactionType::HP_RECEIPT:
-                $this->handleIncomingPaymentPush($txn);
+                $this->handleIncomingPayment($txn);
                 break;
             case TransactionType::HP_AUTHORIZE:         // intended fall-through
             case TransactionType::HP_REGISTRATION:      // intended fall-through
@@ -212,20 +192,17 @@ class ResponseController extends Controller
 
     /**
      * Handles Capture(CAP) and Receipt(REC) push messages.
+     * Creates a payment if necessary and assignes it to the corresponding order.
      *
      * @param $txn
      *
      * @throws \RuntimeException
      */
-    protected function handleIncomingPaymentPush($txn)
+    protected function handleIncomingPayment($txn)
     {
         $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txn->txnId);
-        if (!$relation instanceof OrderTxnIdRelation) {
-            throw new \RuntimeException('response.errorOrderTxnIdRelationNotFound');
-        }
-
-        // don't handle RuntimeExeption
-        $this->paymentService->createPlentyPayment($txn, $relation->mopId, $relation->orderId);
+        $payment = $this->paymentService->createPlentyPayment($txn);
+        $this->paymentService->assignPlentyPayment($payment, $relation->orderId);
     }
     //</editor-fold>
 
@@ -260,6 +237,41 @@ class ResponseController extends Controller
     {
         $this->notification->error($message, __METHOD__, $logData, true);
         return $this->makeResponse($message);
+    }
+
+    /**
+     * Creates a transaction object and returns bool to indicate success.
+     *
+     * @param $response
+     * @param $responseObject
+     *
+     * @return bool
+     */
+    private function createAndHandleTransaction($response, $responseObject): bool
+    {
+        try {
+            /* todo: refactor -> move check and so on to Transaction service */
+            $txn = $this->transactionService->checkTransactionAlreadyExists($responseObject);
+
+            if ($txn instanceof Transaction) {
+                $message = 'response.debugTransactionAlreadyExists';
+            } else {
+                $txn = $this->transactionService->createTransaction($response);
+                $message = 'response.debugCreatedTransaction';
+            }
+
+            $this->notification->debug($message, __METHOD__, ['Response' => $response, 'Transaction' => $txn]);
+            /* todo: all in between can be refactored */
+
+            if ($response['isSuccess'] && !$response['isPending']) {
+                $this->handleTransaction($txn, $responseObject);
+            }
+
+        } catch (\RuntimeException $e) {
+            $this->notification->error($e->getMessage(), __METHOD__, ['data' => ['data' => $response['response']]]);
+            return false;
+        }
+        return true;
     }
     //</editor-fold>
 }

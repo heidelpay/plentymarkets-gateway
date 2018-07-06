@@ -57,9 +57,11 @@ interface OrderTxnIdRelationRepositoryContract
      * Returns relation object by heidelpay transaction id.
      *
      * @param string $txnId
-     * @return OrderTxnIdRelation|null
+     * @return OrderTxnIdRelation
+     *
+     * @throws \RuntimeException
      */
-    public function getOrderTxnIdRelationByTxnId(string $txnId);
+    public function getOrderTxnIdRelationByTxnId(string $txnId): OrderTxnIdRelation;
 
     /**
      * Return the order id associated to the given txn id.

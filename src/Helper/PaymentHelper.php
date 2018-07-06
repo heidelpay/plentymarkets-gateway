@@ -548,7 +548,7 @@ class PaymentHelper
      * @param int $typeId
      * @return PaymentProperty
      */
-    private function getPaymentProperty(Payment $paymentObject, int $typeId): PaymentProperty
+    public function getPaymentProperty(Payment $paymentObject, int $typeId): PaymentProperty
     {
         /** @var PaymentProperty $property */
         foreach ($paymentObject->properties as $property) {

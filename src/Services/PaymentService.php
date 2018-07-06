@@ -499,7 +499,6 @@ class PaymentService
         $payment->receivedAt = date('Y-m-d H:i:s');
         $payment->status = $this->paymentHelper->mapToPlentyStatus($txnData);
         $payment->type = Payment::PAYMENT_TYPE_CREDIT; // From Merchant point of view
-        $payment->method = $this->paymentHelper->getPaymentMethodInstance($paymentMethodId);
 
         $payment->properties = [
             $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_ORIGIN, (string) Payment::ORIGIN_PLUGIN),

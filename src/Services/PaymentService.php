@@ -477,7 +477,7 @@ class PaymentService
     }
 
     /**
-     * Creates a plentymarkets payment entity.
+     * Create a plentymarkets payment entity.
      *
      * @param Transaction $txnData
      * @param int $paymentMethodId
@@ -501,15 +501,11 @@ class PaymentService
         $payment->type = Payment::PAYMENT_TYPE_CREDIT; // From Merchant point of view
         $payment->method = $this->paymentHelper->getPaymentMethodInstance($paymentMethodId);
 
-        $properties = [];
-        $properties[] = $this->paymentHelper
-            ->getNewPaymentProperty(PaymentProperty::TYPE_ORIGIN, (string) Payment::ORIGIN_PLUGIN);
-        $properties[] = $this->paymentHelper->getNewPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $txnId);
-        $bookingText = 'Heidelpay Txn-ID: ' . $txnId;
-        $properties[] = $this->paymentHelper->getNewPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $bookingText);
-        $properties[] = $this->paymentHelper
-            ->getNewPaymentProperty(PaymentProperty::TYPE_ACCOUNT_HOLDER_OF_SENDER, $txnData->accountHolderName);
-        $payment->properties = $properties;
+        $payment->properties = [
+            $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_ORIGIN, (string) Payment::ORIGIN_PLUGIN),
+            $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $txnId),
+            $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, 'Heidelpay Txn-ID: ' . $txnId),
+        ];
 
         // create the payment
         $payment->regenerateHash = true;

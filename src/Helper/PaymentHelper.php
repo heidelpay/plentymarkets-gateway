@@ -340,7 +340,7 @@ class PaymentHelper
      * @param string $value
      * @return PaymentProperty
      */
-    public function getNewPaymentProperty(int $typeId, string $value): PaymentProperty
+    public function newPaymentProperty(int $typeId, string $value): PaymentProperty
     {
         /** @var PaymentProperty $paymentProperty */
         $paymentProperty = pluginApp(PaymentProperty::class);

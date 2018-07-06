@@ -503,12 +503,12 @@ class PaymentService
 
         $properties = [];
         $properties[] = $this->paymentHelper
-            ->getPaymentProperty(PaymentProperty::TYPE_ORIGIN, (string) Payment::ORIGIN_PLUGIN);
-        $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $txnId);
+            ->getNewPaymentProperty(PaymentProperty::TYPE_ORIGIN, (string) Payment::ORIGIN_PLUGIN);
+        $properties[] = $this->paymentHelper->getNewPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $txnId);
         $bookingText = 'Heidelpay Txn-ID: ' . $txnId;
-        $properties[] = $this->paymentHelper->getPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $bookingText);
+        $properties[] = $this->paymentHelper->getNewPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $bookingText);
         $properties[] = $this->paymentHelper
-            ->getPaymentProperty(PaymentProperty::TYPE_ACCOUNT_HOLDER_OF_SENDER, $txnData->accountHolderName);
+            ->getNewPaymentProperty(PaymentProperty::TYPE_ACCOUNT_HOLDER_OF_SENDER, $txnData->accountHolderName);
         $payment->properties = $properties;
 
         // create the payment
@@ -525,8 +525,7 @@ class PaymentService
         } catch (\RuntimeException $e) {
             $logData = ['Payment' => $payment, 'txnId' => $txnId];
             $this->notification->error($e->getMessage(), __METHOD__, $logData);
-            // todo: Enable when plenty fix exists.
-//            $this->paymentHelper->prependPaymentBookingText($payment, $e->getMessage());
+            $this->paymentHelper->prependPaymentBookingText($payment, $e->getMessage());
             throw new \RuntimeException('heidelpay::error.errorDuringPaymentExecution');
         }
 

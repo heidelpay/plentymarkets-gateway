@@ -340,7 +340,7 @@ class PaymentHelper
      * @param string $value
      * @return PaymentProperty
      */
-    public function getPaymentProperty(int $typeId, string $value): PaymentProperty
+    public function getNewPaymentProperty(int $typeId, string $value): PaymentProperty
     {
         /** @var PaymentProperty $paymentProperty */
         $paymentProperty = pluginApp(PaymentProperty::class);
@@ -495,11 +495,15 @@ class PaymentHelper
     public function prependPaymentBookingText(Payment $paymentObject, string $bookingText): self
     {
         /** @var PaymentProperty $bookingTextProperty */
-        $bookingTextProperty = $paymentObject->properties[PaymentProperty::TYPE_BOOKING_TEXT];
-        $oldBookingText = $bookingTextProperty->value;
-        $bookingText .= !empty($oldBookingText) ? ', ' . $oldBookingText : '';
+        $bookingTextProperty = $this->getPaymentProperty($paymentObject, PaymentProperty::TYPE_BOOKING_TEXT);
 
-        $bookingTextProperty->value = $bookingText;
+        if (!$bookingTextProperty instanceof PaymentProperty) {
+            // todo: translation
+            $this->getLogger(__METHOD__)->error('PaymentProperty::TYPE_BOOKING_TEXT is not set.');
+        }
+
+        $oldBookingText = $bookingTextProperty->value;
+        $bookingTextProperty->value = $bookingText . (!empty($oldBookingText) ? ', ' . $oldBookingText : '');
         $this->paymentPropertyRepo->changeProperty($bookingTextProperty);
 
         return $this;
@@ -534,5 +538,24 @@ class PaymentHelper
             throw new \RuntimeException('Order #' . $orderId . ' not found!');
         }
         return $order;
+    }
+
+    /**
+     * Returns the property with of the given type.
+     *
+     * @param Payment $paymentObject
+     * @param int $typeId
+     * @return PaymentProperty
+     */
+    private function getPaymentProperty(Payment $paymentObject, int $typeId): PaymentProperty
+    {
+        /** @var PaymentProperty $property */
+        foreach ($paymentObject->properties as $property) {
+            if ($typeId === $property->typeId) {
+                return $property;
+            }
+        }
+
+        return null;
     }
 }

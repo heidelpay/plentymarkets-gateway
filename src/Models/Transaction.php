@@ -64,8 +64,6 @@ class Transaction extends Model
     const PROCESSING_STATUS_CODE = 'status_code';
     const PROCESSING_TIMESTAMP = 'timestamp';
 
-    const TEMP_FIELD_ACCOUNT_HOLDER_NAME = 'accountHolderName';
-
     public $id = 0;
     public $storeId;
     public $customerId;
@@ -82,9 +80,6 @@ class Transaction extends Model
     public $transactionProcessing = [];
     public $createdAt = '';
     public $updatedAt = '';
-
-    /* These are temporary fields which are not stored to the database. */
-    public $accountHolderName = '';
 
     /**
      * @return string

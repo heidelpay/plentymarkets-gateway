@@ -169,13 +169,13 @@ class ResponseController extends Controller
         $transactionCode = $this->paymentHelper->getTransactionCode($responseObject);
 
         switch ($transactionCode) {
+            case TransactionType::HP_DEBIT:             // intended fall-through
             case TransactionType::HP_CAPTURE:           // intended fall-through
             case TransactionType::HP_RECEIPT:
                 $this->handleIncomingPayment($txn);
                 break;
             case TransactionType::HP_AUTHORIZE:         // intended fall-through
             case TransactionType::HP_REGISTRATION:      // intended fall-through
-            case TransactionType::HP_DEBIT:             // intended fall-through
             case TransactionType::HP_CHARGEBACK:        // intended fall-through
             case TransactionType::HP_CREDIT:            // intended fall-through
             case TransactionType::HP_DEREGISTRATION:    // intended fall-through

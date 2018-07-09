@@ -105,11 +105,7 @@ class ResponseController extends Controller
 
         // if something went wrong during the lib call, return the cancel url.
         // exceptionCode = problem inside of the lib, error = error during libCall.
-        if (isset($response['exceptionCode'])) {
-            return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
-        }
-
-        if ($this->createAndHandleTransaction($response, $responseObject)) {
+        if (!isset($response['exceptionCode']) && $this->createAndHandleTransaction($response, $responseObject)) {
             // if the transaction is successful or pending, return the success url.
             if ($response['isSuccess'] || $response['isPending']) {
                 $this->notification->error('Return success url', __METHOD__, ['Response' => $response]);

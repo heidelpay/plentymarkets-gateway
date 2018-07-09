@@ -112,10 +112,12 @@ class ResponseController extends Controller
         if ($this->createAndHandleTransaction($response, $responseObject)) {
             // if the transaction is successful or pending, return the success url.
             if ($response['isSuccess'] || $response['isPending']) {
+                $this->notification->error('Return success url', __METHOD__, ['Response' => $response]);
                 return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_SUCCESS;
             }
         }
 
+        $this->notification->error('Return failure url', __METHOD__, ['Response' => $response]);
         return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
     }
 

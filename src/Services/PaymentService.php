@@ -263,7 +263,7 @@ class PaymentService
             try {
                 $value = $this->handleSyncResponse($type, $result);
             } catch (\RuntimeException $e) {
-                $this->notification->error($clientErrorMessage, __METHOD__, [$type, $e->getMessage()]);
+                $this->notification->error($clientErrorMessage, __METHOD__, [$type, $e->getMessage()], true);
                 $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
                 $value = $this->getTranslator()->trans($clientErrorMessage);
             }

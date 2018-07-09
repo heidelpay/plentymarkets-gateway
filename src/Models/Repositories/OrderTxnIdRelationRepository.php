@@ -95,7 +95,7 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
     /**
      * @inheritdoc
      */
-    public function getOrderTxnIdRelationByTxnId(string $txnId): OrderTxnIdRelation
+    public function getOrderTxnIdRelationByTxnId(string $txnId)
     {
         $result =  $this->database->query(OrderTxnIdRelation::class)
             ->where(OrderTxnIdRelation::FIELD_TXN_ID, '=', $txnId)

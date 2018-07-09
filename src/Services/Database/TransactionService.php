@@ -169,9 +169,9 @@ class TransactionService
 
     /**
      * @param $heidelpayResponse
-     * @return Transaction
+     * @return Transaction|null
      */
-    public function getTransactionIfItExists($heidelpayResponse): Transaction
+    public function getTransactionIfItExists($heidelpayResponse)
     {
         return $this->transactionRepository->getTransactionsByShortId($heidelpayResponse['IDENTIFICATION.SHORTID']);
     }

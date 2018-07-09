@@ -105,7 +105,9 @@ class ResponseController extends Controller
 
         // if something went wrong during the lib call, return the cancel url.
         // exceptionCode = problem inside of the lib, error = error during libCall.
-        if (!isset($response['exceptionCode']) && $this->createAndHandleTransaction($response, $responseObject)) {
+        if (!isset($response['exceptionCode'])) {
+            $this->createAndHandleTransaction($response, $responseObject);
+
             // if the transaction is successful or pending, return the success url.
             if ($response['isSuccess'] || $response['isPending']) {
                 $this->notification->error('Return success url', __METHOD__, ['Response' => $response]);
@@ -271,7 +273,7 @@ class ResponseController extends Controller
             }
 
         } catch (\RuntimeException $e) {
-            $this->notification->error($e->getMessage(), __METHOD__, ['data' => ['data' => $response['response']]]);
+            $this->notification->warning($e->getMessage(), __METHOD__, ['data' => ['data' => $response['response']]]);
             return false;
         }
         return true;

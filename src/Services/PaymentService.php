@@ -605,7 +605,7 @@ class PaymentService
             $payment = $this->paymentRepository->getPaymentById($paymentProperty->paymentId);
 
             $bookingText = $this->paymentHelper->getPaymentProperty($payment, PaymentProperty::TYPE_BOOKING_TEXT);
-            $shortId = $serializer->deserializeKeyValue($bookingText)['ShortId'];
+            $shortId = $serializer->deserializeKeyValue($bookingText->value)['ShortId'];
 
             if ($txnData->shortId === $shortId) {
                 return $payment;

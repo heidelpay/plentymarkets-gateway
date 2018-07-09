@@ -13,7 +13,7 @@
  */
 namespace Heidelpay\Models\Repositories;
 
-use Plenty\Modules\Payment\Contracts\ExtPaymentPropertyRepositoryContract;
+use Heidelpay\Models\Contracts\ExtPaymentPropertyRepositoryContract;
 use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 

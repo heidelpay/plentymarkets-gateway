@@ -1,5 +1,5 @@
 <?php
-namespace Plenty\Modules\Payment\Contracts;
+namespace Heidelpay\Models\Contracts;
 
 interface ExtPaymentPropertyRepositoryContract
 {

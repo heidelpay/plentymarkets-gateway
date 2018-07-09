@@ -6,6 +6,7 @@ use Heidelpay\Constants\Routes;
 use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
+use Heidelpay\Models\OrderTxnIdRelation;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\NotificationServiceContract;
@@ -201,6 +202,10 @@ class ResponseController extends Controller
     protected function handleIncomingPayment($txn)
     {
         $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txn->txnId);
+        if (!$relation instanceof OrderTxnIdRelation) {
+            throw new \RuntimeException('response.errorOrderTxnIdRelationNotFound');
+        }
+
         $payment = $this->paymentService->createPlentyPayment($txn);
         $this->paymentService->assignPlentyPayment($payment, $relation->orderId);
     }

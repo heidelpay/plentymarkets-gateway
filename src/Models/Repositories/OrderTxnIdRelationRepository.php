@@ -101,10 +101,6 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
             ->where(OrderTxnIdRelation::FIELD_TXN_ID, '=', $txnId)
             ->get();
 
-        if (!$result[0] instanceof OrderTxnIdRelation) {
-            throw new \RuntimeException('response.errorOrderTxnIdRelationNotFound');
-        }
-
         return $result[0];
     }
 

@@ -544,7 +544,7 @@ class PaymentService
             $logData = ['Payment' => $payment, 'orderId' => $orderId];
             $this->notification->error($e->getMessage(), __METHOD__, $logData);
             // todo: move to booking text helper
-            $this->paymentHelper->prependPaymentBookingText($payment, $e->getMessage());
+            $this->paymentHelper->setBookingTextError($payment, $e->getMessage());
             throw new \RuntimeException('heidelpay::error.errorDuringPaymentExecution');
         }
     }

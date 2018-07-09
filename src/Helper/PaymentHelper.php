@@ -17,6 +17,7 @@ use Heidelpay\Methods\Sofort;
 use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
 use Heidelpay\Models\OrderTxnIdRelation;
 use Heidelpay\Models\Transaction;
+use Heidelpay\Services\ArraySerializerService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
@@ -492,18 +493,24 @@ class PaymentHelper
      * @param string $bookingText
      * @return $this
      */
-    public function prependPaymentBookingText(Payment $paymentObject, string $bookingText): self
+    public function setBookingTextError(Payment $paymentObject, string $bookingText): self
     {
+        /** @var ArraySerializerService $serializer */
+        $serializer = pluginApp(ArraySerializerService::class);
+
         /** @var PaymentProperty $bookingTextProperty */
         $bookingTextProperty = $this->getPaymentProperty($paymentObject, PaymentProperty::TYPE_BOOKING_TEXT);
 
         if (!$bookingTextProperty instanceof PaymentProperty) {
             // todo: translation
             $this->getLogger(__METHOD__)->error('PaymentProperty::TYPE_BOOKING_TEXT is not set.');
+            return $this;
         }
 
-        $oldBookingText = $bookingTextProperty->value;
-        $bookingTextProperty->value = $bookingText . (!empty($oldBookingText) ? ', ' . $oldBookingText : '');
+        $bookingTextArray = $serializer->deserializeKeyValue($bookingTextProperty->value);
+        $bookingTextArray['Error'] = $bookingText;
+        ksort($bookingTextArray);
+        $bookingTextProperty->value = $serializer->serializeKeyValue($bookingTextArray);
         $this->paymentPropertyRepo->changeProperty($bookingTextProperty);
 
         return $this;

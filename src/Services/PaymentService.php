@@ -14,7 +14,6 @@ use Heidelpay\Methods\AbstractMethod;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\PaymentMethodContract;
-use Heidelpay\Models\Contracts\ExtPaymentPropertyRepositoryContract;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Traits\Translator;
@@ -98,10 +97,6 @@ class PaymentService
      * @var MethodConfigContract
      */
     private $config;
-    /**
-     * @var ExtPaymentPropertyRepositoryContract
-     */
-    private $ExtPaymentPropertyRepo;
 
     /**
      * PaymentService constructor.
@@ -116,7 +111,6 @@ class PaymentService
      * @param FrontendSessionStorageFactoryContract $sessionStorageFac
      * @param NotificationServiceContract $notification
      * @param MethodConfigContract $config
-     * @param ExtPaymentPropertyRepositoryContract $ePaymentPropertyRepo
      */
     public function __construct(
         AddressRepositoryContract $addressRepository,
@@ -128,8 +122,7 @@ class PaymentService
         Twig $twig,
         FrontendSessionStorageFactoryContract $sessionStorageFac,
         NotificationServiceContract $notification,
-        MethodConfigContract $config,
-        ExtPaymentPropertyRepositoryContract $ePaymentPropertyRepo
+        MethodConfigContract $config
     ) {
         $this->addressRepository = $addressRepository;
         $this->countryRepository = $countryRepository;
@@ -141,7 +134,6 @@ class PaymentService
         $this->sessionStorageFactory = $sessionStorageFac;
         $this->notification = $notification;
         $this->config = $config;
-        $this->ExtPaymentPropertyRepo = $ePaymentPropertyRepo;
     }
 
     /**
@@ -595,15 +587,13 @@ class PaymentService
         $txnId = $txnData->txnId;
 
         // check whether a payment has already been created for this transaction
-        $paymentProperties = $this->ExtPaymentPropertyRepo->allByTypeIdAndValue(
+        $payments = $this->paymentRepository->getPaymentsByPropertyTypeAndValue(
             PaymentProperty::TYPE_TRANSACTION_ID,
             $txnId
         );
 
-        /** @var PaymentProperty $paymentProperty */
-        foreach ($paymentProperties as $paymentProperty) {
-            $payment = $this->paymentRepository->getPaymentById($paymentProperty->paymentId);
-
+        /** @var Payment $payment */
+        foreach ($payments as $payment) {
             $bookingText = $this->paymentHelper->getPaymentProperty($payment, PaymentProperty::TYPE_BOOKING_TEXT);
             $shortId = $serializer->deserializeKeyValue($bookingText->value)['ShortId'];
 

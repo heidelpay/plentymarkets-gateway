@@ -325,6 +325,11 @@ class PaymentHelper
             $this->getLogger(__METHOD__)->error('compare payments', $additionalInfo1);
 
             if ($payment->id === $paymentObject->id) {
+                $this->getLogger(__METHOD__)->error('ids match');
+            }
+
+            if ($payment == $paymentObject) {
+                $this->getLogger(__METHOD__)->error('objects match');
                 return $order;
             }
         }

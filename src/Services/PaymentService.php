@@ -193,17 +193,11 @@ class PaymentService
             return ['error', 'heidelpay::error.errorDuringPaymentExecution'];
         }
 
-        // Create payment transaction if type is not authorize.
-        // If it is authorize the payment will be created when the capture is pushed.
-
-
-        if (TransactionType::AUTHORIZE !== $transaction->transactionType) {
-            try {
-                $payment = $this->createPlentyPayment($transaction);
-                $this->assignPlentyPayment($payment, $orderId);
-            } catch (\RuntimeException $e) {
-                return ['error', $e->getMessage()];
-            }
+        try {
+            // handling is triggered multiple times (e.g. on reception of the push-message)
+            $this->handleIncomingPayment($transaction);
+        } catch (\RuntimeException $e) {
+            return ['error', $e->getMessage()];
         }
 
         return ['success', 'heidelpay::info.infoPaymentSuccessful'];

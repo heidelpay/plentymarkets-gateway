@@ -547,6 +547,8 @@ class PaymentService
             $this->paymentHelper->setBookingTextError($payment, $e->getMessage());
             throw new \RuntimeException('heidelpay::error.errorDuringPaymentExecution');
         }
+
+        $this->paymentHelper->removeBookingTextError($payment);
     }
 
     /**

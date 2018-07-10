@@ -487,13 +487,24 @@ class PaymentHelper
     }
 
     /**
-     * Add a text before the current payment booking text.
+     * Remove the error text.
      *
      * @param Payment $paymentObject
-     * @param string $bookingText
      * @return $this
      */
-    public function setBookingTextError(Payment $paymentObject, string $bookingText): self
+    public function removeBookingTextError(Payment $paymentObject): self
+    {
+        return $this->setBookingTextError($paymentObject);
+    }
+
+    /**
+     * Add error text.
+     *
+     * @param Payment $paymentObject
+     * @param string $bookingErrorText
+     * @return $this
+     */
+    public function setBookingTextError(Payment $paymentObject, string $bookingErrorText = ''): self
     {
         /** @var ArraySerializerService $serializer */
         $serializer = pluginApp(ArraySerializerService::class);
@@ -508,7 +519,13 @@ class PaymentHelper
         }
 
         $bookingTextArray = $serializer->deserializeKeyValue($bookingTextProperty->value);
-        $bookingTextArray['Error'] = $bookingText;
+
+        if (empty($bookingErrorText) && isset($bookingTextArray['Error'])) {
+            unset($bookingTextArray['Error']);
+        } else {
+            $bookingTextArray['Error'] = $bookingErrorText;
+        }
+
         ksort($bookingTextArray);
         $bookingTextProperty->value = $serializer->serializeKeyValue($bookingTextArray);
         $this->paymentPropertyRepo->changeProperty($bookingTextProperty);

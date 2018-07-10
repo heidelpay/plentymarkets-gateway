@@ -192,8 +192,7 @@ class ResponseController extends Controller
     }
 
     /**
-     * Handles Capture(CAP) and Receipt(REC) push messages.
-     * Creates a payment if necessary and assignes it to the corresponding order.
+     * Creates a payment if necessary and assigns it to the corresponding order.
      *
      * @param $txn
      *

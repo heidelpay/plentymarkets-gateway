@@ -488,7 +488,7 @@ class PaymentService
         $serializer = pluginApp(ArraySerializerService::class);
 
         // Payment might have already been created before (e.g. in response controller)
-        $payment = $this->getPaymentByTransactionId($txnData);
+        $payment = $this->getPaymentByTransaction($txnData);
         if ($payment instanceof Payment) {
             return $payment;
         }
@@ -570,12 +570,12 @@ class PaymentService
     }
 
     /**
-     * Fetch the payment by its TransactionId.
+     * Fetch the payment for this transaction if it exists.
      *
      * @param Transaction $txnData
      * @return Payment|null
      */
-    private function getPaymentByTransactionId(Transaction $txnData)
+    private function getPaymentByTransaction(Transaction $txnData)
     {
         /** @var ArraySerializerService $serializer */
         $serializer = pluginApp(ArraySerializerService::class);
@@ -644,6 +644,9 @@ class PaymentService
      */
     protected function handleIncomingPayment($txn)
     {
+        // todo replace with debug and translation
+        $this->notification->error('handle incoming payment', __METHOD__, [$txn]);
+
         $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txn->txnId);
         if (!$relation instanceof OrderTxnIdRelation) {
             throw new \RuntimeException('response.errorOrderTxnIdRelationNotFound');

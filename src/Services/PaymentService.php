@@ -194,8 +194,7 @@ class PaymentService
         }
 
         try {
-            // handling is triggered multiple times (e.g. on reception of the push-message)
-            $this->handleIncomingPayment($transaction);
+            $this->handleTransaction($transaction);
         } catch (\RuntimeException $e) {
             return ['error', $e->getMessage()];
         }
@@ -607,31 +606,28 @@ class PaymentService
      * Handles the given transaction by type
      *
      * @param Transaction $txn
-     * @param $responseObject
      *
      * @throws \RuntimeException
      */
-    public function handleTransaction(Transaction $txn, $responseObject)
+    public function handleTransaction(Transaction $txn)
     {
-        $transactionCode = $this->paymentHelper->getTransactionCode($responseObject);
-
-        switch ($transactionCode) {
-            case TransactionType::HP_DEBIT:             // intended fall-through
-            case TransactionType::HP_CAPTURE:           // intended fall-through
-            case TransactionType::HP_RECEIPT:
+        switch ($txn->transactionType) {
+            case TransactionType::DEBIT:             // intended fall-through
+            case TransactionType::CAPTURE:           // intended fall-through
+            case TransactionType::RECEIPT:
                 $this->handleIncomingPayment($txn);
                 break;
-            case TransactionType::HP_AUTHORIZE:         // intended fall-through
-            case TransactionType::HP_REGISTRATION:      // intended fall-through
-            case TransactionType::HP_CHARGEBACK:        // intended fall-through
-            case TransactionType::HP_CREDIT:            // intended fall-through
-            case TransactionType::HP_DEREGISTRATION:    // intended fall-through
-            case TransactionType::HP_FINALIZE:          // intended fall-through
-            case TransactionType::HP_INITIALIZE:        // intended fall-through
-            case TransactionType::HP_REBILL:            // intended fall-through
-            case TransactionType::HP_REFUND:            // intended fall-through
-            case TransactionType::HP_REREGISTRATION:    // intended fall-through
-            case TransactionType::HP_REVERSAL:          // intended fall-through
+            case TransactionType::AUTHORIZE:         // intended fall-through
+            case TransactionType::REGISTRATION:      // intended fall-through
+            case TransactionType::CHARGEBACK:        // intended fall-through
+            case TransactionType::CREDIT:            // intended fall-through
+            case TransactionType::DEREGISTRATION:    // intended fall-through
+            case TransactionType::FINALIZE:          // intended fall-through
+            case TransactionType::INITIALIZE:        // intended fall-through
+            case TransactionType::REBILL:            // intended fall-through
+            case TransactionType::REFUND:            // intended fall-through
+            case TransactionType::REREGISTRATION:    // intended fall-through
+            case TransactionType::REVERSAL:          // intended fall-through
             default:
                 // do nothing if the given Transaction needs no handling
                 break;
@@ -648,7 +644,7 @@ class PaymentService
     protected function handleIncomingPayment($txn)
     {
         // todo replace with debug and translation
-        $this->notification->error('handle incoming payment', __METHOD__, [$txn], true);
+        $this->notification->error('handle incoming payment', __METHOD__, ['Transaction' => $txn], true);
 
         $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txn->txnId);
         if (!$relation instanceof OrderTxnIdRelation) {

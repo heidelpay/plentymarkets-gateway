@@ -204,7 +204,7 @@ class ResponseController extends Controller
             /* todo: all in between can be refactored */
 
             if ($response['isSuccess'] && !$response['isPending']) {
-                $this->paymentService->handleTransaction($txn, $responseObject);
+                $this->paymentService->handleTransaction($txn);
             }
         } catch (\RuntimeException $e) {
             $this->notification->warning($e->getMessage(), __METHOD__, ['data' => ['data' => $response['response']]]);

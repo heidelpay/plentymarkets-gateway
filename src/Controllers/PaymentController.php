@@ -52,7 +52,7 @@ class PaymentController extends Controller
     public function checkoutSuccess(): BaseResponse
     {
         $this->notification->success('payment.infoPaymentSuccessful', __METHOD__);
-        return $this->response->redirectTo('place-order');
+        return $this->response->redirectTo('checkout');
     }
 
     /**

@@ -14,13 +14,18 @@ use Heidelpay\Methods\AbstractMethod;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\PaymentMethodContract;
+use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
+use Heidelpay\Models\OrderTxnIdRelation;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Order\Property\Models\OrderProperty;
+use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
@@ -51,32 +56,26 @@ class PaymentService
      * @var array
      */
     private $heidelpayRequest = [];
-
     /**
      * @var AddressRepositoryContract
      */
     private $addressRepository;
-
     /**
      * @var CountryRepositoryContract
      */
     private $countryRepository;
-
     /**
      * @var PaymentRepositoryContract
      */
     private $paymentRepository;
-
     /**
      * @var PaymentHelper
      */
     private $paymentHelper;
-
     /**
      * @var LibService
      */
     private $libService;
-
     /**
      * @var Twig
      */
@@ -97,6 +96,14 @@ class PaymentService
      * @var MethodConfigContract
      */
     private $config;
+    /**
+     * @var OrderTxnIdRelationRepositoryContract
+     */
+    private $orderTxnIdRepo;
+    /**
+     * @var OrderRepositoryContract
+     */
+    private $orderRepo;
 
     /**
      * PaymentService constructor.
@@ -111,6 +118,8 @@ class PaymentService
      * @param FrontendSessionStorageFactoryContract $sessionStorageFac
      * @param NotificationServiceContract $notification
      * @param MethodConfigContract $config
+     * @param OrderTxnIdRelationRepositoryContract $orderTxnIdRepo
+     * @param OrderRepositoryContract $orderRepo
      */
     public function __construct(
         AddressRepositoryContract $addressRepository,
@@ -122,7 +131,9 @@ class PaymentService
         Twig $twig,
         FrontendSessionStorageFactoryContract $sessionStorageFac,
         NotificationServiceContract $notification,
-        MethodConfigContract $config
+        MethodConfigContract $config,
+        OrderTxnIdRelationRepositoryContract $orderTxnIdRepo,
+        OrderRepositoryContract $orderRepo
     ) {
         $this->addressRepository = $addressRepository;
         $this->countryRepository = $countryRepository;
@@ -134,6 +145,8 @@ class PaymentService
         $this->sessionStorageFactory = $sessionStorageFac;
         $this->notification = $notification;
         $this->config = $config;
+        $this->orderTxnIdRepo = $orderTxnIdRepo;
+        $this->orderRepo = $orderRepo;
     }
 
     /**
@@ -157,7 +170,7 @@ class PaymentService
 
         // Retrieve heidelpay Transaction by txnId to get values needed for plenty payment (e.g. amount etc).
         $txnId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
-        $this->paymentHelper->createOrUpdateRelation($txnId, $mopId, $orderId);
+        $this->createOrUpdateRelation($txnId, $mopId, $orderId);
 
         $transactions = $this->transactionRepository->getTransactionsByTxnId($txnId);
         foreach ($transactions as $transaction) {
@@ -182,6 +195,8 @@ class PaymentService
 
         // Create payment transaction if type is not authorize.
         // If it is authorize the payment will be created when the capture is pushed.
+
+
         if (TransactionType::AUTHORIZE !== $transaction->transactionType) {
             try {
                 $payment = $this->createPlentyPayment($transaction);
@@ -195,6 +210,8 @@ class PaymentService
     }
 
     /**
+     * Send request to PaymentApi.
+     *
      * @param Basket $basket
      * @param string $paymentMethod
      * @param string $transactionType
@@ -212,7 +229,7 @@ class PaymentService
     ): array {
 
         $txnId = $this->createNewTxnId($basket);
-        $this->paymentHelper->createOrUpdateRelation($txnId, $mopId);
+        $this->createOrUpdateRelation($txnId, $mopId);
         $this->prepareRequest($basket, $paymentMethod, $mopId, $txnId);
 
         $result = $this->libService->sendTransactionRequest($paymentMethod, [
@@ -225,8 +242,8 @@ class PaymentService
     }
 
     /**
-     * Depending on the given payment method, return some information
-     * regarding the payment method, or just continue the process.
+     * Return information on how plenty has to handle the payment method.
+     * E.g. show html-content (e.g. iFrame) or redirect to external url (e.g. paypal etc.).
      *
      * @param string $paymentMethod
      * @param Basket $basket
@@ -278,46 +295,6 @@ class PaymentService
     }
 
     /**
-     * @param string $type
-     * @param $response
-     * @return mixed
-     * @throws \RuntimeException
-     */
-    private function handleSyncResponse(string $type, $response)
-    {
-        if (!\is_array($response)) {
-            return $response;
-        }
-
-        // return the exception message, if present.
-        if (isset($response['exceptionCode'])) {
-            throw new \RuntimeException($response['exceptionCode']);
-        }
-
-        if (!$response['isSuccess']) {
-            throw new \RuntimeException($response['response']['PROCESSING.RETURN']);
-        }
-
-        // return rendered html content
-        if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
-            // return the payment frame url, if it is needed
-            if (\array_key_exists('FRONTEND.PAYMENT_FRAME_URL', $response['response'])) {
-                return $response['response']['FRONTEND.PAYMENT_FRAME_URL'];
-            }
-
-            return $response['response']['FRONTEND.REDIRECT_URL'];
-        }
-
-        // return the redirect url, if present.
-        if ($type === GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL) {
-            return $response['response']['FRONTEND.REDIRECT_URL'];
-        }
-
-
-        return $response;
-    }
-
-    /**
      * @param Basket $basket
      * @param string $paymentMethod
      * @param int $mopId
@@ -325,6 +302,9 @@ class PaymentService
      */
     private function prepareRequest(Basket $basket, string $paymentMethod, int $mopId, string $transactionId)
     {
+        /** @var BasketService $basketService */
+        $basketService = pluginApp(BasketService::class);
+
         // set authentication data
         $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($paymentMethod);
         $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
@@ -373,7 +353,7 @@ class PaymentService
                 : Salutation::MRS;
 
             $this->heidelpayRequest['NAME_BIRTHDATE'] = $addresses['billing']->birthday;
-            $this->heidelpayRequest['BASKET_ID'] = $this->getBasketId($basket, $heidelpayAuth);
+            $this->heidelpayRequest['BASKET_ID'] = $basketService->requestBasketId($basket, $heidelpayAuth);
         }
 
         // shop + module information
@@ -397,6 +377,47 @@ class PaymentService
     }
 
     //<editor-fold desc="Handlers">
+    // todo move methods to payment handler service.
+    /**
+     * @param string $type
+     * @param $response
+     * @return mixed
+     * @throws \RuntimeException
+     */
+    private function handleSyncResponse(string $type, $response)
+    {
+        if (!\is_array($response)) {
+            return $response;
+        }
+
+        // return the exception message, if present.
+        if (isset($response['exceptionCode'])) {
+            throw new \RuntimeException($response['exceptionCode']);
+        }
+
+        if (!$response['isSuccess']) {
+            throw new \RuntimeException($response['response']['PROCESSING.RETURN']);
+        }
+
+        // return rendered html content
+        if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
+            // return the payment frame url, if it is needed
+            if (\array_key_exists('FRONTEND.PAYMENT_FRAME_URL', $response['response'])) {
+                return $response['response']['FRONTEND.PAYMENT_FRAME_URL'];
+            }
+
+            return $response['response']['FRONTEND.REDIRECT_URL'];
+        }
+
+        // return the redirect url, if present.
+        if ($type === GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL) {
+            return $response['response']['FRONTEND.REDIRECT_URL'];
+        }
+
+
+        return $response;
+    }
+
     /**
      * Handles the asynchronous response coming from the heidelpay API.
      *
@@ -421,28 +442,6 @@ class PaymentService
         return $this->libService->handlePushNotification($post);
     }
     //</editor-fold>
-
-    /**
-     * Submits the Basket to the Basket-API and returns its ID.
-     *
-     * @param Basket $basket
-     * @param array  $authData
-     *
-     * @return string
-     */
-    private function getBasketId(Basket $basket, array $authData): string
-    {
-        $params = [];
-        $params['auth'] = [
-            'login' => $authData['USER_LOGIN'],
-            'password' => $authData['USER_PWD'],
-            'senderId' => $authData['SECURITY_SENDER'],
-        ];
-        $params['basket'] = $basket->toArray();
-
-        $response = $this->libService->submitBasket($params);
-        return $response['basketId'];
-    }
 
     /**
      * Gathers address data (billing/invoice and shipping) and returns them as an array.
@@ -605,4 +604,93 @@ class PaymentService
         }
         return null;
     }
+
+    //<editor-fold desc="Helpers">
+    /**
+     * Handles the given transaction by type
+     *
+     * @param Transaction $txn
+     * @param $responseObject
+     *
+     * @throws \RuntimeException
+     */
+    public function handleTransaction(Transaction $txn, $responseObject)
+    {
+        $transactionCode = $this->paymentHelper->getTransactionCode($responseObject);
+
+        switch ($transactionCode) {
+            case TransactionType::HP_DEBIT:             // intended fall-through
+            case TransactionType::HP_CAPTURE:           // intended fall-through
+            case TransactionType::HP_RECEIPT:
+                $this->handleIncomingPayment($txn);
+                break;
+            case TransactionType::HP_AUTHORIZE:         // intended fall-through
+            case TransactionType::HP_REGISTRATION:      // intended fall-through
+            case TransactionType::HP_CHARGEBACK:        // intended fall-through
+            case TransactionType::HP_CREDIT:            // intended fall-through
+            case TransactionType::HP_DEREGISTRATION:    // intended fall-through
+            case TransactionType::HP_FINALIZE:          // intended fall-through
+            case TransactionType::HP_INITIALIZE:        // intended fall-through
+            case TransactionType::HP_REBILL:            // intended fall-through
+            case TransactionType::HP_REFUND:            // intended fall-through
+            case TransactionType::HP_REREGISTRATION:    // intended fall-through
+            case TransactionType::HP_REVERSAL:          // intended fall-through
+            default:
+                // do nothing if the given Transaction needs no handling
+                break;
+        }
+    }
+
+    /**
+     * Creates a payment if necessary and assigns it to the corresponding order.
+     *
+     * @param $txn
+     *
+     * @throws \RuntimeException
+     */
+    protected function handleIncomingPayment($txn)
+    {
+        $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txn->txnId);
+        if (!$relation instanceof OrderTxnIdRelation) {
+            throw new \RuntimeException('response.errorOrderTxnIdRelationNotFound');
+        }
+
+        $payment = $this->createPlentyPayment($txn);
+        $this->assignPlentyPayment($payment, $relation->orderId);
+    }
+
+    /**
+     * @param string $txnId
+     * @param int $mopId
+     * @param int $orderId
+     * @return OrderTxnIdRelation|null
+     */
+    public function createOrUpdateRelation(string $txnId, int $mopId, int $orderId = 0)
+    {
+        $relation =  $this->orderTxnIdRepo->createOrUpdateRelation($txnId, $mopId, $orderId);
+        if ($orderId !== 0) {
+            $this->assignTxnIdToOrder($txnId, $orderId);
+        }
+        return $relation;
+    }
+
+    /**
+     * Adds the txnId to the order as external orderId.
+     *
+     * @param string $txnId
+     * @param int $orderId
+     */
+    protected function assignTxnIdToOrder(string $txnId, int $orderId)
+    {
+        $order = $this->orderRepo->findOrderById($orderId);
+
+        /** @var OrderProperty $orderProperty */
+        $orderProperty = pluginApp(OrderProperty::class);
+        $orderProperty->typeId = OrderPropertyType::EXTERNAL_ORDER_ID;
+        $orderProperty->value = $txnId;
+        $order->properties[] = $orderProperty;
+
+        $this->orderRepo->updateOrder($order->toArray(), $order->id);
+    }
+    //</editor-fold>
 }

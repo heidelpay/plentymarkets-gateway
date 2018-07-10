@@ -14,8 +14,6 @@ use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
-use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
-use Heidelpay\Models\OrderTxnIdRelation;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\ArraySerializerService;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -27,8 +25,6 @@ use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Helper\Services\WebstoreHelper;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Order\Property\Models\OrderProperty;
-use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentPropertyRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
@@ -77,10 +73,6 @@ class PaymentHelper
      */
     private $methodConfig;
     /**
-     * @var OrderTxnIdRelationRepositoryContract
-     */
-    private $orderTxnIdRepo;
-    /**
      * @var PaymentPropertyRepositoryContract
      */
     private $paymentPropertyRepo;
@@ -93,7 +85,6 @@ class PaymentHelper
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRepo
      * @param MainConfigContract $mainConfig
      * @param MethodConfigContract $methodConfig
-     * @param OrderTxnIdRelationRepositoryContract $orderTxnIdRepo
      * @param PaymentPropertyRepositoryContract $propertyRepo
      */
     public function __construct(
@@ -102,7 +93,6 @@ class PaymentHelper
         PaymentOrderRelationRepositoryContract $paymentOrderRepo,
         MainConfigContract $mainConfig,
         MethodConfigContract $methodConfig,
-        OrderTxnIdRelationRepositoryContract $orderTxnIdRepo,
         PaymentPropertyRepositoryContract $propertyRepo
     ) {
         $this->paymentMethodRepo = $paymentMethodRepo;
@@ -110,7 +100,6 @@ class PaymentHelper
         $this->paymentOrderRelationRepo = $paymentOrderRepo;
         $this->mainConfig = $mainConfig;
         $this->methodConfig = $methodConfig;
-        $this->orderTxnIdRepo = $orderTxnIdRepo;
         $this->paymentPropertyRepo = $propertyRepo;
     }
 
@@ -433,40 +422,6 @@ class PaymentHelper
                 break;
         }
         return $instance;
-    }
-
-    /**
-     * Adds the txnId to the order as external orderId.
-     *
-     * @param string $txnId
-     * @param int $orderId
-     */
-    protected function assignTxnIdToOrder(string $txnId, int $orderId)
-    {
-        $order = $this->orderRepo->findOrderById($orderId);
-
-        /** @var OrderProperty $orderProperty */
-        $orderProperty = pluginApp(OrderProperty::class);
-        $orderProperty->typeId = OrderPropertyType::EXTERNAL_ORDER_ID;
-        $orderProperty->value = $txnId;
-        $order->properties[] = $orderProperty;
-
-        $this->orderRepo->updateOrder($order->toArray(), $order->id);
-    }
-
-    /**
-     * @param string $txnId
-     * @param int $mopId
-     * @param int $orderId
-     * @return OrderTxnIdRelation|null
-     */
-    public function createOrUpdateRelation(string $txnId, int $mopId, int $orderId = 0)
-    {
-        $relation =  $this->orderTxnIdRepo->createOrUpdateRelation($txnId, $mopId, $orderId);
-        if ($orderId !== 0) {
-            $this->assignTxnIdToOrder($txnId, $orderId);
-        }
-        return $relation;
     }
 
     /**

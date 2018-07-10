@@ -3,10 +3,7 @@
 namespace Heidelpay\Controllers;
 
 use Heidelpay\Constants\Routes;
-use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\PaymentHelper;
-use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
-use Heidelpay\Models\OrderTxnIdRelation;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\NotificationServiceContract;
@@ -52,9 +49,6 @@ class ResponseController extends Controller
     /** @var NotificationServiceContract */
     private $notification;
 
-    /** @var OrderTxnIdRelationRepositoryContract */
-    private $orderTxnIdRepo;
-
     /**
      * ResponseController constructor.
      *
@@ -64,7 +58,6 @@ class ResponseController extends Controller
      * @param PaymentService $paymentService
      * @param TransactionService $transactionService
      * @param NotificationServiceContract $notification
-     * @param OrderTxnIdRelationRepositoryContract $orderTxnIdRepo
      */
     public function __construct(
         Request $request,
@@ -72,8 +65,7 @@ class ResponseController extends Controller
         PaymentHelper $paymentHelper,
         PaymentService $paymentService,
         TransactionService $transactionService,
-        NotificationServiceContract $notification,
-        OrderTxnIdRelationRepositoryContract $orderTxnIdRepo
+        NotificationServiceContract $notification
     ) {
         $this->request = $request;
         $this->response = $response;
@@ -81,7 +73,6 @@ class ResponseController extends Controller
         $this->paymentService = $paymentService;
         $this->transactionService = $transactionService;
         $this->notification = $notification;
-        $this->orderTxnIdRepo = $orderTxnIdRepo;
     }
 
     //<editor-fold desc="Handlers">
@@ -155,61 +146,6 @@ class ResponseController extends Controller
     }
     //</editor-fold>
 
-    //<editor-fold desc="Helpers">
-    /**
-     * Handles the given transaction by type
-     *
-     * @param Transaction $txn
-     * @param $responseObject
-     *
-     * @throws \RuntimeException
-     */
-    protected function handleTransaction(Transaction $txn, $responseObject)
-    {
-        $transactionCode = $this->paymentHelper->getTransactionCode($responseObject);
-
-        switch ($transactionCode) {
-            case TransactionType::HP_DEBIT:             // intended fall-through
-            case TransactionType::HP_CAPTURE:           // intended fall-through
-            case TransactionType::HP_RECEIPT:
-                $this->handleIncomingPayment($txn);
-                break;
-            case TransactionType::HP_AUTHORIZE:         // intended fall-through
-            case TransactionType::HP_REGISTRATION:      // intended fall-through
-            case TransactionType::HP_CHARGEBACK:        // intended fall-through
-            case TransactionType::HP_CREDIT:            // intended fall-through
-            case TransactionType::HP_DEREGISTRATION:    // intended fall-through
-            case TransactionType::HP_FINALIZE:          // intended fall-through
-            case TransactionType::HP_INITIALIZE:        // intended fall-through
-            case TransactionType::HP_REBILL:            // intended fall-through
-            case TransactionType::HP_REFUND:            // intended fall-through
-            case TransactionType::HP_REREGISTRATION:    // intended fall-through
-            case TransactionType::HP_REVERSAL:          // intended fall-through
-            default:
-                // do nothing if the given Transaction needs no handling
-                break;
-        }
-    }
-
-    /**
-     * Creates a payment if necessary and assigns it to the corresponding order.
-     *
-     * @param $txn
-     *
-     * @throws \RuntimeException
-     */
-    protected function handleIncomingPayment($txn)
-    {
-        $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txn->txnId);
-        if (!$relation instanceof OrderTxnIdRelation) {
-            throw new \RuntimeException('response.errorOrderTxnIdRelationNotFound');
-        }
-
-        $payment = $this->paymentService->createPlentyPayment($txn);
-        $this->paymentService->assignPlentyPayment($payment, $relation->orderId);
-    }
-    //</editor-fold>
-
     //<editor-fold desc="Responses">
     /**
      * @param $message
@@ -268,9 +204,8 @@ class ResponseController extends Controller
             /* todo: all in between can be refactored */
 
             if ($response['isSuccess'] && !$response['isPending']) {
-                $this->handleTransaction($txn, $responseObject);
+                $this->paymentService->handleTransaction($txn, $responseObject);
             }
-
         } catch (\RuntimeException $e) {
             $this->notification->warning($e->getMessage(), __METHOD__, ['data' => ['data' => $response['response']]]);
             return false;

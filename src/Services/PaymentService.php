@@ -480,7 +480,7 @@ class PaymentService
      *
      * @throws \RuntimeException
      */
-    public function createPlentyPayment(Transaction $txnData): Payment
+    public function createOrGetPlentyPayment(Transaction $txnData): Payment
     {
         // todo: Create BookingtextHelper class to use the Array Serializer there.
         // todo: Move prepend method as well.
@@ -593,6 +593,8 @@ class PaymentService
             $shortId = $serializer->deserializeKeyValue($bookingText->value)['ShortId'];
 
             if ($txnData->shortId === $shortId) {
+                // todo: replace by translation and debug
+                $this->notification->error('found payment', __METHOD__, ['TxnData' => $txnData, 'Payment' => $payment]);
                 return $payment;
             }
         }
@@ -652,7 +654,7 @@ class PaymentService
             throw new \RuntimeException('response.errorOrderTxnIdRelationNotFound');
         }
 
-        $payment = $this->createPlentyPayment($txn);
+        $payment = $this->createOrGetPlentyPayment($txn);
         $this->assignPlentyPayment($payment, $relation->orderId);
     }
 

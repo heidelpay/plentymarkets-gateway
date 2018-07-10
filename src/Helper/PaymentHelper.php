@@ -316,7 +316,7 @@ class PaymentHelper
         $order = $this->getOrder($orderId);
 
         $additionalInfo = ['Order' => $order, 'Payment' => $payment];
-        $this->getLogger(__METHOD__)->debug('payment.debugAssignPaymentToOrder', $additionalInfo);
+        $this->getLogger(__METHOD__)->debug('heidelpay::payment.debugAssignPaymentToOrder', $additionalInfo);
 
         $this->paymentOrderRelationRepo->createOrderRelation($payment, $order);
 

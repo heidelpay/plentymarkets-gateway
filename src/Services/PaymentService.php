@@ -594,7 +594,8 @@ class PaymentService
 
             if ($txnData->shortId === $shortId) {
                 // todo: replace by translation and debug
-                $this->notification->error('found payment', __METHOD__, ['TxnData' => $txnData, 'Payment' => $payment]);
+                $logData = ['TxnData' => $txnData, 'Payment' => $payment];
+                $this->notification->error('found payment', __METHOD__, $logData, true);
                 return $payment;
             }
         }

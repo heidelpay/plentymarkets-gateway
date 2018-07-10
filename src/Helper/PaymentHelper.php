@@ -318,8 +318,13 @@ class PaymentHelper
         $additionalInfo = ['Order' => $order, 'Payment' => $payment];
         $this->getLogger(__METHOD__)->debug('heidelpay::payment.debugAssignPaymentToOrder', $additionalInfo);
 
+        /** @var Payment $paymentObject */
         foreach ($order->payments as $paymentObject) {
-            if ($payment === $paymentObject) {
+            // todo: remove
+            $additionalInfo1 = [$order, 'payment' => $payment, 'payment on order' => $paymentObject];
+            $this->getLogger(__METHOD__)->error('compare payments', $additionalInfo1);
+
+            if ($payment->id === $paymentObject->id) {
                 return $order;
             }
         }

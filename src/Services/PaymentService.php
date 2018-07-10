@@ -648,7 +648,7 @@ class PaymentService
     protected function handleIncomingPayment($txn)
     {
         // todo replace with debug and translation
-        $this->notification->error('handle incoming payment', __METHOD__, [$txn]);
+        $this->notification->error('handle incoming payment', __METHOD__, [$txn], true);
 
         $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txn->txnId);
         if (!$relation instanceof OrderTxnIdRelation) {

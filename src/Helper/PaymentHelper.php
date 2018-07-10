@@ -482,8 +482,10 @@ class PaymentHelper
         $bookingTextArray = $serializer->deserializeKeyValue($bookingTextProperty->value);
 
         if (empty($bookingErrorText) && isset($bookingTextArray['Error'])) {
+            $this->getLogger(__METHOD__)->error('Remove', ['\''.$bookingErrorText.'\'', $bookingTextArray]);
             unset($bookingTextArray['Error']);
         } else {
+            $this->getLogger(__METHOD__)->error('Add', ['\''.$bookingErrorText.'\'', $bookingTextArray]);
             $bookingTextArray['Error'] = $bookingErrorText;
         }
 

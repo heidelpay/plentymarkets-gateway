@@ -19,13 +19,9 @@ For licensing information please refer to the attached LICENSE.txt.
 This module is based on the heidelpay php-payment-api (https://github.com/heidelpay/php-payment-api) and heidelpay php-basket-api (https://github.com/heidelpay/php-basket-api).
 
 ## Installation
-+ In [plentyMarketplace](https://marketplace.plentymarkets.com/) either click the *payment*-tab and select the heidelpay plugin or type heidelpay in the search input and select the plugin from the results.
-+ In the upcoming screen follow the instructions to acquire the plugin.
-+ After that you can find the plugin in your shop backend under Plugins > Purchases.
-+ Click the install button in the heidelpay plugin row.
-+ Now the plugin should be visible under Plugins > Plugin overview.
-+ After performing the configuration steps described below you should be able to perform some tests in preview mode.
-+ If everything is fine you can change the configuration to live mode and deploy the plugin for the productive area to enable it for the public.
++ Please refer to [plentyKnowledge](https://knowledge.plentymarkets.com) in order to learn how to install plugins.
++ After performing the configuration steps described below you should be able to perform some tests in staging mode.
++ If everything is fine you can change the configuration to live mode and deploy the plugin for the productive area to enable it for your clients.
 
 ## Configuration
 ### Basic configuration

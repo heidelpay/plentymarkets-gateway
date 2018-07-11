@@ -18,5 +18,5 @@ class Plugin
 {
     const KEY = 'heidelpay';
     const NAME = 'heidelpay';
-    const VERSION = '0.0.1';
+    const VERSION = '1.0.0';
 }

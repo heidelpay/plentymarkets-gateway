@@ -326,9 +326,8 @@ class PaymentService
         $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basket->basketAmount;
         $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basket->currency;
 
-        // TODO: receive frontend language somehow.
         $this->heidelpayRequest['FRONTEND_ENABLED'] = 'TRUE';
-        $this->heidelpayRequest['FRONTEND_LANGUAGE'] = 'DE';
+        $this->heidelpayRequest['FRONTEND_LANGUAGE'] = $this->sessionStorageFactory->getLocaleSettings()->language;
         $this->heidelpayRequest['FRONTEND_RESPONSE_URL'] =
             $this->paymentHelper->getDomain() . '/' . Routes::RESPONSE_URL;
 
@@ -592,9 +591,8 @@ class PaymentService
             $shortId = $serializer->deserializeKeyValue($bookingText->value)['ShortId'];
 
             if ($txnData->shortId === $shortId) {
-                // todo: replace by translation and debug
                 $logData = ['TxnData' => $txnData, 'Payment' => $payment];
-                $this->notification->error('found payment', __METHOD__, $logData, true);
+                $this->notification->debug('payment.debugPaymentFound', __METHOD__, $logData);
                 return $payment;
             }
         }
@@ -643,8 +641,7 @@ class PaymentService
      */
     protected function handleIncomingPayment($txn)
     {
-        // todo replace with debug and translation
-        $this->notification->error('handle incoming payment', __METHOD__, ['Transaction' => $txn], true);
+        $this->notification->debug('payment.debugHandleIncomingPayment', __METHOD__, ['Transaction' => $txn]);
 
         $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txn->txnId);
         if (!$relation instanceof OrderTxnIdRelation) {

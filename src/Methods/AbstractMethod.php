@@ -210,8 +210,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
         }
 
         if (!$this->config->hasTransactionType($this)) {
-            // todo: Add error message?
-            throw new \RuntimeException(self::class . ': Transaction type undefined!');
+            throw new \RuntimeException('payment.errorTransactionTypeUndefined');
         }
         return $this->config->getTransactionType($this);
     }

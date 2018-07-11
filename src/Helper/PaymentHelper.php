@@ -474,8 +474,7 @@ class PaymentHelper
         $bookingTextProperty = $this->getPaymentProperty($paymentObject, PaymentProperty::TYPE_BOOKING_TEXT);
 
         if (!$bookingTextProperty instanceof PaymentProperty) {
-            // todo: translation
-            $this->getLogger(__METHOD__)->error('PaymentProperty::TYPE_BOOKING_TEXT is not set.');
+            $this->getLogger(__METHOD__)->error('heidelpay::payment.errorBookingTextIsMissing');
             return $this;
         }
 

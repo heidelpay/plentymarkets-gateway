@@ -1,7 +1,7 @@
 ![Logo](http://dev.heidelpay.com/devHeidelpay_400_180.jpg)
 
 # heidelpay plentymarkets-gateway plugin
-This extension provides an integration of the heidelpay payment methods to your plentymarkets shop.
+This extension provides an integration of the heidelpay payment methods for your plentymarkets shop.
 
 Currently supported payment methods are:
 * Credit Card
@@ -24,13 +24,12 @@ This module is based on the heidelpay php-payment-api (https://github.com/heidel
 + After that you can find the plugin in your shop backend under Plugins > Purchases.
 + Click the install button in the heidelpay plugin row.
 + Now the plugin should be visible under Plugins > Plugin overview.
-+ Enable the plugin for stage and perform a stage deploy.
-+ After performing the configuration steps described below you should be able to perform some tests.
++ After performing the configuration steps described below you should be able to perform some tests in preview mode.
 + If everything is fine you can change the configuration to live mode and deploy the plugin for the productive area to enable it for the public.
 
 ## Configuration
 ### Basic configuration
-+ Select the Plugin-tab and select "Plugin overview"
++ Select the Plugin-tab and then "Plugin overview"
 + Select the heidelpay plugin to switch to the configuration overview.
 + Now enter your credentials and channel configurations and activate the channels you want to use.
 
@@ -38,12 +37,12 @@ This module is based on the heidelpay php-payment-api (https://github.com/heidel
 
 >*You will have to hit the save-button for each tab individually in order to save the entered data, otherwise Plenty will reset to the original data on tab change.*
 
->*In addition it takes plenty quite some time to show the updated Information on the tabs. The best way is to reload the **Plugin overview**-tab in order to refresh the config-tabs and to make sure the entered data is correct.*
+>*In addition it takes plenty quite some time to show the updated Information on the tabs. You may have to reload the **Plugin overview**-tab in order to refresh the config-tabs and to make sure the entered data is indeed stored.*
 
-### The Config parameters
-#### heidelpay Settings
+### The configuration parameters
+#### heidelpay settings
 ###### Test-/Livesystem
-* Select parameter *'Test environment (CONNECTOR_TEST)'* to enable connection to the test environment, in which case any transactions will be transfered to the test payment and will not be charged.  
+* Select parameter *'Test environment (CONNECTOR_TEST)'* to enable connection to the test environment, in which case any transactions will be transferred to the sandbox and will not be charged.  
 Please make sure to use test credentials and channel-ids when this option is selected (ref. https://dev.heidelpay.com/sandbox-environment/).
 * Select parameter *'Production environment (LIVE)'* to enable live mode which means that actual transactions will be executed and charged.
 Please make sure to use your live credentials and channel-ids when this option is selected.
@@ -120,6 +119,9 @@ There are no additional steps necessary to capture the amount.\
 If the payment is successful, the order is immediately marked paid in your backend.\
 If the payment fails, the order is not created and the customer will be redirected to the checkout page.
 
+### All payment methods
+* Payments contain the TxnId (which is the heidelpay orderId), the shortId (the id of the transaction which lead to the payment i.e. Receipt, Debit or Capture) and the origin (i.e. heidelpay).
+* In case of an error resulting in the order not being created while the payment has been successful will lead to an unassigned plenty payment with the error message prepended to the booking text.
 
 ## Issues and Troubleshooting
 If you run into any questions or issues with this plugin please do one of the following:

@@ -13,6 +13,7 @@
  */
 namespace Heidelpay\Services;
 
+use Heidelpay\Configs\MainConfigContract;
 use Plenty\Modules\Basket\Models\Basket;
 
 class BasketService
@@ -21,15 +22,22 @@ class BasketService
      * @var LibService
      */
     private $libService;
+    /**
+     * @var MainConfigContract
+     */
+    private $config;
 
     /**
      * BasketService constructor.
      * @param LibService $libraryService
+     * @param MainConfigContract $config
      */
     public function __construct(
-        LibService $libraryService
+        LibService $libraryService,
+        MainConfigContract $config
     ) {
         $this->libService = $libraryService;
+        $this->config = $config;
     }
 
     /**
@@ -49,6 +57,7 @@ class BasketService
             'senderId' => $authData['SECURITY_SENDER'],
         ];
         $params['basket'] = $basket->toArray();
+        $params['sandboxmode'] = $this->config->isInSandboxMode();
 
         $response = $this->libService->submitBasket($params);
         return $response['basketId'];

@@ -18,6 +18,8 @@ use Heidelpay\PhpBasketApi\Request as BasketApiRequest;
 $authData = SdkRestApi::getParam('auth');
 /** @var array $basketData */
 $basketData = SdkRestApi::getParam('basket');
+/** @var bool $sandmoxmode */
+$sandboxmode = SdkRestApi::getParam('sandboxmode');
 
 $basket = new \Heidelpay\PhpBasketApi\Object\Basket();
 $basket->setAmountTotalNet((int) $basketData['basketAmountNet'] * 100);
@@ -37,6 +39,7 @@ foreach ($basketData['basketItems'] as $cartItem) {
 
 $request = new BasketApiRequest();
 $request->setAuthentication($authData['login'], $authData['password'], $authData['senderId']);
+$request->setIsSandboxMode($sandboxmode);
 $request->setBasket($basket);
 
 // submit the basket via api call.

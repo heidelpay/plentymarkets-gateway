@@ -118,6 +118,8 @@ If the payment fails, the order is not created and the customer will be redirect
 ### All payment methods
 * Payments contain the TxnId (which is the heidelpay orderId), the shortId (the id of the transaction which lead to the payment i.e. Receipt, Debit or Capture) and the origin (i.e. heidelpay).
 * In case of an error resulting in the order not being created while the payment has been successful will lead to an unassigned plenty payment with the error message prepended to the booking text.
+Unfortunately there is no way for us to re-create the order if the initial order creation fails, even if the payment has been successfully booked in our backend.
+However you will be able to tell there has been an error when there are unassigned payments in your plenty backend showing an error in the booking text.
 
 ## Issues and Troubleshooting
 If you run into any questions or issues with this plugin please do one of the following:

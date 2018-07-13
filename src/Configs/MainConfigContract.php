@@ -46,9 +46,9 @@ interface MainConfigContract
     /**
      * Returns the secret key.
      *
-     * @return string|null
+     * @return string
      */
-    public function getSecretKey();
+    public function getSecretKey(): string;
 
     /**
      * Returns true if the shop is configured to work in sandbox mode aka. connector-test mode.

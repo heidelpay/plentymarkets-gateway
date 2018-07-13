@@ -25,7 +25,7 @@
         },
         "main.senderId": {
           "type": "inputText",
-          "required": false,
+          "required": true,
           "label": "Config.mainSenderIdLabel",
           "options": {
             "defaultValue": "31HA07BC8142C5A171745D00AD63D182"
@@ -33,7 +33,7 @@
         },
         "main.login": {
           "type": "inputText",
-          "required": false,
+          "required": true,
           "label": "Config.mainLoginLabel",
           "options": {
             "defaultValue": "31ha07bc8142c5a171744e5aef11ffd3"
@@ -41,7 +41,7 @@
         },
         "main.password": {
           "type": "inputText",
-          "required": false,
+          "required": true,
           "label": "Config.mainPasswordLabel",
           "options": {
             "defaultValue": "93167DE7",
@@ -50,7 +50,7 @@
         },
         "main.secret": {
           "type": "inputText",
-          "required": false,
+          "required": true,
           "label": "Config.mainSecretLabel",
           "options": {
             "defaultValue": ""

@@ -269,8 +269,8 @@ class PaymentService
         }
 
         if ($methodInstance->hasToBeInitialized()) {
-            $result = $this->sendPaymentRequest($basket, $paymentMethod, $methodInstance->getTransactionType(), $mopId);
             try {
+                $result = $this->sendPaymentRequest($basket, $paymentMethod, $methodInstance->getTransactionType(), $mopId);
                 $value = $this->handleSyncResponse($type, $result);
             } catch (\RuntimeException $e) {
                 $this->notification->error($clientErrorMessage, __METHOD__, [$type, $e->getMessage()], true);

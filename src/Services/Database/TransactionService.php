@@ -188,6 +188,10 @@ class TransactionService
      */
     private function verifyTransaction($heidelpayResponse)
     {
+        if (!isset($heidelpayResponse['CRITERION.SECRET'])) {
+            throw new \RuntimeException('general.errorSecretHashIsNotSet');
+        }
+
         /** @var SecretService $secretService */
         $secretService = pluginApp(SecretService::class);
 

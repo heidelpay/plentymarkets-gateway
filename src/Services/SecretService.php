@@ -36,14 +36,14 @@ class SecretService
      * Creates a hash based on the configured secret and the transactionId.
      *
      * @param $value
-     * @return string|null
+     * @return string
      */
-    public function getSecretHash($value)
+    public function getSecretHash($value): string
     {
         $secretKey = $this->config->getSecretKey();
 
         if ($secretKey === '') {
-            return null;
+            throw new \RuntimeException('general.errorSecretKeyIsNotConfigured');
         }
 
         return hash('sha512', $value . $secretKey);

@@ -95,7 +95,7 @@ class PaymentService
     /**
      * @var MethodConfigContract
      */
-    private $config;
+    private $methodConfig;
     /**
      * @var OrderTxnIdRelationRepositoryContract
      */
@@ -117,7 +117,7 @@ class PaymentService
      * @param Twig $twig
      * @param FrontendSessionStorageFactoryContract $sessionStorageFac
      * @param NotificationServiceContract $notification
-     * @param MethodConfigContract $config
+     * @param MethodConfigContract $methodConfig
      * @param OrderTxnIdRelationRepositoryContract $orderTxnIdRepo
      * @param OrderRepositoryContract $orderRepo
      */
@@ -131,7 +131,7 @@ class PaymentService
         Twig $twig,
         FrontendSessionStorageFactoryContract $sessionStorageFac,
         NotificationServiceContract $notification,
-        MethodConfigContract $config,
+        MethodConfigContract $methodConfig,
         OrderTxnIdRelationRepositoryContract $orderTxnIdRepo,
         OrderRepositoryContract $orderRepo
     ) {
@@ -144,7 +144,7 @@ class PaymentService
         $this->twig = $twig;
         $this->sessionStorageFactory = $sessionStorageFac;
         $this->notification = $notification;
-        $this->config = $config;
+        $this->methodConfig = $methodConfig;
         $this->orderTxnIdRepo = $orderTxnIdRepo;
         $this->orderRepo = $orderRepo;
     }
@@ -298,6 +298,9 @@ class PaymentService
         /** @var BasketService $basketService */
         $basketService = pluginApp(BasketService::class);
 
+        /** @var SecretService $secretService */
+        $secretService = pluginApp(SecretService::class);
+
         // set authentication data
         $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($paymentMethod);
         $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
@@ -359,10 +362,15 @@ class PaymentService
         $this->heidelpayRequest['CRITERION_PUSH_URL'] =
             $this->paymentHelper->getDomain() . '/' . Routes::PUSH_NOTIFICATION_URL;
 
+        $secret = $secretService->getSecretHash($transactionId);
+        if (null !== $secret) {
+            $this->heidelpayRequest['CRITERION_SECRET'] = $secret;
+        }
+
         // general
         $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
         if (null !== $methodInstance) {
-            $this->heidelpayRequest['FRONTEND_CSS_PATH'] = $this->config->getIFrameCssPath($methodInstance);
+            $this->heidelpayRequest['FRONTEND_CSS_PATH'] = $this->methodConfig->getIFrameCssPath($methodInstance);
         }
 
         // TODO: Riskinformation for future payment methods

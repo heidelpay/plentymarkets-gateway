@@ -19,9 +19,7 @@ use Heidelpay\Constants\TransactionMode;
 class MainConfig extends BaseConfig implements MainConfigContract
 {
     /**
-     * Returns the senderId for authentication.
-     *
-     * @return string
+     * {@inheritDoc}
      */
     public function getSenderId(): string
     {
@@ -29,9 +27,7 @@ class MainConfig extends BaseConfig implements MainConfigContract
     }
 
     /**
-     * Returns the user login for authentication.
-     *
-     * @return string
+     * {@inheritDoc}
      */
     public function getUserLogin(): string
     {
@@ -39,9 +35,7 @@ class MainConfig extends BaseConfig implements MainConfigContract
     }
 
     /**
-     * Returns the user password for authentication.
-     *
-     * @return string
+     * {@inheritDoc}
      */
     public function getUserPassword(): string
     {
@@ -49,9 +43,23 @@ class MainConfig extends BaseConfig implements MainConfigContract
     }
 
     /**
-     * Returns true if the shop is configured to work in sandbox mode aka. connector-test mode.
-     *
-     * @return bool
+     * {@inheritDoc}
+     */
+    public function getEnvironment(): string
+    {
+        return $this->isInSandboxMode() ? TransactionMode::CONNECTOR_TEST : TransactionMode::LIVE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSecretKey(): string
+    {
+        return $this->get($this->getConfigKey(Configuration::KEY_SECRET));
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function isInSandboxMode(): bool
     {
@@ -60,22 +68,10 @@ class MainConfig extends BaseConfig implements MainConfigContract
     }
 
     /**
-     * Returns true if the shop is configured to work in live mode.
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function isInLiveMode(): bool
     {
         return !$this->isInSandboxMode();
-    }
-
-    /**
-     * Returns the value for the transaction mode (which is the environment).
-     *
-     * @return string Config::VALUE_ENVIRONMENT_CONNECTOR_TEST | Config::VALUE_ENVIRONMENT_LIVE
-     */
-    public function getEnvironment(): string
-    {
-        return $this->isInSandboxMode() ? TransactionMode::CONNECTOR_TEST : TransactionMode::LIVE;
     }
 }

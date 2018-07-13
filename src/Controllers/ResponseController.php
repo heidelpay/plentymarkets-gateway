@@ -23,7 +23,7 @@ use Plenty\Plugin\Http\Response;
  *
  * @link http://dev.heidelpay.com/plentymarkets-gateway
  *
- * @author Stephano Vogel <development@heidelpay.com>
+ * @author Simon Gabriel <development@heidelpay.com>
  *
  * @package heidelpay\plentymarkets-gateway\controllers
  */
@@ -96,6 +96,7 @@ class ResponseController extends Controller
 
         // if something went wrong during the lib call, return the cancel url.
         // exceptionCode = problem inside of the lib, error = error during libCall.
+        // todo: exceptionCode and error are never set
         if (!isset($response['exceptionCode'])) {
             $this->createAndHandleTransaction($response, $responseObject);
 

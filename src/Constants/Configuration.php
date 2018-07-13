@@ -21,6 +21,7 @@ class Configuration
     const KEY_AUTH_PASSWORD = 'main.password';
     const KEY_AUTH_LOGIN = 'main.login';
     const KEY_ENVIRONMENT = 'main.environment';
+    const KEY_SECRET = 'main.secret';
 
     const KEY_IS_ACTIVE = 'isActive';
     const KEY_DISPLAY_NAME = 'displayName';

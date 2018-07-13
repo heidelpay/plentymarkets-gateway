@@ -45,8 +45,15 @@
           "label": "Config.mainPasswordLabel",
           "options": {
             "defaultValue": "93167DE7",
-            "isPassword": true,
-            "isIBAN": false
+            "isPassword": true
+          }
+        },
+        "main.secret": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.mainSecretLabel",
+          "options": {
+            "defaultValue": ""
           }
         }
       }

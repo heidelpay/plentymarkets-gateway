@@ -44,6 +44,13 @@ interface MainConfigContract
     public function getEnvironment(): string;
 
     /**
+     * Returns the secret key.
+     *
+     * @return string
+     */
+    public function getSecretKey(): string;
+
+    /**
      * Returns true if the shop is configured to work in sandbox mode aka. connector-test mode.
      *
      * @return bool

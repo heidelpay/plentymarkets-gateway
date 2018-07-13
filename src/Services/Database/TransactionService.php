@@ -16,6 +16,7 @@ namespace Heidelpay\Services\Database;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Transaction;
+use Heidelpay\Services\SecretService;
 
 class TransactionService
 {
@@ -64,6 +65,9 @@ class TransactionService
         int $orderId = null
     ): Transaction {
         $heidelpayResponse = $responseData['response'];
+
+        // verify hash
+        $this->verifyTransaction($heidelpayResponse);
 
         $storeId = $storeId ?? (int)$heidelpayResponse['CRITERION.STORE_ID'];
         $paymentMethodId = $paymentMethodId ?? (int) $heidelpayResponse['CRITERION.MOP'];
@@ -158,6 +162,7 @@ class TransactionService
             'PAYMENT.CODE', 'SECURITY.SENDER',
         ];
 
+        // todo: use intersect instead
         foreach ($heidelpayData as $key => $value) {
             if (preg_match($groupPattern, $key) || \in_array($key, $toDelete, true)) {
                 unset($heidelpayData[$key]);
@@ -174,5 +179,21 @@ class TransactionService
     public function getTransactionIfItExists($heidelpayResponse)
     {
         return $this->transactionRepository->getTransactionsByShortId($heidelpayResponse['IDENTIFICATION.SHORTID']);
+    }
+
+    /**
+     * Throws exception if the hash is invalid.
+     *
+     * @param $heidelpayResponse
+     */
+    private function verifyTransaction($heidelpayResponse)
+    {
+        /** @var SecretService $secretService */
+        $secretService = pluginApp(SecretService::class);
+
+        $txnId = $heidelpayResponse['IDENTIFICATION.TRANSACTIONID'];
+        $hash = $heidelpayResponse['CRITERION.SECRET'];
+
+        $secretService->verifySecretHash($txnId, $hash);
     }
 }

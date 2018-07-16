@@ -130,6 +130,4 @@ Unfortunately there is no way for us to re-create the order if the initial order
 However you will be able to tell there has been an error when there are unassigned payments in your plenty backend showing an error in the booking text.
 
 ## Issues and Troubleshooting
-If you run into any questions or issues with this plugin please do one of the following:
-* Sent and email with the question or issue description to development@heidelpay.com
-* Add a GitHub issue [here](https://github.com/heidelpay/plentymarkets-gateway/issues)
+If you run into any questions or issues with this plugin please send an email to support@heidelpay.com

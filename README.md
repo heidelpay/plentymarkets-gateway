@@ -9,8 +9,12 @@ Currently supported payment methods are:
 * Direct Debit
 * Sofort.
 
-## SYSTEM REQUIREMENTS
-This plugin is designed fo Plentymarkets 7.
+## REQUIREMENTS
+* This plugin is designed fo Plentymarkets 7.
+* Push needs to be configured in heidelpay payment api for this plugin to work properly. \
+The push URL consists of the shop domain followed by **'/payment/heidelpay/pushNotification'** \
+e.g. https://my-demo-shop.plentymarkets-cloud01.com/payment/heidelpay/pushNotification \
+or https://www.my-demo-shop.com/payment/heidelpay/pushNotification
 
 ## LICENSE
 For licensing information please refer to the attached LICENSE.txt.
@@ -77,6 +81,10 @@ Setting one of those values to 0 will disable the corresponding limitation.
 
 > **Info:** Some payment methods allow for pre-authorization, which is basically a declaration of intent for the debit of the basket total.
 The total is captured later, usually when the shipping takes place. This provides for the opportunity to only debit the totals of the items actually shipped, e.g. when the basket is divided into several shipments.
+
+###### Secret key
+* This is a security key required to create a hash value which is used to validate that the transactions origin is the heidelpay payment backend.
+This parameter is required and can not be left empty.
 
 ###### URL for custom-css in the iframe
 Some payment methods are shown within an iframe rendering a form for the customer data.

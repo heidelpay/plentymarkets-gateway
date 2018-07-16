@@ -83,7 +83,7 @@ Setting one of those values to 0 will disable the corresponding limitation.
 The total is captured later, usually when the shipping takes place. This provides for the opportunity to only debit the totals of the items actually shipped, e.g. when the basket is divided into several shipments.
 
 ###### Secret key
-* This is a security key required to create a hash value which is used to verify that origin of any incoming transaction is the heidelpay payment backend.
+* This is a security key required to create a hash value which is used to verify that the origin of any incoming transaction is the heidelpay payment backend.
 This parameter is required and can not be left empty.
 
 ###### URL for custom-css in the iframe

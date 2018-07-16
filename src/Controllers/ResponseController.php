@@ -3,6 +3,7 @@
 namespace Heidelpay\Controllers;
 
 use Heidelpay\Constants\Routes;
+use Heidelpay\Exceptions\SecurityHashInvalidException;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
@@ -98,10 +99,16 @@ class ResponseController extends Controller
         // exceptionCode = problem inside of the lib, error = error during libCall.
         // todo: exceptionCode and error are never set
         if (!isset($response['exceptionCode'])) {
-            $this->createAndHandleTransaction($response, $responseObject);
+            try {
+                $this->createAndHandleTransaction($response, $responseObject);
+                $validHash = true;
+            } catch (SecurityHashInvalidException $e) {
+                $this->notification->error($e->getMessage(), __METHOD__, ['Response' => $response]);
+                $validHash = false;
+            }
 
             // if the transaction is successful or pending, return the success url.
-            if ($response['isSuccess'] || $response['isPending']) {
+            if ($validHash && ($response['isSuccess'] || $response['isPending'])) {
                 $this->notification->debug('response.debugReturnSuccessUrl', __METHOD__, ['Response' => $response]);
                 return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_SUCCESS;
             }
@@ -128,7 +135,11 @@ class ResponseController extends Controller
         }
 
         // do not handle error (always return success)
-        $this->createAndHandleTransaction($response, $responseObject);
+        try {
+            $this->createAndHandleTransaction($response, $responseObject);
+        } catch (SecurityHashInvalidException $e) {
+            $this->notification->error($e->getMessage(), __METHOD__, ['Response' => $response]);
+        }
 
         return $this->makeSuccess('general.debugSuccess', []);
     }
@@ -187,6 +198,7 @@ class ResponseController extends Controller
      * @param $responseObject
      *
      * @return bool
+     * @throws \Heidelpay\Exceptions\SecurityHashInvalidException
      */
     private function createAndHandleTransaction($response, $responseObject): bool
     {
@@ -195,7 +207,7 @@ class ResponseController extends Controller
             $txn = $this->transactionService->getTransactionIfItExists($responseObject);
 
             // verify hash
-            $this->transactionService->verifyTransaction($responseObject['response']);
+            $this->transactionService->verifyTransaction($responseObject);
 
             if ($txn instanceof Transaction) {
                 $message = 'response.debugTransactionAlreadyExists';

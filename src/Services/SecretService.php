@@ -14,6 +14,7 @@
 namespace Heidelpay\Services;
 
 use Heidelpay\Configs\MainConfigContract;
+use Heidelpay\Exceptions\SecurityHashInvalidException;
 
 class SecretService
 {
@@ -55,13 +56,14 @@ class SecretService
      * @param $value
      * @param $hash
      * @return bool
+     * @throws SecurityHashInvalidException
      */
     public function verifySecretHash($value, $hash): bool
     {
         $referenceHash = $this->getSecretHash($value);
 
         if ($referenceHash !== $hash) {
-            throw new \RuntimeException('general.errorSecurityHashInvalid');
+            throw new SecurityHashInvalidException('general.errorSecurityHashInvalid');
         }
 
         return true;

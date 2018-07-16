@@ -13,6 +13,7 @@
  */
 namespace Heidelpay\Services\Database;
 
+use Heidelpay\Exceptions\SecurityHashInvalidException;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Transaction;
@@ -182,11 +183,12 @@ class TransactionService
      * Throws exception if the hash is invalid.
      *
      * @param $heidelpayResponse
+     * @throws SecurityHashInvalidException
      */
     public function verifyTransaction($heidelpayResponse)
     {
         if (!isset($heidelpayResponse['CRITERION.SECRET'])) {
-            throw new \RuntimeException('general.errorSecretHashIsNotSet');
+            throw new SecurityHashInvalidException('general.errorSecretHashIsNotSet');
         }
 
         /** @var SecretService $secretService */

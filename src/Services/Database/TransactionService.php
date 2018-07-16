@@ -66,9 +66,6 @@ class TransactionService
     ): Transaction {
         $heidelpayResponse = $responseData['response'];
 
-        // verify hash
-        $this->verifyTransaction($heidelpayResponse);
-
         $storeId = $storeId ?? (int)$heidelpayResponse['CRITERION.STORE_ID'];
         $paymentMethodId = $paymentMethodId ?? (int) $heidelpayResponse['CRITERION.MOP'];
         $processingTimestamp = $heidelpayResponse['PROCESSING.TIMESTAMP'];
@@ -186,7 +183,7 @@ class TransactionService
      *
      * @param $heidelpayResponse
      */
-    private function verifyTransaction($heidelpayResponse)
+    public function verifyTransaction($heidelpayResponse)
     {
         if (!isset($heidelpayResponse['CRITERION.SECRET'])) {
             throw new \RuntimeException('general.errorSecretHashIsNotSet');

@@ -194,6 +194,9 @@ class ResponseController extends Controller
             /* todo: refactor -> move check and so on to Transaction service */
             $txn = $this->transactionService->getTransactionIfItExists($responseObject);
 
+            // verify hash
+            $this->transactionService->verifyTransaction($responseObject['response']);
+
             if ($txn instanceof Transaction) {
                 $message = 'response.debugTransactionAlreadyExists';
             } else {

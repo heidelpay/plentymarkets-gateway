@@ -24,6 +24,6 @@ class DirectDebit extends AbstractMethod
     const ICON = '';
     const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_HTML;
     const INITIALIZE_PAYMENT = true;
-    const FORM_TEMPLATE = 'heidelpay::directDebitForm';
+    const FORM_TEMPLATE = 'Heidelpay::directDebitForm';
     const TRANSACTION_TYPE = TransactionType::DEBIT;
 }

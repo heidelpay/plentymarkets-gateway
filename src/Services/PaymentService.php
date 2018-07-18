@@ -190,7 +190,7 @@ class PaymentService
             }
         } catch (\RuntimeException $exception) {
             $this->notification->error($exception->getMessage(), __METHOD__, ['Transaction' => $transaction], true);
-            return ['error', 'heidelpay::error.errorDuringPaymentExecution'];
+            return ['error', 'Heidelpay::error.errorDuringPaymentExecution'];
         }
 
         try {
@@ -199,7 +199,7 @@ class PaymentService
             return ['error', $e->getMessage()];
         }
 
-        return ['success', 'heidelpay::info.infoPaymentSuccessful'];
+        return ['success', 'Heidelpay::info.infoPaymentSuccessful'];
     }
 
     /**
@@ -251,7 +251,7 @@ class PaymentService
     ): array {
         $value = '';
 
-        $clientErrorMessage = 'heidelpay::payment.errorInternalErrorTryAgainLater';
+        $clientErrorMessage = 'Heidelpay::payment.errorInternalErrorTryAgainLater';
 
         /** @var AbstractMethod $methodInstance */
         $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
@@ -523,7 +523,7 @@ class PaymentService
         $payment = $this->paymentRepository->createPayment($payment);
 
         if (!$payment instanceof Payment) {
-            throw new \RuntimeException('heidelpay::error.errorDuringPaymentExecution');
+            throw new \RuntimeException('Heidelpay::error.errorDuringPaymentExecution');
         }
 
         return $payment;
@@ -544,7 +544,7 @@ class PaymentService
             $this->notification->error($e->getMessage(), __METHOD__, $logData);
             // todo: move to booking text helper
             $this->paymentHelper->setBookingTextError($payment, $e->getMessage());
-            throw new \RuntimeException('heidelpay::error.errorDuringPaymentExecution');
+            throw new \RuntimeException('Heidelpay::error.errorDuringPaymentExecution');
         }
 
         $this->paymentHelper->removeBookingTextError($payment);

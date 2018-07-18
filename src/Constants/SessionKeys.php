@@ -1,6 +1,9 @@
 <?php
+
+namespace Heidelpay\Constants;
+
 /**
- * Description
+ * Constant class for session storage values.
  *
  * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
@@ -9,10 +12,8 @@
  *
  * @author  Simon Gabriel <development@heidelpay.de>
  *
- * @package  heidelpay/${Package}
+ * @package heidelpay\plentymarkets-gateway\constants
  */
-namespace Heidelpay\Constants;
-
 class SessionKeys
 {
     const SESSION_KEY_TXN_ID = 'heidelpay_txn_id';

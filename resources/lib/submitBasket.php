@@ -1,6 +1,6 @@
 <?php
 /**
- * heidelpay PHP Payment API Basket API submit lib callback
+ * Sends requests to heidelpay basketApi.
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.

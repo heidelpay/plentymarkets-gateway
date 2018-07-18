@@ -1,16 +1,5 @@
 <?php
-/**
- * heidelpay Lib Service class
- *
- * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
- * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
- *
- * @link http://dev.heidelpay.com/plentymarkets-gateway
- *
- * @author Stephano Vogel <development@heidelpay.com>
- *
- * @package heidelpay\plentymarkets-gateway\services
- */
+
 namespace Heidelpay\Services;
 
 use Heidelpay\Constants\Plugin;
@@ -22,6 +11,18 @@ use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
 use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
 
+/**
+ * Provides for connection to the libraries.
+ *
+ * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
+ * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
+ *
+ * @link http://dev.heidelpay.com/plentymarkets-gateway
+ *
+ * @author Stephano Vogel <development@heidelpay.com>
+ *
+ * @package heidelpay\plentymarkets-gateway\services
+ */
 class LibService
 {
     /**

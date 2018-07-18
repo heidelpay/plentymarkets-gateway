@@ -1,6 +1,10 @@
 <?php
+namespace Heidelpay\Models\Contracts;
+
+use Heidelpay\Models\OrderTxnIdRelation;
+
 /**
- * Description
+ * Interface for order txnId relation repository.
  *
  * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
@@ -9,13 +13,8 @@
  *
  * @author  Simon Gabriel <development@heidelpay.de>
  *
- * @package  heidelpay/${Package}
+ * @package  heidelpay\plentymarkets-gateway\models
  */
-
-namespace Heidelpay\Models\Contracts;
-
-use Heidelpay\Models\OrderTxnIdRelation;
-
 interface OrderTxnIdRelationRepositoryContract
 {
     /**

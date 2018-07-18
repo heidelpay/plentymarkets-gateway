@@ -1,4 +1,10 @@
 <?php
+namespace Heidelpay\Models\Repositories;
+
+use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
+use Heidelpay\Models\OrderTxnIdRelation;
+use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
+
 /**
  * OrderTxnIdRelationRepository class
  *
@@ -9,14 +15,8 @@
  *
  * @author Simon Gabriel <development@heidelpay.com>
  *
- * @package heidelpay\plentymarkets-gateway\models\repositories
+ * @package heidelpay\plentymarkets-gateway\models
  */
-namespace Heidelpay\Models\Repositories;
-
-use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
-use Heidelpay\Models\OrderTxnIdRelation;
-use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
-
 class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContract
 {
     /**

@@ -11,7 +11,7 @@ use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
  *
  * @link http://dev.heidelpay.com/plentymarkets-gateway
  *
- * @author Stephano Vogel <development@heidelpay.com>
+ * @author Simon Gabriel <development@heidelpay.com>
  *
  * @package heidelpay\plentymarkets-gateway\payment-methods
  */

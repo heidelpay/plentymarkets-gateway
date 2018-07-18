@@ -43,7 +43,7 @@ use Plenty\Plugin\Log\Loggable;
  *
  * @author Stephano Vogel <development@heidelpay.com>
  *
- * @package heidelpay\plentymarkets-gateway\helpr
+ * @package heidelpay\plentymarkets-gateway\helpers
  */
 class PaymentHelper
 {

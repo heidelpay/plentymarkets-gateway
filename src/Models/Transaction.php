@@ -1,4 +1,10 @@
 <?php
+
+namespace Heidelpay\Models;
+
+use Heidelpay\Constants\Plugin;
+use Plenty\Modules\Plugin\DataBase\Contracts\Model;
+
 /**
  * heidelpay Transaction model class
  *
@@ -10,14 +16,6 @@
  * @author Stephano Vogel <development@heidelpay.com>
  *
  * @package heidelpay\plentymarkets-gateway\models
- */
-namespace Heidelpay\Models;
-
-use Heidelpay\Constants\Plugin;
-use Plenty\Modules\Plugin\DataBase\Contracts\Model;
-
-/**
- * heidelpay Transaction model class
  *
  * @property int $id
  * @property int $storeId

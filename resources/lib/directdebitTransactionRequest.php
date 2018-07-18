@@ -1,5 +1,6 @@
 <?php
 /**
+ * Performs direct debit transaction requests.
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.

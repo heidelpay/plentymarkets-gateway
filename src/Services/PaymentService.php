@@ -35,7 +35,7 @@ use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Plugin\Templates\Twig;
 
 /**
- * heidelpay Payment Service class
+ * Provides service methods to handle payments.
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.

@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response as BaseResponse;
  *
  * @author Stephano Vogel <development@heidelpay.com>
  *
- * @package heidelpay\plentymarkets-gateway
+ * @package heidelpay\plentymarkets-gateway\controllers
  */
 class PaymentController extends Controller
 {

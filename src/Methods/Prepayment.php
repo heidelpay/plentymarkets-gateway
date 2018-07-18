@@ -1,4 +1,8 @@
 <?php
+
+namespace Heidelpay\Methods;
+use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
+
 /**
  * heidelpay Prepayment Payment Method
  *
@@ -11,10 +15,6 @@
  *
  * @package heidelpay\plentymarkets-gateway\payment-methods
  */
-namespace Heidelpay\Methods;
-
-use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
-
 class Prepayment extends AbstractMethod
 {
     const CONFIG_KEY = 'prepayment';

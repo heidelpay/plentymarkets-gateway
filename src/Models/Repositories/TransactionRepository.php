@@ -17,7 +17,7 @@ use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
  *
  * @author Stephano Vogel <development@heidelpay.com>
  *
- * @package heidelpay\plentymarkets-gateway\models\repositories
+ * @package heidelpay\plentymarkets-gateway\models
  */
 class TransactionRepository implements TransactionRepositoryContract
 {

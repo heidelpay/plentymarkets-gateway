@@ -10,9 +10,9 @@ namespace Heidelpay\Methods;
  *
  * @link http://dev.heidelpay.com/plentymarkets-gateway
  *
- * @author Stephano Vogel <development@heidelpay.com>
+ * @author Simon Gabriel <development@heidelpay.com>
  *
- * @package heidelpay\plentymarkets-gateway
+ * @package heidelpay\plentymarkets-gateway\payment-methods
  */
 interface PaymentMethodContract
 {

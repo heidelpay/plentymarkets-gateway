@@ -15,8 +15,6 @@ use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
 
 /**
- * heidelpay Response Controller
- *
  * Processes the transaction/payment responses coming from the heidelpay payment system.
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.

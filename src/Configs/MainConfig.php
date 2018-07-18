@@ -1,6 +1,11 @@
 <?php
+
+namespace Heidelpay\Configs;
+use Heidelpay\Constants\Configuration;
+use Heidelpay\Constants\TransactionMode;
+
 /**
- * Description
+ * Allows accessing heidelpay main configuration parameters.
  *
  * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
@@ -9,13 +14,8 @@
  *
  * @author  Simon Gabriel <development@heidelpay.de>
  *
- * @package  heidelpay/${Package}
+ * @package  heidelpay\plentymarkets-gateway\configuration
  */
-namespace Heidelpay\Configs;
-
-use Heidelpay\Constants\Configuration;
-use Heidelpay\Constants\TransactionMode;
-
 class MainConfig extends BaseConfig implements MainConfigContract
 {
     /**

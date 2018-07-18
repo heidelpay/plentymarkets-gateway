@@ -1,6 +1,9 @@
 <?php
+
+namespace Heidelpay\Exceptions;
+
 /**
- * Description
+ * This exception is thrown when a received security hash is invalid.
  *
  * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
@@ -9,10 +12,8 @@
  *
  * @author  Simon Gabriel <development@heidelpay.de>
  *
- * @package  heidelpay/${Package}
+ * @package heidelpay\plentymarkets-gateway\exceptions
  */
-namespace Heidelpay\Exceptions;
-
 class SecurityHashInvalidException extends \Exception
 {
 

@@ -1,6 +1,12 @@
 <?php
+
+namespace Heidelpay\Services;
+
+use Heidelpay\Configs\MainConfigContract;
+use Heidelpay\Exceptions\SecurityHashInvalidException;
+
 /**
- * Description
+ * Provides secret hash generation and validation capabilities.
  *
  * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
@@ -9,13 +15,8 @@
  *
  * @author  Simon Gabriel <development@heidelpay.de>
  *
- * @package  heidelpay/${Package}
+ * @package  heidelpay\plentymarkets-gateway\services
  */
-namespace Heidelpay\Services;
-
-use Heidelpay\Configs\MainConfigContract;
-use Heidelpay\Exceptions\SecurityHashInvalidException;
-
 class SecretService
 {
     /**

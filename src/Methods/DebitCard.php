@@ -1,4 +1,9 @@
 <?php
+
+namespace Heidelpay\Methods;
+
+use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
+
 /**
  * heidelpay Debit Card Payment Method
  *
@@ -11,10 +16,6 @@
  *
  * @package heidelpay\plentymarkets-gateway\payment-methods
  */
-namespace Heidelpay\Methods;
-
-use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
-
 class DebitCard extends AbstractMethod
 {
     const CONFIG_KEY = 'debitcard';

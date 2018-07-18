@@ -1,18 +1,5 @@
 <?php
-/**
- * Description
- *
- * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
- * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
- *
- * @link  http://dev.heidelpay.com/
- *
- * @author  Simon Gabriel <development@heidelpay.de>
- *
- * @package  heidelpay/${Package}
- */
 namespace Heidelpay\Configs;
-
 use Heidelpay\Constants\Configuration;
 use Heidelpay\Constants\DescriptionTypes;
 use Heidelpay\Constants\Plugin;
@@ -23,6 +10,18 @@ use Heidelpay\Methods\DirectDebit;
 use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\Sofort;
 
+/**
+ * Config class to access payment method configuration parameters.
+ *
+ * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
+ * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
+ *
+ * @link  http://dev.heidelpay.com/
+ *
+ * @author  Simon Gabriel <development@heidelpay.de>
+ *
+ * @package  heidelpay\plentymarkets-gateway\configuration
+ */
 class MethodConfig extends BaseConfig implements MethodConfigContract
 {
     const ARRAY_KEY_CONFIG_KEY = 'config_key';

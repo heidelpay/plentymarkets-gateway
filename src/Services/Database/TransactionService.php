@@ -1,4 +1,12 @@
 <?php
+namespace Heidelpay\Services\Database;
+
+use Heidelpay\Exceptions\SecurityHashInvalidException;
+use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Models\Contracts\TransactionRepositoryContract;
+use Heidelpay\Models\Transaction;
+use Heidelpay\Services\SecretService;
+
 /**
  * Transaction Service class
  *
@@ -11,14 +19,6 @@
  *
  * @package heidelpay\plentymarkets-gateway\services
  */
-namespace Heidelpay\Services\Database;
-
-use Heidelpay\Exceptions\SecurityHashInvalidException;
-use Heidelpay\Helper\PaymentHelper;
-use Heidelpay\Models\Contracts\TransactionRepositoryContract;
-use Heidelpay\Models\Transaction;
-use Heidelpay\Services\SecretService;
-
 class TransactionService
 {
     const NO_ORDER_ID = -1;

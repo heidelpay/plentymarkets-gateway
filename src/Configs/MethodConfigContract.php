@@ -1,6 +1,9 @@
 <?php
+namespace Heidelpay\Configs;
+use Heidelpay\Methods\PaymentMethodContract;
+
 /**
- * Description
+ * Interface for payment method configuration class.
  *
  * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
@@ -9,13 +12,8 @@
  *
  * @author  Simon Gabriel <development@heidelpay.de>
  *
- * @package  heidelpay/${Package}
+ * @package  heidelpay/plentymarkets-gateway
  */
-
-namespace Heidelpay\Configs;
-
-use Heidelpay\Methods\PaymentMethodContract;
-
 interface MethodConfigContract
 {
     //<editor-fold desc="General/Helpers">

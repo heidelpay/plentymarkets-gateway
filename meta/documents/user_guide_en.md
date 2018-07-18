@@ -128,6 +128,3 @@ If the payment fails, the order is not created and the customer will be redirect
 * In case of an error resulting in the order not being created while the payment has been successful will lead to an unassigned plenty payment with the error message prepended to the booking text.
 Unfortunately there is no way for us to re-create the order if the initial order creation fails, even if the payment has been successfully booked in our backend.
 However you will be able to tell there has been an error when there are unassigned payments in your plenty backend showing an error in the booking text.
-
-## Issues and Troubleshooting
-If you run into any questions or issues with this plugin please send an email to support@heidelpay.com

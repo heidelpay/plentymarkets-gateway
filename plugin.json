@@ -1,5 +1,5 @@
 {
-  "name": "heidelpay",
+  "name": "Heidelpay",
   "namespace": "Heidelpay",
   "serviceProvider": "Heidelpay\\Providers\\HeidelpayServiceProvider",
   "marketplaceName": {
@@ -8,16 +8,17 @@
   },
   "description": "plentymarkets Integration for heidelpay",
   "shortDescription": {
-    "de": "plentymarkets Integration für heidelpay",
-    "en": "plentymarkets Integration for heidelpay"
+    "de": "plentymarkets Integration für heidelpay Zahlarten",
+    "en": "plentymarkets integration for heidelpay payment methods"
   },
   "categories": ["3519", "3521"],
-  "keywords": ["heidelpay", "plentymarkets", "plugin", "payment", "payment method"],
+  "keywords": ["heidelpay", "plentymarkets", "plugin", "payment", "payment method", "credit card", "debit card", "sofort", "direct debit"],
   "version": "1.0.0",
   "license": "Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.",
   "price": 0.00,
   "author": "heidelpay GmbH",
   "authorIcon": "icon_author_xs.png",
+  "pluginIcon": "icon_plugin_xs.png",
   "email": "development@heidelpay.com",
   "type": "payment",
   "dependencies": {

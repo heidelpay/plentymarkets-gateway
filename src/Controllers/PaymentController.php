@@ -8,8 +8,6 @@ use Plenty\Plugin\Http\Response;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
 /**
- * heidelpay Payment Controller
- *
  * Handles general processes that are interactions with the customer.
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
@@ -23,13 +21,9 @@ use Symfony\Component\HttpFoundation\Response as BaseResponse;
  */
 class PaymentController extends Controller
 {
-    /**
-     * @var Response
-     */
+    /** @var Response */
     private $response;
-    /**
-     * @var NotificationServiceContract
-     */
+    /** @var NotificationServiceContract */
     private $notification;
 
     /**

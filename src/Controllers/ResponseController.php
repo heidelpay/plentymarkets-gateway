@@ -34,19 +34,14 @@ class ResponseController extends Controller
 
     /** @var Request $request */
     private $request;
-
     /** @var Response */
     private $response;
-
     /** @var PaymentHelper */
     private $paymentHelper;
-
     /** @var PaymentService */
     private $paymentService;
-
     /** @var TransactionService*/
     private $transactionService;
-
     /** @var NotificationServiceContract */
     private $notification;
 
@@ -74,6 +69,44 @@ class ResponseController extends Controller
         $this->paymentService = $paymentService;
         $this->transactionService = $transactionService;
         $this->notification = $notification;
+    }
+
+    /**
+     * Creates a transaction object and returns bool to indicate success.
+     *
+     * @param $response
+     * @param $responseObject
+     *
+     * @return bool
+     * @throws \Heidelpay\Exceptions\SecurityHashInvalidException
+     */
+    private function createAndHandleTransaction($response, $responseObject): bool
+    {
+        try {
+            /* todo: refactor -> move check and so on to Transaction service */
+            $txn = $this->transactionService->getTransactionIfItExists($responseObject);
+
+            // verify hash
+            $this->transactionService->verifyTransaction($responseObject);
+
+            if ($txn instanceof Transaction) {
+                $message = 'response.debugTransactionAlreadyExists';
+            } else {
+                $txn = $this->transactionService->createTransaction($response);
+                $message = 'response.debugCreatedTransaction';
+            }
+
+            $this->notification->debug($message, __METHOD__, ['Response' => $response, 'Transaction' => $txn]);
+            /* todo: all in between can be refactored */
+
+            if ($response['isSuccess'] && !$response['isPending']) {
+                $this->paymentService->handleTransaction($txn);
+            }
+        } catch (\RuntimeException $e) {
+            $this->notification->warning($e->getMessage(), __METHOD__, ['data' => ['data' => $response['response']]]);
+            return false;
+        }
+        return true;
     }
 
     //<editor-fold desc="Handlers">
@@ -189,44 +222,6 @@ class ResponseController extends Controller
     {
         $this->notification->error($message, __METHOD__, $logData, true);
         return $this->makeResponse($message);
-    }
-
-    /**
-     * Creates a transaction object and returns bool to indicate success.
-     *
-     * @param $response
-     * @param $responseObject
-     *
-     * @return bool
-     * @throws \Heidelpay\Exceptions\SecurityHashInvalidException
-     */
-    private function createAndHandleTransaction($response, $responseObject): bool
-    {
-        try {
-            /* todo: refactor -> move check and so on to Transaction service */
-            $txn = $this->transactionService->getTransactionIfItExists($responseObject);
-
-            // verify hash
-            $this->transactionService->verifyTransaction($responseObject);
-
-            if ($txn instanceof Transaction) {
-                $message = 'response.debugTransactionAlreadyExists';
-            } else {
-                $txn = $this->transactionService->createTransaction($response);
-                $message = 'response.debugCreatedTransaction';
-            }
-
-            $this->notification->debug($message, __METHOD__, ['Response' => $response, 'Transaction' => $txn]);
-            /* todo: all in between can be refactored */
-
-            if ($response['isSuccess'] && !$response['isPending']) {
-                $this->paymentService->handleTransaction($txn);
-            }
-        } catch (\RuntimeException $e) {
-            $this->notification->warning($e->getMessage(), __METHOD__, ['data' => ['data' => $response['response']]]);
-            return false;
-        }
-        return true;
     }
     //</editor-fold>
 }

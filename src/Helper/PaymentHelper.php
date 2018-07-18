@@ -52,34 +52,20 @@ class PaymentHelper
 
     const NO_PAYMENTMETHOD_FOUND = -1;
 
-    /**
-     * @var PaymentMethodRepositoryContract $paymentMethodRepo
-     */
+    /** @var PaymentMethodRepositoryContract $paymentMethodRepo */
     protected $paymentMethodRepo;
-    /**
-     * @var OrderRepositoryContract
-     */
+    /** @var OrderRepositoryContract */
     private $orderRepo;
-    /**
-     * @var PaymentOrderRelationRepositoryContract
-     */
+    /** @var PaymentOrderRelationRepositoryContract */
     private $paymentOrderRelationRepo;
-    /**
-     * @var MainConfigContract
-     */
+    /** @var MainConfigContract */
     private $mainConfig;
-    /**
-     * @var MethodConfigContract
-     */
+    /** @var MethodConfigContract */
     private $methodConfig;
-    /**
-     * @var PaymentPropertyRepositoryContract
-     */
+    /** @var PaymentPropertyRepositoryContract */
     private $paymentPropertyRepo;
 
     /**
-     * AbstractHelper constructor.
-     *
      * @param PaymentMethodRepositoryContract $paymentMethodRepo
      * @param OrderRepositoryContract $orderRepository
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRepo

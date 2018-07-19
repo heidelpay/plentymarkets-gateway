@@ -24,8 +24,6 @@ class CreateHeidelpayOrderTxnIdRelationTable
     public function run(Migrate $migrate)
     {
         $this->getLogger(__METHOD__)->error('Run Migration: ' . self::class);
-
-        $migrate->deleteTable(OrderTxnIdRelation::class);
-//        $migrate->createTable(OrderTxnIdRelation::class);
+        $migrate->createTable(OrderTxnIdRelation::class);
     }
 }

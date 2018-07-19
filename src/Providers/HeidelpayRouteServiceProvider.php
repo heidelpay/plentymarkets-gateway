@@ -43,7 +43,7 @@ class HeidelpayRouteServiceProvider extends RouteServiceProvider
 
         // heidelpay Payment API responses
         $router->get(Routes::RESPONSE_URL, 'Heidelpay\Controllers\ResponseController@emergencyRedirect');
-        $router->post(Routes::RESPONSE_URL, 'Heidelpay\Controllers\ResponseController@processResponse');
+        $router->post(Routes::RESPONSE_URL, 'Heidelpay\Controllers\ResponseController@processAsyncResponse');
         $router->post(Routes::PUSH_NOTIFICATION_URL, 'Heidelpay\Controllers\ResponseController@processPush');
 
         // redirects in success or cancellation/failure cases

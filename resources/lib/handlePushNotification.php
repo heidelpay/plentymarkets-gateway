@@ -1,6 +1,6 @@
 <?php
 /**
- * heidelpay Push notification handler
+ * Handles heidelpay push messages.
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
@@ -28,7 +28,7 @@ try {
 
 return $responseArray ?? [
     'response' => $heidelpayResponse->toArray(),
-    'jsonResponse' => $response->toJson(),
+    'jsonResponse' => $heidelpayResponse->toJson(),
     'isSuccess' => $heidelpayResponse->isSuccess(),
     'isPending' => $heidelpayResponse->isPending(),
     'isError' => $heidelpayResponse->isError()

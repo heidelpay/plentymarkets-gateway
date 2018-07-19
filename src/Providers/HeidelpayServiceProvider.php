@@ -2,18 +2,23 @@
 
 namespace Heidelpay\Providers;
 
+use Heidelpay\Configs\MainConfig;
+use Heidelpay\Configs\MainConfigContract;
+use Heidelpay\Configs\MethodConfig;
+use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
-use Heidelpay\Methods\CreditCard;
-use Heidelpay\Methods\PayPal;
+use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
+use Heidelpay\Models\Repositories\OrderTxnIdRelationRepository;
 use Heidelpay\Models\Repositories\TransactionRepository;
+use Heidelpay\Services\NotificationService;
+use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
 use Plenty\Plugin\Events\Dispatcher;
-use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\ServiceProvider;
 
 /**
@@ -30,39 +35,44 @@ use Plenty\Plugin\ServiceProvider;
  */
 class HeidelpayServiceProvider extends ServiceProvider
 {
-    use Loggable;
-
     /**
      * Register the heidelpay Service Providers.
      */
     public function register()
     {
-        $this->getApplication()->register(HeidelpayRouteServiceProvider::class);
-        $this->getApplication()->bind(TransactionRepositoryContract::class, TransactionRepository::class);
+        $app = $this->getApplication();
+        $app->register(HeidelpayRouteServiceProvider::class);
+        $app->bind(TransactionRepositoryContract::class, TransactionRepository::class);
+        $app->bind(MainConfigContract::class, MainConfig::class);
+        $app->bind(MethodConfigContract::class, MethodConfig::class);
+        $app->bind(NotificationServiceContract::class, NotificationService::class);
+        $app->bind(OrderTxnIdRelationRepositoryContract::class, OrderTxnIdRelationRepository::class);
     }
 
     /**
-     * Boot the heidelpay Service Prodiver
+     * Boot the heidelpay Service Provider
      * Register payment methods, add event listeners, ...
      *
      * @param BasketRepositoryContract $basketRepository
      * @param PaymentHelper            $paymentHelper
-     * @param PaymentMethodContainer   $paymentMethodContainer
+     * @param PaymentMethodContainer   $methodContainer
      * @param PaymentService           $paymentService
      * @param Dispatcher               $eventDispatcher
      */
     public function boot(
         BasketRepositoryContract $basketRepository,
         PaymentHelper $paymentHelper,
-        PaymentMethodContainer $paymentMethodContainer,
+        PaymentMethodContainer $methodContainer,
         PaymentService $paymentService,
         Dispatcher $eventDispatcher
     ) {
+        $paymentHelper->createMopsIfNotExists();
+
         // loop through all of the plugin's available payment methods
         /** @var string $paymentMethodClass */
-        foreach ($paymentHelper::getPaymentMethods() as $paymentMethodClass) {
+        foreach (MethodConfig::getPaymentMethods() as $paymentMethodClass) {
             // register the payment method in the payment method container
-            $paymentMethodContainer->register(
+            $methodContainer->register(
                 $paymentHelper->getPluginPaymentMethodKey($paymentMethodClass),
                 $paymentMethodClass,
                 $paymentHelper->getPaymentMethodEventList()
@@ -77,18 +87,15 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $paymentHelper,
                 $paymentService
             ) {
-                if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPal::class)) {
-                    $mop = $event->getMop();
-                    $basket = $basketRepository->load();
-                    $event->setValue($paymentService->getPaymentMethodContent(PayPal::class, $basket, $mop));
-                    $event->setType($paymentService->getReturnType());
-                }
+                $mop = $event->getMop();
+                $paymentMethod = $paymentHelper->mapMopToPaymentMethod($mop);
 
-                if ($event->getMop() === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
-                    $mop = $event->getMop();
+                if (!empty($paymentMethod)) {
                     $basket = $basketRepository->load();
-                    $event->setValue($paymentService->getPaymentMethodContent(CreditCard::class, $basket, $mop));
-                    $event->setType($paymentService->getReturnType());
+                    list($type, $value) = $paymentService->getPaymentMethodContent($paymentMethod, $basket, $mop);
+
+                    $event->setValue($value);
+                    $event->setType($type);
                 }
             }
         );
@@ -97,20 +104,17 @@ class HeidelpayServiceProvider extends ServiceProvider
         $eventDispatcher->listen(
             ExecutePayment::class,
             function (ExecutePayment $event) use (
-                $basketRepository,
                 $paymentHelper,
                 $paymentService
             ) {
-                if ($event->getMop() === $paymentHelper->getPaymentMethodId(CreditCard::class)) {
-                    $basket = $basketRepository->load();
-                    $event->setValue($paymentService->executePayment(CreditCard::class, $basket, $event));
-                    $event->setType($paymentService->getReturnType());
-                }
+                $mop = $event->getMop();
+                $paymentMethod = $paymentHelper->mapMopToPaymentMethod($mop);
 
-                if ($event->getMop() === $paymentHelper->getPaymentMethodId(PayPal::class)) {
-                    $basket = $basketRepository->load();
-                    $event->setValue($paymentService->executePayment(PayPal::class, $basket, $event));
-                    $event->setType($paymentService->getReturnType());
+                if (!empty($paymentMethod)) {
+                    list($type, $value) = $paymentService->executePayment($paymentMethod, $event);
+
+                    $event->setValue($value);
+                    $event->setType($type);
                 }
             }
         );

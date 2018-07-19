@@ -3,6 +3,7 @@
 namespace Heidelpay\Models\Contracts;
 
 use Heidelpay\Models\Transaction;
+use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
 /**
  * heidelpay Transaction Repository Contract
@@ -14,7 +15,7 @@ use Heidelpay\Models\Transaction;
  *
  * @author Stephano Vogel <development@heidelpay.com>
  *
- * @package heidelpay\plentymarkets-gateway\models\contracts
+ * @package  heidelpay\plentymarkets-gateway\models
  */
 interface TransactionRepositoryContract
 {
@@ -32,16 +33,23 @@ interface TransactionRepositoryContract
      *
      * @param int $id
      *
-     * @return Transaction
+     * @return Transaction|Model
      */
-    public function getTransactionById(int $id): Transaction;
+    public function getTransactionById(int $id);
 
     /**
-     * @param int $id
+     * @param string $txnId
      *
-     * @return Transaction
+     * @return Transaction[]
      */
-    public function getTransactionByBasketId(int $id): Transaction;
+    public function getTransactionsByTxnId($txnId): array;
+
+    /**
+     * @param string $shortId
+     *
+     * @return Transaction|null
+     */
+    public function getTransactionsByShortId($shortId);
 
     /**
      * @param int $customerId
@@ -58,9 +66,9 @@ interface TransactionRepositoryContract
     public function getTransactionsByType(string $transactionType): array;
 
     /**
-     * @param Transaction $transaction
+     * @param Transaction|Model $transaction
      *
-     * @return Transaction
+     * @return Transaction|Model
      */
-    public function updateTransaction(Transaction $transaction): Transaction;
+    public function updateTransaction($transaction);
 }

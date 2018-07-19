@@ -25,28 +25,35 @@
         },
         "main.senderId": {
           "type": "inputText",
-          "required": false,
+          "required": true,
           "label": "Config.mainSenderIdLabel",
           "options": {
-            "defaultValue": ""
+            "defaultValue": "31HA07BC8142C5A171745D00AD63D182"
           }
         },
         "main.login": {
           "type": "inputText",
-          "required": false,
+          "required": true,
           "label": "Config.mainLoginLabel",
           "options": {
-            "defaultValue": ""
+            "defaultValue": "31ha07bc8142c5a171744e5aef11ffd3"
           }
         },
         "main.password": {
           "type": "inputText",
-          "required": false,
+          "required": true,
           "label": "Config.mainPasswordLabel",
           "options": {
-            "defaultValue": "",
-            "isPassword": true,
-            "isIBAN": false
+            "defaultValue": "93167DE7",
+            "isPassword": true
+          }
+        },
+        "main.secret": {
+          "type": "inputText",
+          "required": true,
+          "label": "Config.mainSecretLabel",
+          "options": {
+            "defaultValue": ""
           }
         }
       }
@@ -75,7 +82,7 @@
           "required": false,
           "label": "Config.creditcardChannelIdLabel",
           "options": {
-            "defaultValue": ""
+            "defaultValue": "31HA07BC8142C5A171749A60D979B6E4"
           }
         },
         "creditcard.minAmount": {
@@ -92,14 +99,6 @@
           "label": "Config.creditcardMaxAmountLabel",
           "options": {
             "defaultValue": "0,00"
-          }
-        },
-        "creditcard.doRegistration": {
-          "type": "checkBox",
-          "required": false,
-          "label": "Config.creditcardDoRegistrationLabel",
-          "options": {
-            "defaultValue": false
           }
         },
         "creditcard.transactionType": {
@@ -124,6 +123,93 @@
           "type": "inputText",
           "required": false,
           "label": "Config.creditcardIframeCssLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        },
+        "creditcard.iconUrl": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.creditcardIconUrl",
+          "options": {
+            "defaultValue": ""
+          }
+        }
+      }
+    },
+    "Config.debitcardTab": {
+      "label": "Config.debitcardTab",
+      "formFields": {
+        "debitcard.isActive": {
+          "type": "checkBox",
+          "required": false,
+          "label": "Config.debitcardIsActiveLabel",
+          "options": {
+            "defaultValue": false
+          }
+        },
+        "debitcard.displayName": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.debitcardDisplayNameLabel",
+          "options": {
+            "defaultValue": "Debitkarte"
+          }
+        },
+        "debitcard.channelId": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.debitcardChannelIdLabel",
+          "options": {
+            "defaultValue": "31HA07BC8142C5A171749A60D979B6E4"
+          }
+        },
+        "debitcard.minAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.debitcardMinAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "debitcard.maxAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.debitcardMaxAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "debitcard.transactionType": {
+          "type": "selectBox",
+          "required": false,
+          "label": "Config.debitcardTransactionTypeLabel",
+          "options": {
+            "defaultValue": "0",
+            "selectBoxValues": [
+              {
+                "value": "0",
+                "caption": "Config.debitcardTransactionTypePossibleValue0"
+              },
+              {
+                "value": "1",
+                "caption": "Config.debitcardTransactionTypePossibleValue1"
+              }
+            ]
+          }
+        },
+        "debitcard.iframeCss": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.debitcardIframeCssLabel",
+          "options": {
+            "defaultValue": ""
+          }
+        },
+        "debitcard.iconUrl": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.debitcardIconUrl",
           "options": {
             "defaultValue": ""
           }
@@ -154,7 +240,7 @@
           "required": false,
           "label": "Config.sofortChannelIdLabel",
           "options": {
-            "defaultValue": ""
+            "defaultValue": "31HA07BC8142C5A171749CDAA43365D2"
           }
         },
         "sofort.minAmount": {
@@ -172,95 +258,66 @@
           "options": {
             "defaultValue": "0,00"
           }
-        }
-      }
-    },
-    "Config.paypalTab": {
-      "label": "Config.paypalTab",
-      "formFields": {
-        "paypal.isActive": {
-          "type": "checkBox",
-          "required": false,
-          "label": "Config.paypalIsActiveLabel",
-          "options": {
-            "defaultValue": false
-          }
         },
-        "paypal.displayName": {
+        "sofort.iconUrl": {
           "type": "inputText",
           "required": false,
-          "label": "Config.paypalDisplayNameLabel",
-          "options": {
-            "defaultValue": "PayPal"
-          }
-        },
-        "paypal.channelId": {
-          "type": "inputText",
-          "required": false,
-          "label": "Config.paypalChannelIdLabel",
+          "label": "Config.sofortIconUrl",
           "options": {
             "defaultValue": ""
-          }
-        },
-        "paypal.minAmount": {
-          "type": "inputText",
-          "required": false,
-          "label": "Config.paypalMinAmountLabel",
-          "options": {
-            "defaultValue": "0,00"
-          }
-        },
-        "paypal.maxAmount": {
-          "type": "inputText",
-          "required": false,
-          "label": "Config.paypalMaxAmountLabel",
-          "options": {
-            "defaultValue": "0,00"
           }
         }
       }
     },
-    "Config.prepaymentTab": {
-      "label": "Config.prepaymentTab",
+    "Config.directdebitTab": {
+      "label": "Config.directdebitTab",
       "formFields": {
-        "prepayment.isActive": {
+        "directdebit.isActive": {
           "type": "checkBox",
           "required": false,
-          "label": "Config.prepaymentIsActiveLabel",
+          "label": "Config.directdebitIsActiveLabel",
           "options": {
             "defaultValue": false
           }
         },
-        "prepayment.displayName": {
+        "directdebit.displayName": {
           "type": "inputText",
           "required": false,
-          "label": "Config.prepaymentDisplayNameLabel",
+          "label": "Config.directdebitDisplayNameLabel",
           "options": {
-            "defaultValue": "Vorkasse"
+            "defaultValue": "Lastschrift"
           }
         },
-        "prepayment.channelId": {
+        "directdebit.channelId": {
           "type": "inputText",
           "required": false,
-          "label": "Config.prepaymentChannelIdLabel",
+          "label": "Config.directdebitChannelIdLabel",
+          "options": {
+            "defaultValue": "31HA07BC8142C5A171749A60D979B6E4"
+          }
+        },
+        "directdebit.minAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.directdebitMinAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "directdebit.maxAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.directdebitMaxAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "directdebit.iconUrl": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.directdebitIconUrl",
           "options": {
             "defaultValue": ""
-          }
-        },
-        "prepayment.minAmount": {
-          "type": "inputText",
-          "required": false,
-          "label": "Config.prepaymentMinAmountLabel",
-          "options": {
-            "defaultValue": "0,00"
-          }
-        },
-        "prepayment.maxAmount": {
-          "type": "inputText",
-          "required": false,
-          "label": "Config.prepaymentMaxAmountLabel",
-          "options": {
-            "defaultValue": "0,00"
           }
         }
       }

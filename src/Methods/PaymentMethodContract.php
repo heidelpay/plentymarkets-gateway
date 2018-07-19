@@ -10,9 +10,9 @@ namespace Heidelpay\Methods;
  *
  * @link http://dev.heidelpay.com/plentymarkets-gateway
  *
- * @author Stephano Vogel <development@heidelpay.com>
+ * @author Simon Gabriel <development@heidelpay.com>
  *
- * @package heidelpay\plentymarkets-gateway
+ * @package heidelpay\plentymarkets-gateway\payment-methods
  */
 interface PaymentMethodContract
 {
@@ -65,7 +65,7 @@ interface PaymentMethodContract
      *
      * @return string
      */
-    public function getConfigKey(): string;
+    public static function getConfigKey(): string;
 
     /**
      * Returns a default display name for the payment method.
@@ -89,13 +89,6 @@ interface PaymentMethodContract
     public function getIcon(): string;
 
     /**
-     * Returns the key for the payment method.
-     *
-     * @return string
-     */
-    public function getMethodKey(): string;
-
-    /**
      * Returns the configured payment method display name.
      *
      * @return string
@@ -110,9 +103,23 @@ interface PaymentMethodContract
     public static function getPaymentMethodDefaultName(): string;
 
     /**
-     * Returns the key for the payment method (static).
+     * Returns the php-payment-api transaction method to be called.
      *
      * @return string
      */
-    public static function getPaymentMethodKey(): string;
+    public function getTransactionType(): string;
+
+    /**
+     * Returns true if the payment has to be initialized with transaction (i.e. to fetch redirect url).
+     *
+     * @return bool
+     */
+    public function hasToBeInitialized(): bool;
+
+    /**
+     * Returns the template of the payment form.
+     *
+     * @return string
+     */
+    public function getFormTemplate(): string;
 }

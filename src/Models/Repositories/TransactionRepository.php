@@ -6,7 +6,6 @@ use Heidelpay\Constants\TransactionType;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Transaction;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
-use Plenty\Plugin\Log\Loggable;
 
 /**
  * heidelpay Transaction repository class
@@ -18,12 +17,10 @@ use Plenty\Plugin\Log\Loggable;
  *
  * @author Stephano Vogel <development@heidelpay.com>
  *
- * @package heidelpay\plentymarkets-gateway\models\repositories
+ * @package heidelpay\plentymarkets-gateway\models
  */
 class TransactionRepository implements TransactionRepositoryContract
 {
-    use Loggable;
-
     /**
      * @var DataBase
      */
@@ -47,25 +44,24 @@ class TransactionRepository implements TransactionRepositoryContract
         /** @var Transaction $transaction */
         $transaction = pluginApp(Transaction::class);
 
-        $transaction->storeId = $data['storeId'];
-        $transaction->customerId = $data['customerId'];
-        $transaction->basketId = $data['basketId'];
-        $transaction->orderId = $data['orderId'];
-        $transaction->paymentMethodId = $data['paymentMethodId'];
-        $transaction->status = $data['status'];
-        $transaction->transactionType = $data['transactionType'];
-        $transaction->shortId = $data['shortId'];
-        $transaction->uniqueId = $data['uniqueId'];
-        $transaction->transactionDetails = $data['transactionDetails'];
-        $transaction->transactionProcessing = $data['transactionProcessing'];
+        $transaction->storeId = $data[Transaction::FIELD_SHOP_ID];
+        $transaction->customerId = $data[Transaction::FIELD_CUSTOMER_ID];
+        $transaction->txnId = $data[Transaction::FIELD_TRANSACTION_ID];
+        $transaction->basketId = $data[Transaction::FIELD_BASKET_ID];
+        $transaction->orderId = $data[Transaction::FIELD_ORDER_ID];
+        $transaction->paymentMethodId = $data[Transaction::FIELD_PAYMENT_METHOD_ID];
+        $transaction->status = $data[Transaction::FIELD_STATUS];
+        $transaction->transactionType = $data[Transaction::FIELD_TRANSACTION_TYPE];
+        $transaction->shortId = $data[Transaction::FIELD_SHORT_ID];
+        $transaction->uniqueId = $data[Transaction::FIELD_UNIQUE_ID];
+        $transaction->transactionDetails = $data[Transaction::FIELD_TRANSACTION_DETAILS];
+        $transaction->transactionProcessing = $data[Transaction::FIELD_TRANSACTION_PROCESSING];
+        $transaction->createdAt = $data[Transaction::FIELD_CREATED_AT];
+        $transaction->updatedAt = $data[Transaction::FIELD_UPDATED_AT];
 
-        if (isset($data['isClosed']) && $data['isCloded'] === true) {
+        if (isset($data['isClosed']) && $data['isClosed'] === true) {
             $transaction->isClosed = true;
         }
-
-        $this->getLogger(__METHOD__)->error('transaction data', [
-            'transaction' => $transaction
-        ]);
 
         $transaction = $this->database->save($transaction);
         return $transaction;
@@ -74,7 +70,7 @@ class TransactionRepository implements TransactionRepositoryContract
     /**
      * @inheritdoc
      */
-    public function updateTransaction(Transaction $transaction): Transaction
+    public function updateTransaction($transaction)
     {
         if ($transaction->id !== null) {
             $transaction = $this->database->save($transaction);
@@ -101,7 +97,7 @@ class TransactionRepository implements TransactionRepositoryContract
     /**
      * @inheritdoc
      */
-    public function getTransactionById(int $id): Transaction
+    public function getTransactionById(int $id)
     {
         return $this->database->find(Transaction::class, $id);
     }
@@ -109,11 +105,21 @@ class TransactionRepository implements TransactionRepositoryContract
     /**
      * @inheritdoc
      */
-    public function getTransactionByBasketId(int $id): Transaction
+    public function getTransactionsByTxnId($txnId): array
     {
-        /** @var Transaction[] $result */
+        return $this->database->query(Transaction::class)
+            ->where(Transaction::FIELD_TRANSACTION_ID, '=', $txnId)
+            ->orderBy(Transaction::FIELD_ID, 'desc')
+            ->get();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTransactionsByShortId($shortId)
+    {
         $result = $this->database->query(Transaction::class)
-            ->where('basketId', '=', $id)
+            ->where(Transaction::FIELD_SHORT_ID, '=', $shortId)
             ->get();
 
         return $result[0];
@@ -126,7 +132,8 @@ class TransactionRepository implements TransactionRepositoryContract
     {
         /** @var Transaction[] $result */
         $result = $this->database->query(Transaction::class)
-            ->where('customerId', '=', $customerId)
+            ->where(Transaction::FIELD_CUSTOMER_ID, '=', $customerId)
+            ->orderBy(Transaction::FIELD_ID, 'desc')
             ->get();
 
         return $result;
@@ -139,7 +146,7 @@ class TransactionRepository implements TransactionRepositoryContract
     {
         /** @var Transaction[] $result */
         $result = $this->database->query(Transaction::class)
-            ->where('transactionType', '=', $transactionType)
+            ->where(Transaction::FIELD_TRANSACTION_TYPE, '=', $transactionType)
             ->get();
 
         return $result;

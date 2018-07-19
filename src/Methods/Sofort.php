@@ -1,6 +1,8 @@
 <?php
 
 namespace Heidelpay\Methods;
+use Heidelpay\Constants\TransactionType;
+use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 
 /**
  * heidelpay Sofort. Payment Method
@@ -19,4 +21,7 @@ class Sofort extends AbstractMethod
     const CONFIG_KEY = 'sofort';
     const KEY = 'SOFORT';
     const DEFAULT_NAME = 'Sofort.';
+    const TRANSACTION_TYPE = TransactionType::AUTHORIZE;
+    const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL;
+    const INITIALIZE_PAYMENT = true;
 }

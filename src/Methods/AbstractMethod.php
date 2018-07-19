@@ -2,11 +2,12 @@
 
 namespace Heidelpay\Methods;
 
+use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
-use Plenty\Modules\Basket\Models\Basket;
+use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
-use Plenty\Plugin\ConfigRepository;
+use Plenty\Plugin\Application;
 
 /**
  * Abstract Payment Method Class
@@ -25,6 +26,11 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     const CONFIG_KEY = 'abstract';
     const DEFAULT_NAME = 'Abstract Payment Method';
     const KEY = 'ABSTRACT';
+    const DEFAULT_ICON_PATH = '/images/logos/default_payment_icon.png';
+    const TRANSACTION_TYPE = '';
+    const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL;
+    const INITIALIZE_PAYMENT = true;
+    const FORM_TEMPLATE = '';
 
     /**
      * @var PaymentHelper $helper
@@ -35,19 +41,26 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      * @var BasketRepositoryContract $basketRepository
      */
     protected $basketRepository;
+    /**
+     * @var MethodConfigContract
+     */
+    private $config;
 
     /**
      * AbstractMethod constructor.
      *
-     * @param PaymentHelper          $paymentHelper
-     * @param BasketRepositoryContract $basketRepositoryContract
+     * @param PaymentHelper $paymentHelper
+     * @param BasketRepositoryContract $basketRepository
+     * @param MethodConfigContract $config
      */
     public function __construct(
         PaymentHelper $paymentHelper,
-        BasketRepositoryContract $basketRepositoryContract
+        BasketRepositoryContract $basketRepository,
+        MethodConfigContract $config
     ) {
         $this->helper = $paymentHelper;
-        $this->basketRepository = $basketRepositoryContract;
+        $this->basketRepository = $basketRepository;
+        $this->config = $config;
     }
 
     /**
@@ -56,7 +69,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     public function isActive(): bool
     {
         // return false if this method is not configured as active.
-        if (! $this->helper->getIsActive($this)) {
+        if (! $this->config->isActive($this)) {
             return false;
         }
 
@@ -64,14 +77,14 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
 
         // check the configured minimum cart amount and return false if an amount is configured
         // (which means > 0.00) and the cart amount is below the configured value.
-        $minAmount = $this->helper->getMinAmount($this);
+        $minAmount = $this->config->getMinAmount($this);
         if ($minAmount > 0.00 && $basket->basketAmount < $minAmount) {
             return false;
         }
 
         // check the configured maximum cart amount and return false if an amount is configured
         // (which means > 0.00) and the cart amount is above the configured value.
-        $maxAmount = $this->helper->getMaxAmount($this);
+        $maxAmount = $this->config->getMaxAmount($this);
         return !($maxAmount > 0.00 && $basket->basketAmount > $maxAmount);
     }
 
@@ -118,7 +131,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     /**
      * @inheritdoc
      */
-    public function getConfigKey(): string
+    public static function getConfigKey(): string
     {
         return static::CONFIG_KEY;
     }
@@ -160,7 +173,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function getName(): string
     {
-        return $this->helper->getPaymentMethodName($this) ?: $this->getDefaultName();
+        return $this->config->getPaymentMethodName($this) ?: $this->getDefaultName();
     }
 
     /**
@@ -168,7 +181,14 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function getIcon(): string
     {
-        return $this->helper->getMethodIcon($this);
+        $iconPath = $this->config->getIcon($this);
+        if (empty($iconPath)) {
+            /** @var Application */
+            $app = pluginApp(Application::class);
+            $iconPath = $app->getUrlPath('heidelpay'). static::DEFAULT_ICON_PATH;
+        }
+
+        return $iconPath;
     }
 
     /**
@@ -176,6 +196,52 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function getDescription(): string
     {
-        return $this->helper->getMethodDescription($this);
+        return $this->config->getMethodDescription($this);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @throws \RuntimeException
+     */
+    public function getTransactionType(): string
+    {
+        if (!empty(static::TRANSACTION_TYPE)) {
+            return static::TRANSACTION_TYPE;
+        }
+
+        if (!$this->config->hasTransactionType($this)) {
+            throw new \RuntimeException('payment.errorTransactionTypeUndefined');
+        }
+        return $this->config->getTransactionType($this);
+    }
+
+    /**
+     * Returns the type of the result returned by the payment method initialization.
+     *
+     * @return string
+     */
+    public function getReturnType(): string
+    {
+        return static::RETURN_TYPE;
+    }
+
+    /**
+     * Returns true if the payment has to be initialized with transaction (i.e. to fetch redirect url).
+     *
+     * @return bool
+     */
+    public function hasToBeInitialized(): bool
+    {
+        return static::INITIALIZE_PAYMENT;
+    }
+
+    /**
+     * Returns the template of the payment form.
+     *
+     * @return string
+     */
+    public function getFormTemplate(): string
+    {
+        return static::FORM_TEMPLATE;
     }
 }

@@ -2,14 +2,12 @@
 
 namespace Heidelpay\Controllers;
 
-use Heidelpay\Services\PaymentService;
+use Heidelpay\Services\NotificationServiceContract;
 use Plenty\Plugin\Controller;
-use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
 /**
- * heidelpay Payment Controller
- *
  * Handles general processes that are interactions with the customer.
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
@@ -19,52 +17,44 @@ use Plenty\Plugin\Http\Response;
  *
  * @author Stephano Vogel <development@heidelpay.com>
  *
- * @package heidelpay\plentymarkets-gateway
+ * @package heidelpay\plentymarkets-gateway\controllers
  */
 class PaymentController extends Controller
 {
-    /**
-     * @var Request $request
-     */
-    private $request;
-
-    /**
-     * @var Response
-     */
+    /** @var Response */
     private $response;
-
-    /**
-     * @var PaymentService
-     */
-    private $paymentService;
+    /** @var NotificationServiceContract */
+    private $notification;
 
     /**
      * ResponseController constructor.
      *
-     * @param Request        $request
-     * @param Response       $response
-     * @param PaymentService $paymentService
+     * @param Response $response
+     * @param NotificationServiceContract $notification
      */
-    public function __construct(Request $request, Response $response, PaymentService $paymentService)
-    {
-        $this->request = $request;
+    public function __construct(
+        Response $response,
+        NotificationServiceContract $notification
+    ) {
         $this->response = $response;
-        $this->paymentService = $paymentService;
+        $this->notification = $notification;
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return BaseResponse
      */
-    public function checkoutSuccess(): \Symfony\Component\HttpFoundation\Response
+    public function checkoutSuccess(): BaseResponse
     {
+        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__);
         return $this->response->redirectTo('place-order');
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return BaseResponse
      */
-    public function checkoutCancel(): \Symfony\Component\HttpFoundation\Response
+    public function checkoutCancel(): BaseResponse
     {
+        $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
         return $this->response->redirectTo('checkout');
     }
 }

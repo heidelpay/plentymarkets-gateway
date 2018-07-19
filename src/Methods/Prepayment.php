@@ -1,6 +1,7 @@
 <?php
 
 namespace Heidelpay\Methods;
+use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 
 /**
  * heidelpay Prepayment Payment Method
@@ -19,4 +20,6 @@ class Prepayment extends AbstractMethod
     const CONFIG_KEY = 'prepayment';
     const KEY = 'PREPAYMENT';
     const DEFAULT_NAME = 'Prepayment';
+    const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_CONTINUE;
+    const INITIALIZE_PAYMENT = false;
 }

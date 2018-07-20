@@ -1,11 +1,11 @@
 ## Web page
- 
 https://dev.heidelpay.de/plentymarkets/
  
 ## Email
- 
-development@heidelpay.com
+support@heidelpay.com
  
 ## Phone
- 
-+49 (0)6221/6471-400
++49 (0)6221/6471-200
+
+## Twitter
+@devHeidelpay

@@ -33,7 +33,7 @@ Dieses Plugin basiert auf heidelpay php-payment-api (https://github.com/heidelpa
 + Wählen Sie dann das heidelpay Plugin um die Konfigurationsumgebung zu gelangen.
 + Nun tragen Sie Ihre Zugangsdaten und Kanalkonfigurationen ein und aktivieren Sie die Zahlarten, die beim Checkout auswählbar sein sollen.
 
->*Standardmäßig ist die Konfiguration auf unsere Testumgebung eingestellt.* (siehe https://dev.heidelpay.com/sandbox-environment/).
+>*Standardmäßig ist die Konfiguration auf unsere Testumgebung eingestellt.* (siehe https://dev.heidelpay.de/sandbox-environment/).
 
 >*Klicken Sie den speichern-Button für jeden Tab einzeln um die eingetragenen Einstellungen zu sichern, andernfalls setzt Plenty die Daten ungespeicherter Tabs zurück auf die Standardwerte, wenn der Tab gewechselt wird.*
 
@@ -43,7 +43,7 @@ Dieses Plugin basiert auf heidelpay php-payment-api (https://github.com/heidelpa
 #### heidelpay Einstellungen
 ###### Test-/Livesystem
 * Wählen Sie die Option *'Testumgebung (CONNECTOR_TEST)'* um die Verbindung zu unserem Testserver herzustellen, was dazu führt, dass alle Transaktionen zur Sandbox gesendet werden und keine Kosten entstehen.  
-Bitte stellen Sie hierfür sicher, dass die Konfiguration test-Zugangsdaten und Kanäle enthält (siehe https://dev.heidelpay.com/sandbox-environment/).
+Bitte stellen Sie hierfür sicher, dass die Konfiguration test-Zugangsdaten und Kanäle enthält (siehe https://dev.heidelpay.de/sandbox-environment/).
 * Wählen Sie die Option *'Liveumgebung (LIVE)'* um den Produktivitätsmodus einzuschalten. Das bedeutet, das tatsächliche, kostenpflichtige Transaktionen durchgeführt werden.
 Bitte stellen Sie hierfür Ihre Live-Zugangsdaten und Kanal-Ids ein.
 
@@ -104,7 +104,7 @@ Anforderungen an die URL:
 * sie muss mit '.jpg', '.png' oder '.gif' enden
 
 ## Beschreibung der Zahlungsabläufe 
-### Kreditkarte und Debitkartek
+### Kreditkarte und Debitkarte
 * Wenn für die Zahlart der *Buchungsmodus* *'Direkte Buchung'* ausgewählt ist, wird die Zahlung sofort erzeugt und mit der Bestellung verknüpft.
 Es sind in diesem Fall keine weiteren Schritte notwendig um den Betrag zu buchen.\
 Ist die Zahlung erfolgreich, wird die Bestellung sofort erzeugt und im Backend als bezahlt markiert.\

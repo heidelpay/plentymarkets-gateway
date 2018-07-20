@@ -4,8 +4,12 @@
 
 ### Deutsch
 Diese Erweiterung integriert die heidelpay Zahlarten in Ihren Plentymarkets Shop.\
-Den deutschen User Guide finden Sie [hier](meta/documents/user_guide_de.md)
+* [User Guide](meta/documents/user_guide_de.md)
+* [Changelog](meta/documents/changelog_de.md)
+* [Supportkontakte](meta/documents/support_contact_de.md)
 
 ### English
 This extension provides an integration of the heidelpay payment methods for your plentymarkets shop.\
-Please refer to the english user guide [here](meta/documents/user_guide_en.md)
+* [User Guide](meta/documents/user_guide_en.md)
+* [Changelog](meta/documents/changelog_en.md)
+* [Support Contacts](meta/documents/support_contact_en.md)

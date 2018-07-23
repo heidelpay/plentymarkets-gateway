@@ -11,7 +11,7 @@
     "de": "plentymarkets Integration für heidelpay Zahlarten",
     "en": "plentymarkets integration for heidelpay payment methods"
   },
-  "categories": ["3519", "3521"],
+  "categories": ["3519"],
   "keywords": ["heidelpay", "plentymarkets", "plugin", "payment", "payment method", "credit card", "debit card", "sofort", "direct debit"],
   "version": "1.0.0",
   "license": "Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.",

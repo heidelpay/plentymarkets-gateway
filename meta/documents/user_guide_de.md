@@ -33,7 +33,7 @@ Dieses Plugin basiert auf heidelpay php-payment-api (https://github.com/heidelpa
 + Wählen Sie dann das heidelpay Plugin um die Konfigurationsumgebung zu gelangen.
 + Nun tragen Sie Ihre Zugangsdaten und Kanalkonfigurationen ein und aktivieren Sie die Zahlarten, die beim Checkout auswählbar sein sollen.
 
->*Standardmäßig ist die Konfiguration auf unsere Testumgebung eingestellt.* (siehe https://dev.heidelpay.com/sandbox-environment/).
+>*Standardmäßig ist die Konfiguration auf unsere Testumgebung eingestellt.* (siehe https://dev.heidelpay.de/sandbox-environment/).
 
 >*Klicken Sie den speichern-Button für jeden Tab einzeln um die eingetragenen Einstellungen zu sichern, andernfalls setzt Plenty die Daten ungespeicherter Tabs zurück auf die Standardwerte, wenn der Tab gewechselt wird.*
 
@@ -43,7 +43,7 @@ Dieses Plugin basiert auf heidelpay php-payment-api (https://github.com/heidelpa
 #### heidelpay Einstellungen
 ###### Test-/Livesystem
 * Wählen Sie die Option *'Testumgebung (CONNECTOR_TEST)'* um die Verbindung zu unserem Testserver herzustellen, was dazu führt, dass alle Transaktionen zur Sandbox gesendet werden und keine Kosten entstehen.  
-Bitte stellen Sie hierfür sicher, dass die Konfiguration test-Zugangsdaten und Kanäle enthält (siehe https://dev.heidelpay.com/sandbox-environment/).
+Bitte stellen Sie hierfür sicher, dass die Konfiguration test-Zugangsdaten und Kanäle enthält (siehe https://dev.heidelpay.de/sandbox-environment/).
 * Wählen Sie die Option *'Liveumgebung (LIVE)'* um den Produktivitätsmodus einzuschalten. Das bedeutet, das tatsächliche, kostenpflichtige Transaktionen durchgeführt werden.
 Bitte stellen Sie hierfür Ihre Live-Zugangsdaten und Kanal-Ids ein.
 
@@ -80,11 +80,11 @@ Die Zahlart ist für Ihre Kunden nur auswählbar, wenn die Bestellsumme zwischen
 Um die Limitierung zu deaktivieren muss der entsprechende Wert auf 0 gesetzt werden.
 
 ###### Buchungsmodus
-* Wählen sie die Option **Direkte Buchung** aus, damit der Gesamtbetrag sofort und komplett von der angegebenen Quelle abzubuchen. 
+* Wählen Sie die Option **Direkte Buchung** aus, damit der Gesamtbetrag sofort und komplett von der angegebenen Quelle abzubuchen. 
 * Wählen Sie die Option **Reservierung mit Erfassung bei Rechnungserstellung** aus, um Abbuchungen zunächst nur Autorisieren zu lassen und erst später tatsächlich durchzuführen.
 
 > **Info:** Einige Zahlarten ermöglichen die Reservierung von Beträgen, was grundsätzlich nur die Absichtserklärung darüber ist, dass der Betrag abgebucht werden wird.\
-Der Betrag wird später abgebucht, üblicherweise z. B. zum Versandzeitpunkt. Dies gibt Ihnen die Möglichkeit nur die Beträge der Waren tatsächlich zu buchen, die auch tatsächlich versandt werden, z. B. dann wenn eine Bestellung auf mehrere Einzellieferungen aufgeteilt wird.
+Der Betrag wird später abgebucht, z. B. zum Versandzeitpunkt. Dies gibt Ihnen die Möglichkeit nur die Beträge der Waren tatsächlich zu buchen, die auch tatsächlich versandt werden, z. B. dann wenn eine Bestellung auf mehrere Einzellieferungen aufgeteilt wird.
 
 ###### URL für Custom-CSS im IFrame
 Einige Zahlarten rendern ein Formular für Kundeneingaben innerhalb eines iFrames.
@@ -104,13 +104,12 @@ Anforderungen an die URL:
 * sie muss mit '.jpg', '.png' oder '.gif' enden
 
 ## Beschreibung der Zahlungsabläufe 
-### Kreditkarte und Debitkartek
-* Wenn für die Zahlart der *Buchungsmodus* *'Direkte Buchung'* ausgewählt ist, wird die Zahlung sofort erzeugt und mit der Bestellung verknüpft.
-Es sind in diesem Fall keine weiteren Schritte notwendig um den Betrag zu buchen.\
-Ist die Zahlung erfolgreich, wird die Bestellung sofort erzeugt und im Backend als bezahlt markiert.\
+### Kreditkarte und Debitkarte
+* Wenn für die Zahlart der **Buchungsmodus 'Direkte Buchung'** ausgewählt ist, wird die Zahlung sofort erzeugt und mit der Bestellung verknüpft.
+Es sind in diesem Fall keine weiteren Schritte notwendig um den Betrag zu buchen. Ist die Zahlung erfolgreich, wird die Bestellung sofort erzeugt und im Backend als bezahlt markiert.
 Schlägt die Zahlung fehl, wird die Bestellung nicht erzeugt und der Kunde wird zur Checkout-Seite umgeleitet.
-* Wenn für die Zahlart der *Buchungsmodus* *Reservierung mit Erfassung bei Rechnungserstellung* ausgewählt ist, wird die Bestellung erzeugt aber die Buchung muss manuell im hip ausgelöst werden.
-Die Buchungstransaktion (Capture) wird dann in Ihren Plenty-Markets shop gepusht (wie oben beschrieben muss hierfür die Push-URL im heidelpay backend konfiguriert sein).
+* Wenn für die Zahlart der **Buchungsmodus 'Reservierung mit Erfassung bei Rechnungserstellung'** ausgewählt ist, wird die Bestellung erzeugt aber die Buchung muss manuell im hip ausgelöst werden.
+Die Buchungstransaktion (Capture) wird dann in Ihren Plenty-Markets shop gepusht (hierfür die Push-URL im bei heidelpay eingetragen sein s. Anforderungen).
 Dies führt dazu, dass eine Zahlung im Plenty-Backend angelegt wird und mit der entsprechenden Buchung verknüpft wird.
 
 ### Sofort.
@@ -124,6 +123,11 @@ Wenn die Zahlung fehlschlägt, wird die Bestellung nicht erzeugt und der Kunde w
 
 ### Alle Zahlarten
 * Zahlungen im Plenty-Backend enthalten die txnId (heidelpay Bestellnummer), die shortId (die eindeutige id der Transaktion d. h. Receipt, Debit oder Capture) und den Hinweis, dass es sich um eine durch heidelpay angelegte Zahlung handelt.
-* Im Falle eines Fehlers, der dazu führt, dass die Bestellung im Plenty-Backend nicht angelegt werden kann, während die Zahlung erfolgreich im heidelpay backend erzeugt wird, wird der Buchungstext der Zahlung um eine entsprechende Fehlermeldung erweitert.\
-Leider ist es nicht möglich für die Bestellung im Nachhinein zu erzeugen, d. h. wenn zum Beispiel die Rückleitung in den Shop nach dem Bezahlen schief geht. Auch wenn die Zahlung erfolgreich im heidelpay backend gespeichert worden ist.\
-Aber durch die Fehlermeldung im Buchungstext von Zahlungen, die nicht zugeordnet werden konnten, ist es möglich diese Fehlerfälle zu erkennen und zu behandeln.
+* Im Falle eines Fehlers, der dazu führt, dass die Bestellung im Plenty-Backend nicht angelegt werden kann, während die Zahlung erfolgreich im heidelpay backend erzeugt wird, wird der Buchungstext der Zahlung um eine entsprechende Fehlermeldung erweitert.
+
+## Technische Besonderheiten
+1. Leider ist es nicht möglich die Bestellung im Nachhinein zu erzeugen, d. h. wenn zum Beispiel die Rückleitung in den Shop nach dem Bezahlen schief geht. Auch wenn die Zahlung erfolgreich im heidelpay backend gespeichert worden ist.\
+Durch die Fehlermeldung im Buchungstext von Zahlungen, die nicht zugeordnet werden konnten, ist es möglich diese Fehlerfälle zu erkennen und zu behandeln.
+2. Zur Zeit werden Log-Einträge nicht übersetzt, sondern deren Übersetzungsschlüssel im Log angezeigt z. B. *'Heidelpay::payment.debugHandleIncomingPayment'*.\
+Das Thema ist bei Plentymarkets bekannt und wird in Kürze bearbeitet. Sobald eine Lösung vorliegt werden wir ggf. ein Update machen.\
+Den aktuellen Stand können Sie hier einsehen: https://forum.plentymarkets.com/t/log-uebersetzungen-heidelpay-plugin/496675

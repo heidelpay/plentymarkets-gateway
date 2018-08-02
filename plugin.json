@@ -22,8 +22,8 @@
   "email": "development@heidelpay.com",
   "type": "payment",
   "dependencies": {
-    "heidelpay/php-basket-api": "^1.0.0",
-    "heidelpay/php-payment-api": "^1.5.0",
+    "heidelpay/php-basket-api": "^1.0.1",
+    "heidelpay/php-payment-api": "^1.6.0",
     "plentymarkets/plugin-io": "^2.13.0"
   },
   "runOnBuild": [

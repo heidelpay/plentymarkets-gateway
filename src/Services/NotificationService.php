@@ -140,7 +140,6 @@ class NotificationService implements NotificationServiceContract
                 break;
             case self::LEVEL_CRITICAL: // intended Fall-Through (handle unknown levels as critical)
             default:
-                // todo: send email to merchant as well?
                 // The client gets a general error message.
                 $this->getNotifier()->error($this->getTranslation('general.errorGeneralErrorTryAgainLater'));
                 $this->getLogger($method)->critical($message, $logData);

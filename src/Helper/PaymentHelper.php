@@ -92,7 +92,7 @@ class PaymentHelper
     /**
      * Create the payment method IDs that don't exist yet.
      */
-    public function createMopsIfNotExists()
+    public function createMopsIfNotExist()
     {
         foreach ($this->methodConfig::getPaymentMethods() as $paymentMethod) {
             $this->createMopIfNotExists($paymentMethod);

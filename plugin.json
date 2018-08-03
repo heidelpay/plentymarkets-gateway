@@ -21,10 +21,10 @@
   "pluginIcon": "icon_plugin_xs.png",
   "email": "development@heidelpay.com",
   "type": "payment",
+  "require": ["IO"],
   "dependencies": {
-    "heidelpay/php-basket-api": "^1.0.1",
-    "heidelpay/php-payment-api": "^1.6.0",
-    "plentymarkets/plugin-io": "^2.13.0"
+    "heidelpay/php-basket-api": "^1.0.2",
+    "heidelpay/php-payment-api": "^1.6.0"
   },
   "runOnBuild": [
     "Heidelpay\\Migrations\\CreateHeidelpayTables"

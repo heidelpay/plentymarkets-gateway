@@ -508,8 +508,7 @@ class PaymentHelper
 
         // Check whether the order exists
         if (!$order instanceof Order) {
-            $orderStr = $orderId !== 0 ? ' #' . $orderId : '';
-            throw new \RuntimeException('Order' . $orderStr . ' not found!');
+            throw new \RuntimeException('payment.warningOrderDoesNotExist');
         }
         return $order;
     }

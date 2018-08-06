@@ -126,8 +126,5 @@ Wenn die Zahlung fehlschlägt, wird die Bestellung nicht erzeugt und der Kunde w
 * Im Falle eines Fehlers, der dazu führt, dass die Bestellung im Plenty-Backend nicht angelegt werden kann, während die Zahlung erfolgreich im heidelpay backend erzeugt wird, wird der Buchungstext der Zahlung um eine entsprechende Fehlermeldung erweitert.
 
 ## Technische Besonderheiten
-1. Leider ist es nicht möglich die Bestellung im Nachhinein zu erzeugen, d. h. wenn zum Beispiel die Rückleitung in den Shop nach dem Bezahlen schief geht. Auch wenn die Zahlung erfolgreich im heidelpay backend gespeichert worden ist.\
+* Leider ist es nicht möglich die Bestellung im Nachhinein zu erzeugen, d. h. wenn zum Beispiel die Rückleitung in den Shop nach dem Bezahlen schief geht. Auch wenn die Zahlung erfolgreich im heidelpay backend gespeichert worden ist.\
 Durch die Fehlermeldung im Buchungstext von Zahlungen, die nicht zugeordnet werden konnten, ist es möglich diese Fehlerfälle zu erkennen und zu behandeln.
-2. Zur Zeit werden Log-Einträge nicht übersetzt, sondern deren Übersetzungsschlüssel im Log angezeigt z. B. *'Heidelpay::payment.debugHandleIncomingPayment'*.\
-Das Thema ist bei Plentymarkets bekannt und wird in Kürze bearbeitet. Sobald eine Lösung vorliegt werden wir ggf. ein Update machen.\
-Den aktuellen Stand können Sie hier einsehen: https://forum.plentymarkets.com/t/log-uebersetzungen-heidelpay-plugin/496675

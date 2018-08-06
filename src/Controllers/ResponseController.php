@@ -81,7 +81,6 @@ class ResponseController extends Controller
     private function createAndHandleTransaction($response, $responseObject): bool
     {
         try {
-            /* todo: refactor -> move check and so on to Transaction service */
             $txn = $this->transactionService->getTransactionIfItExists($responseObject);
 
             // verify hash
@@ -95,7 +94,6 @@ class ResponseController extends Controller
             }
 
             $this->notification->debug($message, __METHOD__, ['Response' => $response, 'Transaction' => $txn]);
-            /* todo: all in between can be refactored */
 
             if ($response['isSuccess'] && !$response['isPending']) {
                 $this->paymentService->handleTransaction($txn);
@@ -128,7 +126,6 @@ class ResponseController extends Controller
 
         // if something went wrong during the lib call, return the cancel url.
         // exceptionCode = problem inside of the lib, error = error during libCall.
-        // todo: exceptionCode and error are never set
         if (!isset($response['exceptionCode'])) {
             try {
                 $this->createAndHandleTransaction($response, $responseObject);

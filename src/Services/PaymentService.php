@@ -341,7 +341,6 @@ class PaymentService
             $this->heidelpayRequest['FRONTEND_PREVENT_ASYNC_REDIRECT'] = 'false';
         }
 
-        // TODO: Secure information for B2C payment methods
         if (false) {
             $this->heidelpayRequest['NAME_SALUTATION'] = $addresses['billing']->gender === 'male'
                 ? Salutation::MR
@@ -372,12 +371,9 @@ class PaymentService
         if (null !== $methodInstance) {
             $this->heidelpayRequest['FRONTEND_CSS_PATH'] = $this->methodConfig->getIFrameCssPath($methodInstance);
         }
-
-        // TODO: Riskinformation for future payment methods
     }
 
     //<editor-fold desc="Handlers">
-    // todo move methods to payment handler service.
     /**
      * @param string $type
      * @param $response
@@ -488,8 +484,6 @@ class PaymentService
      */
     public function createOrGetPlentyPayment(Transaction $txnData): Payment
     {
-        // todo: Create BookingtextHelper class to use the Array Serializer there.
-        // todo: Move prepend method as well.
         /** @var ArraySerializerService $serializer */
         $serializer = pluginApp(ArraySerializerService::class);
 
@@ -542,7 +536,6 @@ class PaymentService
         } catch (\RuntimeException $e) {
             $logData = ['Payment' => $payment, 'orderId' => $orderId];
             $this->notification->error($e->getMessage(), __METHOD__, $logData);
-            // todo: move to booking text helper
             $this->paymentHelper->setBookingTextError($payment, $e->getMessage());
             throw new \RuntimeException('Heidelpay::error.errorDuringPaymentExecution');
         }

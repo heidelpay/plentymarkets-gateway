@@ -160,7 +160,6 @@ class TransactionService
             'PAYMENT.CODE', 'SECURITY.SENDER',
         ];
 
-        // todo: use intersect instead
         foreach ($heidelpayData as $key => $value) {
             if (preg_match($groupPattern, $key) || \in_array($key, $toDelete, true)) {
                 unset($heidelpayData[$key]);

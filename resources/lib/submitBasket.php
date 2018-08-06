@@ -25,7 +25,6 @@ $basket = new \Heidelpay\PhpBasketApi\Object\Basket();
 $basket->setAmountTotalNet((int) $basketData['basketAmountNet'] * 100);
 //$basket->setAmountTotalVat($basketData['??']);
 $basket->setAmountTotalDiscount((int) $basketData['basketRebate'] * 100);
-// todo: set basket data
 
 foreach ($basketData['basketItems'] as $cartItem) {
     $basketItem = new \Heidelpay\PhpBasketApi\Object\BasketItem();
@@ -34,7 +33,6 @@ foreach ($basketData['basketItems'] as $cartItem) {
     $basketItem->setAmountDiscount((int) $cartItem['rebate'] * 100);
     $basketItem->setQuantity((int) $cartItem['quantity'] * 100);
     $basketItem->setVat((int) $cartItem['vat'] * 100);
-    // todo: set basket item data
 }
 
 $request = new BasketApiRequest();

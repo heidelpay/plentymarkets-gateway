@@ -92,7 +92,7 @@ class PaymentHelper
     /**
      * Create the payment method IDs that don't exist yet.
      */
-    public function createMopsIfNotExists()
+    public function createMopsIfNotExist()
     {
         foreach ($this->methodConfig::getPaymentMethods() as $paymentMethod) {
             $this->createMopIfNotExists($paymentMethod);
@@ -355,8 +355,9 @@ class PaymentHelper
                 $paymentMethod = DirectDebit::class;
                 break;
             default:
-                // do nothing
-                $this->getLogger(__METHOD__)->critical('general.errorMethodNotFound', ['mopId' => $mop]);
+                // do nothing.
+                // not even logging, since this method will be called not only for heidelpay
+                // methods from the event listener
                 break;
         }
 

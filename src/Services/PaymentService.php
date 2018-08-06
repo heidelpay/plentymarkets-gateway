@@ -535,7 +535,7 @@ class PaymentService
             $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $orderId);
         } catch (\RuntimeException $e) {
             $logData = ['Payment' => $payment, 'orderId' => $orderId];
-            $this->notification->error($e->getMessage(), __METHOD__, $logData);
+            $this->notification->warning($e->getMessage(), __METHOD__, $logData);
             $this->paymentHelper->setBookingTextError($payment, $e->getMessage());
             throw new \RuntimeException('Heidelpay::error.errorDuringPaymentExecution');
         }

@@ -333,7 +333,7 @@ class PaymentService
         $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $transactionId;
 
         // set basket information (amount, currency, orderId, ...)
-        $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basket->paymentAmount;
+        $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basket->basketAmount;
         $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basket->currency;
 
         $this->heidelpayRequest['FRONTEND_ENABLED'] = 'TRUE';

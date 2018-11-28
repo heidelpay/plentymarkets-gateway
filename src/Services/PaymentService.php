@@ -333,7 +333,8 @@ class PaymentService
         $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $transactionId;
 
         // set basket information (amount, currency, orderId, ...)
-        $this->notification->error('Basket Content', __METHOD__, $basket->toArray());
+        $clientErrorMessage = 'Heidelpay::payment.errorInternalErrorTryAgainLater';
+        $this->notification->error($clientErrorMessage, __METHOD__, $basket->toArray(), true);
         $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basket->paymentAmount;
         $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basket->currency;
 

@@ -212,6 +212,7 @@ class PaymentService
      * @param array $parameters
      *
      * @return array
+     * @throws \RuntimeException
      */
     public function sendPaymentRequest(
         Basket $basket,
@@ -270,7 +271,12 @@ class PaymentService
 
         if ($methodInstance->hasToBeInitialized()) {
             try {
-                $result = $this->sendPaymentRequest($basket, $paymentMethod, $methodInstance->getTransactionType(), $mopId);
+                $result = $this->sendPaymentRequest(
+                    $basket,
+                    $paymentMethod,
+                    $methodInstance->getTransactionType(),
+                    $mopId
+                );
                 $value = $this->handleSyncResponse($type, $result);
             } catch (\RuntimeException $e) {
                 $this->notification->error($clientErrorMessage, __METHOD__, [$type, $e->getMessage()], true);
@@ -292,6 +298,7 @@ class PaymentService
      * @param string $paymentMethod
      * @param int $mopId
      * @param string $transactionId
+     * @throws \RuntimeException
      */
     private function prepareRequest(Basket $basket, string $paymentMethod, int $mopId, string $transactionId)
     {
@@ -528,6 +535,7 @@ class PaymentService
      *
      * @param Payment $payment
      * @param int $orderId
+     * @throws \RuntimeException
      */
     public function assignPlentyPayment(Payment $payment, int $orderId)
     {

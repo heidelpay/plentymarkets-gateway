@@ -7,6 +7,9 @@
 - Resolve codingstyle violations.
 - update .gitignore
 
+### Fixed
+- Fix support phone number.
+
 ## [1.1.0][1.1.0]
 
 ### Removed

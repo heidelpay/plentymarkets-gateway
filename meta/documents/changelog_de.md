@@ -7,6 +7,9 @@
 - diverse Codingstyle-Fehler behoben.
 - .gitignore aktualisiert
 
+### Fixed
+- Support Telefonnummer korrigiert.
+
 ## [1.1.0][1.1.0]
 
 ### Removed

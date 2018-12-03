@@ -5,7 +5,7 @@ https://dev.heidelpay.de/plentymarkets/
 support@heidelpay.com
  
 ## Phone
-+49 (0)6221/6471-200
++49 (0)6221/6471-100
 
 ## Twitter
 @devHeidelpay

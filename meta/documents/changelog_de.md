@@ -4,11 +4,13 @@
 
 ### Change
 - Logos ausgetauscht.
-- diverse Codingstyle-Fehler behoben.
+- Diverse Codingstyle-Fehler behoben.
 - .gitignore aktualisiert
+- Readme um Support Informationen ergänzt
 
 ### Fixed
 - Support Telefonnummer korrigiert.
+- MwSt wird nun bei Auslandsgeschäften nicht mit einbezogen
 
 ## [1.1.0][1.1.0]
 

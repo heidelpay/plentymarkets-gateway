@@ -302,12 +302,6 @@ class PaymentService
      */
     private function prepareRequest(Basket $basket, string $paymentMethod, int $mopId, string $transactionId)
     {
-        //TODO Nr3 Überprüfen, ob Workaround funktioniert
-        //TODO Nr4 Wenn Workaround funktioniert, diesen in Service auslagern.
-        //TODO Nr5 Alle vorkommnisse von $basket durch den Service ersetzen.
-        //TODO Nr6 Todos Entfernen.
-        //TODO Nr7 supportnummer in readme hinzufügen (TPHP-50).
-
         $basketArray = $basket->toArray();
 
         /** @var BasketService $basketService */
@@ -340,24 +334,14 @@ class PaymentService
 
         $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $transactionId;
 
-        // set basket information (amount, currency, orderId, ...)
-
-        $clientErrorMessage = 'Heidelpay::payment.errorInternalErrorTryAgainLater';
-        $this->notification->error($clientErrorMessage, __METHOD__, $basket->toArray(), true);
-        $this->notification->error(
-            $clientErrorMessage,
-            __METHOD__,
-            $this->sessionStorageFactory->getCustomer()->toArray(),
-            true
-        );
-
+        // set amount to net if showNetPrice === true
         if ($this->sessionStorageFactory->getCustomer()->showNetPrice) {
-            //Muss auf totalVats geprüft werden?
             $basketArray['itemSum']        = $basketArray['itemSumNet'];
             $basketArray['basketAmount']   = $basketArray['basketAmountNet'];
             $basketArray['shippingAmount'] = $basketArray['shippingAmountNet'];
         }
 
+        // set basket information (amount, currency, orderId, ...)
         $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basketArray['basketAmount'];
         $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basketArray['currency'];
 
@@ -373,7 +357,6 @@ class PaymentService
             $this->heidelpayRequest['FRONTEND_PREVENT_ASYNC_REDIRECT'] = 'false';
         }
 
-        //TODO Refactoring
         if (false) {
             $this->heidelpayRequest['NAME_SALUTATION'] = $addresses['billing']->gender === 'male'
                 ? Salutation::MR

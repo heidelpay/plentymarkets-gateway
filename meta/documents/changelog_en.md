@@ -5,10 +5,12 @@
 ### Change
 - Replace images.
 - Resolve codingstyle violations.
-- update .gitignore
+- Update .gitignore
+- Add support information to readme
 
 ### Fixed
 - Fix support phone number.
+- Fix incorrect VAT for internaational customer
 
 ## [1.1.0][1.1.0]
 

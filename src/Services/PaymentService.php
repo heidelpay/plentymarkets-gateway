@@ -302,6 +302,17 @@ class PaymentService
      */
     private function prepareRequest(Basket $basket, string $paymentMethod, int $mopId, string $transactionId)
     {
+        //TODO Nr0 Überprüfen ob die IO-funktion getBasketForTemplate() funktioniert und "keinen anderen Schmu macht"
+
+        //TODO Nr2 Wenn showNetPrice === true dann siehe Beispiel
+        //TODO Nr3 Überprüfen, ob Workaround funktioniert
+        //TODO Nr4 Wenn Workaround funktioniert, diesen in Service auslagern.
+        //TODO Nr5 Alle vorkommnisse von $basket durch den Service ersetzen.
+        //TODO Nr6 Todos Entfernen.
+        //TODO Nr7 supportnummer in readme hinzufügen (TPHP-50).
+
+        $basketArray = $basket->toArray();
+
         /** @var BasketService $basketService */
         $basketService = pluginApp(BasketService::class);
 
@@ -314,7 +325,7 @@ class PaymentService
 
         // set customer personal information & address data
         $addresses = $this->getCustomerAddressData($basket);
-        $this->heidelpayRequest['IDENTIFICATION_SHOPPERID'] = $basket->customerId;
+        $this->heidelpayRequest['IDENTIFICATION_SHOPPERID'] = $basketArray['customerId'];
         $this->heidelpayRequest['NAME_GIVEN'] = $addresses['billing']->firstName;
         $this->heidelpayRequest['NAME_FAMILY'] = $addresses['billing']->lastName;
         $this->heidelpayRequest['CONTACT_EMAIL'] = $addresses['billing']->email;
@@ -336,10 +347,15 @@ class PaymentService
 
         $clientErrorMessage = 'Heidelpay::payment.errorInternalErrorTryAgainLater';
         $this->notification->error($clientErrorMessage, __METHOD__, $basket->toArray(), true);
-        $this->notification->error($clientErrorMessage, __METHOD__, $this->sessionStorageFactory->getCustomer()->toArray(), true);
+        $this->notification->error(
+            $clientErrorMessage,
+            __METHOD__,
+            $this->sessionStorageFactory->getCustomer()->toArray(),
+            true
+        );
 
-        $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basket->basketAmount;
-        $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basket->currency;
+        $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basketArray['basketAmount'];
+        $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basketArray['currency'];
 
         $this->heidelpayRequest['FRONTEND_ENABLED'] = 'TRUE';
         $this->heidelpayRequest['FRONTEND_LANGUAGE'] = $this->sessionStorageFactory->getLocaleSettings()->language;
@@ -353,6 +369,7 @@ class PaymentService
             $this->heidelpayRequest['FRONTEND_PREVENT_ASYNC_REDIRECT'] = 'false';
         }
 
+        //TODO Refactoring
         if (false) {
             $this->heidelpayRequest['NAME_SALUTATION'] = $addresses['billing']->gender === 'male'
                 ? Salutation::MR
@@ -367,9 +384,9 @@ class PaymentService
         $this->heidelpayRequest['CRITERION_MOP'] = $mopId;
         $this->heidelpayRequest['CRITERION_SHOP_TYPE'] = 'plentymarkets 7';
         $this->heidelpayRequest['CRITERION_SHOPMODULE_VERSION'] = Plugin::VERSION;
-        $this->heidelpayRequest['CRITERION_BASKET_ID'] = $basket->id;
-        $this->heidelpayRequest['CRITERION_ORDER_ID'] = $basket->orderId;
-        $this->heidelpayRequest['CRITERION_ORDER_TIMESTAMP'] = $basket->orderTimestamp;
+        $this->heidelpayRequest['CRITERION_BASKET_ID'] = $basketArray['id'];
+        $this->heidelpayRequest['CRITERION_ORDER_ID'] = $basketArray['orderId'];
+        $this->heidelpayRequest['CRITERION_ORDER_TIMESTAMP'] = $basketArray['orderTimestamp'];
         $this->heidelpayRequest['CRITERION_PUSH_URL'] =
             $this->paymentHelper->getDomain() . '/' . Routes::PUSH_NOTIFICATION_URL;
 

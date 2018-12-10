@@ -302,7 +302,6 @@ class PaymentService
      */
     private function prepareRequest(Basket $basket, string $paymentMethod, int $mopId, string $transactionId)
     {
-        //TODO Nr0 Überprüfen ob die IO-funktion getBasketForTemplate() funktioniert und "keinen anderen Schmu macht"
         //TODO Nr3 Überprüfen, ob Workaround funktioniert
         //TODO Nr4 Wenn Workaround funktioniert, diesen in Service auslagern.
         //TODO Nr5 Alle vorkommnisse von $basket durch den Service ersetzen.
@@ -354,9 +353,9 @@ class PaymentService
 
         if ($this->sessionStorageFactory->getCustomer()->showNetPrice) {
             //Muss auf totalVats geprüft werden?
-            $basket['itemSum']        = $basket['itemSumNet'];
-            $basket['basketAmount']   = $basket['basketAmountNet'];
-            $basket['shippingAmount'] = $basket['shippingAmountNet'];
+            $basketArray['itemSum']        = $basketArray['itemSumNet'];
+            $basketArray['basketAmount']   = $basketArray['basketAmountNet'];
+            $basketArray['shippingAmount'] = $basketArray['shippingAmountNet'];
         }
 
         $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basketArray['basketAmount'];

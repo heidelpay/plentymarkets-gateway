@@ -13,3 +13,18 @@ This extension provides an integration of the heidelpay payment methods for your
 * [User Guide](meta/documents/user_guide_en.md)
 * [Changelog](meta/documents/changelog_en.md)
 * [Support Contacts](meta/documents/support_contact_en.md)
+
+## Support
+For any issues or questions please get in touch with our support.
+
+#### Web page
+https://dev.heidelpay.com/
+ 
+#### Email
+support@heidelpay.com
+ 
+#### Phone
++49 (0)6221/6471-100
+
+#### Twitter
+@devHeidelpay

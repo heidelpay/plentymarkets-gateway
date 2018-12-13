@@ -302,6 +302,8 @@ class PaymentService
      */
     private function prepareRequest(Basket $basket, string $paymentMethod, int $mopId, string $transactionId)
     {
+        $basketArray = $basket->toArray();
+
         /** @var BasketService $basketService */
         $basketService = pluginApp(BasketService::class);
 
@@ -314,7 +316,7 @@ class PaymentService
 
         // set customer personal information & address data
         $addresses = $this->getCustomerAddressData($basket);
-        $this->heidelpayRequest['IDENTIFICATION_SHOPPERID'] = $basket->customerId;
+        $this->heidelpayRequest['IDENTIFICATION_SHOPPERID'] = $basketArray['customerId'];
         $this->heidelpayRequest['NAME_GIVEN'] = $addresses['billing']->firstName;
         $this->heidelpayRequest['NAME_FAMILY'] = $addresses['billing']->lastName;
         $this->heidelpayRequest['CONTACT_EMAIL'] = $addresses['billing']->email;
@@ -332,9 +334,16 @@ class PaymentService
 
         $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $transactionId;
 
+        // set amount to net if showNetPrice === true
+        if ($this->sessionStorageFactory->getCustomer()->showNetPrice) {
+            $basketArray['itemSum']        = $basketArray['itemSumNet'];
+            $basketArray['basketAmount']   = $basketArray['basketAmountNet'];
+            $basketArray['shippingAmount'] = $basketArray['shippingAmountNet'];
+        }
+
         // set basket information (amount, currency, orderId, ...)
-        $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basket->basketAmount;
-        $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basket->currency;
+        $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basketArray['basketAmount'];
+        $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basketArray['currency'];
 
         $this->heidelpayRequest['FRONTEND_ENABLED'] = 'TRUE';
         $this->heidelpayRequest['FRONTEND_LANGUAGE'] = $this->sessionStorageFactory->getLocaleSettings()->language;
@@ -362,9 +371,9 @@ class PaymentService
         $this->heidelpayRequest['CRITERION_MOP'] = $mopId;
         $this->heidelpayRequest['CRITERION_SHOP_TYPE'] = 'plentymarkets 7';
         $this->heidelpayRequest['CRITERION_SHOPMODULE_VERSION'] = Plugin::VERSION;
-        $this->heidelpayRequest['CRITERION_BASKET_ID'] = $basket->id;
-        $this->heidelpayRequest['CRITERION_ORDER_ID'] = $basket->orderId;
-        $this->heidelpayRequest['CRITERION_ORDER_TIMESTAMP'] = $basket->orderTimestamp;
+        $this->heidelpayRequest['CRITERION_BASKET_ID'] = $basketArray['id'];
+        $this->heidelpayRequest['CRITERION_ORDER_ID'] = $basketArray['orderId'];
+        $this->heidelpayRequest['CRITERION_ORDER_TIMESTAMP'] = $basketArray['orderTimestamp'];
         $this->heidelpayRequest['CRITERION_PUSH_URL'] =
             $this->paymentHelper->getDomain() . '/' . Routes::PUSH_NOTIFICATION_URL;
 

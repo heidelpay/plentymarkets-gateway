@@ -1,5 +1,17 @@
 # heidelpay Payment Gateway Changelog
 
+## [1.1.1][1.1.1]
+
+### Change
+- Logos ausgetauscht.
+- Diverse Codingstyle-Fehler behoben.
+- .gitignore aktualisiert
+- Readme um Support Informationen ergänzt
+
+### Fixed
+- Support Telefonnummer korrigiert.
+- MwSt wird nun bei Auslandsgeschäften nicht mit einbezogen
+
 ## [1.1.0][1.1.0]
 
 ### Removed
@@ -21,3 +33,4 @@
 - Zahlarten Kreditkarte, Debitkarte, Sofort und Lastschrift hinzugefügt.
 
 [1.1.0]: https://github.com/heidelpay/plentymarkets-gateway/tree/1.1.0
+[1.1.1]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.1.0..1.1.1

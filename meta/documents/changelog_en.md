@@ -1,5 +1,17 @@
 # heidelpay Payment Gateway Changelog
 
+## [1.1.1][1.1.1]
+
+### Change
+- Replace images.
+- Resolve codingstyle violations.
+- Update .gitignore
+- Add support information to readme
+
+### Fixed
+- Fix support phone number.
+- Fix incorrect VAT for internaational customer
+
 ## [1.1.0][1.1.0]
 
 ### Removed
@@ -21,3 +33,4 @@
 - Added payment methods credit card, debit card, Sofort and direct debit.
 
 [1.1.0]: https://github.com/heidelpay/plentymarkets-gateway/tree/1.1.0
+[1.1.1]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.1.0..1.1.1

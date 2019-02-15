@@ -347,12 +347,7 @@ class PaymentService
 
         $this->heidelpayRequest['FRONTEND_ENABLED']      = 'TRUE';
         $this->heidelpayRequest['FRONTEND_LANGUAGE']     = $this->sessionStorageFactory->getLocaleSettings()->language;
-
-        $responseURL = $this->paymentHelper->getDomain() . '/' . Routes::RESPONSE_URL;
-        if (isset($_COOKIE['PluginSetPreview'])) {
-            $responseURL .= '?pluginSetPreview=' .$_COOKIE ['PluginSetPreview'];
-        }
-        $this->heidelpayRequest['FRONTEND_RESPONSE_URL'] = $responseURL;
+        $this->heidelpayRequest['FRONTEND_RESPONSE_URL'] = $this->generateUrl(Routes::RESPONSE_URL);
 
         // add the origin domain, which is important for the CSP
         // set 'PREVENT_ASYNC_REDIRECT' to false, to ensure the customer is being redirected after submitting the form.
@@ -378,8 +373,7 @@ class PaymentService
         $this->heidelpayRequest['CRITERION_BASKET_ID'] = $basketArray['id'];
         $this->heidelpayRequest['CRITERION_ORDER_ID'] = $basketArray['orderId'];
         $this->heidelpayRequest['CRITERION_ORDER_TIMESTAMP'] = $basketArray['orderTimestamp'];
-        $this->heidelpayRequest['CRITERION_PUSH_URL'] =
-            $this->paymentHelper->getDomain() . '/' . Routes::PUSH_NOTIFICATION_URL;
+        $this->heidelpayRequest['CRITERION_PUSH_URL'] = $this->generateUrl(Routes::PUSH_NOTIFICATION_URL);
 
         $secret = $secretService->getSecretHash($transactionId);
         if (null !== $secret) {
@@ -706,6 +700,21 @@ class PaymentService
         $order->properties[] = $orderProperty;
 
         $this->orderRepo->updateOrder($order->toArray(), $order->id);
+    }
+
+    /**
+     * Generates the full route to the given url.
+     *
+     * @param string $route
+     * @return string
+     */
+    private function generateUrl($route): string
+    {
+        $responseURL = $this->paymentHelper->getDomain() . '/' . $route;
+        if (isset($_COOKIE['PluginSetPreview'])) {
+            $responseURL .= '?pluginSetPreview=' . $_COOKIE ['PluginSetPreview'];
+        }
+        return $responseURL;
     }
     //</editor-fold>
 }

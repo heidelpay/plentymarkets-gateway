@@ -348,7 +348,7 @@ class PaymentService
         $this->heidelpayRequest['FRONTEND_ENABLED']      = 'TRUE';
         $this->heidelpayRequest['FRONTEND_LANGUAGE']     = $this->sessionStorageFactory->getLocaleSettings()->language;
 
-        $this->notification->error('Cookie', __METHOD__, $_COOKIE);
+        $this->notification->error('Cookie', __METHOD__, $_COOKIE, true);
 
         $responseURL = $this->paymentHelper->getDomain() . '/' . Routes::RESPONSE_URL;
         $this->heidelpayRequest['FRONTEND_RESPONSE_URL'] = $responseURL;

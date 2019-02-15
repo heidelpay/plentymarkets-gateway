@@ -39,6 +39,7 @@ class SecretService
      *
      * @param $value
      * @return string
+     * @throws \RuntimeException
      */
     public function getSecretHash($value): string
     {
@@ -58,6 +59,7 @@ class SecretService
      * @param $hash
      * @return bool
      * @throws SecurityHashInvalidException
+     * @throws \RuntimeException
      */
     public function verifySecretHash($value, $hash): bool
     {

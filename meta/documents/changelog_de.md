@@ -1,5 +1,10 @@
 # heidelpay Payment Gateway Changelog
 
+## [1.1.2][1.1.2]
+
+### Fixed
+- Ein Problem behoben, dass dazu geführt hat, dass Bestellungen im Preview-Modus nicht angelegt werden.
+
 ## [1.1.1][1.1.1]
 
 ### Change
@@ -34,3 +39,4 @@
 
 [1.1.0]: https://github.com/heidelpay/plentymarkets-gateway/tree/1.1.0
 [1.1.1]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.1.0..1.1.1
+[1.1.2]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.1.1..1.1.2

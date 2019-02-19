@@ -169,17 +169,6 @@ class PaymentHelper
     }
 
     /**
-     * @return string
-     */
-    public function getDomain(): string
-    {
-        /** @var WebstoreHelper $webstoreHelper */
-        $webstoreHelper = pluginApp(WebstoreHelper::class);
-
-        return $webstoreHelper->getCurrentWebstoreConfiguration()->domainSsl;
-    }
-
-    /**
      * @return int
      */
     public function getWebstoreId(): int

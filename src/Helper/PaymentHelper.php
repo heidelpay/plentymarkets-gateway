@@ -12,8 +12,6 @@ use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\DirectDebit;
 use Heidelpay\Methods\InvoiceSecuredB2C;
 use Heidelpay\Methods\PaymentMethodContract;
-use Heidelpay\Methods\PayPal;
-use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\ArraySerializerService;
@@ -386,16 +384,8 @@ class PaymentHelper
                 $instance = pluginApp(DebitCard::class);
                 break;
 
-            case PayPal::class:
-                $instance = pluginApp(PayPal::class);
-                break;
-
             case Sofort::class:
                 $instance = pluginApp(Sofort::class);
-                break;
-
-            case Prepayment::class:
-                $instance = pluginApp(Prepayment::class);
                 break;
 
             case DirectDebit::class:

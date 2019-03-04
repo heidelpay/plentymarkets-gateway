@@ -6,8 +6,6 @@ use Heidelpay\Constants\Plugin;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\DirectDebit;
-use Heidelpay\Methods\PayPal;
-use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
 use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
 
@@ -134,14 +132,6 @@ class LibService
                 return $this->sendDirectDebitTransactionRequest($params);
                 break;
 
-            case PayPal::class:
-                return $this->sendPayPalTransactionRequest($params);
-                break;
-
-            case Prepayment::class:
-                return $this->sendPrepaymentTransactionRequest($params);
-                break;
-
             default:
                 return [];
         }
@@ -195,29 +185,6 @@ class LibService
         return $this->executeLibCall('directdebitTransactionRequest', $params);
     }
 
-    /**
-     * Submits a request for a PayPal transaction.
-     *
-     * @param $params
-     *
-     * @return array
-     */
-    protected function sendPayPalTransactionRequest(array $params): array
-    {
-        return $this->executeLibCall('paypalTransactionRequest', $params);
-    }
-
-    /**
-     * Submits a request for a Prepayment transaction.
-     *
-     * @param $params
-     *
-     * @return array
-     */
-    protected function sendPrepaymentTransactionRequest(array $params): array
-    {
-        return $this->executeLibCall('prepaymentTransactionRequest', $params);
-    }
     //</editor-fold>
 
     //<editor-fold desc="Basket">

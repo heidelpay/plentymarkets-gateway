@@ -244,7 +244,7 @@ class PaymentService
 
     /**
      * Return information on how plenty has to handle the payment method.
-     * E.g. show html-content (e.g. iFrame) or redirect to external url (e.g. paypal etc.).
+     * E.g. show html-content (e.g. iFrame) or redirect to external url (e.g. Sofort etc.).
      *
      * @param string $paymentMethod
      * @param Basket $basket

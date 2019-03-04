@@ -114,7 +114,7 @@ class ResponseController extends Controller
     public function processAsyncResponse(): string
     {
         // get all post parameters except the 'plentyMarkets' one injected by the plentymarkets core.
-        // also scrap the 'lang' parameter which will be sent when e.g. PayPal is being used.
+        // also scrap the 'lang' parameter which will be sent when e.g. Sofort is being used.
         $postResponse = $this->request->except(['plentyMarkets', 'lang']);
         ksort($postResponse);
 

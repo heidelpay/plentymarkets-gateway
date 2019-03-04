@@ -10,6 +10,7 @@ use Heidelpay\Constants\TransactionType;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\DirectDebit;
+use Heidelpay\Methods\InvoiceSecuredB2C;
 use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\PayPal;
 use Heidelpay\Methods\Prepayment;
@@ -342,6 +343,9 @@ class PaymentHelper
                 break;
             case $this->getPaymentMethodId(DirectDebit::class):
                 $paymentMethod = DirectDebit::class;
+                break;
+            case $this->getPaymentMethodId(InvoiceSecuredB2C::class):
+                $paymentMethod = InvoiceSecuredB2C::class;
                 break;
             default:
                 // do nothing.

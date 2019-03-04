@@ -392,6 +392,10 @@ class PaymentHelper
                 $instance = pluginApp(DirectDebit::class);
                 break;
 
+            case InvoiceSecuredB2C::class:
+                $instance = pluginApp(InvoiceSecuredB2C::class);
+                break;
+
             default:
                 // do nothing
                 $this->getLogger(__METHOD__)->critical('general.errorMethodNotFound', ['Method' => $paymentMethod]);

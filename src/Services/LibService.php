@@ -7,6 +7,7 @@ use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\DirectDebit;
 use Heidelpay\Methods\Sofort;
+use Heidelpay\Methods\InvoiceSecuredB2C;
 use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
 
 /**
@@ -128,6 +129,10 @@ class LibService
                 return $this->sendSofortTransactionRequest($params);
                 break;
 
+            case InvoiceSecuredB2C::class:
+                return $this->sendInvoiceSecuredB2CTransactionRequest($params);
+                break;
+
             case DirectDebit::class:
                 return $this->sendDirectDebitTransactionRequest($params);
                 break;
@@ -171,6 +176,18 @@ class LibService
     protected function sendSofortTransactionRequest(array $params): array
     {
         return $this->executeLibCall('sofortTransactionRequest', $params);
+    }
+
+    /**
+     * Submits a request for a Invoice Secured B2C transaction.
+     *
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function sendInvoiceSecuredB2CTransactionRequest(array $params): array
+    {
+        return $this->executeLibCall('invoiceSecuredB2CTransactionRequest', $params);
     }
 
     /**

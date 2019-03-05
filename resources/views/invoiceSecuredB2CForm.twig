@@ -15,10 +15,10 @@
         </div>
         <div class="row">
             <div class="input-box">
-                <div class="col-xs-4">
-                    <label for="dateofbirth" class="required">Geburtsdatum <em>*</em></label>
+                <div class="col-xs-5">
+                    <label for="dateofbirth" class="required">{{ "Heidelpay::template.birthday"|trans() }} <em>*</em></label>
                 </div>
-                <div class="col-xs-8">
+                <div class="col-xs-7">
                     <select id="dob_day" required>
                         <option disabled="" value="">Tag</option>
                         <option value="01">01</option><option value="02">02</option><option value="03">03</option>
@@ -35,30 +35,34 @@
                     </select>
                 </div>
             </div>
-            <div class="input-box">
-                <div class="col-xs-offset-4 col-xs-8">
-                    <select title="dob_month" required>
-                        <option disabled="" value="">Monat</option>
-                        <option value="01">01</option><option value="02">02</option><option value="03">03</option>
-                        <option value="04">04</option><option value="05">05</option><option value="06">06</option>
-                        <option value="07">07</option><option value="08">08</option><option value="09">09</option>
-                        <option value="10">10</option><option value="11">11</option><option value="12">12</option>
-                    </select>
+            <div class="row">
+                <div class="input-box">
+                    <div class="col-xs-offset-4 col-xs-8">
+                        <select title="dob_month" required>
+                            <option disabled="" value="">Monat</option>
+                            <option value="01">01</option><option value="02">02</option><option value="03">03</option>
+                            <option value="04">04</option><option value="05">05</option><option value="06">06</option>
+                            <option value="07">07</option><option value="08">08</option><option value="09">09</option>
+                            <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-            <div class="input-box">
-                <div class="col-xs-offset-4 col-xs-8">
-                    <select id="dob_year" required>
-                        <option disabled="" value="">Jahr</option>
-                        {% set minYear = "now -80 years"|date("Y") %}
-                        {% set maxYear = "now -18 years"|date("Y") %}
-                        <ul>
-                            {% for year in minYear..maxYear %}
-                                <option value="{{ year }}">{{ year }}</option>
-                                {#{% set year = year + 1 %}#}
-                            {% endfor %}
-                        </ul>
-                    </select>
+            <div class="row">
+                <div class="input-box">
+                    <div class="col-xs-offset-4 col-xs-8">
+                        <select id="dob_year" required>
+                            <option disabled="" value="">Jahr</option>
+                            {% set minYear = "now -80 years"|date("Y") %}
+                            {% set maxYear = "now -18 years"|date("Y") %}
+                            <ul>
+                                {% for year in minYear..maxYear %}
+                                    <option value="{{ year }}">{{ year }}</option>
+                                    {#{% set year = year + 1 %}#}
+                                {% endfor %}
+                            </ul>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>

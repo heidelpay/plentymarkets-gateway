@@ -10,6 +10,7 @@ use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
 use Heidelpay\Services\UrlServiceContract;
 use Heidelpay\Traits\Translator;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -188,12 +189,15 @@ class ResponseController extends Controller
     /**
      * Handles form requests which do not need any further action by the client.
      *
+     * @param BasketRepositoryContract $basketRepo
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function handleForm(): \Symfony\Component\HttpFoundation\Response
+    public function handleForm(BasketRepositoryContract $basketRepo): \Symfony\Component\HttpFoundation\Response
     {
-        $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
-        return $this->response->redirectTo('checkout');
+        $basket = $basketRepo->load();
+        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__, ['basket' => $basket]);
+
+        return $this->response->redirectTo('place-order');
     }
     //</editor-fold>
 

@@ -31,6 +31,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL;
     const INITIALIZE_PAYMENT = true;
     const FORM_TEMPLATE = '';
+    const NEEDS_CUSTOMER_INPUT = true;
 
     /**
      * @var PaymentHelper $helper
@@ -243,5 +244,16 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     public function getFormTemplate(): string
     {
         return static::FORM_TEMPLATE;
+    }
+
+    /**
+     * Returns true if the customer has to be redirected to enter additional information (e.g. 3D-secure, sofort, etc.).
+     * This determines whether a synchronous or asynchronous request is performed.
+     *
+     * @return bool
+     */
+    public function needsCustomerInput(): bool
+    {
+        return static::NEEDS_CUSTOMER_INPUT;
     }
 }

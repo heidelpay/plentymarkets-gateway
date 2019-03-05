@@ -326,6 +326,9 @@ class PaymentService
         /** @var SecretService $secretService */
         $secretService = pluginApp(SecretService::class);
 
+        /** @var PaymentMethodContract $methodInstance */
+        $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
+
         // set authentication data
         $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($paymentMethod);
         $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
@@ -361,7 +364,7 @@ class PaymentService
         $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basketArray['basketAmount'];
         $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basketArray['currency'];
 
-        $this->heidelpayRequest['FRONTEND_ENABLED']      = 'TRUE';
+        $this->heidelpayRequest['FRONTEND_ENABLED']      = $methodInstance->needsCustomerInput() ? 'TRUE' : 'FALSE';
         $this->heidelpayRequest['FRONTEND_LANGUAGE']     = $this->sessionStorageFactory->getLocaleSettings()->language;
         $this->heidelpayRequest['FRONTEND_RESPONSE_URL'] = $this->urlService->generateURL(Routes::RESPONSE_URL);
 
@@ -397,10 +400,7 @@ class PaymentService
         }
 
         // general
-        $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
-        if (null !== $methodInstance) {
-            $this->heidelpayRequest['FRONTEND_CSS_PATH'] = $this->methodConfig->getIFrameCssPath($methodInstance);
-        }
+        $this->heidelpayRequest['FRONTEND_CSS_PATH'] = $this->methodConfig->getIFrameCssPath($methodInstance);
     }
 
     //<editor-fold desc="Handlers">

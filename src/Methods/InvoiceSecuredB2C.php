@@ -23,4 +23,5 @@ class InvoiceSecuredB2C extends AbstractMethod
     const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_HTML;
     const INITIALIZE_PAYMENT = false;
     const FORM_TEMPLATE = 'Heidelpay::invoiceSecuredB2CForm';
+    const NEEDS_CUSTOMER_INPUT = false;
 }

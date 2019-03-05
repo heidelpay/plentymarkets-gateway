@@ -290,11 +290,11 @@ class PaymentService
                 $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
                 $value = $this->getTranslator()->trans($clientErrorMessage);
             }
+        }
 
-            if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
-                // $value should contain the payment frame url (also form url)
-                $value = $this->renderPaymentForm($methodInstance->getFormTemplate(), ['paymentFrameUrl' => $value]);
-            }
+        if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
+            // $value should contain the payment frame url (also form url)
+            $value = $this->renderPaymentForm($methodInstance->getFormTemplate(), ['paymentFrameUrl' => $value]);
         }
 
         return [$type, $value];

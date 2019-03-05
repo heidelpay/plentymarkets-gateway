@@ -65,9 +65,7 @@ class PaymentController extends Controller
      */
     public function handleForm(): BaseResponse
     {
-        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__);
-
-        $this->notification->critical('Formulareingaben werden bearbeitet!', __METHOD__);
+        $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
         return $this->response->redirectTo('checkout');
     }
 }

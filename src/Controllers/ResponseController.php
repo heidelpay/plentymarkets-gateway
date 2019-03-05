@@ -10,10 +10,12 @@ use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
 use Heidelpay\Services\UrlServiceContract;
 use Heidelpay\Traits\Translator;
+use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
 /**
  * Processes the transaction/payment responses coming from the heidelpay payment system.
@@ -178,9 +180,9 @@ class ResponseController extends Controller
      * the heidelpay API redirects to the processAsyncResponse url using GET instead of POST.
      * This method is for handling this behaviour.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return BaseResponse
      */
-    public function emergencyRedirect(): \Symfony\Component\HttpFoundation\Response
+    public function emergencyRedirect(): BaseResponse
     {
         $this->notification->warning('response.warningResponseCalledInInvalidContext', __METHOD__);
         return $this->response->redirectTo('checkout');
@@ -190,12 +192,18 @@ class ResponseController extends Controller
      * Handles form requests which do not need any further action by the client.
      *
      * @param BasketRepositoryContract $basketRepo
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param AddressRepositoryContract $addressRepo
+     * @return BaseResponse
      */
-    public function handleSyncRequest(BasketRepositoryContract $basketRepo): \Symfony\Component\HttpFoundation\Response
-    {
+    public function handleSyncRequest(
+        BasketRepositoryContract $basketRepo,
+        AddressRepositoryContract $addressRepo
+    ): BaseResponse {
         $basket = $basketRepo->load();
-        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__, ['basket' => $basket]);
+
+        $invoiceAddress = $addressRepo->findAddressById($basket->customerInvoiceAddressId);
+
+        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__, ['basket' => $basket, 'invoice address' => $invoiceAddress]);
 
         return $this->response->redirectTo('place-order');
     }

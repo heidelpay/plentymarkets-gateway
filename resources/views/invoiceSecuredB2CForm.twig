@@ -3,21 +3,24 @@
 {% block content %}
     <form action="" id="heidelpay-payment-form">
         <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-5 col-lg-2">
+            <div class="col-md-3"></div>
+            <div class="col-md-3">
                 <label for="salutation" class="required">{{ trans('Heidelpay::template.salutation') }} <em>*</em></label>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-7 col-lg-10">
+            <div class="col-md-3">
                 <select id="salutation" required>
                     <option value="MR">{{ trans('Heidelpay::template.mr') }}</option>
                     <option value="MRS">{{ trans('Heidelpay::template.mrs') }}</option>
                 </select>
             </div>
+            <div class="col-md-3"></div>
         </div>
         <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3">
+            <div class="col-md-3"></div>
+            <div class="col-md-3">
                 <label for="dateofbirth" class="required">{{ trans('Heidelpay::template.birthday') }} <em>*</em></label>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3">
+            <div class="col-md-3">
                 <div class="input-box">
                     <select id="dob_day" required>
                         <option disabled="" value="">{{ trans('Heidelpay::template.day') }}</option>
@@ -35,7 +38,12 @@
                     </select>
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3">
+            <div class="col-md-3"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-3"></div>
+            <div class="col-md-3">
                 <div class="input-box">
                     <select title="dob_month" required>
                         <option disabled="" value="">{{ trans('Heidelpay::template.month') }}</option>
@@ -46,7 +54,12 @@
                     </select>
                 </div>
             </div>
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-3">
+            <div class="col-md-3"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-3"></div>
+            <div class="col-md-3">
                 <div class="input-box">
                     <select id="dob_year" required>
                         <option disabled="" value="">{{ trans('Heidelpay::template.year') }}</option>
@@ -60,6 +73,7 @@
                     </select>
                 </div>
             </div>
+            <div class="col-md-3"></div>
         </div>
         {% include "Heidelpay::partials/cancelSubmitButtons" %}
     </form>

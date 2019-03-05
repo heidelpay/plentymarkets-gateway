@@ -21,6 +21,7 @@ use Heidelpay\Models\Transaction;
 use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
@@ -108,6 +109,10 @@ class PaymentService
      * @var UrlServiceContract
      */
     private $urlService;
+    /**
+     * @var BasketRepositoryContract
+     */
+    private $basketRepository;
 
     /**
      * PaymentService constructor.
@@ -125,6 +130,7 @@ class PaymentService
      * @param OrderTxnIdRelationRepositoryContract $orderTxnIdRepo
      * @param OrderRepositoryContract $orderRepo
      * @param UrlServiceContract $urlService
+     * @param BasketRepositoryContract $basketRepository
      */
     public function __construct(
         AddressRepositoryContract $addressRepository,
@@ -139,7 +145,8 @@ class PaymentService
         MethodConfigContract $methodConfig,
         OrderTxnIdRelationRepositoryContract $orderTxnIdRepo,
         OrderRepositoryContract $orderRepo,
-        UrlServiceContract $urlService
+        UrlServiceContract $urlService,
+        BasketRepositoryContract $basketRepository
     ) {
         $this->addressRepository = $addressRepository;
         $this->countryRepository = $countryRepository;
@@ -154,6 +161,7 @@ class PaymentService
         $this->orderTxnIdRepo = $orderTxnIdRepo;
         $this->orderRepo = $orderRepo;
         $this->urlService = $urlService;
+        $this->basketRepository = $basketRepository;
     }
 
     /**
@@ -244,17 +252,15 @@ class PaymentService
 
     /**
      * Return information on how plenty has to handle the payment method.
-     * E.g. show html-content (e.g. iFrame) or redirect to external url (e.g. paypal etc.).
+     * E.g. show html-content (e.g. iFrame) or redirect to external url (e.g. Sofort etc.).
      *
      * @param string $paymentMethod
-     * @param Basket $basket
      * @param int    $mopId
      *
      * @return array
      */
     public function getPaymentMethodContent(
         string $paymentMethod,
-        Basket $basket,
         int $mopId
     ): array {
         $value = '';
@@ -276,10 +282,12 @@ class PaymentService
             return [$type, $value];
         }
 
+        $value = $this->urlService->generateURL(Routes::HANDLE_FORM_URL);
+
         if ($methodInstance->hasToBeInitialized()) {
             try {
                 $result = $this->sendPaymentRequest(
-                    $basket,
+                    $this->basketRepository->load(),
                     $paymentMethod,
                     $methodInstance->getTransactionType(),
                     $mopId
@@ -289,12 +297,13 @@ class PaymentService
                 $this->notification->error($clientErrorMessage, __METHOD__, [$type, $e->getMessage()], true);
                 $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
                 $value = $this->getTranslator()->trans($clientErrorMessage);
+                return [$type, $value];
             }
+        }
 
-            if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
-                // $value should contain the payment frame url (also form url)
-                $value = $this->renderPaymentForm($methodInstance->getFormTemplate(), ['paymentFrameUrl' => $value]);
-            }
+        if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
+            // $value should contain the payment frame url (also form url)
+            $value = $this->renderPaymentForm($methodInstance->getFormTemplate(), ['submit_action' => $value]);
         }
 
         return [$type, $value];

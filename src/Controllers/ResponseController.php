@@ -10,6 +10,7 @@ use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
 use Heidelpay\Services\UrlServiceContract;
 use Heidelpay\Traits\Translator;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -114,7 +115,7 @@ class ResponseController extends Controller
     public function processAsyncResponse(): string
     {
         // get all post parameters except the 'plentyMarkets' one injected by the plentymarkets core.
-        // also scrap the 'lang' parameter which will be sent when e.g. PayPal is being used.
+        // also scrap the 'lang' parameter which will be sent when e.g. Sofort is being used.
         $postResponse = $this->request->except(['plentyMarkets', 'lang']);
         ksort($postResponse);
 
@@ -183,6 +184,20 @@ class ResponseController extends Controller
     {
         $this->notification->warning('response.warningResponseCalledInInvalidContext', __METHOD__);
         return $this->response->redirectTo('checkout');
+    }
+
+    /**
+     * Handles form requests which do not need any further action by the client.
+     *
+     * @param BasketRepositoryContract $basketRepo
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function handleSyncRequest(BasketRepositoryContract $basketRepo): \Symfony\Component\HttpFoundation\Response
+    {
+        $basket = $basketRepo->load();
+        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__, ['basket' => $basket]);
+
+        return $this->response->redirectTo('place-order');
     }
     //</editor-fold>
 

@@ -4,7 +4,7 @@ namespace Heidelpay\Methods;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 
 /**
- * heidelpay Prepayment Payment Method
+ * heidelpay Invoice Secured B2C Payment Method
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
@@ -15,11 +15,12 @@ use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
  *
  * @package heidelpay\plentymarkets-gateway\payment-methods
  */
-class PayPal extends AbstractMethod
+class InvoiceSecuredB2C extends AbstractMethod
 {
-    const CONFIG_KEY = 'paypal';
-    const KEY = 'PAYPAL';
-    const DEFAULT_NAME = 'PayPal';
-    const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL;
-    const INITIALIZE_PAYMENT = true;
+    const CONFIG_KEY = 'invoicesecuredb2c';
+    const KEY = 'INVOICE_SECURED_B2C';
+    const DEFAULT_NAME = 'Invoice Secured';
+    const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_HTML;
+    const INITIALIZE_PAYMENT = false;
+    const FORM_TEMPLATE = 'Heidelpay::invoiceSecuredB2CForm';
 }

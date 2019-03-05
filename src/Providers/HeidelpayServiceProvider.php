@@ -16,7 +16,6 @@ use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
 use Heidelpay\Services\UrlService;
 use Heidelpay\Services\UrlServiceContract;
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
@@ -56,14 +55,12 @@ class HeidelpayServiceProvider extends ServiceProvider
      * Boot the heidelpay Service Provider
      * Register payment methods, add event listeners, ...
      *
-     * @param BasketRepositoryContract $basketRepository
      * @param PaymentHelper            $paymentHelper
      * @param PaymentMethodContainer   $methodContainer
      * @param PaymentService           $paymentService
      * @param Dispatcher               $eventDispatcher
      */
     public function boot(
-        BasketRepositoryContract $basketRepository,
         PaymentHelper $paymentHelper,
         PaymentMethodContainer $methodContainer,
         PaymentService $paymentService,
@@ -84,7 +81,6 @@ class HeidelpayServiceProvider extends ServiceProvider
         $eventDispatcher->listen(
             GetPaymentMethodContent::class,
             function (GetPaymentMethodContent $event) use (
-                $basketRepository,
                 $paymentHelper,
                 $paymentService
             ) {
@@ -92,8 +88,7 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $paymentMethod = $paymentHelper->mapMopToPaymentMethod($mop);
 
                 if (!empty($paymentMethod)) {
-                    $basket = $basketRepository->load();
-                    list($type, $value) = $paymentService->getPaymentMethodContent($paymentMethod, $basket, $mop);
+                    list($type, $value) = $paymentService->getPaymentMethodContent($paymentMethod, $mop);
 
                     $event->setValue($value);
                     $event->setType($type);

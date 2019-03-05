@@ -6,9 +6,8 @@ use Heidelpay\Constants\Plugin;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\DirectDebit;
-use Heidelpay\Methods\PayPal;
-use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
+use Heidelpay\Methods\InvoiceSecuredB2C;
 use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
 
 /**
@@ -130,16 +129,12 @@ class LibService
                 return $this->sendSofortTransactionRequest($params);
                 break;
 
+            case InvoiceSecuredB2C::class:
+                return $this->sendInvoiceSecuredB2CTransactionRequest($params);
+                break;
+
             case DirectDebit::class:
                 return $this->sendDirectDebitTransactionRequest($params);
-                break;
-
-            case PayPal::class:
-                return $this->sendPayPalTransactionRequest($params);
-                break;
-
-            case Prepayment::class:
-                return $this->sendPrepaymentTransactionRequest($params);
                 break;
 
             default:
@@ -184,6 +179,18 @@ class LibService
     }
 
     /**
+     * Submits a request for a Invoice Secured B2C transaction.
+     *
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function sendInvoiceSecuredB2CTransactionRequest(array $params): array
+    {
+        return $this->executeLibCall('invoiceSecuredB2CTransactionRequest', $params);
+    }
+
+    /**
      * Submits a request for a Direct Debit transaction.
      *
      * @param array $params
@@ -195,29 +202,6 @@ class LibService
         return $this->executeLibCall('directdebitTransactionRequest', $params);
     }
 
-    /**
-     * Submits a request for a PayPal transaction.
-     *
-     * @param $params
-     *
-     * @return array
-     */
-    protected function sendPayPalTransactionRequest(array $params): array
-    {
-        return $this->executeLibCall('paypalTransactionRequest', $params);
-    }
-
-    /**
-     * Submits a request for a Prepayment transaction.
-     *
-     * @param $params
-     *
-     * @return array
-     */
-    protected function sendPrepaymentTransactionRequest(array $params): array
-    {
-        return $this->executeLibCall('prepaymentTransactionRequest', $params);
-    }
     //</editor-fold>
 
     //<editor-fold desc="Basket">

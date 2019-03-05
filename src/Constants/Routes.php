@@ -22,7 +22,7 @@ class Routes
 
     const RESPONSE_URL = self::BASE_URI . 'response';
     const PUSH_NOTIFICATION_URL = self::BASE_URI . 'pushNotification';
-    const HANDLE_FORM_URL = self::BASE_URI . 'handleForm';
+    const HANDLE_FORM_URL = self::BASE_URI . 'handleSyncRequest';
 
     const CHECKOUT_SUCCESS = self::BASE_URI . 'checkoutSuccess';
     const CHECKOUT_CANCEL = self::BASE_URI . 'checkoutCancel';

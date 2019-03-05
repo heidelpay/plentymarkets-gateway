@@ -192,7 +192,7 @@ class ResponseController extends Controller
      * @param BasketRepositoryContract $basketRepo
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function handleForm(BasketRepositoryContract $basketRepo): \Symfony\Component\HttpFoundation\Response
+    public function handleSyncRequest(BasketRepositoryContract $basketRepo): \Symfony\Component\HttpFoundation\Response
     {
         $basket = $basketRepo->load();
         $this->notification->success('payment.infoPaymentSuccessful', __METHOD__, ['basket' => $basket]);

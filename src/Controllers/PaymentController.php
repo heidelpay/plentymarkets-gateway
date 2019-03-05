@@ -57,15 +57,4 @@ class PaymentController extends Controller
         $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
         return $this->response->redirectTo('checkout');
     }
-
-    /**
-     * Handles form requests which do not need any further action by the client.
-     *
-     * @return BaseResponse
-     */
-    public function handleForm(): BaseResponse
-    {
-        $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
-        return $this->response->redirectTo('checkout');
-    }
 }

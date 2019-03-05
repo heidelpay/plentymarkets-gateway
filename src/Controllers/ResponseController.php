@@ -184,6 +184,17 @@ class ResponseController extends Controller
         $this->notification->warning('response.warningResponseCalledInInvalidContext', __METHOD__);
         return $this->response->redirectTo('checkout');
     }
+
+    /**
+     * Handles form requests which do not need any further action by the client.
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function handleForm(): \Symfony\Component\HttpFoundation\Response
+    {
+        $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
+        return $this->response->redirectTo('checkout');
+    }
     //</editor-fold>
 
     //<editor-fold desc="Responses">

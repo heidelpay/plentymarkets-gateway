@@ -294,7 +294,7 @@ class PaymentService
 
         if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
             // $value should contain the payment frame url (also form url)
-            $value = $this->renderPaymentForm($methodInstance->getFormTemplate(), ['paymentFrameUrl' => $value]);
+            $value = $this->renderPaymentForm($methodInstance->getFormTemplate(), ['submit_action' => $value]);
         }
 
         return [$type, $value];

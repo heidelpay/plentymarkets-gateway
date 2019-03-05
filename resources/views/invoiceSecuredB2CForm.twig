@@ -20,8 +20,8 @@
             <div class="col-md-3">
                 <label for="dateofbirth" class="required">{{ trans('Heidelpay::template.birthday') }} <em>*</em></label>
             </div>
-            <div class="col-md-3">
-                <div class="input-box">
+            <div class="col-md-2">
+                <div class="input-box" style="witdh:100%">
                     <select id="dob_day" required>
                         <option disabled="" value="">{{ trans('Heidelpay::template.day') }}</option>
                         <option value="01">01</option><option value="02">02</option><option value="03">03</option>
@@ -38,13 +38,8 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-3"></div>
-        </div>
-        <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-3"></div>
-            <div class="col-md-3">
-                <div class="input-box">
+            <div class="col-md-2">
+                <div class="input-box" style="witdh:100%">
                     <select title="dob_month" required>
                         <option disabled="" value="">{{ trans('Heidelpay::template.month') }}</option>
                         <option value="01">01</option><option value="02">02</option><option value="03">03</option>
@@ -54,13 +49,8 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-3"></div>
-        </div>
-        <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-3"></div>
-            <div class="col-md-3">
-                <div class="input-box">
+            <div class="col-md-2">
+                <div class="input-box" style="witdh:100%">
                     <select id="dob_year" required>
                         <option disabled="" value="">{{ trans('Heidelpay::template.year') }}</option>
                         {% set minYear = "now -80 years"|date("Y") %}

@@ -276,6 +276,8 @@ class PaymentService
             return [$type, $value];
         }
 
+        $value = $this->urlService->generateURL();
+
         if ($methodInstance->hasToBeInitialized()) {
             try {
                 $result = $this->sendPaymentRequest(
@@ -289,6 +291,7 @@ class PaymentService
                 $this->notification->error($clientErrorMessage, __METHOD__, [$type, $e->getMessage()], true);
                 $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
                 $value = $this->getTranslator()->trans($clientErrorMessage);
+                return [$type, $value];
             }
         }
 

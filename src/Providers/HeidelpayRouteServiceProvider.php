@@ -47,6 +47,8 @@ class HeidelpayRouteServiceProvider extends RouteServiceProvider
         $router->post(Routes::RESPONSE_URL, 'Heidelpay\Controllers\ResponseController@processAsyncResponse');
         $router->post(Routes::PUSH_NOTIFICATION_URL, 'Heidelpay\Controllers\ResponseController@processPush');
 
+        $router->post(Routes::HANDLE_FORM_URL, 'Heidelpay\Controllers\PaymentController@handleForm');
+
         // redirects in success or cancellation/failure cases
         $router->get(Routes::CHECKOUT_SUCCESS, 'Heidelpay\Controllers\PaymentController@checkoutSuccess');
         $router->get(Routes::CHECKOUT_CANCEL, 'Heidelpay\Controllers\PaymentController@checkoutCancel');

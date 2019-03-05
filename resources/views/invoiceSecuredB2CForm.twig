@@ -1,0 +1,19 @@
+{% extends "Heidelpay::base" %}
+
+{% block content %}
+    <form action="" id="heidelpay-payment-form">
+        <div class="row">
+            <div class="col-xs-12">
+                <label for="salutation" class="required">Anrede</label>
+                <select id="salutation" title="Anrede" required autocomplete="off">
+                    <option value="MR">Herr</option>
+                    <option value="MRS">Frau</option>
+                </select>
+            </div>
+        </div>
+        {% include "Heidelpay::partials/cancelSubmitButtons" %}
+    </form>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

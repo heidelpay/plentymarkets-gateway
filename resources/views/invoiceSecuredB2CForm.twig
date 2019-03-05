@@ -9,8 +9,9 @@
             </div>
             <div class="col-md-2">
                 <select id="salutation" required>
-                    <option value="MR">{{ trans('Heidelpay::template.mr') }}</option>
-                    <option value="MRS">{{ trans('Heidelpay::template.mrs') }}</option>
+                    <option value="" disabled selected>{{ trans('Heidelpay::template.choose') }}</option>
+                    <option value="mr">{{ trans('Heidelpay::template.mr') }}</option>
+                    <option value="mrs">{{ trans('Heidelpay::template.mrs') }}</option>
                 </select>
             </div>
             <div class="col-md-4"></div>
@@ -23,7 +24,7 @@
             <div class="col-md-1">
                 <div class="input-box" style="width:100%">
                     <select id="dob_day" required>
-                        <option disabled="" value="">{{ trans('Heidelpay::template.day') }}</option>
+                        <option disabled selected value="">{{ trans('Heidelpay::template.day') }}</option>
                         <option value="01">01</option><option value="02">02</option><option value="03">03</option>
                         <option value="04">04</option><option value="05">05</option><option value="06">06</option>
                         <option value="07">07</option><option value="08">08</option><option value="09">09</option>
@@ -41,7 +42,7 @@
             <div class="col-md-1">
                 <div class="input-box" style="width:100%">
                     <select title="dob_month" required>
-                        <option disabled="" value="">{{ trans('Heidelpay::template.month') }}</option>
+                        <option disabled selected value="">{{ trans('Heidelpay::template.month') }}</option>
                         <option value="01">01</option><option value="02">02</option><option value="03">03</option>
                         <option value="04">04</option><option value="05">05</option><option value="06">06</option>
                         <option value="07">07</option><option value="08">08</option><option value="09">09</option>
@@ -52,7 +53,7 @@
             <div class="col-md-1">
                 <div class="input-box" style="width:100%">
                     <select id="dob_year" required>
-                        <option disabled="" value="">{{ trans('Heidelpay::template.year') }}</option>
+                        <option disabled selected value="">{{ trans('Heidelpay::template.year') }}</option>
                         {% set minYear = "now -80 years"|date("Y") %}
                         {% set maxYear = "now -18 years"|date("Y") %}
                         <ul>

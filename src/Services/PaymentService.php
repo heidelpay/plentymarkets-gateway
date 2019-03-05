@@ -276,7 +276,7 @@ class PaymentService
             return [$type, $value];
         }
 
-        $value = $this->urlService->generateURL();
+        $value = $this->urlService->generateURL(Routes::HANDLE_FORM_URL);
 
         if ($methodInstance->hasToBeInitialized()) {
             try {

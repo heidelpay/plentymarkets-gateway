@@ -4,6 +4,8 @@ namespace Heidelpay\Controllers;
 
 use Heidelpay\Constants\Routes;
 use Heidelpay\Exceptions\SecurityHashInvalidException;
+use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\NotificationServiceContract;
@@ -13,7 +15,6 @@ use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
-use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -196,14 +197,15 @@ class ResponseController extends Controller
      * @param BasketRepositoryContract $basketRepo
      * @param AddressRepositoryContract $addressRepo
      * @param ContactRepositoryContract $contactRepo
-     * @param FrontendSessionStorageFactoryContract $frontendSessionStorage
+     * @param PaymentHelper $paymentHelper
      * @return BaseResponse
+     * @throws \RuntimeException
      */
     public function handleSyncRequest(
         BasketRepositoryContract $basketRepo,
         AddressRepositoryContract $addressRepo,
         ContactRepositoryContract $contactRepo,
-        FrontendSessionStorageFactoryContract $frontendSessionStorage
+        PaymentHelper $paymentHelper
     ): BaseResponse {
 
         if (!$this->request->exists('customer_salutation') || !$this->request->exists('customer_dob_day') ||
@@ -232,14 +234,22 @@ class ResponseController extends Controller
         $contact['birthdayAt'] = strtotime($dateOfBirth);
         $contactRepo->updateContact($contact, $customerId);
 
-        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__, [
+        $mopId          = $basket->methodOfPaymentId;
+        $paymentMethod = $paymentHelper->mapMopToPaymentMethod($mopId);
+        $methodInstance = $paymentHelper->getPaymentMethodInstanceByMopId($mopId);
+        if (!$methodInstance instanceof PaymentMethodContract) {
+            $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
+            return $this->response->redirectTo('checkout');
+        }
+
+        $this->paymentService->sendPaymentRequest(
             $basket,
-            $frontendSessionStorage->getOrder(),
-            $frontendSessionStorage->getCustomer(),
-            $frontendSessionStorage->getForum(),
-            $frontendSessionStorage->getLocaleSettings(),
-            $frontendSessionStorage->getPlugin()
-        ]);
+            $paymentMethod,
+            $methodInstance->getTransactionType(),
+            $mopId
+        );
+
+        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__);
         return $this->response->redirectTo('place-order');
     }
     //</editor-fold>

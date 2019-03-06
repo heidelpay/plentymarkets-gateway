@@ -1,6 +1,7 @@
 <?php
 
 namespace Heidelpay\Methods;
+use Heidelpay\Constants\TransactionType;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 
 /**
@@ -21,6 +22,7 @@ class InvoiceSecuredB2C extends AbstractMethod
     const KEY = 'INVOICE_SECURED_B2C';
     const DEFAULT_NAME = 'Invoice Secured';
     const RETURN_TYPE = GetPaymentMethodContent::RETURN_TYPE_HTML;
+    const TRANSACTION_TYPE = TransactionType::AUTHORIZE;
     const INITIALIZE_PAYMENT = false;
     const FORM_TEMPLATE = 'Heidelpay::invoiceSecuredB2CForm';
     const NEEDS_CUSTOMER_INPUT = false;

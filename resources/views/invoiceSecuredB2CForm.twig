@@ -8,7 +8,7 @@
                 <label for="salutation" class="required">{{ trans('Heidelpay::template.salutation') }} <em>*</em></label>
             </div>
             <div class="col-md-2">
-                <select id="salutation" required>
+                <select id="salutation" name="customer_salutation" required>
                     <option value="" disabled selected>{{ trans('Heidelpay::template.choose') }}</option>
                     <option value="mr">{{ trans('Heidelpay::template.mr') }}</option>
                     <option value="mrs">{{ trans('Heidelpay::template.mrs') }}</option>
@@ -23,7 +23,7 @@
             </div>
             <div class="col-md-1">
                 <div class="input-box" style="width:100%">
-                    <select id="dob_day" required>
+                    <select id="dob_day" name="customer_dob_day" required>
                         <option disabled selected value="">{{ trans('Heidelpay::template.day') }}</option>
                         <option value="01">01</option><option value="02">02</option><option value="03">03</option>
                         <option value="04">04</option><option value="05">05</option><option value="06">06</option>
@@ -41,7 +41,7 @@
             </div>
             <div class="col-md-1">
                 <div class="input-box" style="width:100%">
-                    <select title="dob_month" required>
+                    <select title="dob_month" name="customer_dob_month" required>
                         <option disabled selected value="">{{ trans('Heidelpay::template.month') }}</option>
                         <option value="01">01</option><option value="02">02</option><option value="03">03</option>
                         <option value="04">04</option><option value="05">05</option><option value="06">06</option>
@@ -52,7 +52,7 @@
             </div>
             <div class="col-md-1">
                 <div class="input-box" style="width:100%">
-                    <select id="dob_year" required>
+                    <select id="dob_year" name="customer_dob_year" required>
                         <option disabled selected value="">{{ trans('Heidelpay::template.year') }}</option>
                         {% set minYear = "now -80 years"|date("Y") %}
                         {% set maxYear = "now -18 years"|date("Y") %}

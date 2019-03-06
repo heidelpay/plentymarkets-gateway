@@ -5,13 +5,16 @@ namespace Heidelpay\Controllers;
 use Heidelpay\Constants\Routes;
 use Heidelpay\Exceptions\SecurityHashInvalidException;
 use Heidelpay\Models\Transaction;
+use Heidelpay\PhpPaymentApi\PushMapping\Contact;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
 use Heidelpay\Services\UrlServiceContract;
 use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Plenty\Modules\CustomerContract\Contracts\CustomerContractRepositoryContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -193,11 +196,13 @@ class ResponseController extends Controller
      *
      * @param BasketRepositoryContract $basketRepo
      * @param AddressRepositoryContract $addressRepo
+     * @param ContactRepositoryContract $contactRepo
      * @return BaseResponse
      */
     public function handleSyncRequest(
         BasketRepositoryContract $basketRepo,
-        AddressRepositoryContract $addressRepo
+        AddressRepositoryContract $addressRepo,
+        ContactRepositoryContract $contactRepo
     ): BaseResponse {
         $basket = $basketRepo->load();
 
@@ -206,12 +211,21 @@ class ResponseController extends Controller
         $invoiceAddressArray['gender'] = 'female';
         $invoiceAddressAfter = $addressRepo->updateAddress($invoiceAddressArray, $invoiceAddress->id);
 
+//        $customer = $customerContractRepo->get($basket->customerId);
+
+        $contact = $contactRepo->findContactById($basket->customerId);
+        $contactArray = $contact->toArray();
+        $contactArray['birthdayAt'] = strtotime('1982-11-25');
+        $contactAfter = $contactRepo->updateContact($contactArray, $basket->customerId);
+
         $this->notification->success('payment.infoPaymentSuccessful', __METHOD__,
                                      [
                                          'basket' => $basket,
                                          'invoice address' => $invoiceAddress,
                                          'invoice address after' => $invoiceAddressAfter,
-                                         'post data' => $this->request->all()
+                                         'post data' => $this->request->all(),
+                                         'contact' => $contact,
+                                         'contact after' => $contactAfter
                                      ]
         );
 

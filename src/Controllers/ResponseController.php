@@ -5,7 +5,6 @@ namespace Heidelpay\Controllers;
 use Heidelpay\Constants\Routes;
 use Heidelpay\Exceptions\SecurityHashInvalidException;
 use Heidelpay\Models\Transaction;
-use Heidelpay\PhpPaymentApi\PushMapping\Contact;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
@@ -14,7 +13,6 @@ use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
-use Plenty\Modules\CustomerContract\Contracts\CustomerContractRepositoryContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -204,31 +202,34 @@ class ResponseController extends Controller
         AddressRepositoryContract $addressRepo,
         ContactRepositoryContract $contactRepo
     ): BaseResponse {
+
+        if (!$this->request->exists('customer_salutation') || !$this->request->exists('customer_dob_day') ||
+            !$this->request->exists('customer_dob_month') || !$this->request->exists('customer_dob_year'))
+        {
+            $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
+            return $this->response->redirectTo('checkout');
+        }
+
+        $salutation = $this->request->get('customer_salutation');
+        $dateOfBirth = implode('-',
+                               [
+                                   $this->request->get('customer_dob_year'),
+                                   $this->request->get('customer_dob_month'),
+                                   $this->request->get('customer_dob_day')
+                               ]);
+
         $basket = $basketRepo->load();
+        $customerId = $basket->customerId;
 
-        $invoiceAddress = $addressRepo->findAddressById($basket->customerInvoiceAddressId);
-        $invoiceAddressArray = $invoiceAddress->toArray();
-        $invoiceAddressArray['gender'] = 'female';
-        $invoiceAddressAfter = $addressRepo->updateAddress($invoiceAddressArray, $invoiceAddress->id);
+        $invoiceAddress = $addressRepo->findAddressById($basket->customerInvoiceAddressId)->toArray();
+        $invoiceAddress['gender'] = $salutation === 'mrs' ? 'female' : 'male';
+        $addressRepo->updateAddress($invoiceAddress, $invoiceAddress['id']);
 
-//        $customer = $customerContractRepo->get($basket->customerId);
+        $contact = $contactRepo->findContactById($customerId)->toArray();
+        $contact['birthdayAt'] = strtotime($dateOfBirth);
+        $contactRepo->updateContact($contact, $customerId);
 
-        $contact = $contactRepo->findContactById($basket->customerId);
-        $contactArray = $contact->toArray();
-        $contactArray['birthdayAt'] = strtotime('1982-11-25');
-        $contactAfter = $contactRepo->updateContact($contactArray, $basket->customerId);
-
-        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__,
-                                     [
-                                         'basket' => $basket,
-                                         'invoice address' => $invoiceAddress,
-                                         'invoice address after' => $invoiceAddressAfter,
-                                         'post data' => $this->request->all(),
-                                         'contact' => $contact,
-                                         'contact after' => $contactAfter
-                                     ]
-        );
-
+        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__);
         return $this->response->redirectTo('place-order');
     }
     //</editor-fold>

@@ -201,9 +201,19 @@ class ResponseController extends Controller
     ): BaseResponse {
         $basket = $basketRepo->load();
 
-        $invoiceAddress = $addressRepo->findAddressById($basket->customerInvoiceAddressId);
+        $invoiceAddress          = $addressRepo->findAddressById($basket->customerInvoiceAddressId);
+        $invoiceAddressArray     = $invoiceAddress->toArray();
+//        $invoiceAddressArray[''] =
+//        $invoiceAddressAfter = $addressRepo->updateAddress($invoiceAddressArray, $invoiceAddress['id']);
 
-        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__, ['basket' => $basket, 'invoice address' => $invoiceAddress]);
+
+        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__,
+                                     [
+                                         'basket' => $basket,
+                                         'invoice address' => $invoiceAddress,
+                                         'invoice address array' => $invoiceAddressArray,
+                                         'post data' => $this->request->all()]
+        );
 
         return $this->response->redirectTo('place-order');
     }

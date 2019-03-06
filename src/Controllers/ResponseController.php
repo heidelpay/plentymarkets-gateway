@@ -11,6 +11,7 @@ use Heidelpay\Services\PaymentService;
 use Heidelpay\Services\UrlServiceContract;
 use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
+use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
@@ -201,19 +202,14 @@ class ResponseController extends Controller
     ): BaseResponse {
         $basket = $basketRepo->load();
 
-        $invoiceAddress          = $addressRepo->findAddressById($basket->customerInvoiceAddressId);
-        $invoiceAddressArray     = $invoiceAddress->toArray();
-        $invoiceAddressArray['gender'] = 'female';
-        $addressRepo->updateAddress($invoiceAddressArray, $invoiceAddress['id']);
-        $invoiceAddressAfter = $addressRepo->findAddressById($basket->customerInvoiceAddressId);
-
+        $invoiceAddress = $addressRepo->findAddressById($basket->customerInvoiceAddressId);
+        $invoiceAddressAfter = $addressRepo->updateAddress(['gender' => 'female'], $invoiceAddress->id);
 
         $this->notification->success('payment.infoPaymentSuccessful', __METHOD__,
                                      [
                                          'basket' => $basket,
                                          'invoice address' => $invoiceAddress,
                                          'invoice address after' => $invoiceAddressAfter,
-                                         'invoice address array' => $invoiceAddressArray,
                                          'post data' => $this->request->all()
                                      ]
         );

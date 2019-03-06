@@ -13,6 +13,7 @@ use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
@@ -195,12 +196,14 @@ class ResponseController extends Controller
      * @param BasketRepositoryContract $basketRepo
      * @param AddressRepositoryContract $addressRepo
      * @param ContactRepositoryContract $contactRepo
+     * @param FrontendSessionStorageFactoryContract $frontendSessionStorage
      * @return BaseResponse
      */
     public function handleSyncRequest(
         BasketRepositoryContract $basketRepo,
         AddressRepositoryContract $addressRepo,
-        ContactRepositoryContract $contactRepo
+        ContactRepositoryContract $contactRepo,
+        FrontendSessionStorageFactoryContract $frontendSessionStorage
     ): BaseResponse {
 
         if (!$this->request->exists('customer_salutation') || !$this->request->exists('customer_dob_day') ||
@@ -229,7 +232,14 @@ class ResponseController extends Controller
         $contact['birthdayAt'] = strtotime($dateOfBirth);
         $contactRepo->updateContact($contact, $customerId);
 
-        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__);
+        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__, [
+            $basket,
+            $frontendSessionStorage->getOrder(),
+            $frontendSessionStorage->getCustomer(),
+            $frontendSessionStorage->getForum(),
+            $frontendSessionStorage->getLocaleSettings(),
+            $frontendSessionStorage->getPlugin()
+        ]);
         return $this->response->redirectTo('place-order');
     }
     //</editor-fold>

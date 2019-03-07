@@ -263,9 +263,9 @@ class ResponseController extends Controller
         $basket = $basketRepo->load();
         $customerId = $basket->customerId;
 
-        $invoiceAddress = $addressRepo->findAddressById($basket->customerInvoiceAddressId)->toArray();
-        $invoiceAddress['gender'] = $this->getSalutation();
-        $addressRepo->updateAddress($invoiceAddress, $invoiceAddress['id']);
+        $billingAddress = $addressRepo->findAddressById($basket->customerInvoiceAddressId)->toArray();
+        $billingAddress['gender'] = $this->getSalutation();
+        $addressRepo->updateAddress($billingAddress, $billingAddress['id']);
 
         $contact = $contactRepo->findContactById($customerId)->toArray();
         $contact['birthdayAt'] = $this->getDateOfBirth();

@@ -334,21 +334,22 @@ class PaymentService
         $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
 
         // set customer personal information & address data
-        $addresses = $this->getCustomerAddressData($basket);
+        $addresses                                          = $this->getCustomerAddressData($basket);
+        $billingAddress                                     = $addresses['billing'];
         $this->heidelpayRequest['IDENTIFICATION_SHOPPERID'] = $basketArray['customerId'];
-        $this->heidelpayRequest['NAME_GIVEN'] = $addresses['billing']->firstName;
-        $this->heidelpayRequest['NAME_FAMILY'] = $addresses['billing']->lastName;
-        $this->heidelpayRequest['CONTACT_EMAIL'] = $addresses['billing']->email;
-        $this->heidelpayRequest['ADDRESS_STREET'] = $this->getFullStreetAndHouseNumber($addresses['billing']);
-        $this->heidelpayRequest['ADDRESS_ZIP'] = $addresses['billing']->postalCode;
-        $this->heidelpayRequest['ADDRESS_CITY'] = $addresses['billing']->town;
-        $this->heidelpayRequest['ADDRESS_COUNTRY'] = $this->countryRepository->findIsoCode(
-            $addresses['billing']->countryId,
+        $this->heidelpayRequest['NAME_GIVEN']               = $billingAddress->firstName;
+        $this->heidelpayRequest['NAME_FAMILY']              = $billingAddress->lastName;
+        $this->heidelpayRequest['CONTACT_EMAIL']            = $billingAddress->email;
+        $this->heidelpayRequest['ADDRESS_STREET']           = $this->getFullStreetAndHouseNumber($billingAddress);
+        $this->heidelpayRequest['ADDRESS_ZIP']              = $billingAddress->postalCode;
+        $this->heidelpayRequest['ADDRESS_CITY']             = $billingAddress->town;
+        $this->heidelpayRequest['ADDRESS_COUNTRY']          = $this->countryRepository->findIsoCode(
+            $billingAddress->countryId,
             'isoCode2'
         );
 
-        if ($addresses['billing']->companyName !== null) {
-            $this->heidelpayRequest['NAME_COMPANY'] = $addresses['billing']->companyName;
+        if ($billingAddress->companyName !== null) {
+            $this->heidelpayRequest['NAME_COMPANY'] = $billingAddress->companyName;
         }
 
         $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $transactionId;
@@ -375,8 +376,8 @@ class PaymentService
             $this->heidelpayRequest['FRONTEND_PREVENT_ASYNC_REDIRECT'] = 'false';
         }
 
-        $this->heidelpayRequest['NAME_SALUTATION'] = $this->mapGenderToSalutation($addresses['billing']->gender);
-        $this->heidelpayRequest['NAME_BIRTHDATE'] = $addresses['billing']->birthday;
+        $this->heidelpayRequest['NAME_SALUTATION'] = $this->mapGenderToSalutation($billingAddress->gender);
+        $this->heidelpayRequest['NAME_BIRTHDATE']  = $billingAddress->birthday;
 
 //        if ($methodInstance->needsBasket()) {
 //            $this->heidelpayRequest['BASKET_ID'] = $basketService->requestBasketId($basket, $heidelpayAuth);

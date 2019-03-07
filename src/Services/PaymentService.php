@@ -309,9 +309,21 @@ class PaymentService
             }
         }
 
+        $basket     = $this->basketRepository->load();
+        $customerId = $basket->customerId;
+        $contact    = $this->contactRepo->findContactById($customerId);
+        $birthday   = explode('-', substr($contact->birthdayAt, 0, 10));
+
         if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
             // $value should contain the payment frame url (also form url)
-            $value = $this->renderPaymentForm($methodInstance->getFormTemplate(), ['submit_action' => $value]);
+            $parameters = [
+                'submit_action' => $value,
+                'customer_dob_day' => $birthday[2] ?? '',
+                'customer_dob_month' => $birthday[1] ?? '',
+                'customer_dob_year' => $birthday[0] ?? '',
+                'customer_salutation' => $contact->gender
+            ];
+            $value      = $this->renderPaymentForm($methodInstance->getFormTemplate(), $parameters);
         }
 
         return [$type, $value];

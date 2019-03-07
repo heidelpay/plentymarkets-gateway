@@ -375,12 +375,10 @@ class PaymentService
             $this->heidelpayRequest['FRONTEND_PREVENT_ASYNC_REDIRECT'] = 'false';
         }
 
-        if (false) {
-            $this->heidelpayRequest['NAME_SALUTATION'] = $addresses['billing']->gender === 'male'
-                ? Salutation::MR
-                : Salutation::MRS;
+        $this->heidelpayRequest['NAME_SALUTATION'] = $this->mapGenderToSalutation($addresses['billing']->gender);
+        $this->heidelpayRequest['NAME_BIRTHDATE'] = $addresses['billing']->birthday;
 
-            $this->heidelpayRequest['NAME_BIRTHDATE'] = $addresses['billing']->birthday;
+        if ($methodInstance->needsBasket()) {
             $this->heidelpayRequest['BASKET_ID'] = $basketService->requestBasketId($basket, $heidelpayAuth);
         }
 
@@ -718,6 +716,21 @@ class PaymentService
         $order->properties[] = $orderProperty;
 
         $this->orderRepo->updateOrder($order->toArray(), $order->id);
+    }
+
+    /**
+     * Returns the salutation for the given gender.
+     *
+     * @param array $gender
+     * @return mixed
+     */
+    private function mapGenderToSalutation(array $gender)
+    {
+        $salutation = Salutation::MRS;
+        if ($gender === 'female') {
+            $salutation = Salutation::MRS;
+        }
+        return $salutation;
     }
 
     //</editor-fold>

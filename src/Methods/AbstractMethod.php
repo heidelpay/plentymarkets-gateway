@@ -32,6 +32,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     const INITIALIZE_PAYMENT = true;
     const FORM_TEMPLATE = '';
     const NEEDS_CUSTOMER_INPUT = true;
+    const NEEDS_BASKET = false;
 
     /**
      * @var PaymentHelper $helper
@@ -255,5 +256,13 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     public function needsCustomerInput(): bool
     {
         return static::NEEDS_CUSTOMER_INPUT;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function needsBasket(): bool
+    {
+        return static::NEEDS_BASKET;
     }
 }

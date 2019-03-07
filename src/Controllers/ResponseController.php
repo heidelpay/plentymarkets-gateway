@@ -75,6 +75,7 @@ class ResponseController extends Controller
         $this->urlService = $urlService;
     }
 
+    //<editor-fold desc="Helpers">
     /**
      * Creates a transaction object and returns bool to indicate success.
      *
@@ -110,6 +111,58 @@ class ResponseController extends Controller
         }
         return true;
     }
+
+
+
+    /**
+     * Returns the salutation from the post request.
+     *
+     * @return string
+     * @throws \RuntimeException
+     */
+    private function getSalutation(): string
+    {
+        if ($this->request->exists('customer_salutation')) {
+            switch ($this->request->get('customer_salutation')) {
+                case 'mr':
+                    return 'male';
+                    break;
+                case 'mrs':
+                    return 'female';
+                    break;
+                default:
+                    // do nothing, an exception will be thrown later on
+                    break;
+            }
+        }
+
+        throw new \RuntimeException('Salutation not set!');
+    }
+
+    /**
+     * Returns the date of birth from the request.
+     *
+     * @return string
+     * @throws \RuntimeException
+     */
+    private function getDateOfBirth(): string
+    {
+        if ($this->request->exists('customer_dob_day') &&
+            $this->request->exists('customer_dob_month') &&
+            $this->request->exists('customer_dob_year')) {
+            return strtotime(implode(
+                                 '-',
+                                 [
+                                     $this->request->get('customer_dob_year'),
+                                     $this->request->get('customer_dob_month'),
+                                     $this->request->get('customer_dob_day')
+                                 ]
+                             ));
+        }
+
+        throw new \RuntimeException('Date of birth not set!');
+    }
+    //</editor-fold>
 
     //<editor-fold desc="Handlers">
     /**
@@ -207,51 +260,24 @@ class ResponseController extends Controller
         ContactRepositoryContract $contactRepo,
         PaymentHelper $paymentHelper
     ): BaseResponse {
-
-        $this->notification->error('number 1', __METHOD__);
-
-        if (!$this->request->exists('customer_salutation') || !$this->request->exists('customer_dob_day') ||
-            !$this->request->exists('customer_dob_month') || !$this->request->exists('customer_dob_year'))
-        {
-            $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
-            return $this->response->redirectTo('checkout');
-        }
-
-        $this->notification->error('number 2', __METHOD__);
-
-        $salutation = $this->request->get('customer_salutation');
-        $dateOfBirth = implode('-',
-                               [
-                                   $this->request->get('customer_dob_year'),
-                                   $this->request->get('customer_dob_month'),
-                                   $this->request->get('customer_dob_day')
-                               ]);
-
         $basket = $basketRepo->load();
         $customerId = $basket->customerId;
 
         $invoiceAddress = $addressRepo->findAddressById($basket->customerInvoiceAddressId)->toArray();
-        $invoiceAddress['gender'] = $salutation === 'mrs' ? 'female' : 'male';
+        $invoiceAddress['gender'] = $this->getSalutation();
         $addressRepo->updateAddress($invoiceAddress, $invoiceAddress['id']);
 
-        $this->notification->error('number 3', __METHOD__);
-
         $contact = $contactRepo->findContactById($customerId)->toArray();
-        $contact['birthdayAt'] = strtotime($dateOfBirth);
+        $contact['birthdayAt'] = $this->getDateOfBirth();
         $contactRepo->updateContact($contact, $customerId);
 
-        $this->notification->error('number 4', __METHOD__);
-
         $mopId          = $basket->methodOfPaymentId;
-        $paymentMethod = $paymentHelper->mapMopToPaymentMethod($mopId);
+        $paymentMethod  = $paymentHelper->mapMopToPaymentMethod($mopId);
         $methodInstance = $paymentHelper->getPaymentMethodInstanceByMopId($mopId);
         if (!$methodInstance instanceof PaymentMethodContract) {
             $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
             return $this->response->redirectTo('checkout');
         }
-
-
-        $this->notification->error('number 5', __METHOD__);
 
         $response = $this->paymentService->sendPaymentRequest(
             $basket,
@@ -266,7 +292,6 @@ class ResponseController extends Controller
                 $responseObj = $response['response'];
                 $errorMsg  = $responseObj['PROCESSING.REASON'] . ': ' . $responseObj['PROCESSING.RETURN'];
             }
-
             $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__, ['Message' => $errorMsg]);
             return $this->response->redirectTo('checkout');
         }

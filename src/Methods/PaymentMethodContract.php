@@ -130,4 +130,11 @@ interface PaymentMethodContract
      * @return bool
      */
     public function needsCustomerInput(): bool;
+
+    /**
+     * Returns true if a basket id has to be requested.
+     *
+     * @return bool
+     */
+    public function needsBasket(): bool;
 }

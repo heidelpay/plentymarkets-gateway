@@ -378,9 +378,9 @@ class PaymentService
         $this->heidelpayRequest['NAME_SALUTATION'] = $this->mapGenderToSalutation($addresses['billing']->gender);
         $this->heidelpayRequest['NAME_BIRTHDATE'] = $addresses['billing']->birthday;
 
-        if ($methodInstance->needsBasket()) {
-            $this->heidelpayRequest['BASKET_ID'] = $basketService->requestBasketId($basket, $heidelpayAuth);
-        }
+//        if ($methodInstance->needsBasket()) {
+//            $this->heidelpayRequest['BASKET_ID'] = $basketService->requestBasketId($basket, $heidelpayAuth);
+//        }
 
         // shop + module information
         $this->heidelpayRequest['CRITERION_STORE_ID'] = $this->paymentHelper->getWebstoreId();

@@ -388,7 +388,7 @@ class PaymentService
         $contact    = $this->contactRepo->findContactById($customerId);
 
         $this->heidelpayRequest['NAME_SALUTATION'] = $this->mapGenderToSalutation($billingAddress->gender);
-        $this->heidelpayRequest['NAME_BIRTHDATE']  = (new \DateTime($contact->birthdayAt))->format('Y-m-d');
+        $this->heidelpayRequest['NAME_BIRTHDATE']  = $contact->birthdayAt;
 
 //        if ($methodInstance->needsBasket()) {
 //            $this->heidelpayRequest['BASKET_ID'] = $basketService->requestBasketId($basket, $heidelpayAuth);

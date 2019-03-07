@@ -53,9 +53,12 @@ try {
 
 // return the responseArray, if an exception has been thrown.
 // else, return an array containing response results.
+$responseObj   = $paymentMethod->getResponse();
+$responseArray = $responseObj->toArray();
+ksort($responseArray);
 return $responseArray ?? [
-        'response' => $paymentMethod->getResponse()->toArray(),
-        'isSuccess' => $paymentMethod->getResponse()->isSuccess(),
-        'isPending' => $paymentMethod->getResponse()->isPending(),
-        'isError' => $paymentMethod->getResponse()->isError(),
+        'response' => $responseArray,
+        'isSuccess' => $responseObj->isSuccess(),
+        'isPending' => $responseObj->isPending(),
+        'isError' => $responseObj->isError(),
 ];

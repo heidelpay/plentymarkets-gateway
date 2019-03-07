@@ -21,6 +21,7 @@ use Heidelpay\Models\Transaction;
 use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
@@ -113,6 +114,10 @@ class PaymentService
      * @var BasketRepositoryContract
      */
     private $basketRepository;
+    /**
+     * @var ContactRepositoryContract
+     */
+    private $contactRepo;
 
     /**
      * PaymentService constructor.
@@ -131,6 +136,7 @@ class PaymentService
      * @param OrderRepositoryContract $orderRepo
      * @param UrlServiceContract $urlService
      * @param BasketRepositoryContract $basketRepository
+     * @param ContactRepositoryContract $contactRepo
      */
     public function __construct(
         AddressRepositoryContract $addressRepository,
@@ -146,7 +152,8 @@ class PaymentService
         OrderTxnIdRelationRepositoryContract $orderTxnIdRepo,
         OrderRepositoryContract $orderRepo,
         UrlServiceContract $urlService,
-        BasketRepositoryContract $basketRepository
+        BasketRepositoryContract $basketRepository,
+        ContactRepositoryContract $contactRepo
     ) {
         $this->addressRepository = $addressRepository;
         $this->countryRepository = $countryRepository;
@@ -162,6 +169,7 @@ class PaymentService
         $this->orderRepo = $orderRepo;
         $this->urlService = $urlService;
         $this->basketRepository = $basketRepository;
+        $this->contactRepo = $contactRepo;
     }
 
     /**
@@ -334,8 +342,8 @@ class PaymentService
         $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
 
         // set customer personal information & address data
-        $addresses                                          = $this->getCustomerAddressData($basket);
-        $billingAddress                                     = $addresses['billing'];
+        $addresses      = $this->getCustomerAddressData($basket);
+        $billingAddress = $addresses['billing'];
         $this->heidelpayRequest['IDENTIFICATION_SHOPPERID'] = $basketArray['customerId'];
         $this->heidelpayRequest['NAME_GIVEN']               = $billingAddress->firstName;
         $this->heidelpayRequest['NAME_FAMILY']              = $billingAddress->lastName;
@@ -376,8 +384,11 @@ class PaymentService
             $this->heidelpayRequest['FRONTEND_PREVENT_ASYNC_REDIRECT'] = 'false';
         }
 
+        $customerId = $basket->customerId;
+        $contact    = $this->contactRepo->findContactById($customerId);
+
         $this->heidelpayRequest['NAME_SALUTATION'] = $this->mapGenderToSalutation($billingAddress->gender);
-        $this->heidelpayRequest['NAME_BIRTHDATE']  = $billingAddress->birthday;
+        $this->heidelpayRequest['NAME_BIRTHDATE']  = (new \DateTime($contact->birthdayAt))->format('Y-m-d');
 
 //        if ($methodInstance->needsBasket()) {
 //            $this->heidelpayRequest['BASKET_ID'] = $basketService->requestBasketId($basket, $heidelpayAuth);

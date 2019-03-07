@@ -287,11 +287,8 @@ class ResponseController extends Controller
         );
 
         if ($response['isError'] === true) {
-            $errorMsg = '';
-            if (isset($response['response']['PROCESSING.REASON'], $response['response']['PROCESSING.RETURN'])) {
-                $responseObj = $response['response'];
-                $errorMsg  = $responseObj['PROCESSING.REASON'] . ': ' . $responseObj['PROCESSING.RETURN'];
-            }
+            $responseObj = $response['response'];
+            $errorMsg  = ($responseObj['PROCESSING.REASON'] ?? '') . ': ' . ($responseObj['PROCESSING.RETURN'] ?? '');
             $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__, ['Message' => $errorMsg]);
             return $this->response->redirectTo('checkout');
         }

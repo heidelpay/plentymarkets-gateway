@@ -721,10 +721,10 @@ class PaymentService
     /**
      * Returns the salutation for the given gender.
      *
-     * @param array $gender
+     * @param string $gender
      * @return mixed
      */
-    private function mapGenderToSalutation(array $gender)
+    private function mapGenderToSalutation($gender)
     {
         $salutation = Salutation::MRS;
         if ($gender === 'female') {

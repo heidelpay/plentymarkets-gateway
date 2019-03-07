@@ -61,7 +61,6 @@ class LibService
     {
         $libName = $pluginName . '::' . $libCall;
         $result = $this->libCall->call($libName, $params);
-        ksort($params);
 
         $logData = ['LibCall' => $libName, 'Parameters' => $params, 'Result' => $result];
         $this->notification->debug('request.debugLibCallResult', __METHOD__, $logData);

@@ -401,6 +401,8 @@ class PaymentService
 
         // general
         $this->heidelpayRequest['FRONTEND_CSS_PATH'] = $this->methodConfig->getIFrameCssPath($methodInstance);
+
+        ksort($this->heidelpayRequest);
     }
 
     //<editor-fold desc="Handlers">

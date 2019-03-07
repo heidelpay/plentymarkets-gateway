@@ -44,7 +44,7 @@ try {
         $response = $paymentMethod->{$transactionType}($paymentFrameOrigin, $preventAsyncRedirect, $cssPath);
     }
 } catch (\Exception $e) {
-    $responseArray = [
+    $errorResponse = [
         'exceptionCode' => $e->getCode(),
         'exceptionMsg' => $e->getMessage(),
         'exceptionTrace' => $e->getTraceAsString(),
@@ -56,7 +56,7 @@ try {
 $responseObj   = $paymentMethod->getResponse();
 $responseArray = $responseObj->toArray();
 ksort($responseArray);
-return $responseArray ?? [
+return $errorResponse ?? [
         'response' => $responseArray,
         'isSuccess' => $responseObj->isSuccess(),
         'isPending' => $responseObj->isPending(),

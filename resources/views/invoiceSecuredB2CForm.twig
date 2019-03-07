@@ -27,7 +27,7 @@
                         <option disabled {% if customer_dob_day == '' %} selected {% endif %} value="">
                             {{ trans('Heidelpay::template.day') }}</option>
                         {% for day in 1..31 %}
-                            {{ day = '%02d'|format(day) }}
+                            {% set day = '%02d'|format(day) %}
                             <option value="{{ day }}"
                                 {% if not customer_dob_day == '' and day == customer_dob_day %} selected{% endif %}>
                                 {{ day }}</option>

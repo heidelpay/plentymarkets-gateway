@@ -208,12 +208,16 @@ class ResponseController extends Controller
         PaymentHelper $paymentHelper
     ): BaseResponse {
 
+        $this->notification->error('number 1', __METHOD__);
+
         if (!$this->request->exists('customer_salutation') || !$this->request->exists('customer_dob_day') ||
             !$this->request->exists('customer_dob_month') || !$this->request->exists('customer_dob_year'))
         {
             $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
             return $this->response->redirectTo('checkout');
         }
+
+        $this->notification->error('number 2', __METHOD__);
 
         $salutation = $this->request->get('customer_salutation');
         $dateOfBirth = implode('-',
@@ -230,9 +234,13 @@ class ResponseController extends Controller
         $invoiceAddress['gender'] = $salutation === 'mrs' ? 'female' : 'male';
         $addressRepo->updateAddress($invoiceAddress, $invoiceAddress['id']);
 
+        $this->notification->error('number 3', __METHOD__);
+
         $contact = $contactRepo->findContactById($customerId)->toArray();
         $contact['birthdayAt'] = strtotime($dateOfBirth);
         $contactRepo->updateContact($contact, $customerId);
+
+        $this->notification->error('number 4', __METHOD__);
 
         $mopId          = $basket->methodOfPaymentId;
         $paymentMethod = $paymentHelper->mapMopToPaymentMethod($mopId);
@@ -241,6 +249,9 @@ class ResponseController extends Controller
             $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
             return $this->response->redirectTo('checkout');
         }
+
+
+        $this->notification->error('number 5', __METHOD__);
 
         $response = $this->paymentService->sendPaymentRequest(
             $basket,

@@ -346,7 +346,7 @@
           "required": false,
           "label": "Config.invoicesecuredb2cChannelIdLabel",
           "options": {
-            "defaultValue": "31HA07BC81895ACFE22C154CBC521922"
+            "defaultValue": "31HA07BC8129FBA7AF65934626B0F907"
           }
         },
         "invoicesecuredb2c.minAmount": {

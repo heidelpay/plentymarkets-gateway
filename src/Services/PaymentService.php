@@ -321,7 +321,7 @@ class PaymentService
                 'customer_dob_day' => $birthday[2] ?? '',
                 'customer_dob_month' => $birthday[1] ?? '',
                 'customer_dob_year' => $birthday[0] ?? '',
-                'customer_salutation' => $contact->gender
+                'customer_gender' => $contact->gender
             ];
             $value      = $this->renderPaymentForm($methodInstance->getFormTemplate(), $parameters);
         }

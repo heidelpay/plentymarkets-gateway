@@ -9,9 +9,9 @@
             </div>
             <div class="col-md-2">
                 <select id="salutation" name="customer_salutation" required>
-                    <option value="" disabled selected>{{ trans('Heidelpay::template.choose') }}</option>
-                    <option value="mr">{{ trans('Heidelpay::template.mr') }}</option>
-                    <option value="mrs">{{ trans('Heidelpay::template.mrs') }}</option>
+                    <option value="" disabled {% if customer_gender == '' %}selected{% endif %}>{{ trans('Heidelpay::template.choose') }}</option>
+                    <option value="mr" {% if customer_gender == 'male' %}selected{% endif %}>{{ trans('Heidelpay::template.mr') }}</option>
+                    <option value="mrs" {% if customer_gender == 'female' %}selected{% endif %}>{{ trans('Heidelpay::template.mrs') }}</option>
                 </select>
             </div>
             <div class="col-md-4"></div>
@@ -38,22 +38,28 @@
             <div class="col-md-1">
                 <div class="input-box" style="width:100%">
                     <select title="dob_month" name="customer_dob_month" required>
-                        <option disabled selected value="">{{ trans('Heidelpay::template.month') }}</option>
-                        <option value="01">01</option><option value="02">02</option><option value="03">03</option>
-                        <option value="04">04</option><option value="05">05</option><option value="06">06</option>
-                        <option value="07">07</option><option value="08">08</option><option value="09">09</option>
-                        <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                        <option disabled {% if customer_dob_month == '' %} selected {% endif %} value="">
+                            {{ trans('Heidelpay::template.month') }}</option>
+                        {% for month in 1..12 %}
+                            {% set month = '%02d'|format(month) %}
+                            <option value="{{ month }}"
+                                    {% if not customer_dob_month == '' and month == customer_dob_month %} selected{% endif %}>
+                                {{ month }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
             <div class="col-md-1">
                 <div class="input-box" style="width:100%">
                     <select id="dob_year" name="customer_dob_year" required>
-                        <option disabled selected value="">{{ trans('Heidelpay::template.year') }}</option>
+                        <option disabled {% if customer_dob_year == '' %} selected {% endif %} value="">
+                            {{ trans('Heidelpay::template.year') }}</option>
                         {% set minYear = "now -80 years"|date("Y") %}
                         {% set maxYear = "now -18 years"|date("Y") %}
                         {% for year in maxYear..minYear %}
-                            <option value="{{ year }}">{{ year }}</option>
+                            <option value="{{ year }}"
+                                    {% if not customer_dob_year == '' and year == customer_dob_year %} selected{% endif %}>
+                                {{ year }}</option>
                         {% endfor %}
                     </select>
                 </div>

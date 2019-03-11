@@ -12,7 +12,12 @@
  * @package heidelpay\plentymarkets-gateway\external-lib-callbacks
  */
 
+use Heidelpay\PhpBasketApi\Object\BasketItem;
 use Heidelpay\PhpBasketApi\Request as BasketApiRequest;
+
+function normalizeValue($value) {
+    return (int)round(bcmul($value, 100));
+}
 
 /** @var array $authData */
 $authData = SdkRestApi::getParam('auth');
@@ -24,16 +29,19 @@ $basketItems = SdkRestApi::getParam('basketItems');
 $sandboxmode = SdkRestApi::getParam('sandboxmode');
 
 $basket = new \Heidelpay\PhpBasketApi\Object\Basket();
-$basket->setAmountTotalNet((int) $basketData['basketAmountNet'] * 100);
-$basket->setAmountTotalDiscount((int) $basketData['basketRebate'] * 100);
+$basket->setAmountTotalNet(normalizeValue($basketData['basketAmountNet']));
+$basket->setAmountTotalDiscount(normalizeValue($basketData['basketRebate']));
 $basket->setCurrencyCode($basketData['currency']);
 
 foreach ($basketItems as $item) {
-    $basketItem = new \Heidelpay\PhpBasketApi\Object\BasketItem();
-    $basketItem->setAmountGross((int)$item['price'] * 100);
-    $basketItem->setAmountDiscount((int)$item['rebate'] * 100);
+    $basketItem = new BasketItem();
+    $amount     = normalizeValue($item['price']);
+    $vat        = $item['vat'];
+    $basketItem->setAmountGross($amount);
+    $basketItem->setAmountNet(normalizeValue(bcdiv($amount, 100 + $vat)));
+    $basketItem->setAmountDiscount(normalizeValue($item['rebate']));
     $basketItem->setQuantity((int)$item['quantity']);
-    $basketItem->setVat((int)$item['vat'] * 100);
+    $basketItem->setVat(normalizeValue($vat));
     $basket->addBasketItem($basketItem);
 }
 

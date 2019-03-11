@@ -4,6 +4,7 @@ namespace Heidelpay\Services;
 
 use Heidelpay\Configs\MainConfigContract;
 use Plenty\Modules\Basket\Models\Basket;
+use Plenty\Modules\Basket\Models\BasketItem;
 
 /**
  * Provides connection to heidelpay basketApi.
@@ -65,11 +66,19 @@ class BasketService
             'senderId' => $authData['SECURITY_SENDER'],
         ];
         $params['basket'] = $basket->toArray();
+
+        $items = [];
+        foreach ($basket->basketItems as $item) {
+            /** @var BasketItem $item*/
+            $items = $item->toArray();
+        }
+        $params['basketItems'] = $items;
+
         $params['sandboxmode'] = $this->config->isInSandboxMode();
 
         $response = $this->libService->submitBasket($params);
 
-        $this->notificationService->error('BasketItems', __METHOD__, ['basket' => $basket, 'array' => $basket->toArray(), 'items' => $basket->basketItems]);
+        $this->notificationService->error('BasketItems', __METHOD__, ['basket' => $basket, 'array' => $basket->toArray(), 'items' => $basket->basketItems, 'itemsArrays' => $items]);
 
         return $response['basketId'];
     }

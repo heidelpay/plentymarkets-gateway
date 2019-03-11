@@ -138,14 +138,14 @@ class ResponseController extends Controller
         if ($this->request->exists('customer_dob_day') &&
             $this->request->exists('customer_dob_month') &&
             $this->request->exists('customer_dob_year')) {
-            return strtotime(implode(
-                                 '-',
-                                 [
-                                     $this->request->get('customer_dob_year'),
-                                     $this->request->get('customer_dob_month'),
-                                     $this->request->get('customer_dob_day')
-                                 ]
-                             ));
+            return implode(
+                             '-',
+                             [
+                                 $this->request->get('customer_dob_year'),
+                                 $this->request->get('customer_dob_month'),
+                                 $this->request->get('customer_dob_day')
+                             ]
+                         );
         }
 
         throw new \RuntimeException('Date of birth not set!');

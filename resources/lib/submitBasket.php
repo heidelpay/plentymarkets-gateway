@@ -25,7 +25,6 @@ $sandboxmode = SdkRestApi::getParam('sandboxmode');
 
 $basket = new \Heidelpay\PhpBasketApi\Object\Basket();
 $basket->setAmountTotalNet((int) $basketData['basketAmountNet'] * 100);
-//$basket->setAmountTotalVat($basketData['??']);
 $basket->setAmountTotalDiscount((int) $basketData['basketRebate'] * 100);
 
 foreach ($basketItems as $item) {

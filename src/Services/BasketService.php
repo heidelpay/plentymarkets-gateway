@@ -27,18 +27,25 @@ class BasketService
      * @var MainConfigContract
      */
     private $config;
+    /**
+     * @var NotificationServiceContract
+     */
+    private $notificationService;
 
     /**
      * BasketService constructor.
      * @param LibService $libraryService
      * @param MainConfigContract $config
+     * @param NotificationServiceContract $notificationService
      */
     public function __construct(
         LibService $libraryService,
-        MainConfigContract $config
+        MainConfigContract $config,
+        NotificationServiceContract $notificationService
     ) {
         $this->libService = $libraryService;
         $this->config = $config;
+        $this->notificationService = $notificationService;
     }
 
     /**
@@ -61,6 +68,9 @@ class BasketService
         $params['sandboxmode'] = $this->config->isInSandboxMode();
 
         $response = $this->libService->submitBasket($params);
+
+        $this->notificationService->error('BasketItems', __METHOD__, ['basket' => $basket]);
+
         return $response['basketId'];
     }
 }

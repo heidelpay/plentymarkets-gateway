@@ -69,7 +69,7 @@ class BasketService
 
         $response = $this->libService->submitBasket($params);
 
-        $this->notificationService->error('BasketItems', __METHOD__, ['basket' => $basket]);
+        $this->notificationService->error('BasketItems', __METHOD__, ['basket' => $basket, 'array' => $basket->toArray(), 'items' => $basket->basketItems]);
 
         return $response['basketId'];
     }

@@ -42,6 +42,7 @@ foreach ($basketItems as $item) {
     $basketItem->setAmountDiscount(normalizeValue($item['rebate']));
     $basketItem->setQuantity((int)$item['quantity']);
     $basketItem->setVat(normalizeValue($vat));
+    $basketItem->setBasketItemReferenceId($item->id);
     $basket->addBasketItem($basketItem);
 }
 

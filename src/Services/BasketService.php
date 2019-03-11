@@ -70,7 +70,7 @@ class BasketService
         $items = [];
         foreach ($basket->basketItems as $item) {
             /** @var BasketItem $item*/
-            $items = $item->toArray();
+            $items[] = $item->toArray();
         }
         $params['basketItems'] = $items;
 

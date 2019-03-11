@@ -35,13 +35,16 @@ $basket->setCurrencyCode($basketData['currency']);
 
 foreach ($basketItems as $item) {
     $basketItem = new BasketItem();
-    $amount     = normalizeValue($item['price']);
+    $quantity   = $item['quantity'];
+    $amountPerUnit      = $item['price'];
+    $amount     = normalizeValue($amountPerUnit * $quantity);
     $vat        = $item['vat'];
     $basketItem->setAmountGross($amount);
     $basketItem->setAmountNet(normalizeValue($amount / (100 + $vat)));
     $basketItem->setAmountDiscount(normalizeValue($item['rebate']));
-    $basketItem->setQuantity((int)$item['quantity']);
+    $basketItem->setQuantity($quantity);
     $basketItem->setVat(normalizeValue($vat));
+    $basketItem->setAmountPerUnit($amountPerUnit);
     $basketItem->setBasketItemReferenceId($item['id']);
     $basketItem->setTitle($item['id']);
     $basket->addBasketItem($basketItem);

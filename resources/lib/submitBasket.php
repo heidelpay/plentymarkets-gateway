@@ -43,6 +43,7 @@ foreach ($basketItems as $item) {
     $basketItem->setQuantity((int)$item['quantity']);
     $basketItem->setVat(normalizeValue($vat));
     $basketItem->setBasketItemReferenceId($item['id']);
+    $basketItem->setTitle($item['id']);
     $basket->addBasketItem($basketItem);
 }
 

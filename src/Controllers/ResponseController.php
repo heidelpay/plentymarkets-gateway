@@ -12,8 +12,6 @@ use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
 use Heidelpay\Services\UrlServiceContract;
 use Heidelpay\Traits\Translator;
-use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
@@ -123,17 +121,7 @@ class ResponseController extends Controller
     private function getSalutation(): string
     {
         if ($this->request->exists('customer_salutation')) {
-            switch ($this->request->get('customer_salutation')) {
-                case 'mr':
-                    return 'male';
-                    break;
-                case 'mrs':
-                    return 'female';
-                    break;
-                default:
-                    // do nothing, an exception will be thrown later on
-                    break;
-            }
+            $this->request->get('customer_salutation');
         }
 
         throw new \RuntimeException('Salutation not set!');
@@ -248,28 +236,15 @@ class ResponseController extends Controller
      * Handles form requests which do not need any further action by the client.
      *
      * @param BasketRepositoryContract $basketRepo
-     * @param AddressRepositoryContract $addressRepo
-     * @param ContactRepositoryContract $contactRepo
      * @param PaymentHelper $paymentHelper
      * @return BaseResponse
      * @throws \RuntimeException
      */
     public function handleSyncRequest(
         BasketRepositoryContract $basketRepo,
-        AddressRepositoryContract $addressRepo,
-        ContactRepositoryContract $contactRepo,
         PaymentHelper $paymentHelper
     ): BaseResponse {
         $basket = $basketRepo->load();
-        $customerId = $basket->customerId;
-
-        $billingAddress = $addressRepo->findAddressById($basket->customerInvoiceAddressId)->toArray();
-        $billingAddress['gender'] = $this->getSalutation();
-        $addressRepo->updateAddress($billingAddress, $billingAddress['id']);
-
-        $contact = $contactRepo->findContactById($customerId)->toArray();
-        $contact['birthdayAt'] = $this->getDateOfBirth();
-        $contactRepo->updateContact($contact, $customerId);
 
         $mopId          = $basket->methodOfPaymentId;
         $paymentMethod  = $paymentHelper->mapMopToPaymentMethod($mopId);
@@ -283,7 +258,8 @@ class ResponseController extends Controller
             $basket,
             $paymentMethod,
             $methodInstance->getTransactionType(),
-            $mopId
+            $mopId,
+            ['birthday' => $this->getDateOfBirth(), 'salutation' => $this->getSalutation()]
         );
 
         if ($response['isError'] === true) {

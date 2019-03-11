@@ -10,8 +10,8 @@
             <div class="col-md-2">
                 <select id="salutation" name="customer_salutation" required>
                     <option value="" disabled {% if customer_gender == '' %}selected{% endif %}>{{ trans('Heidelpay::template.choose') }}</option>
-                    <option value="mr" {% if customer_gender == 'male' %}selected{% endif %}>{{ trans('Heidelpay::template.mr') }}</option>
-                    <option value="mrs" {% if customer_gender == 'female' %}selected{% endif %}>{{ trans('Heidelpay::template.mrs') }}</option>
+                    <option value="MR" {% if customer_gender == 'male' %}selected{% endif %}>{{ trans('Heidelpay::template.mr') }}</option>
+                    <option value="MRS" {% if customer_gender == 'female' %}selected{% endif %}>{{ trans('Heidelpay::template.mrs') }}</option>
                 </select>
             </div>
             <div class="col-md-4"></div>

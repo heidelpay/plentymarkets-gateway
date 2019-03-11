@@ -5,7 +5,6 @@ namespace Heidelpay\Services;
 use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Constants\Plugin;
 use Heidelpay\Constants\Routes;
-use Heidelpay\Constants\Salutation;
 use Heidelpay\Constants\SessionKeys;
 use Heidelpay\Constants\TransactionStatus;
 use Heidelpay\Constants\TransactionType;
@@ -232,7 +231,7 @@ class PaymentService
      * @param string $paymentMethod
      * @param string $transactionType
      * @param int $mopId
-     * @param array $parameters
+     * @param array $additionalParams
      *
      * @return array
      * @throws \RuntimeException
@@ -242,17 +241,16 @@ class PaymentService
         string $paymentMethod,
         string $transactionType,
         int $mopId,
-        array $parameters = []
+        array $additionalParams = []
     ): array {
 
         $txnId = $this->createNewTxnId($basket);
         $this->createOrUpdateRelation($txnId, $mopId);
-        $this->prepareRequest($basket, $paymentMethod, $mopId, $txnId);
+        $this->prepareRequest($basket, $paymentMethod, $mopId, $txnId, $additionalParams);
 
         $result = $this->libService->sendTransactionRequest($paymentMethod, [
             'request' => $this->heidelpayRequest,
-            'transactionType' => $transactionType,
-            'parameters' => $parameters
+            'transactionType' => $transactionType
         ]);
 
         return $result;
@@ -311,6 +309,7 @@ class PaymentService
 
         $basket     = $this->basketRepository->load();
         $customerId = $basket->customerId;
+
         $contact    = $this->contactRepo->findContactById($customerId);
         $birthday   = explode('-', substr($contact->birthdayAt, 0, 10));
 
@@ -334,14 +333,20 @@ class PaymentService
      * @param string $paymentMethod
      * @param int $mopId
      * @param string $transactionId
+     * @param array $additionalParams
      * @throws \RuntimeException
      */
-    private function prepareRequest(Basket $basket, string $paymentMethod, int $mopId, string $transactionId)
+    private function prepareRequest(
+        Basket $basket,
+        string $paymentMethod,
+        int $mopId,
+        string $transactionId,
+        array $additionalParams = [])
     {
         $basketArray = $basket->toArray();
 
-        /** @var BasketService $basketService */
-        $basketService = pluginApp(BasketService::class);
+//        /** @var BasketService $basketService */
+//        $basketService = pluginApp(BasketService::class);
 
         /** @var SecretService $secretService */
         $secretService = pluginApp(SecretService::class);
@@ -396,11 +401,13 @@ class PaymentService
             $this->heidelpayRequest['FRONTEND_PREVENT_ASYNC_REDIRECT'] = 'false';
         }
 
-        $customerId = $basket->customerId;
-        $contact    = $this->contactRepo->findContactById($customerId);
+        if (isset($additionalParams['birthday'])) {
+            $this->heidelpayRequest['NAME_BIRTHDATE']  = $additionalParams['birthday'];
+        }
 
-        $this->heidelpayRequest['NAME_SALUTATION'] = $this->mapGenderToSalutation($billingAddress->gender);
-        $this->heidelpayRequest['NAME_BIRTHDATE']  = substr($contact->birthdayAt, 0, 10);
+        if (isset($additionalParams['salutation'])) {
+            $this->heidelpayRequest['NAME_SALUTATION']  = $additionalParams['salutation'];
+        }
 
 //        if ($methodInstance->needsBasket()) {
 //            $this->heidelpayRequest['BASKET_ID'] = $basketService->requestBasketId($basket, $heidelpayAuth);
@@ -740,21 +747,6 @@ class PaymentService
         $order->properties[] = $orderProperty;
 
         $this->orderRepo->updateOrder($order->toArray(), $order->id);
-    }
-
-    /**
-     * Returns the salutation for the given gender.
-     *
-     * @param string $gender
-     * @return mixed
-     */
-    private function mapGenderToSalutation($gender)
-    {
-        $salutation = Salutation::MRS;
-        if ($gender === 'female') {
-            $salutation = Salutation::MRS;
-        }
-        return $salutation;
     }
 
     //</editor-fold>

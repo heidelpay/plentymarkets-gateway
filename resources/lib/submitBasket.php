@@ -34,6 +34,7 @@ foreach ($basketItems as $item) {
     $basketItem->setAmountDiscount((int)$item['rebate'] * 100);
     $basketItem->setQuantity((int)$item['quantity']);
     $basketItem->setVat((int)$item['vat'] * 100);
+    $basket->addBasketItem($basketItem);
 }
 
 $request = new BasketApiRequest();

@@ -244,6 +244,11 @@ class ResponseController extends Controller
         BasketRepositoryContract $basketRepo,
         PaymentHelper $paymentHelper
     ): BaseResponse {
+
+        $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__, $this->request->all());
+        return $this->response->redirectTo('checkout');
+
+
         $basket = $basketRepo->load();
 
         $mopId          = $basket->methodOfPaymentId;

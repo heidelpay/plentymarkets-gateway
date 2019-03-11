@@ -7,6 +7,7 @@ use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract;
+use Plenty\Modules\Item\Item\Models\Item;
 
 /**
  * Provides connection to heidelpay basketApi.
@@ -31,10 +32,6 @@ class BasketService
      */
     private $config;
     /**
-     * @var NotificationServiceContract
-     */
-    private $notificationService;
-    /**
      * @var AuthHelper
      */
     private $authHelper;
@@ -47,20 +44,17 @@ class BasketService
      * BasketService constructor.
      * @param LibService $libraryService
      * @param MainConfigContract $config
-     * @param NotificationServiceContract $notificationService
      * @param ItemRepositoryContract $itemRepo
      * @param AuthHelper $authHelper
      */
     public function __construct(
         LibService $libraryService,
         MainConfigContract $config,
-        NotificationServiceContract $notificationService,
         ItemRepositoryContract $itemRepo,
         AuthHelper $authHelper
     ) {
         $this->libService = $libraryService;
         $this->config = $config;
-        $this->notificationService = $notificationService;
         $this->authHelper = $authHelper;
         $this->itemRepo = $itemRepo;
     }
@@ -86,17 +80,16 @@ class BasketService
         $items = [];
         foreach ($basket->basketItems as $basketItem) {
             /** @var BasketItem $basketItem */
-            $item = $this->authHelper->processUnguarded(
+            /** @var Item $item */
+            $item    = $this->authHelper->processUnguarded(
                 function () use ($basketItem) {
                     return $this->itemRepo->show($basketItem->itemId);
                 }
             );
-            $items[] = $basketItem->toArray();
-
-            $this->notificationService->error('basket basketItem', __METHOD__, ['basketItem' => $basketItem, 'item' => $item]);
+            $itemArray = $basketItem->toArray();
+            $itemArray['title'] = $item->texts[0]->name1;
+            $items[] = $itemArray;
         }
-
-
 
         $params['basketItems'] = $items;
         $params['sandboxmode'] = $this->config->isInSandboxMode();

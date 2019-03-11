@@ -5,6 +5,7 @@ namespace Heidelpay\Services;
 use Heidelpay\Configs\MainConfigContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
+use Plenty\Modules\Item\SalesPrice\Contracts\SalesPriceRepositoryContract;
 
 /**
  * Provides connection to heidelpay basketApi.
@@ -32,21 +33,28 @@ class BasketService
      * @var NotificationServiceContract
      */
     private $notificationService;
+    /**
+     * @var SalesPriceRepositoryContract
+     */
+    private $priceRepo;
 
     /**
      * BasketService constructor.
      * @param LibService $libraryService
      * @param MainConfigContract $config
      * @param NotificationServiceContract $notificationService
+     * @param SalesPriceRepositoryContract $priceRepo
      */
     public function __construct(
         LibService $libraryService,
         MainConfigContract $config,
-        NotificationServiceContract $notificationService
+        NotificationServiceContract $notificationService,
+        SalesPriceRepositoryContract $priceRepo
     ) {
         $this->libService = $libraryService;
         $this->config = $config;
         $this->notificationService = $notificationService;
+        $this->priceRepo = $priceRepo;
     }
 
     /**
@@ -69,8 +77,15 @@ class BasketService
 
         $items = [];
         foreach ($basket->basketItems as $item) {
+            /** @var BasketItem $item */
+            $price = $this->priceRepo->findById($item->priceId);
             $items[] = $item->toArray();
+
+            $this->notificationService->error('basket item', __METHOD__, ['item' => $item, 'price' => $price]);
         }
+
+
+
         $params['basketItems'] = $items;
         $params['sandboxmode'] = $this->config->isInSandboxMode();
         $response = $this->libService->submitBasket($params);

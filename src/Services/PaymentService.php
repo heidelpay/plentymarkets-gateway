@@ -345,8 +345,8 @@ class PaymentService
     {
         $basketArray = $basket->toArray();
 
-//        /** @var BasketService $basketService */
-//        $basketService = pluginApp(BasketService::class);
+        /** @var BasketService $basketService */
+        $basketService = pluginApp(BasketService::class);
 
         /** @var SecretService $secretService */
         $secretService = pluginApp(SecretService::class);
@@ -409,9 +409,9 @@ class PaymentService
             $this->heidelpayRequest['NAME_SALUTATION']  = $additionalParams['salutation'];
         }
 
-//        if ($methodInstance->needsBasket()) {
-//            $this->heidelpayRequest['BASKET_ID'] = $basketService->requestBasketId($basket, $heidelpayAuth);
-//        }
+        if ($methodInstance->needsBasket()) {
+            $this->heidelpayRequest['BASKET_ID'] = $basketService->requestBasketId($basket, $heidelpayAuth);
+        }
 
         // shop + module information
         $this->heidelpayRequest['CRITERION_STORE_ID'] = $this->paymentHelper->getWebstoreId();

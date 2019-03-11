@@ -30,10 +30,9 @@ $basket->setAmountTotalDiscount((int) $basketData['basketRebate'] * 100);
 
 foreach ($basketItems as $item) {
     $basketItem = new \Heidelpay\PhpBasketApi\Object\BasketItem();
-    $basketItem->setAmountGross((int)$item['basketAmount'] * 100);
-    $basketItem->setAmountNet((int)$item['basketAmountNet'] * 100);
+    $basketItem->setAmountGross((int)$item['price'] * 100);
     $basketItem->setAmountDiscount((int)$item['rebate'] * 100);
-    $basketItem->setQuantity((int)$item['quantity'] * 100);
+    $basketItem->setQuantity((int)$item['quantity']);
     $basketItem->setVat((int)$item['vat'] * 100);
 }
 

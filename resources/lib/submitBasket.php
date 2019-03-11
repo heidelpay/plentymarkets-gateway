@@ -39,7 +39,7 @@ foreach ($basketItems as $item) {
     $quantity   = $item['quantity'];
     $amount     = $item['price'] * $quantity;
     $vat        = $item['vat'];
-    $amountVat  = $amount * $vat;
+    $amountVat  = $amount * $vat / 100;
     $basketItem->setAmountGross(normalizeValue($amount));
     $basketItem->setAmountVat(normalizeValue($amountVat));
     $basketItem->setAmountNet(normalizeValue($amount * 100 / (100 + $vat)));

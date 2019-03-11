@@ -32,14 +32,17 @@ $basket = new \Heidelpay\PhpBasketApi\Object\Basket();
 $basket->setAmountTotalNet(normalizeValue($basketData['basketAmountNet']));
 $basket->setAmountTotalDiscount(normalizeValue($basketData['basketRebate']));
 $basket->setCurrencyCode($basketData['currency']);
+$basketAmountVat = 0;
 
 foreach ($basketItems as $item) {
     $basketItem = new BasketItem();
     $quantity   = $item['quantity'];
-    $amount     = normalizeValue($item['price'] * $quantity);
+    $amount     = $item['price'] * $quantity;
     $vat        = $item['vat'];
-    $basketItem->setAmountGross($amount);
-    $basketItem->setAmountNet(normalizeValue($amount / (100 + $vat)));
+    $amountVat  = $amount * $vat;
+    $basketItem->setAmountGross(normalizeValue($amount));
+    $basketItem->setAmountVat(normalizeValue($amountVat));
+    $basketItem->setAmountNet(normalizeValue($amount * 100 / (100 + $vat)));
     $basketItem->setAmountDiscount(normalizeValue($item['rebate']));
     $basketItem->setQuantity($quantity);
     $basketItem->setVat($vat);
@@ -47,7 +50,10 @@ foreach ($basketItems as $item) {
     $basketItem->setBasketItemReferenceId($item['id']);
     $basketItem->setTitle($item['title']);
     $basket->addBasketItem($basketItem);
+
+    $basketAmountVat += $amountVat;
 }
+$basket->setAmountTotalVat(normalizeValue($basketAmountVat));
 
 $request = new BasketApiRequest();
 $request->setAuthentication($authData['login'], $authData['password'], $authData['senderId']);

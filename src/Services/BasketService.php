@@ -70,6 +70,7 @@ class BasketService
         $items = [];
         foreach ($basket->basketItems as $item) {
             /** @var BasketItem $item*/
+            $this->notificationService->error('BasketItem', __METHOD__, ['item' => $item->toArray()]);
             $items[] = $item->toArray();
         }
         $params['basketItems'] = $items;

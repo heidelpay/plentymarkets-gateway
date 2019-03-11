@@ -16,7 +16,7 @@ use Heidelpay\PhpBasketApi\Object\BasketItem;
 use Heidelpay\PhpBasketApi\Request as BasketApiRequest;
 
 function normalizeValue($value) {
-    return (int)round(bcmul($value, 100));
+    return (int)round($value * 100);
 }
 
 /** @var array $authData */
@@ -38,7 +38,7 @@ foreach ($basketItems as $item) {
     $amount     = normalizeValue($item['price']);
     $vat        = $item['vat'];
     $basketItem->setAmountGross($amount);
-    $basketItem->setAmountNet(normalizeValue(bcdiv($amount, 100 + $vat)));
+    $basketItem->setAmountNet(normalizeValue($amount / (100 + $vat)));
     $basketItem->setAmountDiscount(normalizeValue($item['rebate']));
     $basketItem->setQuantity((int)$item['quantity']);
     $basketItem->setVat(normalizeValue($vat));

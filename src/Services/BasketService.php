@@ -3,6 +3,7 @@
 namespace Heidelpay\Services;
 
 use Heidelpay\Configs\MainConfigContract;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Item\SalesPrice\Contracts\SalesPriceRepositoryContract;
@@ -37,6 +38,10 @@ class BasketService
      * @var SalesPriceRepositoryContract
      */
     private $priceRepo;
+    /**
+     * @var AuthHelper
+     */
+    private $authHelper;
 
     /**
      * BasketService constructor.
@@ -44,17 +49,20 @@ class BasketService
      * @param MainConfigContract $config
      * @param NotificationServiceContract $notificationService
      * @param SalesPriceRepositoryContract $priceRepo
+     * @param AuthHelper $authHelper
      */
     public function __construct(
         LibService $libraryService,
         MainConfigContract $config,
         NotificationServiceContract $notificationService,
-        SalesPriceRepositoryContract $priceRepo
+        SalesPriceRepositoryContract $priceRepo,
+        AuthHelper $authHelper
     ) {
         $this->libService = $libraryService;
         $this->config = $config;
         $this->notificationService = $notificationService;
         $this->priceRepo = $priceRepo;
+        $this->authHelper = $authHelper;
     }
 
     /**
@@ -78,7 +86,11 @@ class BasketService
         $items = [];
         foreach ($basket->basketItems as $item) {
             /** @var BasketItem $item */
-            $price = $this->priceRepo->findById($item->priceId);
+            $price = $this->authHelper->processUnguarded(
+                function () use ($item) {
+                    return $this->priceRepo->findById($item->priceId);
+                }
+            );
             $items[] = $item->toArray();
 
             $this->notificationService->error('basket item', __METHOD__, ['item' => $item, 'price' => $price]);

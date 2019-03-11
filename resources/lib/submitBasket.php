@@ -18,6 +18,8 @@ use Heidelpay\PhpBasketApi\Request as BasketApiRequest;
 $authData = SdkRestApi::getParam('auth');
 /** @var array $basketData */
 $basketData = SdkRestApi::getParam('basket');
+/** @var array $basketItems */
+$basketItems = SdkRestApi::getParam('basketItems');
 /** @var bool $sandmoxmode */
 $sandboxmode = SdkRestApi::getParam('sandboxmode');
 
@@ -26,13 +28,13 @@ $basket->setAmountTotalNet((int) $basketData['basketAmountNet'] * 100);
 //$basket->setAmountTotalVat($basketData['??']);
 $basket->setAmountTotalDiscount((int) $basketData['basketRebate'] * 100);
 
-foreach ($basketData['basketItems'] as $cartItem) {
+foreach ($basketItems as $item) {
     $basketItem = new \Heidelpay\PhpBasketApi\Object\BasketItem();
-    $basketItem->setAmountGross((int) $cartItem['basketAmount'] * 100);
-    $basketItem->setAmountNet((int) $cartItem['basketAmountNet'] * 100);
-    $basketItem->setAmountDiscount((int) $cartItem['rebate'] * 100);
-    $basketItem->setQuantity((int) $cartItem['quantity'] * 100);
-    $basketItem->setVat((int) $cartItem['vat'] * 100);
+    $basketItem->setAmountGross((int)$item['basketAmount'] * 100);
+    $basketItem->setAmountNet((int)$item['basketAmountNet'] * 100);
+    $basketItem->setAmountDiscount((int)$item['rebate'] * 100);
+    $basketItem->setQuantity((int)$item['quantity'] * 100);
+    $basketItem->setVat((int)$item['vat'] * 100);
 }
 
 $request = new BasketApiRequest();

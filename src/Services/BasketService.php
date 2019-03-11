@@ -68,25 +68,12 @@ class BasketService
         $params['basket'] = $basket->toArray();
 
         $items = [];
-        $this->notificationService->error('Vor BasketItems loop', __METHOD__);
         foreach ($basket->basketItems as $item) {
-            /** @var BasketItem $item*/
-            $this->notificationService->error('BasketItem', __METHOD__, [
-                'item' => $item->toArray(),
-                'itemObj' => $item,
-                'items' => $basket->basketItems
-            ]);
             $items[] = $item->toArray();
         }
-        $this->notificationService->error('Nach BasketItems llop', __METHOD__);
         $params['basketItems'] = $items;
-
         $params['sandboxmode'] = $this->config->isInSandboxMode();
-
         $response = $this->libService->submitBasket($params);
-
-        $this->notificationService->error('BasketItems', __METHOD__, ['basket' => $basket, 'array' => $basket->toArray(), 'items' => $basket->basketItems, 'itemsArrays' => $items]);
-
         return $response['basketId'];
     }
 }

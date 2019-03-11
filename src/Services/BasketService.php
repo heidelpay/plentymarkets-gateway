@@ -71,7 +71,11 @@ class BasketService
         $this->notificationService->error('Vor BasketItems loop', __METHOD__);
         foreach ($basket->basketItems as $item) {
             /** @var BasketItem $item*/
-            $this->notificationService->error('BasketItem', __METHOD__, ['item' => $item->toArray()]);
+            $this->notificationService->error('BasketItem', __METHOD__, [
+                'item' => $item->toArray(),
+                'itemObj' => $item,
+                'items' => $basket->basketItems
+            ]);
             $items[] = $item->toArray();
         }
         $this->notificationService->error('Nach BasketItems llop', __METHOD__);

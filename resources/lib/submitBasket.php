@@ -39,10 +39,11 @@ foreach ($basketItems as $item) {
     $quantity   = $item['quantity'];
     $amount     = $item['price'] * $quantity;
     $vat        = $item['vat'];
-    $amountVat  = $amount * $vat / 100;
+    $amountNet  = $amount * 100 / (100 + $vat);
+    $amountVat  = $amount - $amountNet; // $amountNet * $vat / 100;
     $basketItem->setAmountGross(normalizeValue($amount));
     $basketItem->setAmountVat(normalizeValue($amountVat));
-    $basketItem->setAmountNet(normalizeValue($amount * 100 / (100 + $vat)));
+    $basketItem->setAmountNet(normalizeValue($amountNet));
     $basketItem->setAmountDiscount(normalizeValue($item['rebate']));
     $basketItem->setQuantity($quantity);
     $basketItem->setVat($vat);

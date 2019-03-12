@@ -2,6 +2,14 @@
   "name": "Heidelpay",
   "namespace": "Heidelpay",
   "serviceProvider": "Heidelpay\\Providers\\HeidelpayServiceProvider",
+  "dataProviders":
+  [
+    {
+      "key"           :"Heidelpay\\Containers\\AdditionalPaymentInformationContainer",
+      "name"          :"AdditionalPaymentInformation",
+      "description"   :"Display additional payment information to the customer."
+    }
+  ],
   "marketplaceName": {
     "de": "heidelpay Payment Gateway",
     "en": "heidelpay Payment Gateway"

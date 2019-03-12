@@ -13,8 +13,7 @@ class InvoiceDetailsProvider
         $args
     ): string {
         $notificationService->error(self::class, __METHOD__, ['args' => $args]);
-
-
+        return $twig->render('test');
     }
 //        $mop = $service->getOrderMopId();
 //        $orderId = null;

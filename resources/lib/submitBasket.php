@@ -29,10 +29,14 @@ $basketItems = SdkRestApi::getParam('basketItems');
 $sandboxmode = SdkRestApi::getParam('sandboxmode');
 
 $basket = new \Heidelpay\PhpBasketApi\Object\Basket();
-$basket->setAmountTotalNet(normalizeValue($basketData['basketAmountNet']))
-       ->setAmountTotalDiscount(normalizeValue($basketData['basketRebate']))
-       ->setCurrencyCode($basketData['currency']);
-$basketAmountVat = 0;
+$basketAmount  = $basketData['basketAmount'];
+$basketAmountNet = $basketData['basketAmountNet'];
+$basketAmountVat = $basketAmount - $basketAmountNet;
+$basketDiscount = $basketData['couponDiscount'];
+$basket->setAmountTotalNet(normalizeValue($basketAmountNet))
+       ->setAmountTotalDiscount(normalizeValue($basketDiscount))
+       ->setCurrencyCode($basketData['currency'])
+       ->setAmountTotalVat(normalizeValue($basketAmountVat));
 
 foreach ($basketItems as $item) {
     $basketItem = new BasketItem();
@@ -51,8 +55,6 @@ foreach ($basketItems as $item) {
                ->setBasketItemReferenceId($item['id'])
                ->setTitle($item['title']);
     $basket->addBasketItem($basketItem);
-
-    $basketAmountVat += $amountVat;
 }
 
 // Add shipping position
@@ -68,11 +70,10 @@ $shipping->setAmountGross(normalizeValue($shippingAmount))
          ->setBasketItemReferenceId('shipping')
          ->setTitle('Shipping');
 $basket->addBasketItem($shipping);
-$basketAmountVat += $shippingVat;
 
-// Add shipping position
+// Add discount position
 $rebate         = new BasketItem();
-$discountAmount = $basketData['couponDiscount'];
+$discountAmount = $basketDiscount;
 $rebate->setAmountGross(normalizeValue($discountAmount))
          ->setAmountNet(normalizeValue($discountAmount))
          ->setQuantity(1)
@@ -80,8 +81,6 @@ $rebate->setAmountGross(normalizeValue($discountAmount))
          ->setBasketItemReferenceId('discount')
          ->setTitle('Discount');
 $basket->addBasketItem($rebate);
-
-$basket->setAmountTotalVat(normalizeValue($basketAmountVat));
 
 $request = new BasketApiRequest();
 $request->setAuthentication($authData['login'], $authData['password'], $authData['senderId']);

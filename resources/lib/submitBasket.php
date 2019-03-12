@@ -29,9 +29,9 @@ $basketItems = SdkRestApi::getParam('basketItems');
 $sandboxmode = SdkRestApi::getParam('sandboxmode');
 
 $basket = new \Heidelpay\PhpBasketApi\Object\Basket();
-$basket->setAmountTotalNet(normalizeValue($basketData['basketAmountNet']));
-$basket->setAmountTotalDiscount(normalizeValue($basketData['basketRebate']));
-$basket->setCurrencyCode($basketData['currency']);
+$basket->setAmountTotalNet(normalizeValue($basketData['basketAmountNet']))
+       ->setAmountTotalDiscount(normalizeValue($basketData['basketRebate']))
+       ->setCurrencyCode($basketData['currency']);
 $basketAmountVat = 0;
 
 foreach ($basketItems as $item) {
@@ -41,19 +41,35 @@ foreach ($basketItems as $item) {
     $vat        = $item['vat'];
     $amountNet  = $amount * 100 / (100 + $vat);
     $amountVat  = $amount - $amountNet; // $amountNet * $vat / 100;
-    $basketItem->setAmountGross(normalizeValue($amount));
-    $basketItem->setAmountVat(normalizeValue($amountVat));
-    $basketItem->setAmountNet(normalizeValue($amountNet));
-    $basketItem->setAmountDiscount(normalizeValue($item['rebate']));
-    $basketItem->setQuantity($quantity);
-    $basketItem->setVat($vat);
-    $basketItem->setAmountPerUnit(normalizeValue($item['price']));
-    $basketItem->setBasketItemReferenceId($item['id']);
-    $basketItem->setTitle($item['title']);
+    $basketItem->setAmountGross(normalizeValue($amount))
+               ->setAmountVat(normalizeValue($amountVat))
+               ->setAmountNet(normalizeValue($amountNet))
+               ->setAmountDiscount(normalizeValue($item['rebate']))
+               ->setQuantity($quantity)
+               ->setVat($vat)
+               ->setAmountPerUnit(normalizeValue($item['price']))
+               ->setBasketItemReferenceId($item['id'])
+               ->setTitle($item['title']);
     $basket->addBasketItem($basketItem);
 
     $basketAmountVat += $amountVat;
 }
+
+// Add shipping position
+$shipping = new BasketItem();
+$shippingAmount    = $basketData['shippingAmount'];
+$shippingNet = $basketData['shippingAmountNet'];
+$shippingVat = $shippingAmount - $shippingNet;
+$shipping->setAmountGross(normalizeValue($shippingAmount))
+         ->setAmountNet(normalizeValue($shippingNet))
+         ->setAmountVat(normalizeValue($shippingVat))
+         ->setQuantity(1)
+         ->setAmountPerUnit(normalizeValue($shippingAmount))
+         ->setBasketItemReferenceId('shipping')
+         ->setTitle('Shipping');
+$basket->addBasketItem($shipping);
+$basketAmountVat += $shippingVat;
+
 $basket->setAmountTotalVat(normalizeValue($basketAmountVat));
 
 $request = new BasketApiRequest();

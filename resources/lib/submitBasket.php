@@ -55,7 +55,7 @@ foreach ($basketItems as $item) {
                ->setAmountPerUnit(normalizeValue($item['price']))
                ->setBasketItemReferenceId($item['id'])
                ->setTitle($item['title'])
-               ->setType($item['goods']);
+               ->setType('goods');
     $basket->addBasketItem($basketItem);
     $goodsAndShipmentNet += $amountNet;
 }

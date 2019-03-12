@@ -34,7 +34,7 @@ $basketAmountNet = $basketData['basketAmountNet'];
 $basketAmountVat = $basketAmount - $basketAmountNet;
 $basketDiscount = $basketData['couponDiscount'];
 $basket->setAmountTotalNet(normalizeValue($basketAmountNet))
-       ->setAmountTotalDiscount($basketDiscount)
+       ->setAmountTotalDiscount(normalizeValue($basketDiscount))
        ->setCurrencyCode($basketData['currency'])
        ->setAmountTotalVat(normalizeValue($basketAmountVat));
 $goodsAndShipmentNet = 0;

@@ -75,18 +75,20 @@ $basket->addBasketItem($shipping);
 $goodsAndShipmentNet += $shippingNet;
 
 // Add discount position
-$discountItem   = new BasketItem();
 $discountAmount = $basketData['couponDiscount'];
-$discountNet = $basketAmountNet - $goodsAndShipmentNet;
-$discountItem->setAmountGross(normalizeValue($discountAmount))
-         ->setAmountNet(normalizeValue($discountNet))
-         ->setQuantity(1)
-         ->setAmountPerUnit(normalizeValue($discountAmount))
-         ->setBasketItemReferenceId('discount')
-         ->setTitle('Discount')
-         ->setType('voucher');
+if ($discountAmount !== 0) {
+    $discountItem = new BasketItem();
+    $discountNet  = $basketAmountNet - $goodsAndShipmentNet;
+    $discountItem->setAmountGross(normalizeValue($discountAmount))
+        ->setAmountNet(normalizeValue($discountNet))
+        ->setQuantity(1)
+        ->setAmountPerUnit(normalizeValue($discountAmount))
+        ->setBasketItemReferenceId('discount')
+        ->setTitle('Discount')
+        ->setType('voucher');
 
-$basket->addBasketItem($discountItem);
+    $basket->addBasketItem($discountItem);
+}
 
 $request = new BasketApiRequest();
 $request->setAuthentication($authData['login'], $authData['password'], $authData['senderId']);

@@ -195,6 +195,8 @@ class PaymentService
         $this->createOrUpdateRelation($txnId, $mopId, $orderId);
 
         $transactions = $this->transactionRepository->getTransactionsByTxnId($txnId);
+        $this->notification->error('remove me', __METHOD__, ['Transactions' => $transactions], true);
+
         foreach ($transactions as $transaction) {
             $allowedStatus = [TransactionStatus::ACK, TransactionStatus::PENDING];
             if (\in_array($transaction->status, $allowedStatus, false)) {

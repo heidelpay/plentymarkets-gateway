@@ -5,9 +5,9 @@
   "dataProviders":
   [
     {
-      "key"           :"Heidelpay\\Containers\\AdditionalPaymentInformationContainer",
-      "name"          :"AdditionalPaymentInformation",
-      "description"   :"Display additional payment information to the customer."
+      "key"           :"Heidelpay\\Providers\\InvoiceDetailsProvider",
+      "name"          :"Invoice details",
+      "description"   :"Display invoice details to the customer."
     }
   ],
   "marketplaceName": {

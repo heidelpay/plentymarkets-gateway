@@ -32,9 +32,7 @@ $basket = new \Heidelpay\PhpBasketApi\Object\Basket();
 $basketAmount  = $basketData['basketAmount'];
 $basketAmountNet = $basketData['basketAmountNet'];
 $basketAmountVat = $basketAmount - $basketAmountNet;
-$basketDiscount = $basketData['couponDiscount'];
 $basket->setAmountTotalNet(normalizeValue($basketAmountNet))
-       ->setAmountTotalDiscount(normalizeValue($basketDiscount))
        ->setCurrencyCode($basketData['currency'])
        ->setAmountTotalVat(normalizeValue($basketAmountVat));
 $goodsAndShipmentNet = 0;
@@ -78,7 +76,7 @@ $goodsAndShipmentNet += $shippingNet;
 
 // Add discount position
 $discountItem   = new BasketItem();
-$discountAmount = $basketDiscount;
+$discountAmount = $basketData['couponDiscount'];
 $discountNet = $basketAmountNet - $goodsAndShipmentNet;
 $discountItem->setAmountGross(normalizeValue($discountAmount))
          ->setAmountNet(normalizeValue($discountNet))

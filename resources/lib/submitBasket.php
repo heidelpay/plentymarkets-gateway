@@ -70,6 +70,17 @@ $shipping->setAmountGross(normalizeValue($shippingAmount))
 $basket->addBasketItem($shipping);
 $basketAmountVat += $shippingVat;
 
+// Add shipping position
+$rebate         = new BasketItem();
+$discountAmount = $basketData['couponDiscount'];
+$rebate->setAmountGross(normalizeValue($discountAmount))
+         ->setAmountNet(normalizeValue($discountAmount))
+         ->setQuantity(1)
+         ->setAmountPerUnit(normalizeValue($discountAmount))
+         ->setBasketItemReferenceId('discount')
+         ->setTitle('Discount');
+$basket->addBasketItem($rebate);
+
 $basket->setAmountTotalVat(normalizeValue($basketAmountVat));
 
 $request = new BasketApiRequest();

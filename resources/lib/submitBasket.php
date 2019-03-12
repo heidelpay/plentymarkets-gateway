@@ -34,7 +34,7 @@ $basketAmountNet = $basketData['basketAmountNet'];
 $basketAmountVat = $basketAmount - $basketAmountNet;
 $basketDiscount = $basketData['couponDiscount'];
 $basket->setAmountTotalNet(normalizeValue($basketAmountNet))
-       ->setAmountTotalDiscount(normalizeValue($basketDiscount))
+       ->setAmountTotalDiscount($basketDiscount)
        ->setCurrencyCode($basketData['currency'])
        ->setAmountTotalVat(normalizeValue($basketAmountVat));
 
@@ -72,15 +72,17 @@ $shipping->setAmountGross(normalizeValue($shippingAmount))
 $basket->addBasketItem($shipping);
 
 // Add discount position
-$rebate         = new BasketItem();
+$discountItem   = new BasketItem();
 $discountAmount = $basketDiscount;
-$rebate->setAmountGross(normalizeValue($discountAmount))
+$discountItem->setAmountGross(normalizeValue($discountAmount))
          ->setAmountNet(normalizeValue($discountAmount))
          ->setQuantity(1)
          ->setAmountPerUnit(normalizeValue($discountAmount))
          ->setBasketItemReferenceId('discount')
-         ->setTitle('Discount');
-$basket->addBasketItem($rebate);
+         ->setTitle('Discount')
+         ->setVat(0);
+
+$basket->addBasketItem($discountItem);
 
 $request = new BasketApiRequest();
 $request->setAuthentication($authData['login'], $authData['password'], $authData['senderId']);

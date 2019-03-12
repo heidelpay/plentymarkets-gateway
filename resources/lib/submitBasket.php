@@ -16,7 +16,7 @@ use Heidelpay\PhpBasketApi\Object\BasketItem;
 use Heidelpay\PhpBasketApi\Request as BasketApiRequest;
 
 function normalizeValue($value) {
-    return (int)round($value * 100);
+    return (int)round(abs($value) * 100);
 }
 
 /** @var array $authData */
@@ -37,6 +37,7 @@ $basket->setAmountTotalNet(normalizeValue($basketAmountNet))
        ->setAmountTotalDiscount($basketDiscount)
        ->setCurrencyCode($basketData['currency'])
        ->setAmountTotalVat(normalizeValue($basketAmountVat));
+$goodsAndShipmentNet = 0;
 
 foreach ($basketItems as $item) {
     $basketItem = new BasketItem();
@@ -53,8 +54,10 @@ foreach ($basketItems as $item) {
                ->setVat($vat)
                ->setAmountPerUnit(normalizeValue($item['price']))
                ->setBasketItemReferenceId($item['id'])
-               ->setTitle($item['title']);
+               ->setTitle($item['title'])
+               ->setType($item['goods']);
     $basket->addBasketItem($basketItem);
+    $goodsAndShipmentNet += $amountNet;
 }
 
 // Add shipping position
@@ -67,20 +70,23 @@ $shipping->setAmountGross(normalizeValue($shippingAmount))
          ->setAmountVat(normalizeValue($shippingVat))
          ->setQuantity(1)
          ->setAmountPerUnit(normalizeValue($shippingAmount))
-         ->setBasketItemReferenceId('shipping')
-         ->setTitle('Shipping');
+         ->setBasketItemReferenceId('shipment')
+         ->setTitle('Shipment')
+         ->setType('shipment');
 $basket->addBasketItem($shipping);
+$goodsAndShipmentNet += $shippingNet;
 
 // Add discount position
 $discountItem   = new BasketItem();
 $discountAmount = $basketDiscount;
+$discountNet = $basketAmountNet - $goodsAndShipmentNet;
 $discountItem->setAmountGross(normalizeValue($discountAmount))
-         ->setAmountNet(normalizeValue($discountAmount))
+         ->setAmountNet(normalizeValue($discountNet))
          ->setQuantity(1)
          ->setAmountPerUnit(normalizeValue($discountAmount))
          ->setBasketItemReferenceId('discount')
          ->setTitle('Discount')
-         ->setVat(0);
+         ->setType('voucher');
 
 $basket->addBasketItem($discountItem);
 

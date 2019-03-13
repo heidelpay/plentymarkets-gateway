@@ -21,9 +21,20 @@ class InvoiceDetailsProvider
 
         $notificationService->error('remove me ', __METHOD__, ['txn' => $transaction]);
 
+        $details = $transaction->transactionDetails;
+        $accountIBAN = $details['CONNECTOR_ACCOUNT_IBAN'];
+        $accountBIC = $details['CONNECTOR_ACCOUNT_BIC'];
+        $accountHolder = $details['CONNECTOR_ACCOUNT_HOLDER'];
+        $accountUsage = isset($details['CONNECTOR_ACCOUNT_USAGE']) ?: $details['IDENTIFICATION_SHORTID'];
+
         return $twig->render(
             'Heidelpay::content/InvoiceDetails',
-            ['transactionDetails' => $transaction['transactionDetails']]
+            [
+                'accountIBAN' => $accountIBAN,
+                'accountBIC' => $accountBIC,
+                'accountHolder' => $accountHolder,
+                'accountUsage' => $accountUsage
+            ]
         );
     }
 }

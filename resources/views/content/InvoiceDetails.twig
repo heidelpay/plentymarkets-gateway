@@ -1,12 +1,16 @@
 <h2>Test {% for day in 1..31 %}{{ day }} {% endfor %}</h2>
 
-{{ dump() }}
+{{ accountIBAN }} <br/>
+{{ accountBIC }} <br/>
+{{ accountHolder }} <br/>
+{{ accountUsage }} <br/>
+
 
 {#{% set bankAccount = config("system.bank") %}#}
-{#<hr>#}
-{#<div class="row">#}
+<hr>
+<div class="row">
     {#<strong class="col-xs-6 col-sm-5">{{ trans("Invoice::PaymentMethod.bankDetails") }}</strong>#}
-    {#<span class="col-xs-6 col-sm-7">#}
+    <span class="col-xs-6 col-sm-7">
         {#<table border="0" cellpadding="0">#}
             {#<tbody>#}
                 {#<tr>#}
@@ -27,5 +31,5 @@
                 {#</tr>#}
             {#</tbody>#}
         {#</table>#}
-    {#</span>#}
-{#</div>#}
+    </span>
+</div>

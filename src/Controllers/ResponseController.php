@@ -169,11 +169,11 @@ class ResponseController extends Controller
         try {
             $this->processResponse($response);
         } catch (\RuntimeException $e) {
-            $this->notification->debug('response.debugReturnFailureUrl', __METHOD__, ['Response' => $e->getMessage()]);
+            $this->notification->debug('response.debugReturnFailureUrl', __METHOD__, ['Message' => $e->getMessage()]);
             return $this->urlService->generateURL(Routes::CHECKOUT_CANCEL);
         }
 
-        $this->notification->debug('response.debugReturnSuccessUrl', __METHOD__, ['Error' => $postResponse]);
+        $this->notification->debug('response.debugReturnSuccessUrl', __METHOD__, ['Response' => $postResponse]);
         return $this->urlService->generateURL(Routes::CHECKOUT_SUCCESS);
     }
 

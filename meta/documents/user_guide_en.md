@@ -8,6 +8,7 @@ Currently supported payment methods are:
 * Debit Card
 * Direct Debit
 * Sofort.
+* Invoice secured B2C
 
 ## REQUIREMENTS
 * This plugin is designed fo Plentymarkets 7.
@@ -61,7 +62,7 @@ It should be given to you by your heidelpay contact person.
 
 ###### Secret key
 This is a security key required to create a hash value which is used to verify that the origin of any incoming transaction is the heidelpay payment backend.
-This parameter is required and can not be left empty.
+This parameter is required and can not be left empty. You can use any string for the secret key.
 
 ##### Payment Method Parameters
 ###### Active
@@ -122,6 +123,13 @@ The payment will be created immediately and referenced to the order. \
 There are no additional steps necessary to capture the amount.\
 If the payment is successful, the order is immediately marked paid in your backend.\
 If the payment fails, the order is not created and the customer will be redirected to the checkout page.
+
+### Invoice secured B2C
+In order to start the insurance of a Payment you need to trigger a finalize transaction (FIN) from the hIP.\
+This starts the insurance period in which the customer has to transfert the total amount of the order.\
+This period is determined within your contract with heidelpay.\
+As soon as the customer transferred the total amount a receipt transaction (REC) appears within the hIP and is sent to the pushUrl of your shop.\
+The shop module will then create a new payment and link it to the corresponding order.
 
 ### All payment methods
 * Payments contain the txnId (which is the heidelpay orderId), the shortId (the id of the transaction which lead to the payment i.e. Receipt, Debit or Capture) and the origin (i.e. heidelpay).

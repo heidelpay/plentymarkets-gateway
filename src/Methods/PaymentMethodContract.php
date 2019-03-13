@@ -143,5 +143,5 @@ interface PaymentMethodContract
      *
      * @return bool
      */
-    public function renderInvoiceData():bool;
+    public function renderInvoiceData(): bool;
 }

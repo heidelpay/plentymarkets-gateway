@@ -270,7 +270,8 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     /**
      * {@inheritDoc}
      */
-    public function renderInvoiceData(): bool {
+    public function renderInvoiceData(): bool
+    {
         return static::RENDER_INVOICE_DATA;
     }
 }

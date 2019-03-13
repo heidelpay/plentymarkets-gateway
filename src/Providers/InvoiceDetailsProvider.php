@@ -1,6 +1,8 @@
 <?php
 namespace Heidelpay\Providers;
 
+use Heidelpay\Constants\SessionKeys;
+use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Services\NotificationServiceContract;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Models\Order;
@@ -11,11 +13,15 @@ class InvoiceDetailsProvider
     public function call(
         Twig $twig,
         NotificationServiceContract $notificationService,
-        FrontendSessionStorageFactoryContract $sessionStorage
+        FrontendSessionStorageFactoryContract $sessionStorage,
+        TransactionRepositoryContract $transactionRepos
     ): string {
-        /** @var Order $order */
-        $order = $sessionStorage->getOrder();
-        $notificationService->error('remove me ', __METHOD__, ['order' => $order]);
+        // render bank details
+
+        $txnId = $sessionStorage->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
+        $transactions = $transactionRepos->getTransactionsByTxnId($txnId);
+
+        $notificationService->error('remove me ', __METHOD__, ['txn' => $transactions]);
 
         return $twig->render('Heidelpay::content/InvoiceDetails');
     }

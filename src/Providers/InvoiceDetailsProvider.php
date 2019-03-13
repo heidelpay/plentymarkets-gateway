@@ -2,6 +2,7 @@
 namespace Heidelpay\Providers;
 
 use Heidelpay\Services\NotificationServiceContract;
+use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Plugin\Templates\Twig;
 
@@ -10,11 +11,16 @@ class InvoiceDetailsProvider
     public function call(
         Twig $twig,
         NotificationServiceContract $notificationService,
-        $args
+        FrontendSessionStorageFactoryContract $sessionStorage
     ): string {
-        $notificationService->error(self::class, __METHOD__, ['args' => $args]);
-        return 'test';//$twig->render('test');
+        /** @var Order $order */
+        $order = $sessionStorage->getOrder();
+        $notificationService->error('remove me ', __METHOD__, ['order' => $order]);
+
+        return $twig->render('Heidelpay::content/InvoiceDetails');
     }
+
+
 //        $mop = $service->getOrderMopId();
 //        $orderId = null;
 //        $content = '';

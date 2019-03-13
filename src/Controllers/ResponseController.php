@@ -163,9 +163,78 @@ class ResponseController extends Controller
         // get all post parameters except the 'plentyMarkets' one injected by the plentymarkets core.
         // also scrap the 'lang' parameter which will be sent when e.g. Sofort is being used.
         $postResponse = $this->request->except(['plentyMarkets', 'lang']);
+
+        // if the transaction is successful or pending, return the success url.
+        try {
+            $this->processResponse($postResponse);
+        } catch (\RuntimeException $e) {
+            $this->notification->debug('response.debugReturnFailureUrl', __METHOD__, ['Response' => $e->getMessage()]);
+            return $this->urlService->generateURL(Routes::CHECKOUT_CANCEL);
+        }
+
+        $this->notification->debug('response.debugReturnSuccessUrl', __METHOD__, ['Error' => $postResponse]);
+        return $this->urlService->generateURL(Routes::CHECKOUT_SUCCESS);
+    }
+
+    /**
+     * Handles form requests which do not need any further action by the client.
+     *
+     * @param BasketRepositoryContract $basketRepo
+     * @param PaymentHelper $paymentHelper
+     * @return BaseResponse
+     * @throws \RuntimeException
+     */
+    public function handleSyncRequest(
+        BasketRepositoryContract $basketRepo,
+        PaymentHelper $paymentHelper
+    ): BaseResponse {
+        $basket = $basketRepo->load();
+
+        $mopId          = $basket->methodOfPaymentId;
+        $paymentMethod  = $paymentHelper->mapMopToPaymentMethod($mopId);
+        $methodInstance = $paymentHelper->getPaymentMethodInstanceByMopId($mopId);
+        if (!$methodInstance instanceof PaymentMethodContract) {
+            $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
+            return $this->response->redirectTo('checkout');
+        }
+
+        $response = $this->paymentService->sendPaymentRequest(
+            $basket,
+            $paymentMethod,
+            $methodInstance->getTransactionType(),
+            $mopId,
+            ['birthday' => $this->getDateOfBirth(), 'salutation' => $this->getSalutation()]
+        );
+
+        try {
+            $this->processResponse($response);
+        } catch (\RuntimeException $e) {
+            $this->notification->error(
+               'payment.errorDuringPaymentExecution',
+               __METHOD__,
+               ['Message' => $e->getMessage()]
+            );
+            return $this->response->redirectTo('checkout');
+        }
+
+        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__);
+        return $this->response->redirectTo('place-order');
+    }
+
+    /**
+     * Handles a transaction response and returns a success flag.
+     * Returns true if the transaction was successful and false if it was not.
+     *
+     * @test
+     *
+     * @param array $postResponse
+     * @throws \RuntimeException
+     */
+    public function processResponse($postResponse)
+    {
         ksort($postResponse);
 
-        $response = $this->paymentService->handleAsyncPaymentResponse(['response' => $postResponse]);
+        $response = $this->paymentService->handlePaymentResponse(['response' => $postResponse]);
         $responseObject = $response['response'];
 
         $logData = ['POST response' => $postResponse, 'response' => $response];
@@ -184,13 +253,18 @@ class ResponseController extends Controller
 
             // if the transaction is successful or pending, return the success url.
             if ($validHash && ($response['isSuccess'] || $response['isPending'])) {
-                $this->notification->debug('response.debugReturnSuccessUrl', __METHOD__, ['Response' => $response]);
-                return $this->urlService->generateURL(Routes::CHECKOUT_SUCCESS);
+                return;
             }
         }
 
-        $this->notification->debug('response.debugReturnFailureUrl', __METHOD__, ['Response' => $response]);
-        return $this->urlService->generateURL(Routes::CHECKOUT_CANCEL);
+        $errorMsg = 'An error occurred handling the transaction.';
+
+        if (isset($response['response'])) {
+            $responseObj = $response['response'];
+            $errorMsg    = ($responseObj['PROCESSING.REASON'] ?? '') . ': ' . ($responseObj['PROCESSING.RETURN'] ?? '');
+        }
+
+        throw new \RuntimeException($errorMsg);
     }
 
     /**
@@ -230,47 +304,6 @@ class ResponseController extends Controller
     {
         $this->notification->warning('response.warningResponseCalledInInvalidContext', __METHOD__);
         return $this->response->redirectTo('checkout');
-    }
-
-    /**
-     * Handles form requests which do not need any further action by the client.
-     *
-     * @param BasketRepositoryContract $basketRepo
-     * @param PaymentHelper $paymentHelper
-     * @return BaseResponse
-     * @throws \RuntimeException
-     */
-    public function handleSyncRequest(
-        BasketRepositoryContract $basketRepo,
-        PaymentHelper $paymentHelper
-    ): BaseResponse {
-        $basket = $basketRepo->load();
-
-        $mopId          = $basket->methodOfPaymentId;
-        $paymentMethod  = $paymentHelper->mapMopToPaymentMethod($mopId);
-        $methodInstance = $paymentHelper->getPaymentMethodInstanceByMopId($mopId);
-        if (!$methodInstance instanceof PaymentMethodContract) {
-            $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
-            return $this->response->redirectTo('checkout');
-        }
-
-        $response = $this->paymentService->sendPaymentRequest(
-            $basket,
-            $paymentMethod,
-            $methodInstance->getTransactionType(),
-            $mopId,
-            ['birthday' => $this->getDateOfBirth(), 'salutation' => $this->getSalutation()]
-        );
-
-        if ($response['isError'] === true) {
-            $responseObj = $response['response'];
-            $errorMsg  = ($responseObj['PROCESSING.REASON'] ?? '') . ': ' . ($responseObj['PROCESSING.RETURN'] ?? '');
-            $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__, ['Message' => $errorMsg]);
-            return $this->response->redirectTo('checkout');
-        }
-
-        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__);
-        return $this->response->redirectTo('place-order');
     }
     //</editor-fold>
 

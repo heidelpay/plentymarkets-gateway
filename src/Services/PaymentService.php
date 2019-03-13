@@ -206,7 +206,7 @@ class PaymentService
         }
 
         try {
-            if (!empty($transactionDetails)) {
+            if (empty($transactionDetails)) {
                 throw new \RuntimeException('Could not find transaction!');
             }
             if (!isset($transactionDetails['PRESENTATION.AMOUNT'], $transactionDetails['PRESENTATION.CURRENCY'])) {
@@ -484,7 +484,7 @@ class PaymentService
      *
      * @return array
      */
-    public function handleAsyncPaymentResponse(array $post): array
+    public function handlePaymentResponse(array $post): array
     {
         return $this->libService->handleResponse($post);
     }

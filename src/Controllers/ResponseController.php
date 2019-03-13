@@ -163,10 +163,11 @@ class ResponseController extends Controller
         // get all post parameters except the 'plentyMarkets' one injected by the plentymarkets core.
         // also scrap the 'lang' parameter which will be sent when e.g. Sofort is being used.
         $postResponse = $this->request->except(['plentyMarkets', 'lang']);
+        $response = $this->paymentService->handlePaymentResponse(['response' => $postResponse]);
 
         // if the transaction is successful or pending, return the success url.
         try {
-            $this->processResponse($postResponse);
+            $this->processResponse($response);
         } catch (\RuntimeException $e) {
             $this->notification->debug('response.debugReturnFailureUrl', __METHOD__, ['Response' => $e->getMessage()]);
             return $this->urlService->generateURL(Routes::CHECKOUT_CANCEL);
@@ -227,18 +228,15 @@ class ResponseController extends Controller
      *
      * @test
      *
-     * @param array $postResponse
+     * @param array $response
      * @throws \RuntimeException
      */
-    public function processResponse($postResponse)
+    public function processResponse($response)
     {
-        ksort($postResponse);
-
-        $response = $this->paymentService->handlePaymentResponse(['response' => $postResponse]);
+        ksort($response);
         $responseObject = $response['response'];
 
-        $logData = ['POST response' => $postResponse, 'response' => $response];
-        $this->notification->debug('response.debugReceivedResponse', __METHOD__, $logData);
+        $this->notification->debug('response.debugReceivedResponse', __METHOD__, ['response' => $response]);
 
         // if something went wrong during the lib call, return the cancel url.
         // exceptionCode = problem inside of the lib, error = error during libCall.

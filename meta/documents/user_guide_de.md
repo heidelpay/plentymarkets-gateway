@@ -104,6 +104,16 @@ Anforderungen an die URL:
 * sie muss mit 'http://' oder 'https://' beginnen
 * sie muss mit '.jpg', '.png' oder '.gif' enden
 
+### Daten Container
+#### Zusätzliche Zahlungsinformationen
+Dieses Modul stellt einen Container zur Verfügung, der Zahlungsinformationen (z.B. Überweisungsdaten für Rechnungskäufe) darstellt.\
+Um diese Informationen auf der Buchungsbestätigungs-Seite darzustellen folgen Sie bitte folgenden Schritten.
+1. wechseln Sie im Backend auf den Menüpunkt *CMS > Container-Verknüpfungen*
+2. wählen Sie im Drop-Down-Menü das Plug-in Set, für welches Sie die Änderung vornehmen möchten aus
+3. klappen Sie das Menü *Invoice Details (Heidelpay)* auf und aktivieren hier den Ceres-Container ``Order confirmation: Additional payment information``
+4. klicken Sie den speichern Button
+![Container-Verknüpfung](../images/preview_4.png)
+
 ## Beschreibung der Zahlungsabläufe 
 ### Kreditkarte und Debitkarte
 * Wenn für die Zahlart der **Buchungsmodus 'Direkte Buchung'** ausgewählt ist, wird die Zahlung sofort erzeugt und mit der Bestellung verknüpft.

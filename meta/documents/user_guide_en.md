@@ -104,6 +104,16 @@ Prerequisites for the url string:
 * it must start with 'http://' or 'https://'
 * it must end with '.jpg', '.png' or '.gif'
 
+### Data Container
+#### Additional payment data
+This modul provides for a data container to render additional payment information (e.g. bank data for invoice payments).\
+To show the information on your order confirmation page please follow these steps:
+1. switch to the menu item *CMS > Container Links*
+2. choose the corresponding plug-in set from the drop down
+3. open the menu *Invoice Details (Heidelpay)* and enable the ceres container ``Order confirmation: Additional payment information``
+4. click the save button
+![Container links](../images/preview_4.png)
+
 ## Workflow description
 ### Credit Card and Debit Card
 * If the payment method is configured to use *Transaction Mode* *'Direct debit'* the payment will be created immediately and referenced to the order.

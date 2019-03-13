@@ -27,4 +27,5 @@ class InvoiceSecuredB2C extends AbstractMethod
     const FORM_TEMPLATE = 'Heidelpay::invoiceSecuredB2CForm';
     const NEEDS_CUSTOMER_INPUT = false;
     const NEEDS_BASKET = true;
+    const RENDER_INVOICE_DATA = true;
 }

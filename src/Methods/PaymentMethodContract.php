@@ -137,4 +137,11 @@ interface PaymentMethodContract
      * @return bool
      */
     public function needsBasket(): bool;
+
+    /**
+     * Returns true if bank information has to be shown to the customer.
+     *
+     * @return bool
+     */
+    public function renderInvoiceData():bool;
 }

@@ -1,35 +1,10 @@
-<h2>Test {% for day in 1..31 %}{{ day }} {% endfor %}</h2>
-
-{{ accountIBAN }} <br/>
-{{ accountBIC }} <br/>
-{{ accountHolder }} <br/>
-{{ accountUsage }} <br/>
-
-
-{#{% set bankAccount = config("system.bank") %}#}
 <hr>
 <div class="row">
-    {#<strong class="col-xs-6 col-sm-5">{{ trans("Invoice::PaymentMethod.bankDetails") }}</strong>#}
+    <strong class="col-xs-6 col-sm-5">{{ trans("Heidelpay::Template.transactionDetails") }}</strong>
     <span class="col-xs-6 col-sm-7">
-        {#<table border="0" cellpadding="0">#}
-            {#<tbody>#}
-                {#<tr>#}
-                    {#<td align="left">{{ trans("Invoice::PaymentMethod.bankAccountOwner") }}</td>#}
-                    {#<td align="right">{{ bankAccount["accountOwner"] }}</td>#}
-                {#</tr>#}
-                {#<tr>#}
-                    {#<td align="left">{{ trans("Invoice::PaymentMethod.bankName") }}</td>#}
-                    {#<td align="right">{{ bankAccount["name"] }}</td>#}
-                {#</tr>#}
-                {#<tr>#}
-                    {#<td align="left">{{ trans("Invoice::PaymentMethod.bankIban") }}</td>#}
-                    {#<td align="right">{{ bankAccount["iban"] }}</td>#}
-                {#</tr>#}
-                {#<tr>#}
-                    {#<td align="left">{{ trans("Invoice::PaymentMethod.bankSwift") }}</td>#}
-                    {#<td align="right">{{ bankAccount["swift"] }}</td>#}
-                {#</tr>#}
-            {#</tbody>#}
-        {#</table>#}
+        {{ trans("Heidelpay::Template.bankAccountIBAN") }}: {{ accountIBAN }} <br/>
+        {{ trans("Heidelpay::Template.bankAccountBIC") }}: {{ accountBIC }} <br/>
+        {{ trans("Heidelpay::Template.bankAccountHolder") }}: {{ accountHolder }} <br/>
+        {{ trans("Heidelpay::Template.bankAccountUsage") }}: {{ accountUsage }} <br/>
     </span>
 </div>

@@ -25,7 +25,7 @@ class InvoiceDetailsProvider
         $accountIBAN = $details['CONNECTOR.ACCOUNT_IBAN'];
         $accountBIC = $details['CONNECTOR.ACCOUNT_BIC'];
         $accountHolder = $details['CONNECTOR.ACCOUNT_HOLDER'];
-        $accountUsage = isset($details['CONNECTOR.ACCOUNT_USAGE']) ?: $transaction->shortId;
+        $accountUsage = $details['CONNECTOR.ACCOUNT_USAGE'] ?? $transaction->shortId;
 
         $notificationService->error('remove me too', __METHOD__, [
             'accountIBAN' => $accountIBAN,

@@ -207,22 +207,28 @@ class PaymentService
             return ['error', 'Heidelpay::error.errorDuringPaymentExecution'];
         }
 
+
         $accountIban = $transactionDetails['CONNECTOR.ACCOUNT_IBAN'];
         $accountBic = $transactionDetails['CONNECTOR.ACCOUNT_BIC'];
         $accountHolder = $transactionDetails['CONNECTOR.ACCOUNT_HOLDER'];
         $accountUsage = $transactionDetails['CONNECTOR.ACCOUNT_USAGE'] ?? $transaction->shortId;
 
         // add payment info to order
-        $data = [];
-        $data['referenceType'] = Comment::REFERENCE_TYPE_ORDER;
-        $data['referenceValue'] = $orderId;
-        $data['text'] =
-            'IBAN: ' . $accountIban . '; ' .
-            'BIC: ' . $accountBic . '; ' .
-            'Account Holder: ' . $accountHolder . '; ' .
-            'Usage: ' . $accountUsage;
+        $order = $this->paymentHelper->getOrder($orderId);
+        $this->notification->error('before', __METHOD__, ['order' => $order]);
+
+        $commentText = 'IBAN: ' . $accountIban . '; ' . 'BIC: ' . $accountBic . '; ' .
+            'Account Holder: ' . $accountHolder . '; ' . 'Usage: ' . $accountUsage;
+        $this->notification->error('comment text', __METHOD__, ['Comment' => $commentText]);
+        $data                        = [];
+        $data['referenceType']       = Comment::REFERENCE_TYPE_ORDER;
+        $data['referenceValue']      = $orderId;
+        $data['text']                = $commentText;
         $data['isVisibleForContact'] = true;
         $this->commentRepo->createComment($data);
+
+        $order = $this->paymentHelper->getOrder($orderId);
+        $this->notification->error('after', __METHOD__, ['order' => $order]);
 
         try {
             $this->handleTransaction($transaction);

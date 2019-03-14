@@ -486,7 +486,7 @@ class PaymentHelper
         try {// Get the order by the given order ID
             $order = $authHelper->processUnguarded(
                 function () use ($orderId) {
-                    return $this->orderRepo->findOrderById($orderId);
+                    return $this->orderRepo->findOrderById($orderId, ['comments']);
                 }
             );
         } catch (\Exception $e) {

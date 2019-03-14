@@ -476,7 +476,7 @@ class PaymentHelper
      * @return Order
      * @throws \RuntimeException
      */
-    private function getOrder(int $orderId): Order
+    public function getOrder(int $orderId): Order
     {
         $order = null;
 

@@ -4,7 +4,7 @@ namespace Heidelpay\Methods;
 
 use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Heidelpay\Services\BasketServiceContract;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Plugin\Application;
@@ -34,6 +34,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     const NEEDS_CUSTOMER_INPUT = true;
     const NEEDS_BASKET = false;
     const RENDER_INVOICE_DATA = false;
+    const B2C_ONLY = false;
 
     /**
      * @var PaymentHelper $helper
@@ -41,29 +42,29 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     protected $helper;
 
     /**
-     * @var BasketRepositoryContract $basketRepository
-     */
-    protected $basketRepository;
-    /**
      * @var MethodConfigContract
      */
     private $config;
+    /**
+     * @var BasketServiceContract
+     */
+    private $basketService;
 
     /**
      * AbstractMethod constructor.
      *
      * @param PaymentHelper $paymentHelper
-     * @param BasketRepositoryContract $basketRepository
      * @param MethodConfigContract $config
+     * @param BasketServiceContract $basketService
      */
     public function __construct(
         PaymentHelper $paymentHelper,
-        BasketRepositoryContract $basketRepository,
-        MethodConfigContract $config
+        MethodConfigContract $config,
+        BasketServiceContract $basketService
     ) {
         $this->helper = $paymentHelper;
-        $this->basketRepository = $basketRepository;
         $this->config = $config;
+        $this->basketService = $basketService;
     }
 
     /**
@@ -76,7 +77,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
             return false;
         }
 
-        $basket = $this->basketRepository->load();
+        $basket = $this->basketService->getBasket();
 
         // check the configured minimum cart amount and return false if an amount is configured
         // (which means > 0.00) and the cart amount is below the configured value.
@@ -88,7 +89,16 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
         // check the configured maximum cart amount and return false if an amount is configured
         // (which means > 0.00) and the cart amount is above the configured value.
         $maxAmount = $this->config->getMaxAmount($this);
-        return !($maxAmount > 0.00 && $basket->basketAmount > $maxAmount);
+        if ($maxAmount > 0.00 && $basket->basketAmount > $maxAmount) {
+            return false;
+        }
+
+        // enable the payment method only if it is enabled for the current transaction (B2C||B2B)
+        if ($this->isB2cOnly() && $this->basketService->isBasketB2B()) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -273,5 +283,13 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     public function renderInvoiceData(): bool
     {
         return static::RENDER_INVOICE_DATA;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isB2cOnly(): bool
+    {
+        return static::B2C_ONLY;
     }
 }

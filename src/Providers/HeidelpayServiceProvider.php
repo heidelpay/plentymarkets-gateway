@@ -11,6 +11,8 @@ use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Repositories\OrderTxnIdRelationRepository;
 use Heidelpay\Models\Repositories\TransactionRepository;
+use Heidelpay\Services\BasketService;
+use Heidelpay\Services\BasketServiceContract;
 use Heidelpay\Services\NotificationService;
 use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
@@ -49,6 +51,7 @@ class HeidelpayServiceProvider extends ServiceProvider
         $app->bind(NotificationServiceContract::class, NotificationService::class);
         $app->bind(OrderTxnIdRelationRepositoryContract::class, OrderTxnIdRelationRepository::class);
         $app->bind(UrlServiceContract::class, UrlService::class);
+        $app->bind(BasketServiceContract::class, BasketService::class);
     }
 
     /**

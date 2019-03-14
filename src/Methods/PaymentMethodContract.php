@@ -144,4 +144,9 @@ interface PaymentMethodContract
      * @return bool
      */
     public function renderInvoiceData(): bool;
+
+    /**
+     * Returns true if the payment method is meant for B2C orders.
+     */
+    public function isB2cOnly(): bool;
 }

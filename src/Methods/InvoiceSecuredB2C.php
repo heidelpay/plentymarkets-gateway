@@ -28,4 +28,5 @@ class InvoiceSecuredB2C extends AbstractMethod
     const NEEDS_CUSTOMER_INPUT = false;
     const NEEDS_BASKET = true;
     const RENDER_INVOICE_DATA = true;
+    const B2C_ONLY = true;
 }

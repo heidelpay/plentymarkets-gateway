@@ -22,7 +22,6 @@ use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Comment\Contracts\CommentRepositoryContract;
-use Plenty\Modules\Comment\Models\Comment;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
@@ -129,7 +128,6 @@ class PaymentService
      * @param UrlServiceContract $urlService
      * @param BasketServiceContract $basketService
      * @param ContactRepositoryContract $contactRepo
-     * @param CommentRepositoryContract $commentRepo
      */
     public function __construct(
         LibService $libraryService,
@@ -144,8 +142,7 @@ class PaymentService
         OrderRepositoryContract $orderRepo,
         UrlServiceContract $urlService,
         BasketServiceContract $basketService,
-        ContactRepositoryContract $contactRepo,
-        CommentRepositoryContract $commentRepo
+        ContactRepositoryContract $contactRepo
     ) {
         $this->libService = $libraryService;
         $this->paymentRepository = $paymentRepository;
@@ -160,7 +157,6 @@ class PaymentService
         $this->urlService = $urlService;
         $this->contactRepo = $contactRepo;
         $this->basketService = $basketService;
-        $this->commentRepo = $commentRepo;
     }
 
     /**
@@ -206,29 +202,6 @@ class PaymentService
             $this->notification->error($exception->getMessage(), __METHOD__, ['Transaction' => $transaction], true);
             return ['error', 'Heidelpay::error.errorDuringPaymentExecution'];
         }
-
-
-        $accountIban = $transactionDetails['CONNECTOR.ACCOUNT_IBAN'];
-        $accountBic = $transactionDetails['CONNECTOR.ACCOUNT_BIC'];
-        $accountHolder = $transactionDetails['CONNECTOR.ACCOUNT_HOLDER'];
-        $accountUsage = $transactionDetails['CONNECTOR.ACCOUNT_USAGE'] ?? $transaction->shortId;
-
-        // add payment info to order
-        $order = $this->paymentHelper->getOrder($orderId);
-        $this->notification->error('before', __METHOD__, ['order' => $order]);
-
-        $commentText = 'IBAN: ' . $accountIban . '; ' . 'BIC: ' . $accountBic . '; ' .
-            'Account Holder: ' . $accountHolder . '; ' . 'Usage: ' . $accountUsage;
-        $this->notification->error('comment text', __METHOD__, ['Comment' => $commentText]);
-        $data                        = [];
-        $data['referenceType']       = Comment::REFERENCE_TYPE_ORDER;
-        $data['referenceValue']      = $orderId;
-        $data['text']                = $commentText;
-        $data['isVisibleForContact'] = true;
-        $this->commentRepo->createComment($data);
-
-        $order = $this->paymentHelper->getOrder($orderId);
-        $this->notification->error('after', __METHOD__, ['order' => $order]);
 
         try {
             $this->handleTransaction($transaction);

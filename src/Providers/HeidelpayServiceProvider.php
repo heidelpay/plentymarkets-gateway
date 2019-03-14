@@ -18,6 +18,7 @@ use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
 use Heidelpay\Services\UrlService;
 use Heidelpay\Services\UrlServiceContract;
+use Plenty\Modules\Order\Pdf\Events\OrderPdfGenerationEvent;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
@@ -58,16 +59,18 @@ class HeidelpayServiceProvider extends ServiceProvider
      * Boot the heidelpay Service Provider
      * Register payment methods, add event listeners, ...
      *
-     * @param PaymentHelper            $paymentHelper
-     * @param PaymentMethodContainer   $methodContainer
-     * @param PaymentService           $paymentService
-     * @param Dispatcher               $eventDispatcher
+     * @param PaymentHelper $paymentHelper
+     * @param PaymentMethodContainer $methodContainer
+     * @param PaymentService $paymentService
+     * @param Dispatcher $eventDispatcher
+     * @param NotificationServiceContract $notificationService
      */
     public function boot(
         PaymentHelper $paymentHelper,
         PaymentMethodContainer $methodContainer,
         PaymentService $paymentService,
-        Dispatcher $eventDispatcher
+        Dispatcher $eventDispatcher,
+        NotificationServiceContract $notificationService
     ) {
         // loop through all of the plugin's available payment methods
         /** @var string $paymentMethodClass */
@@ -115,6 +118,19 @@ class HeidelpayServiceProvider extends ServiceProvider
                     $event->setValue($value);
                     $event->setType($type);
                 }
+            }
+        );
+
+        // add payment information to the invoice pdf
+        $eventDispatcher->listen(
+            OrderPdfGenerationEvent::class,
+            function (OrderPdfGenerationEvent $event) use ($notificationService) {
+                $notificationService->error('OrderPdfGenerationEvent',
+                                            __METHOD__,
+                                            [
+                                                'Order' => $event->getOrder(),
+                                                'DocType' => $event->getDocType()
+                                            ]);
             }
         );
     }

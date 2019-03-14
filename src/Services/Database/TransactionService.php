@@ -183,6 +183,7 @@ class TransactionService
      *
      * @param $heidelpayResponse
      * @throws SecurityHashInvalidException
+     * @throws \RuntimeException
      */
     public function verifyTransaction($heidelpayResponse)
     {

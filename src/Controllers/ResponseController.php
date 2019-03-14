@@ -4,15 +4,19 @@ namespace Heidelpay\Controllers;
 
 use Heidelpay\Constants\Routes;
 use Heidelpay\Exceptions\SecurityHashInvalidException;
+use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
 use Heidelpay\Services\UrlServiceContract;
 use Heidelpay\Traits\Translator;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
 /**
  * Processes the transaction/payment responses coming from the heidelpay payment system.
@@ -69,6 +73,7 @@ class ResponseController extends Controller
         $this->urlService = $urlService;
     }
 
+    //<editor-fold desc="Helpers">
     /**
      * Creates a transaction object and returns bool to indicate success.
      *
@@ -105,6 +110,48 @@ class ResponseController extends Controller
         return true;
     }
 
+
+
+    /**
+     * Returns the salutation from the post request.
+     *
+     * @return string
+     * @throws \RuntimeException
+     */
+    private function getSalutation(): string
+    {
+        if ($this->request->exists('customer_salutation')) {
+            return $this->request->get('customer_salutation');
+        }
+
+        throw new \RuntimeException('Salutation not set!');
+    }
+
+    /**
+     * Returns the date of birth from the request.
+     *
+     * @return string
+     * @throws \RuntimeException
+     */
+    private function getDateOfBirth(): string
+    {
+        if ($this->request->exists('customer_dob_day') &&
+            $this->request->exists('customer_dob_month') &&
+            $this->request->exists('customer_dob_year')) {
+            return implode(
+                             '-',
+                             [
+                                 $this->request->get('customer_dob_year'),
+                                 $this->request->get('customer_dob_month'),
+                                 $this->request->get('customer_dob_day')
+                             ]
+                         );
+        }
+
+        throw new \RuntimeException('Date of birth not set!');
+    }
+    //</editor-fold>
+
     //<editor-fold desc="Handlers">
     /**
      * Process the incoming POST response and return the redirect url depending on the response result.
@@ -114,15 +161,82 @@ class ResponseController extends Controller
     public function processAsyncResponse(): string
     {
         // get all post parameters except the 'plentyMarkets' one injected by the plentymarkets core.
-        // also scrap the 'lang' parameter which will be sent when e.g. PayPal is being used.
+        // also scrap the 'lang' parameter which will be sent when e.g. Sofort is being used.
         $postResponse = $this->request->except(['plentyMarkets', 'lang']);
-        ksort($postResponse);
+        $response = $this->paymentService->handlePaymentResponse(['response' => $postResponse]);
 
-        $response = $this->paymentService->handleAsyncPaymentResponse(['response' => $postResponse]);
+        // if the transaction is successful or pending, return the success url.
+        try {
+            $this->processResponse($response);
+        } catch (\RuntimeException $e) {
+            $this->notification->debug('response.debugReturnFailureUrl', __METHOD__, ['Message' => $e->getMessage()]);
+            return $this->urlService->generateURL(Routes::CHECKOUT_CANCEL);
+        }
+
+        $this->notification->debug('response.debugReturnSuccessUrl', __METHOD__, ['Response' => $postResponse]);
+        return $this->urlService->generateURL(Routes::CHECKOUT_SUCCESS);
+    }
+
+    /**
+     * Handles form requests which do not need any further action by the client.
+     *
+     * @param BasketRepositoryContract $basketRepo
+     * @param PaymentHelper $paymentHelper
+     * @return BaseResponse
+     * @throws \RuntimeException
+     */
+    public function handleSyncRequest(
+        BasketRepositoryContract $basketRepo,
+        PaymentHelper $paymentHelper
+    ): BaseResponse {
+        $basket = $basketRepo->load();
+
+        $mopId          = $basket->methodOfPaymentId;
+        $paymentMethod  = $paymentHelper->mapMopToPaymentMethod($mopId);
+        $methodInstance = $paymentHelper->getPaymentMethodInstanceByMopId($mopId);
+        if (!$methodInstance instanceof PaymentMethodContract) {
+            $this->notification->error('payment.errorDuringPaymentExecution', __METHOD__);
+            return $this->response->redirectTo('checkout');
+        }
+
+        $response = $this->paymentService->sendPaymentRequest(
+            $basket,
+            $paymentMethod,
+            $methodInstance->getTransactionType(),
+            $mopId,
+            ['birthday' => $this->getDateOfBirth(), 'salutation' => $this->getSalutation()]
+        );
+
+        try {
+            $this->processResponse($response);
+        } catch (\RuntimeException $e) {
+            $this->notification->error(
+               'payment.errorDuringPaymentExecution',
+               __METHOD__,
+               ['Message' => $e->getMessage()]
+            );
+            return $this->response->redirectTo('checkout');
+        }
+
+        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__);
+        return $this->response->redirectTo('place-order');
+    }
+
+    /**
+     * Handles a transaction response and returns a success flag.
+     * Returns true if the transaction was successful and false if it was not.
+     *
+     * @test
+     *
+     * @param array $response
+     * @throws \RuntimeException
+     */
+    public function processResponse($response)
+    {
+        ksort($response);
         $responseObject = $response['response'];
 
-        $logData = ['POST response' => $postResponse, 'response' => $response];
-        $this->notification->debug('response.debugReceivedResponse', __METHOD__, $logData);
+        $this->notification->debug('response.debugReceivedResponse', __METHOD__, ['response' => $response]);
 
         // if something went wrong during the lib call, return the cancel url.
         // exceptionCode = problem inside of the lib, error = error during libCall.
@@ -137,13 +251,18 @@ class ResponseController extends Controller
 
             // if the transaction is successful or pending, return the success url.
             if ($validHash && ($response['isSuccess'] || $response['isPending'])) {
-                $this->notification->debug('response.debugReturnSuccessUrl', __METHOD__, ['Response' => $response]);
-                return $this->urlService->generateURL(Routes::CHECKOUT_SUCCESS);
+                return;
             }
         }
 
-        $this->notification->debug('response.debugReturnFailureUrl', __METHOD__, ['Response' => $response]);
-        return $this->urlService->generateURL(Routes::CHECKOUT_CANCEL);
+        $errorMsg = 'An error occurred handling the transaction.';
+
+        if (isset($response['response'])) {
+            $responseObj = $response['response'];
+            $errorMsg    = ($responseObj['PROCESSING.REASON'] ?? '') . ': ' . ($responseObj['PROCESSING.RETURN'] ?? '');
+        }
+
+        throw new \RuntimeException($errorMsg);
     }
 
     /**
@@ -177,9 +296,9 @@ class ResponseController extends Controller
      * the heidelpay API redirects to the processAsyncResponse url using GET instead of POST.
      * This method is for handling this behaviour.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return BaseResponse
      */
-    public function emergencyRedirect(): \Symfony\Component\HttpFoundation\Response
+    public function emergencyRedirect(): BaseResponse
     {
         $this->notification->warning('response.warningResponseCalledInInvalidContext', __METHOD__);
         return $this->response->redirectTo('checkout');

@@ -8,6 +8,7 @@ Currently supported payment methods are:
 * Debit Card
 * Direct Debit
 * Sofort.
+* Invoice secured B2C
 
 ## REQUIREMENTS
 * This plugin is designed fo Plentymarkets 7.
@@ -61,7 +62,7 @@ It should be given to you by your heidelpay contact person.
 
 ###### Secret key
 This is a security key required to create a hash value which is used to verify that the origin of any incoming transaction is the heidelpay payment backend.
-This parameter is required and can not be left empty.
+This parameter is required and can not be left empty. You can use any string for the secret key.
 
 ##### Payment Method Parameters
 ###### Active
@@ -103,6 +104,16 @@ Prerequisites for the url string:
 * it must start with 'http://' or 'https://'
 * it must end with '.jpg', '.png' or '.gif'
 
+### Data Container
+#### Additional payment data
+This modul provides for a data container to render additional payment information (e.g. bank data for invoice payments).\
+To show the information on your order confirmation page please follow these steps:
+1. switch to the menu item *CMS > Container Links*
+2. choose the corresponding plug-in set from the drop down
+3. open the menu *Invoice Details (Heidelpay)* and enable the ceres container ``Order confirmation: Additional payment information``
+4. click the save button
+![Container links](../images/preview_4.png)
+
 ## Workflow description
 ### Credit Card and Debit Card
 * If the payment method is configured to use *Transaction Mode* *'Direct debit'* the payment will be created immediately and referenced to the order.
@@ -122,6 +133,13 @@ The payment will be created immediately and referenced to the order. \
 There are no additional steps necessary to capture the amount.\
 If the payment is successful, the order is immediately marked paid in your backend.\
 If the payment fails, the order is not created and the customer will be redirected to the checkout page.
+
+### Invoice secured B2C
+In order to start the insurance of a Payment you need to trigger a finalize transaction (FIN) from the hIP.\
+This starts the insurance period in which the customer has to transfert the total amount of the order.\
+This period is determined within your contract with heidelpay.\
+As soon as the customer transferred the total amount a receipt transaction (REC) appears within the hIP and is sent to the pushUrl of your shop.\
+The shop module will then create a new payment and link it to the corresponding order.
 
 ### All payment methods
 * Payments contain the txnId (which is the heidelpay orderId), the shortId (the id of the transaction which lead to the payment i.e. Receipt, Debit or Capture) and the origin (i.e. heidelpay).

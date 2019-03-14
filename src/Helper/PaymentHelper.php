@@ -10,9 +10,8 @@ use Heidelpay\Constants\TransactionType;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\DirectDebit;
+use Heidelpay\Methods\InvoiceSecuredB2C;
 use Heidelpay\Methods\PaymentMethodContract;
-use Heidelpay\Methods\PayPal;
-use Heidelpay\Methods\Prepayment;
 use Heidelpay\Methods\Sofort;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\ArraySerializerService;
@@ -343,6 +342,9 @@ class PaymentHelper
             case $this->getPaymentMethodId(DirectDebit::class):
                 $paymentMethod = DirectDebit::class;
                 break;
+            case $this->getPaymentMethodId(InvoiceSecuredB2C::class):
+                $paymentMethod = InvoiceSecuredB2C::class;
+                break;
             default:
                 // do nothing.
                 // not even logging, since this method will be called not only for heidelpay
@@ -382,20 +384,16 @@ class PaymentHelper
                 $instance = pluginApp(DebitCard::class);
                 break;
 
-            case PayPal::class:
-                $instance = pluginApp(PayPal::class);
-                break;
-
             case Sofort::class:
                 $instance = pluginApp(Sofort::class);
                 break;
 
-            case Prepayment::class:
-                $instance = pluginApp(Prepayment::class);
-                break;
-
             case DirectDebit::class:
                 $instance = pluginApp(DirectDebit::class);
+                break;
+
+            case InvoiceSecuredB2C::class:
+                $instance = pluginApp(InvoiceSecuredB2C::class);
                 break;
 
             default:

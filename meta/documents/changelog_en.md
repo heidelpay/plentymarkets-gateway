@@ -1,5 +1,19 @@
 # heidelpay Payment Gateway Changelog
 
+## [1.2.0][1.2.0]
+
+### Added
+- Added payment type ``secured Invoice B2C``.
+- Data-Container for additional payment information. [See User Guide for details.](user_guide_en.md)
+- Additional preview image.
+- Enabled basket transmission for secured payments.
+
+### Changed
+- Updated the User guides.
+
+### Removed
+- Removed obsolete code.
+
 ## [1.1.2][1.1.2]
 
 ### Fixed
@@ -40,3 +54,4 @@
 [1.1.0]: https://github.com/heidelpay/plentymarkets-gateway/tree/1.1.0
 [1.1.1]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.1.0..1.1.1
 [1.1.2]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.1.1..1.1.2
+[1.2.0]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.1.2..1.2.0

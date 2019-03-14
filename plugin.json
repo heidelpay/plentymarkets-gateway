@@ -2,6 +2,14 @@
   "name": "Heidelpay",
   "namespace": "Heidelpay",
   "serviceProvider": "Heidelpay\\Providers\\HeidelpayServiceProvider",
+  "dataProviders":
+  [
+    {
+      "key"           :"Heidelpay\\Providers\\InvoiceDetailsProvider",
+      "name"          :"Invoice details",
+      "description"   :"Display invoice details to the customer."
+    }
+  ],
   "marketplaceName": {
     "de": "heidelpay Payment Gateway",
     "en": "heidelpay Payment Gateway"
@@ -13,7 +21,7 @@
   },
   "categories": ["3519"],
   "keywords": ["heidelpay", "plentymarkets", "plugin", "payment", "payment method", "credit card", "debit card", "sofort", "direct debit"],
-  "version": "1.1.2",
+  "version": "1.2.0",
   "license": "Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.",
   "price": 0.00,
   "author": "heidelpay GmbH",
@@ -23,10 +31,11 @@
   "type": "payment",
   "require": ["IO"],
   "dependencies": {
-    "heidelpay/php-basket-api": "^1.0.2",
-    "heidelpay/php-payment-api": "^1.6.0"
+    "heidelpay/php-basket-api": "^1.0.3",
+    "heidelpay/php-payment-api": "^1.7.1"
   },
   "runOnBuild": [
-    "Heidelpay\\Migrations\\CreateHeidelpayTables"
+    "Heidelpay\\Migrations\\CreateHeidelpayTables",
+    "Heidelpay\\Migrations\\AddInvoiceSecuredB2C"
   ]
 }

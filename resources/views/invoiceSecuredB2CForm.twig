@@ -1,0 +1,74 @@
+{% extends "Heidelpay::base" %}
+
+{% block content %}
+    <form action="{{ submit_action }}" id="heidelpay-payment-form" method="post">
+        <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-2">
+                <label for="salutation" class="required">{{ trans('Heidelpay::template.salutation') }} <em>*</em></label>
+            </div>
+            <div class="col-md-2">
+                <select id="salutation" name="customer_salutation" required>
+                    <option value="" disabled {% if customer_gender == '' %}selected{% endif %}>{{ trans('Heidelpay::template.choose') }}</option>
+                    <option value="MR" {% if customer_gender == 'male' %}selected{% endif %}>{{ trans('Heidelpay::template.mr') }}</option>
+                    <option value="MRS" {% if customer_gender == 'female' %}selected{% endif %}>{{ trans('Heidelpay::template.mrs') }}</option>
+                </select>
+            </div>
+            <div class="col-md-4"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-2">
+                <label for="dateofbirth" class="required">{{ trans('Heidelpay::template.birthday') }} <em>*</em></label>
+            </div>
+            <div class="col-md-1">
+                <div class="input-box" style="width:100%">
+                    <select id="dob_day" name="customer_dob_day" required>
+                        <option disabled {% if customer_dob_day == '' %} selected {% endif %} value="">
+                            {{ trans('Heidelpay::template.day') }}</option>
+                        {% for day in 1..31 %}
+                            {% set day = '%02d'|format(day) %}
+                            <option value="{{ day }}"
+                                {% if not customer_dob_day == '' and day == customer_dob_day %} selected{% endif %}>
+                                {{ day }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <div class="input-box" style="width:100%">
+                    <select title="dob_month" name="customer_dob_month" required>
+                        <option disabled {% if customer_dob_month == '' %} selected {% endif %} value="">
+                            {{ trans('Heidelpay::template.month') }}</option>
+                        {% for month in 1..12 %}
+                            {% set month = '%02d'|format(month) %}
+                            <option value="{{ month }}"
+                                    {% if not customer_dob_month == '' and month == customer_dob_month %} selected{% endif %}>
+                                {{ month }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <div class="input-box" style="width:100%">
+                    <select id="dob_year" name="customer_dob_year" required>
+                        <option disabled {% if customer_dob_year == '' %} selected {% endif %} value="">
+                            {{ trans('Heidelpay::template.year') }}</option>
+                        {% set minYear = "now -80 years"|date("Y") %}
+                        {% set maxYear = "now -18 years"|date("Y") %}
+                        {% for year in maxYear..minYear %}
+                            <option value="{{ year }}"
+                                    {% if not customer_dob_year == '' and year == customer_dob_year %} selected{% endif %}>
+                                {{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+        {% include "Heidelpay::partials/cancelSubmitButtons" %}
+    </form>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

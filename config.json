@@ -321,6 +321,59 @@
           }
         }
       }
+    },
+    "Config.invoicesecuredb2cTab": {
+      "label": "Config.invoicesecuredb2cTab",
+      "formFields": {
+        "invoicesecuredb2c.isActive": {
+          "type": "checkBox",
+          "required": false,
+          "label": "Config.invoicesecuredb2cIsActiveLabel",
+          "options": {
+            "defaultValue": false
+          }
+        },
+        "invoicesecuredb2c.displayName": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.invoicesecuredb2cDisplayNameLabel",
+          "options": {
+            "defaultValue": "Gesicherter Rechnungskauf B2C"
+          }
+        },
+        "invoicesecuredb2c.channelId": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.invoicesecuredb2cChannelIdLabel",
+          "options": {
+            "defaultValue": "31HA07BC8129FBA7AF65934626B0F907"
+          }
+        },
+        "invoicesecuredb2c.minAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.invoicesecuredb2cMinAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "invoicesecuredb2c.maxAmount": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.invoicesecuredb2cMaxAmountLabel",
+          "options": {
+            "defaultValue": "0,00"
+          }
+        },
+        "invoicesecuredb2c.iconUrl": {
+          "type": "inputText",
+          "required": false,
+          "label": "Config.invoicesecuredb2cIconUrl",
+          "options": {
+            "defaultValue": ""
+          }
+        }
+      }
     }
   }
 }

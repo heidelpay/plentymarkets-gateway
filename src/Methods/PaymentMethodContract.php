@@ -122,4 +122,26 @@ interface PaymentMethodContract
      * @return string
      */
     public function getFormTemplate(): string;
+
+    /**
+     * Returns true if the customer has to be redirected to enter additional information (e.g. 3D-secure, sofort, etc.).
+     * This determines whether a synchronous or asynchronous request is performed.
+     *
+     * @return bool
+     */
+    public function needsCustomerInput(): bool;
+
+    /**
+     * Returns true if a basket id has to be requested.
+     *
+     * @return bool
+     */
+    public function needsBasket(): bool;
+
+    /**
+     * Returns true if bank information has to be shown to the customer.
+     *
+     * @return bool
+     */
+    public function renderInvoiceData(): bool;
 }

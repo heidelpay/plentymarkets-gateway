@@ -4,11 +4,11 @@ namespace Heidelpay\Controllers;
 
 use Heidelpay\Constants\Routes;
 use Heidelpay\Exceptions\SecurityHashInvalidException;
-use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
+use Heidelpay\Services\UrlServiceContract;
 use Heidelpay\Traits\Translator;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
@@ -34,39 +34,39 @@ class ResponseController extends Controller
     private $request;
     /** @var Response */
     private $response;
-    /** @var PaymentHelper */
-    private $paymentHelper;
     /** @var PaymentService */
     private $paymentService;
     /** @var TransactionService*/
     private $transactionService;
     /** @var NotificationServiceContract */
     private $notification;
+    /** @var UrlServiceContract */
+    private $urlService;
 
     /**
      * ResponseController constructor.
      *
      * @param Request $request
      * @param Response $response
-     * @param PaymentHelper $paymentHelper
      * @param PaymentService $paymentService
      * @param TransactionService $transactionService
      * @param NotificationServiceContract $notification
+     * @param UrlServiceContract $urlService
      */
     public function __construct(
         Request $request,
         Response $response,
-        PaymentHelper $paymentHelper,
         PaymentService $paymentService,
         TransactionService $transactionService,
-        NotificationServiceContract $notification
+        NotificationServiceContract $notification,
+        UrlServiceContract $urlService
     ) {
         $this->request = $request;
         $this->response = $response;
-        $this->paymentHelper = $paymentHelper;
         $this->paymentService = $paymentService;
         $this->transactionService = $transactionService;
         $this->notification = $notification;
+        $this->urlService = $urlService;
     }
 
     /**
@@ -138,12 +138,12 @@ class ResponseController extends Controller
             // if the transaction is successful or pending, return the success url.
             if ($validHash && ($response['isSuccess'] || $response['isPending'])) {
                 $this->notification->debug('response.debugReturnSuccessUrl', __METHOD__, ['Response' => $response]);
-                return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_SUCCESS;
+                return $this->urlService->generateURL(Routes::CHECKOUT_SUCCESS);
             }
         }
 
         $this->notification->debug('response.debugReturnFailureUrl', __METHOD__, ['Response' => $response]);
-        return $this->paymentHelper->getDomain() . '/' . Routes::CHECKOUT_CANCEL;
+        return $this->urlService->generateURL(Routes::CHECKOUT_CANCEL);
     }
 
     /**

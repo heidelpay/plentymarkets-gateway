@@ -104,6 +104,10 @@ class PaymentService
      * @var OrderRepositoryContract
      */
     private $orderRepo;
+    /**
+     * @var UrlServiceContract
+     */
+    private $urlService;
 
     /**
      * PaymentService constructor.
@@ -120,6 +124,7 @@ class PaymentService
      * @param MethodConfigContract $methodConfig
      * @param OrderTxnIdRelationRepositoryContract $orderTxnIdRepo
      * @param OrderRepositoryContract $orderRepo
+     * @param UrlServiceContract $urlService
      */
     public function __construct(
         AddressRepositoryContract $addressRepository,
@@ -133,7 +138,8 @@ class PaymentService
         NotificationServiceContract $notification,
         MethodConfigContract $methodConfig,
         OrderTxnIdRelationRepositoryContract $orderTxnIdRepo,
-        OrderRepositoryContract $orderRepo
+        OrderRepositoryContract $orderRepo,
+        UrlServiceContract $urlService
     ) {
         $this->addressRepository = $addressRepository;
         $this->countryRepository = $countryRepository;
@@ -147,6 +153,7 @@ class PaymentService
         $this->methodConfig = $methodConfig;
         $this->orderTxnIdRepo = $orderTxnIdRepo;
         $this->orderRepo = $orderRepo;
+        $this->urlService = $urlService;
     }
 
     /**
@@ -345,15 +352,14 @@ class PaymentService
         $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basketArray['basketAmount'];
         $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basketArray['currency'];
 
-        $this->heidelpayRequest['FRONTEND_ENABLED'] = 'TRUE';
-        $this->heidelpayRequest['FRONTEND_LANGUAGE'] = $this->sessionStorageFactory->getLocaleSettings()->language;
-        $this->heidelpayRequest['FRONTEND_RESPONSE_URL'] =
-            $this->paymentHelper->getDomain() . '/' . Routes::RESPONSE_URL;
+        $this->heidelpayRequest['FRONTEND_ENABLED']      = 'TRUE';
+        $this->heidelpayRequest['FRONTEND_LANGUAGE']     = $this->sessionStorageFactory->getLocaleSettings()->language;
+        $this->heidelpayRequest['FRONTEND_RESPONSE_URL'] = $this->urlService->generateURL(Routes::RESPONSE_URL);
 
         // add the origin domain, which is important for the CSP
         // set 'PREVENT_ASYNC_REDIRECT' to false, to ensure the customer is being redirected after submitting the form.
         if (\in_array($paymentMethod, self::CARD_METHODS, true)) {
-            $this->heidelpayRequest['FRONTEND_PAYMENT_FRAME_ORIGIN'] = $this->paymentHelper->getDomain();
+            $this->heidelpayRequest['FRONTEND_PAYMENT_FRAME_ORIGIN'] = $this->urlService->getDomain();
             $this->heidelpayRequest['FRONTEND_PREVENT_ASYNC_REDIRECT'] = 'false';
         }
 
@@ -374,8 +380,7 @@ class PaymentService
         $this->heidelpayRequest['CRITERION_BASKET_ID'] = $basketArray['id'];
         $this->heidelpayRequest['CRITERION_ORDER_ID'] = $basketArray['orderId'];
         $this->heidelpayRequest['CRITERION_ORDER_TIMESTAMP'] = $basketArray['orderTimestamp'];
-        $this->heidelpayRequest['CRITERION_PUSH_URL'] =
-            $this->paymentHelper->getDomain() . '/' . Routes::PUSH_NOTIFICATION_URL;
+        $this->heidelpayRequest['CRITERION_PUSH_URL'] = $this->urlService->generateURL(Routes::PUSH_NOTIFICATION_URL);
 
         $secret = $secretService->getSecretHash($transactionId);
         if (null !== $secret) {
@@ -703,5 +708,6 @@ class PaymentService
 
         $this->orderRepo->updateOrder($order->toArray(), $order->id);
     }
+
     //</editor-fold>
 }

@@ -8,6 +8,7 @@ Aktuell werden folgende Zahlarten unterstützt:
 * Debitkarte
 * Lastschrift (ungesichert)
 * Sofort.
+* Gesicherter Rechnungskauf B2C
 
 ## Anforderungen
 * Dieses Plugin ist für Plentymarkets 7 entwickelt worden.
@@ -61,11 +62,11 @@ Diese Information erhalten Sie von ihrem heidelpay-Ansprechpartner.
 
 ###### Geheimer Schlüssel
 Der Schlüssel ist erforderlich, um einen Sicherheitshash zu generieren, der verwendet wird um zu verifizieren, dass alle Transaktionen tatsächlich vom heidelpay backend kommen.\
-Dieser Parameter ist erforderlich und darf nicht leer gelassen werden sein.
+Dieser Parameter ist erforderlich und darf nicht leer gelassen werden. Sie können hier eine beliebige Zeichenfolge eintragen.
 
 ##### Parameter für die Zahlarten
 ###### Aktiv
-Wenn diese Option angehakt ist, wird die entsprechende Zahlart auswählbar auf der Checkout-Seite.
+Wenn diese Option angehakt ist, wird die entsprechende Zahlart auf der Checkout-Seite auswählbar.
 
 ###### Anzeigename
 Der Name unter dem die Zahlart auf der Checkout-Seite angezeigt wird.\
@@ -73,7 +74,7 @@ Wenn hier nichts eingetragen wird, wird der Standardname für die Zahlart angeze
 
 ###### Channel-Id
 Die Id des Kanals auf dem für Sie die entsprechende Zahlart aufgeschaltet wurde.\
-Diese Information erhalten Sie von ihrem heidelpay-Ansprechpartner. 
+Diese Information erhalten Sie von ihrem heidelpay-Ansprechpartner.
 
 ###### Mindest-/Höchstbetrag
 Die Zahlart ist für Ihre Kunden nur auswählbar, wenn die Bestellsumme zwischen diesen beiden Werten liegt.\
@@ -103,12 +104,22 @@ Anforderungen an die URL:
 * sie muss mit 'http://' oder 'https://' beginnen
 * sie muss mit '.jpg', '.png' oder '.gif' enden
 
+### Daten Container
+#### Zusätzliche Zahlungsinformationen
+Dieses Modul stellt einen Container zur Verfügung, der Zahlungsinformationen (z.B. Überweisungsdaten für Rechnungskäufe) darstellt.\
+Um diese Informationen auf der Buchungsbestätigungs-Seite darzustellen folgen Sie bitte folgenden Schritten.
+1. wechseln Sie im Backend auf den Menüpunkt *CMS > Container-Verknüpfungen*
+2. wählen Sie im Drop-Down-Menü das Plug-in Set, für welches Sie die Änderung vornehmen möchten aus
+3. klappen Sie das Menü *Invoice Details (Heidelpay)* auf und aktivieren hier den Ceres-Container ``Order confirmation: Additional payment information``
+4. klicken Sie den speichern Button
+![Container-Verknüpfung](../images/preview_4.png)
+
 ## Beschreibung der Zahlungsabläufe 
 ### Kreditkarte und Debitkarte
 * Wenn für die Zahlart der **Buchungsmodus 'Direkte Buchung'** ausgewählt ist, wird die Zahlung sofort erzeugt und mit der Bestellung verknüpft.
 Es sind in diesem Fall keine weiteren Schritte notwendig um den Betrag zu buchen. Ist die Zahlung erfolgreich, wird die Bestellung sofort erzeugt und im Backend als bezahlt markiert.
 Schlägt die Zahlung fehl, wird die Bestellung nicht erzeugt und der Kunde wird zur Checkout-Seite umgeleitet.
-* Wenn für die Zahlart der **Buchungsmodus 'Reservierung mit Erfassung bei Rechnungserstellung'** ausgewählt ist, wird die Bestellung erzeugt aber die Buchung muss manuell im hip ausgelöst werden.
+* Wenn für die Zahlart der **Buchungsmodus 'Reservierung mit Erfassung bei Rechnungserstellung'** ausgewählt ist, wird die Bestellung erzeugt aber die Buchung muss manuell im hIP ausgelöst werden.
 Die Buchungstransaktion (Capture) wird dann in Ihren Plenty-Markets shop gepusht (hierfür die Push-URL im bei heidelpay eingetragen sein s. Anforderungen).
 Dies führt dazu, dass eine Zahlung im Plenty-Backend angelegt wird und mit der entsprechenden Buchung verknüpft wird.
 
@@ -120,6 +131,12 @@ Die Zahlung wird sofort erzeugt und mit der Bestellung verknüpft.\
 Es sind keine weiteren Schritte notwendig, um den Betrag zu buchen.\
 Wenn die Zahlung erfolgreich ist, wird die Bestellung im Backend direkt als bezahlt markiert.\
 Wenn die Zahlung fehlschlägt, wird die Bestellung nicht erzeugt und der Kunde wird wieder auf die Checkout-Seite des Shops geleitet.
+
+### Gesicherter Rechnungskauf B2C
+Um die Sicherung zu aktivieren müssen Sie im hIP eine Finalisierung (FIN) ausführen.\
+Ab diesem Zeitpunkt startet der vertraglich festgelegte Versicherungzeitraum innerhalb dessen die Zahlung durch den Kunden erwartet wird.\
+Wenn der Kunde die Überweisung tätigt erscheint diese im hIP als Receipt (REC) und wird an die Push-URL ihres Shops gesendet.\
+Hier wird daraufhin eine Zahlung angelegt und mit der Buchung verknüpft.
 
 ### Alle Zahlarten
 * Zahlungen im Plenty-Backend enthalten die txnId (heidelpay Bestellnummer), die shortId (die eindeutige id der Transaktion d. h. Receipt, Debit oder Capture) und den Hinweis, dass es sich um eine durch heidelpay angelegte Zahlung handelt.

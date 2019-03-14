@@ -366,7 +366,7 @@ class PaymentService
             'isoCode2'
         );
 
-        if ($billingAddress->companyName !== null) {
+        if ($this->basketService->isBasketB2B()) {
             $this->heidelpayRequest['NAME_COMPANY'] = $billingAddress->companyName;
         }
 

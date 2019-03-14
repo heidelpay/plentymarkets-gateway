@@ -1,5 +1,19 @@
 # heidelpay Payment Gateway Changelog
 
+## [1.2.0][1.2.0]
+
+### Added
+- Zahlart ``gesicherter Rechnungskauf B2C`` hinzugefügt.
+- Daten-Container für zusätzliche Zahlungsinformationen ergänzt. [Siehe Beschreibung im User Guide.](user_guide_de.md)
+- Weiteres Vorschaubild hinzugefügt.
+- Warenkorbübertragung für gesicherte Zahlarten aktiviert.
+
+### Changed
+- User guides aktualisiert.
+
+### Removed
+- Veralteten code entfernt.
+
 ## [1.1.2][1.1.2]
 
 ### Fixed
@@ -40,3 +54,4 @@
 [1.1.0]: https://github.com/heidelpay/plentymarkets-gateway/tree/1.1.0
 [1.1.1]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.1.0..1.1.1
 [1.1.2]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.1.1..1.1.2
+[1.2.0]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.1.2..1.2.0

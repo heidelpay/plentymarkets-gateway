@@ -20,7 +20,6 @@ use Heidelpay\Models\Transaction;
 use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
@@ -104,10 +103,6 @@ class PaymentService
      * @var UrlServiceContract
      */
     private $urlService;
-    /**
-     * @var BasketRepositoryContract
-     */
-    private $basketRepository;
     /**
      * @var ContactRepositoryContract
      */
@@ -286,15 +281,12 @@ class PaymentService
 
         $value = $this->urlService->generateURL(Routes::HANDLE_FORM_URL);
 
+        $basket     = $this->basketService->getBasket();
         if ($methodInstance->hasToBeInitialized()) {
             try {
-                $result = $this->sendPaymentRequest(
-                    $this->basketRepository->load(),
-                    $paymentMethod,
-                    $methodInstance->getTransactionType(),
-                    $mopId
-                );
-                $value = $this->handleSyncResponse($type, $result);
+                $transactionType = $methodInstance->getTransactionType();
+                $result          = $this->sendPaymentRequest($basket, $paymentMethod, $transactionType, $mopId);
+                $value           = $this->handleSyncResponse($type, $result);
             } catch (\RuntimeException $e) {
                 $this->notification->error($clientErrorMessage, __METHOD__, [$type, $e->getMessage()], true);
                 $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
@@ -303,7 +295,6 @@ class PaymentService
             }
         }
 
-        $basket     = $this->basketRepository->load();
         $customerId = $basket->customerId;
 
         $contact    = $this->contactRepo->findContactById($customerId);

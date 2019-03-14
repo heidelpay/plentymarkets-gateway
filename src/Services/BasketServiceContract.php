@@ -60,4 +60,11 @@ interface BasketServiceContract
      * @return Basket
      */
     public function getBasket(): Basket;
+
+    /**
+     * Returns the country code as isoCode2.
+     *
+     * @return string
+     */
+    public function getBillingCountryCode(): string;
 }

@@ -35,6 +35,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     const NEEDS_BASKET = false;
     const RENDER_INVOICE_DATA = false;
     const B2C_ONLY = false;
+    const COUNTRY_RESTRICTION = [];
 
     /**
      * @var PaymentHelper $helper
@@ -96,6 +97,13 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
         // enable the payment method only if it is enabled for the current transaction (B2C||B2B)
         if ($this->isB2cOnly() && $this->basketService->isBasketB2B()) {
             return false;
+        }
+
+        // enable the payment method only if it is allowed for the given billing country
+        $countryRestrictions = $this->getCountryRestrictions();
+        if (!empty($countryRestrictions) &&
+            !in_array($this->basketService->getBillingCountryCode(), $countryRestrictions, true)) {
+                return false;
         }
 
         return true;
@@ -291,5 +299,13 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     public function isB2cOnly(): bool
     {
         return static::B2C_ONLY;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getCountryRestrictions(): array
+    {
+        return static::COUNTRY_RESTRICTION;
     }
 }

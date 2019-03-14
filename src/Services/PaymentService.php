@@ -25,7 +25,6 @@ use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFact
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
-use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
@@ -55,10 +54,6 @@ class PaymentService
      * @var array
      */
     private $heidelpayRequest = [];
-    /**
-     * @var CountryRepositoryContract
-     */
-    private $countryRepository;
     /**
      * @var PaymentRepositoryContract
      */
@@ -115,7 +110,6 @@ class PaymentService
     /**
      * PaymentService constructor.
      *
-     * @param CountryRepositoryContract $countryRepository
      * @param LibService $libraryService
      * @param PaymentRepositoryContract $paymentRepository
      * @param TransactionRepositoryContract $transactionRepo
@@ -131,7 +125,6 @@ class PaymentService
      * @param ContactRepositoryContract $contactRepo
      */
     public function __construct(
-        CountryRepositoryContract $countryRepository,
         LibService $libraryService,
         PaymentRepositoryContract $paymentRepository,
         TransactionRepositoryContract $transactionRepo,
@@ -146,7 +139,6 @@ class PaymentService
         BasketServiceContract $basketService,
         ContactRepositoryContract $contactRepo
     ) {
-        $this->countryRepository = $countryRepository;
         $this->libService = $libraryService;
         $this->paymentRepository = $paymentRepository;
         $this->transactionRepository = $transactionRepo;
@@ -352,10 +344,7 @@ class PaymentService
         $this->heidelpayRequest['ADDRESS_STREET']           = $this->getFullStreetAndHouseNumber($billingAddress);
         $this->heidelpayRequest['ADDRESS_ZIP']              = $billingAddress->postalCode;
         $this->heidelpayRequest['ADDRESS_CITY']             = $billingAddress->town;
-        $this->heidelpayRequest['ADDRESS_COUNTRY']          = $this->countryRepository->findIsoCode(
-            $billingAddress->countryId,
-            'isoCode2'
-        );
+        $this->heidelpayRequest['ADDRESS_COUNTRY']          = $this->basketService->getBillingCountryCode();
 
         if ($this->basketService->isBasketB2B()) {
             $this->heidelpayRequest['NAME_COMPANY'] = $billingAddress->companyName;

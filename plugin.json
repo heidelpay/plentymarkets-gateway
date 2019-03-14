@@ -31,8 +31,8 @@
   "type": "payment",
   "require": ["IO"],
   "dependencies": {
-    "heidelpay/php-basket-api": "^1.0.2",
-    "heidelpay/php-payment-api": "^1.6.0"
+    "heidelpay/php-basket-api": "^1.0.3",
+    "heidelpay/php-payment-api": "^1.7.1"
   },
   "runOnBuild": [
     "Heidelpay\\Migrations\\CreateHeidelpayTables",

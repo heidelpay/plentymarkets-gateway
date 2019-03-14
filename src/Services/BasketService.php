@@ -11,6 +11,7 @@ use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract;
 use Plenty\Modules\Item\Item\Models\Item;
+use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 
 /**
  * Provides connection to heidelpay basketApi.
@@ -50,9 +51,14 @@ class BasketService implements BasketServiceContract
      * @var BasketRepositoryContract
      */
     private $basketRepo;
+    /**
+     * @var CountryRepositoryContract
+     */
+    private $countryRepository;
 
     /**
      * BasketService constructor.
+     * @param CountryRepositoryContract $countryRepository
      * @param AddressRepositoryContract $addressRepository
      * @param BasketRepositoryContract $basketRepo
      * @param LibService $libraryService
@@ -61,6 +67,7 @@ class BasketService implements BasketServiceContract
      * @param AuthHelper $authHelper
      */
     public function __construct(
+        CountryRepositoryContract $countryRepository,
         AddressRepositoryContract $addressRepository,
         BasketRepositoryContract $basketRepo,
         LibService $libraryService,
@@ -74,6 +81,7 @@ class BasketService implements BasketServiceContract
         $this->itemRepo = $itemRepo;
         $this->addressRepository = $addressRepository;
         $this->basketRepo = $basketRepo;
+        $this->countryRepository = $countryRepository;
     }
 
     /**
@@ -154,5 +162,14 @@ class BasketService implements BasketServiceContract
     public function getBasket(): Basket
     {
         return $this->basketRepo->load();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getBillingCountryCode(): string
+    {
+        $billingAddress = $this->getCustomerAddressData()['billing'];
+        return $this->countryRepository->findIsoCode($billingAddress->countryId, 'isoCode2');
     }
 }

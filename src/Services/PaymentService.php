@@ -269,6 +269,7 @@ class PaymentService
             $value = $clientErrorMessage;
             return [$type, $value];
         }
+        $this->notification->error('3',__METHOD__, [$methodInstance]);
 
         $type = $methodInstance->getReturnType();
 
@@ -279,6 +280,7 @@ class PaymentService
         $value = $this->urlService->generateURL(Routes::HANDLE_FORM_URL);
 
         $basket     = $this->basketService->getBasket();
+        $this->notification->error('4',__METHOD__, [$basket]);
         if ($methodInstance->hasToBeInitialized()) {
             try {
                 $transactionType = $methodInstance->getTransactionType();
@@ -293,9 +295,11 @@ class PaymentService
         }
 
         $customerId = $basket->customerId;
+        $this->notification->error('5',__METHOD__, ['customerId' => $customerId]);
 
         $contact    = $this->contactRepo->findContactById($customerId);
         $birthday   = explode('-', substr($contact->birthdayAt, 0, 10));
+        $this->notification->error('6',__METHOD__, ['contact' => $contact]);
 
         if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
             // $value should contain the payment frame url (also form url)

@@ -20,6 +20,7 @@ use Heidelpay\Services\UrlService;
 use Heidelpay\Services\UrlServiceContract;
 use Plenty\Modules\Document\Models\Document;
 use Plenty\Modules\Order\Pdf\Events\OrderPdfGenerationEvent;
+use Plenty\Modules\Order\Pdf\Models\OrderPdfGeneration;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
@@ -144,7 +145,12 @@ class HeidelpayServiceProvider extends ServiceProvider
                     return;
                 }
 
-                $event->addOrderPdfGeneration('Bitte überweisen Sie auf folgendes Konto: iugherogherogherogiherioh');
+                /** @var OrderPdfGeneration $orderPdfGeneration */
+                $orderPdfGeneration = pluginApp(OrderPdfGeneration::class);
+                $orderPdfGeneration->language = 'de';
+                $orderPdfGeneration->advice = 'Bitte überweisen Sie auf folgendes Konto: iugherogherogherogiherioh';
+
+                $event->addOrderPdfGeneration($orderPdfGeneration);
             }
         );
     }

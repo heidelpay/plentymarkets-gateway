@@ -297,8 +297,8 @@ class PaymentService
         $customerId = $basket->customerId;
         $this->notification->error('5',__METHOD__, ['customerId' => $customerId]);
 
-        $contact    = $this->contactRepo->findContactById($customerId);
-        $birthday   = explode('-', substr($contact->birthdayAt, 0, 10));
+        $contact    = $customerId ? $this->contactRepo->findContactById($customerId) : null;
+        $birthday   = $contact ? explode('-', substr($contact->birthdayAt, 0, 10)): null;
         $this->notification->error('6',__METHOD__, ['contact' => $contact]);
 
         if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {

@@ -15,14 +15,13 @@ use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\Sofort;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\ArraySerializerService;
-use Plenty\Modules\Authorization\Services\AuthHelper;
+use Heidelpay\Services\OrderServiceContract;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketChanged;
 use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
 use Plenty\Modules\Basket\Events\BasketItem\AfterBasketItemAdd;
 use Plenty\Modules\Frontend\Events\FrontendLanguageChanged;
 use Plenty\Modules\Frontend\Events\FrontendShippingCountryChanged;
 use Plenty\Modules\Helper\Services\WebstoreHelper;
-use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentPropertyRepositoryContract;
@@ -53,8 +52,6 @@ class PaymentHelper
 
     /** @var PaymentMethodRepositoryContract $paymentMethodRepo */
     protected $paymentMethodRepo;
-    /** @var OrderRepositoryContract */
-    private $orderRepo;
     /** @var PaymentOrderRelationRepositoryContract */
     private $paymentOrderRelationRepo;
     /** @var MainConfigContract */
@@ -63,29 +60,33 @@ class PaymentHelper
     private $methodConfig;
     /** @var PaymentPropertyRepositoryContract */
     private $paymentPropertyRepo;
+    /**
+     * @var OrderServiceContract
+     */
+    private $orderService;
 
     /**
      * @param PaymentMethodRepositoryContract $paymentMethodRepo
-     * @param OrderRepositoryContract $orderRepository
      * @param PaymentOrderRelationRepositoryContract $paymentOrderRepo
      * @param MainConfigContract $mainConfig
      * @param MethodConfigContract $methodConfig
      * @param PaymentPropertyRepositoryContract $propertyRepo
+     * @param OrderServiceContract $orderService
      */
     public function __construct(
         PaymentMethodRepositoryContract $paymentMethodRepo,
-        OrderRepositoryContract $orderRepository,
         PaymentOrderRelationRepositoryContract $paymentOrderRepo,
         MainConfigContract $mainConfig,
         MethodConfigContract $methodConfig,
-        PaymentPropertyRepositoryContract $propertyRepo
+        PaymentPropertyRepositoryContract $propertyRepo,
+        OrderServiceContract $orderService
     ) {
         $this->paymentMethodRepo = $paymentMethodRepo;
-        $this->orderRepo = $orderRepository;
         $this->paymentOrderRelationRepo = $paymentOrderRepo;
         $this->mainConfig = $mainConfig;
         $this->methodConfig = $methodConfig;
         $this->paymentPropertyRepo = $propertyRepo;
+        $this->orderService = $orderService;
     }
 
     /**
@@ -287,7 +288,7 @@ class PaymentHelper
     public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId): Order
     {
         /** @var Order $order */
-        $order = $this->getOrder($orderId);
+        $order = $this->orderService->getOrder($orderId);
 
         $additionalInfo = ['Order' => $order, 'Payment' => $payment];
         $this->getLogger(__METHOD__)->debug('Heidelpay::payment.debugAssignPaymentToOrder', $additionalInfo);
@@ -467,37 +468,6 @@ class PaymentHelper
         $this->paymentPropertyRepo->changeProperty($bookingTextProperty);
 
         return $this;
-    }
-
-    /**
-     * Fetches the Order object to the given orderId.
-     *
-     * @param int $orderId
-     * @return Order
-     * @throws \RuntimeException
-     */
-    public function getOrder(int $orderId): Order
-    {
-        $order = null;
-
-        /** @var AuthHelper $authHelper */
-        $authHelper = pluginApp(AuthHelper::class);
-
-        try {// Get the order by the given order ID
-            $order = $authHelper->processUnguarded(
-                function () use ($orderId) {
-                    return $this->orderRepo->findOrderById($orderId, ['comments']);
-                }
-            );
-        } catch (\Exception $e) {
-            // no need to handle here
-        }
-
-        // Check whether the order exists
-        if (!$order instanceof Order) {
-            throw new \RuntimeException('payment.warningOrderDoesNotExist');
-        }
-        return $order;
     }
 
     /**

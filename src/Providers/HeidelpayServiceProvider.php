@@ -15,6 +15,8 @@ use Heidelpay\Services\BasketService;
 use Heidelpay\Services\BasketServiceContract;
 use Heidelpay\Services\NotificationService;
 use Heidelpay\Services\NotificationServiceContract;
+use Heidelpay\Services\OrderService;
+use Heidelpay\Services\OrderServiceContract;
 use Heidelpay\Services\PaymentService;
 use Heidelpay\Services\UrlService;
 use Heidelpay\Services\UrlServiceContract;
@@ -55,6 +57,7 @@ class HeidelpayServiceProvider extends ServiceProvider
         $app->bind(OrderTxnIdRelationRepositoryContract::class, OrderTxnIdRelationRepository::class);
         $app->bind(UrlServiceContract::class, UrlService::class);
         $app->bind(BasketServiceContract::class, BasketService::class);
+        $app->bind(OrderServiceContract::class, OrderService::class);
     }
 
     /**
@@ -127,8 +130,7 @@ class HeidelpayServiceProvider extends ServiceProvider
         $eventDispatcher->listen(
             OrderPdfGenerationEvent::class,
             function (OrderPdfGenerationEvent $event) use (
-                $notificationService,
-                $paymentHelper
+                $notificationService
             ) {
                 $order = $event->getOrder();
                 $docType = $event->getDocType();

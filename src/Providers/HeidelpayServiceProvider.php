@@ -125,6 +125,8 @@ class HeidelpayServiceProvider extends ServiceProvider
         $eventDispatcher->listen(
             OrderPdfGenerationEvent::class,
             function (OrderPdfGenerationEvent $event) use ($notificationService) {
+                throw new \RuntimeException('OrderPdfGenerationEvent');
+
                 $notificationService->error('OrderPdfGenerationEvent',
                                             __METHOD__,
                                             [

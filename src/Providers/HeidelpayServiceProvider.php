@@ -137,17 +137,13 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $order = $event->getOrder();
                 $docType = $event->getDocType();
 
-                $notificationService->error('OrderPdfGenerationEvent',
-                                            __METHOD__,
-                                            [
-                                                'Order' => $order,
-                                                'DocType' => $docType
-                                            ], true
-                );
+                $notificationService->error('OrderPdfGenerationEvent1', __METHOD__, ['Order' => $order, 'DocType' => $docType], true);
 
                 if ($docType !== Document::INVOICE) {
                     return;
                 }
+
+                $notificationService->error('OrderPdfGenerationEvent2', __METHOD__, ['Order' => $order, 'DocType' => $docType], true);
 
                 /** @var OrderPdfGeneration $orderPdfGeneration */
                 $orderPdfGeneration           = pluginApp(OrderPdfGeneration::class);
@@ -156,10 +152,13 @@ class HeidelpayServiceProvider extends ServiceProvider
 
                 $paymentDetails = $paymentHelper->getPaymentDetailsForOrder($order);
 
+                $notificationService->error('OrderPdfGenerationEvent3', __METHOD__, ['$paymentDetails' => $paymentDetails], true);
+
                 if (!isset($paymentDetails['accountIBAN'], $paymentDetails['accountBIC'], $paymentDetails['accountHolder'], $paymentDetails['accountUsage'])) {
                     // do nothing if no payment details are defined,
                     return;
                 }
+                $notificationService->error('OrderPdfGenerationEvent4', __METHOD__, ['$paymentDetails' => $paymentDetails], true);
 
                 $adviceParts = [
                     $notificationService->getTranslation('Heidelpay::template.pleaseTransferTheTotalTo', [], $language),
@@ -169,6 +168,9 @@ class HeidelpayServiceProvider extends ServiceProvider
                     $notificationService->getTranslation('Heidelpay::template.accountUsage', [], $language) . ': ' . $paymentDetails['accountUsage']
                 ];
                 $orderPdfGeneration->advice = implode(PHP_EOL, $adviceParts);
+
+                $notificationService->error('OrderPdfGenerationEvent5', __METHOD__, ['$orderPdfGeneration' => $orderPdfGeneration], true);
+
 
                 $event->addOrderPdfGeneration($orderPdfGeneration);
             }

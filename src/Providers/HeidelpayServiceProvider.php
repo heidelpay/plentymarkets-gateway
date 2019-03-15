@@ -19,6 +19,7 @@ use Heidelpay\Services\PaymentService;
 use Heidelpay\Services\UrlService;
 use Heidelpay\Services\UrlServiceContract;
 use Plenty\Modules\Order\Pdf\Events\OrderPdfGenerationEvent;
+use Plenty\Modules\Order\Pdf\Models\OrderPdfGeneration;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
@@ -123,8 +124,8 @@ class HeidelpayServiceProvider extends ServiceProvider
 
         // add payment information to the invoice pdf
         $eventDispatcher->listen(
-            OrderPdfGenerationEvent::class,
-            function (OrderPdfGenerationEvent $event) use ($notificationService) {
+            OrderPdfGeneration::class,
+            function (OrderPdfGeneration $event) use ($notificationService) {
                 throw new \RuntimeException('OrderPdfGenerationEvent');
 
                 $notificationService->error('OrderPdfGenerationEvent',

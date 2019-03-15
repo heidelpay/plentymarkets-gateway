@@ -2,6 +2,7 @@
 
 namespace Heidelpay\Services;
 
+use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
@@ -14,22 +15,26 @@ class OrderService implements OrderServiceContract
      * @var OrderRepositoryContract
      */
     private $orderRepo;
+    /**
+     * @var OrderTxnIdRelationRepositoryContract
+     */
+    private $orderTxnIdRelationRepo;
 
     /**
      * OrderHelper constructor.
      * @param OrderRepositoryContract $orderRepository
+     * @param OrderTxnIdRelationRepositoryContract $orderTxnIdRelationRepo
      */
-    public function __construct(OrderRepositoryContract $orderRepository)
-    {
-        $this->orderRepo = $orderRepository;
+    public function __construct(
+        OrderRepositoryContract $orderRepository,
+        OrderTxnIdRelationRepositoryContract $orderTxnIdRelationRepo
+    ) {
+        $this->orderRepo              = $orderRepository;
+        $this->orderTxnIdRelationRepo = $orderTxnIdRelationRepo;
     }
 
-
     /**
-     * Returns the language code of the given order or 'DE' as default.
-     *
-     * @param Order $order
-     * @return string
+     * {@inheritDoc}
      */
     public function getLanguage(Order $order): string
     {
@@ -44,11 +49,7 @@ class OrderService implements OrderServiceContract
     }
 
     /**
-     * Fetches the Order object to the given orderId.
-     *
-     * @param int $orderId
-     * @return Order
-     * @throws \RuntimeException
+     * {@inheritDoc}
      */
     public function getOrder(int $orderId): Order
     {
@@ -72,5 +73,14 @@ class OrderService implements OrderServiceContract
             throw new \RuntimeException('payment.warningOrderDoesNotExist');
         }
         return $order;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOrderByTxnId($txnId): Order
+    {
+        $orderId = $this->orderTxnIdRelationRepo->getOrderIdByTxnId($txnId);
+        return $this->getOrder($orderId);
     }
 }

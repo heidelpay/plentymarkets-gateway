@@ -132,7 +132,7 @@ class HeidelpayServiceProvider extends ServiceProvider
         $eventDispatcher->listen(
             OrderPdfGenerationEvent::class,
             function (OrderPdfGenerationEvent $event) use (
-                $notificationService, $orderService
+                $notificationService, $paymentHelper, $orderService
             ) {
                 $order = $event->getOrder();
                 $docType = $event->getDocType();
@@ -153,8 +153,22 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $orderPdfGeneration           = pluginApp(OrderPdfGeneration::class);
                 $language                     = $orderService->getLanguage($order);
                 $orderPdfGeneration->language = $language;
-                $orderPdfGeneration->advice   =
-                    $notificationService->getTranslation('Heidelpay::template.pleaseTransferTheTotalTo', [], $language);
+
+                $paymentDetails = $paymentHelper->getPaymentDetailsForOrder($order);
+
+                if (!isset($paymentDetails['accountIBAN'], $paymentDetails['accountBIC'], $paymentDetails['accountHolder'], $paymentDetails['accountUsage'])) {
+                    // do nothing if no payment details are defined,
+                    return;
+                }
+
+                $adviceParts = [
+                    $notificationService->getTranslation('Heidelpay::template.pleaseTransferTheTotalTo', [], $language),
+                    $notificationService->getTranslation('Heidelpay::template.accountIban', [], $language) . ': ' . $paymentDetails['accountIBAN'],
+                    $notificationService->getTranslation('Heidelpay::template.accountBic', [], $language) . ': ' . $paymentDetails['accountBIC'],
+                    $notificationService->getTranslation('Heidelpay::template.accountHolder', [], $language) . ': ' . $paymentDetails['accountHolder'],
+                    $notificationService->getTranslation('Heidelpay::template.accountUsage', [], $language) . ': ' . $paymentDetails['accountUsage']
+                ];
+                $orderPdfGeneration->advice = implode(PHP_EOL, $adviceParts);
 
                 $event->addOrderPdfGeneration($orderPdfGeneration);
             }

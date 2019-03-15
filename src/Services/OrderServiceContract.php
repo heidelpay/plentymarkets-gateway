@@ -34,4 +34,13 @@ interface OrderServiceContract
      * @throws \RuntimeException
      */
     public function getOrder(int $orderId): Order;
+
+    /**
+     * Returns the order object corresponding to the given txnId.
+     *
+     * @param $txnId
+     * @return Order
+     * @throws \RuntimeException
+     */
+    public function getOrderByTxnId($txnId): Order;
 }

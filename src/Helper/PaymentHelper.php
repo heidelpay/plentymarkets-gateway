@@ -13,6 +13,9 @@ use Heidelpay\Methods\DirectDebit;
 use Heidelpay\Methods\InvoiceSecuredB2C;
 use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Methods\Sofort;
+use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
+use Heidelpay\Models\Contracts\TransactionRepositoryContract;
+use Heidelpay\Models\OrderTxnIdRelation;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\ArraySerializerService;
 use Heidelpay\Services\OrderServiceContract;
@@ -60,10 +63,14 @@ class PaymentHelper
     private $methodConfig;
     /** @var PaymentPropertyRepositoryContract */
     private $paymentPropertyRepo;
-    /**
-     * @var OrderServiceContract
-     */
+    /** @var OrderServiceContract */
     private $orderService;
+    /** @var OrderTxnIdRelationRepositoryContract */
+    private $orderTxnIdRelationRepo;
+    /**
+     * @var TransactionRepositoryContract
+     */
+    private $transactionRepo;
 
     /**
      * @param PaymentMethodRepositoryContract $paymentMethodRepo
@@ -72,6 +79,8 @@ class PaymentHelper
      * @param MethodConfigContract $methodConfig
      * @param PaymentPropertyRepositoryContract $propertyRepo
      * @param OrderServiceContract $orderService
+     * @param OrderTxnIdRelationRepositoryContract $orderTxnIdRelationRepo
+     * @param TransactionRepositoryContract $transactionRepo
      */
     public function __construct(
         PaymentMethodRepositoryContract $paymentMethodRepo,
@@ -79,7 +88,9 @@ class PaymentHelper
         MainConfigContract $mainConfig,
         MethodConfigContract $methodConfig,
         PaymentPropertyRepositoryContract $propertyRepo,
-        OrderServiceContract $orderService
+        OrderServiceContract $orderService,
+        OrderTxnIdRelationRepositoryContract $orderTxnIdRelationRepo,
+        TransactionRepositoryContract $transactionRepo
     ) {
         $this->paymentMethodRepo = $paymentMethodRepo;
         $this->paymentOrderRelationRepo = $paymentOrderRepo;
@@ -87,6 +98,8 @@ class PaymentHelper
         $this->methodConfig = $methodConfig;
         $this->paymentPropertyRepo = $propertyRepo;
         $this->orderService = $orderService;
+        $this->orderTxnIdRelationRepo = $orderTxnIdRelationRepo;
+        $this->transactionRepo = $transactionRepo;
     }
 
     /**
@@ -487,5 +500,64 @@ class PaymentHelper
         }
 
         return null;
+    }
+
+    /**
+     * Returns an array holding the bank details for the given order.
+     * The array will be empty when no details are available.
+     *
+     * @param Order $order
+     * @return array
+     */
+    public function getPaymentDetailsForOrder(Order $order): array
+    {
+        $relation = $this->orderTxnIdRelationRepo->getOrderTxnIdRelationByOrderId($order->id);
+        if ($relation instanceof OrderTxnIdRelation) {
+            return $this->getPaymentDetailsByTxnId($relation->txnId);
+        }
+
+        return [];
+    }
+
+    /**
+     * Returns an array holding the bank details for the given txnId.
+     * The array will be empty when no details are available.
+     *
+     * @param string $txnId
+     * @return array
+     */
+    public function getPaymentDetailsByTxnId($txnId): array
+    {
+        $transactions = $this->transactionRepo->getTransactionsByTxnId($txnId);
+        $paymentDetails = [];
+
+        foreach ($transactions as $transaction) {
+            /** @var Transaction $transaction */
+            if ($transaction->transactionType === TransactionType::HP_AUTHORIZE) {
+                $details       = $transaction->transactionDetails;
+                if (!isset(
+                    $details['CONNECTOR.ACCOUNT_IBAN'],
+                    $details['CONNECTOR.ACCOUNT_IBAN'],
+                    $details['CONNECTOR.ACCOUNT_IBAN'],
+                    $details['CONNECTOR.ACCOUNT_IBAN']
+                )) {
+                    break;
+                }
+
+                $accountIBAN   = $details['CONNECTOR.ACCOUNT_IBAN'];
+                $accountBIC    = $details['CONNECTOR.ACCOUNT_BIC'];
+                $accountHolder = $details['CONNECTOR.ACCOUNT_HOLDER'];
+                $accountUsage  = $details['CONNECTOR.ACCOUNT_USAGE'] ?? $transaction->shortId;
+
+                $paymentDetails = [
+                    'accountIBAN'   => $accountIBAN,
+                    'accountBIC'    => $accountBIC,
+                    'accountHolder' => $accountHolder,
+                    'accountUsage'  => $accountUsage
+                ];
+            }
+        }
+
+        return $paymentDetails;
     }
 }

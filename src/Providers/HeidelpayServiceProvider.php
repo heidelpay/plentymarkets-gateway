@@ -95,7 +95,8 @@ class HeidelpayServiceProvider extends ServiceProvider
             GetPaymentMethodContent::class,
             function (GetPaymentMethodContent $event) use (
                 $paymentHelper,
-                $paymentService
+                $paymentService,
+                $notificationService
             ) {
                 $mop = $event->getMop();
                 $paymentMethod = $paymentHelper->mapMopToPaymentMethod($mop);

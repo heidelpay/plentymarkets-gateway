@@ -152,7 +152,7 @@ class BasketService implements BasketServiceContract
     {
         $billingAddress = $this->getCustomerAddressData()['billing'];
 
-        return $billingAddress->gender === null;
+        return $billingAddress ? $billingAddress->gender === null : false;
     }
 
     /**

@@ -293,9 +293,8 @@ class PaymentService
         }
 
         $customerId = $basket->customerId;
-
-        $contact    = $this->contactRepo->findContactById($customerId);
-        $birthday   = explode('-', substr($contact->birthdayAt, 0, 10));
+        $contact    = $customerId ? $this->contactRepo->findContactById($customerId) : null;
+        $birthday   = $contact ? explode('-', substr($contact->birthdayAt, 0, 10)): null;
 
         if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
             // $value should contain the payment frame url (also form url)

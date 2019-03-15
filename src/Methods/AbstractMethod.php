@@ -95,16 +95,16 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
         }
 
         // enable the payment method only if it is enabled for the current transaction (B2C||B2B)
-//        if ($this->isB2cOnly() && $this->basketService->isBasketB2B()) {
-//            return false;
-//        }
+        if ($this->isB2cOnly() && $this->basketService->isBasketB2B()) {
+            return false;
+        }
 
-//        // enable the payment method only if it is allowed for the given billing country
-//        $countryRestrictions = $this->getCountryRestrictions();
-//        if (!empty($countryRestrictions) &&
-//            !in_array($this->basketService->getBillingCountryCode(), $countryRestrictions, true)) {
-//                return false;
-//        }
+        // enable the payment method only if it is allowed for the given billing country
+        $countryRestrictions = $this->getCountryRestrictions();
+        if (!empty($countryRestrictions) &&
+            !in_array($this->basketService->getBillingCountryCode(), $countryRestrictions, true)) {
+                return false;
+        }
 
         return true;
     }

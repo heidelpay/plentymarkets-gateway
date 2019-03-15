@@ -69,13 +69,15 @@ class HeidelpayServiceProvider extends ServiceProvider
      * @param PaymentService $paymentService
      * @param Dispatcher $eventDispatcher
      * @param NotificationServiceContract $notificationService
+     * @param OrderServiceContract $orderService
      */
     public function boot(
         PaymentHelper $paymentHelper,
         PaymentMethodContainer $methodContainer,
         PaymentService $paymentService,
         Dispatcher $eventDispatcher,
-        NotificationServiceContract $notificationService
+        NotificationServiceContract $notificationService,
+        OrderServiceContract $orderService
     ) {
         // loop through all of the plugin's available payment methods
         /** @var string $paymentMethodClass */
@@ -130,7 +132,7 @@ class HeidelpayServiceProvider extends ServiceProvider
         $eventDispatcher->listen(
             OrderPdfGenerationEvent::class,
             function (OrderPdfGenerationEvent $event) use (
-                $notificationService
+                $notificationService, $orderService
             ) {
                 $order = $event->getOrder();
                 $docType = $event->getDocType();
@@ -148,9 +150,11 @@ class HeidelpayServiceProvider extends ServiceProvider
                 }
 
                 /** @var OrderPdfGeneration $orderPdfGeneration */
-                $orderPdfGeneration = pluginApp(OrderPdfGeneration::class);
-                $orderPdfGeneration->language = 'de';
-                $orderPdfGeneration->advice = 'Bitte überweisen Sie auf folgendes Konto: iugherogherogherogiherioh';
+                $orderPdfGeneration           = pluginApp(OrderPdfGeneration::class);
+                $language                     = $orderService->getLanguage($order);
+                $orderPdfGeneration->language = $language;
+                $orderPdfGeneration->advice   =
+                    $notificationService->getTranslation('Heidelpay::template.pleaseTransferTheTotalTo', [], $language);
 
                 $event->addOrderPdfGeneration($orderPdfGeneration);
             }

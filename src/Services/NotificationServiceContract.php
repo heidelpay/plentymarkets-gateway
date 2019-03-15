@@ -73,4 +73,14 @@ interface NotificationServiceContract
      * @param array $logData
      */
     public function critical($message, $method = 'no context given', array $logData = []);
+
+    /**
+     * Translates the given message using the given locale.
+     *
+     * @param $message
+     * @param array $parameters
+     * @param string $locale
+     * @return mixed
+     */
+    public function getTranslation($message, $parameters = [], $locale = null);
 }

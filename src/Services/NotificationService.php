@@ -148,12 +148,11 @@ class NotificationService implements NotificationServiceContract
     }
 
     /**
-     * @param $message
-     * @return mixed
+     * {@inheritDoc}
      */
-    protected function getTranslation($message)
+    public function getTranslation($message, $parameters = [], $locale = null)
     {
-        return $this->translator->trans($message);
+        return $this->translator->trans($message, $parameters, $locale);
     }
 
     /**

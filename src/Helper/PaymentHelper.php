@@ -512,11 +512,12 @@ class PaymentHelper
     public function getPaymentDetailsForOrder(Order $order): array
     {
         $relation = $this->orderTxnIdRelationRepo->getOrderTxnIdRelationByOrderId($order->id);
+
         if ($relation instanceof OrderTxnIdRelation) {
             return $this->getPaymentDetailsByTxnId($relation->txnId);
         }
 
-        return [];
+        return ['error' => 'getPaymentDetailsForOrder'];
     }
 
     /**
@@ -529,7 +530,7 @@ class PaymentHelper
     public function getPaymentDetailsByTxnId($txnId): array
     {
         $transactions = $this->transactionRepo->getTransactionsByTxnId($txnId);
-        $paymentDetails = [];
+        $paymentDetails = ['error' => 'getPaymentDetailsByTxnId'];
 
         foreach ($transactions as $transaction) {
             /** @var Transaction $transaction */

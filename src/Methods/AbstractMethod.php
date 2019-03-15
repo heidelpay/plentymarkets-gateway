@@ -99,12 +99,12 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
             return false;
         }
 
-        // enable the payment method only if it is allowed for the given billing country
-        $countryRestrictions = $this->getCountryRestrictions();
-        if (!empty($countryRestrictions) &&
-            !in_array($this->basketService->getBillingCountryCode(), $countryRestrictions, true)) {
-                return false;
-        }
+//        // enable the payment method only if it is allowed for the given billing country
+//        $countryRestrictions = $this->getCountryRestrictions();
+//        if (!empty($countryRestrictions) &&
+//            !in_array($this->basketService->getBillingCountryCode(), $countryRestrictions, true)) {
+//                return false;
+//        }
 
         return true;
     }

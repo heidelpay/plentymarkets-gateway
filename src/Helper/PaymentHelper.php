@@ -517,7 +517,7 @@ class PaymentHelper
             return $this->getPaymentDetailsByTxnId($relation->txnId);
         }
 
-        return ['error' => 'getPaymentDetailsForOrder'];
+        return [];
     }
 
     /**
@@ -530,9 +530,7 @@ class PaymentHelper
     public function getPaymentDetailsByTxnId($txnId): array
     {
         $transactions = $this->transactionRepo->getTransactionsByTxnId($txnId);
-        $paymentDetails = ['error' => 'getPaymentDetailsByTxnId'];
-
-        return $transactions;
+        $paymentDetails = [];
 
         foreach ($transactions as $transaction) {
             /** @var Transaction $transaction */

@@ -18,6 +18,7 @@ use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
 use Heidelpay\Services\UrlService;
 use Heidelpay\Services\UrlServiceContract;
+use Plenty\Modules\Document\Models\Document;
 use Plenty\Modules\Order\Pdf\Events\OrderPdfGenerationEvent;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
@@ -124,14 +125,26 @@ class HeidelpayServiceProvider extends ServiceProvider
         // add payment information to the invoice pdf
         $eventDispatcher->listen(
             OrderPdfGenerationEvent::class,
-            function (OrderPdfGenerationEvent $event) use ($notificationService) {
+            function (OrderPdfGenerationEvent $event) use (
+                $notificationService,
+                $paymentHelper
+            ) {
+                $order = $event->getOrder();
+                $docType = $event->getDocType();
+
                 $notificationService->error('OrderPdfGenerationEvent',
                                             __METHOD__,
                                             [
-                                                'Order' => $event->getOrder(),
-                                                'DocType' => $event->getDocType()
-                                            ],true
+                                                'Order' => $order,
+                                                'DocType' => $docType
+                                            ], true
                 );
+
+                if ($docType !== Document::INVOICE) {
+                    return;
+                }
+
+                $event->addOrderPdfGeneration('Bitte überweisen Sie auf folgendes Konto: iugherogherogherogiherioh');
             }
         );
     }

@@ -112,8 +112,7 @@ Um diese Informationen auf der Buchungsbestätigungs-Seite darzustellen folgen S
 2. wählen Sie im Drop-Down-Menü das Plug-in Set, für welches Sie die Änderung vornehmen möchten aus
 3. klappen Sie das Menü *Invoice Details (Heidelpay)* auf
 4. aktivieren sie den Ceres-Container ``Order confirmation: Additional payment information``
-5. aktivieren sie den Ceres-Container ``My account: Additional payment information``
-6. klicken Sie den speichern Button
+5. klicken Sie den speichern Button
 ![Container-Verknüpfung](../images/preview_4.png)
 
 ## Beschreibung der Zahlungsabläufe 

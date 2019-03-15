@@ -112,8 +112,7 @@ To show the information on your order confirmation page please follow these step
 2. choose the corresponding plug-in set from the drop down
 3. open the menu *Invoice Details (Heidelpay)*
 4. enable the ceres container ``Order confirmation: Additional payment information``
-5. enable the ceres container ``My account: Additional payment information``
-6. click the save button
+5. click the save button
 ![Container links](../images/preview_4.png)
 
 ## Workflow description

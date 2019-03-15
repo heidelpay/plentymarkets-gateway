@@ -124,8 +124,8 @@ class HeidelpayServiceProvider extends ServiceProvider
 
         // add payment information to the invoice pdf
         $eventDispatcher->listen(
-            OrderPdfGeneration::class,
-            function (OrderPdfGeneration $event) use ($notificationService) {
+            OrderPdfGenerationEvent::class,
+            function (OrderPdfGenerationEvent $event) use ($notificationService) {
                 throw new \RuntimeException('OrderPdfGenerationEvent');
 
                 $notificationService->error('OrderPdfGenerationEvent',

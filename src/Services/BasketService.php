@@ -132,7 +132,8 @@ class BasketService implements BasketServiceContract
         $basket = $this->getBasket();
 
         $addresses = [];
-        $addresses['billing'] = $this->addressRepository->findAddressById($basket->customerInvoiceAddressId);
+        $addresses['billing'] = $basket->customerInvoiceAddressId ?
+            $this->addressRepository->findAddressById($basket->customerInvoiceAddressId) : null;
 
         // if the shipping address is -99 or null, it is matching the billing address.
         if ($basket->customerShippingAddressId === null || $basket->customerShippingAddressId === -99) {
@@ -170,6 +171,7 @@ class BasketService implements BasketServiceContract
     public function getBillingCountryCode(): string
     {
         $billingAddress = $this->getCustomerAddressData()['billing'];
-        return $this->countryRepository->findIsoCode($billingAddress->countryId, 'isoCode2');
+        return $billingAddress ?
+            $this->countryRepository->findIsoCode($billingAddress->countryId, 'isoCode2') : '';
     }
 }

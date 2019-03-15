@@ -15,9 +15,14 @@ use Heidelpay\Services\BasketService;
 use Heidelpay\Services\BasketServiceContract;
 use Heidelpay\Services\NotificationService;
 use Heidelpay\Services\NotificationServiceContract;
+use Heidelpay\Services\OrderService;
+use Heidelpay\Services\OrderServiceContract;
 use Heidelpay\Services\PaymentService;
 use Heidelpay\Services\UrlService;
 use Heidelpay\Services\UrlServiceContract;
+use Plenty\Modules\Document\Models\Document;
+use Plenty\Modules\Order\Pdf\Events\OrderPdfGenerationEvent;
+use Plenty\Modules\Order\Pdf\Models\OrderPdfGeneration;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
@@ -52,22 +57,27 @@ class HeidelpayServiceProvider extends ServiceProvider
         $app->bind(OrderTxnIdRelationRepositoryContract::class, OrderTxnIdRelationRepository::class);
         $app->bind(UrlServiceContract::class, UrlService::class);
         $app->bind(BasketServiceContract::class, BasketService::class);
+        $app->bind(OrderServiceContract::class, OrderService::class);
     }
 
     /**
      * Boot the heidelpay Service Provider
      * Register payment methods, add event listeners, ...
      *
-     * @param PaymentHelper            $paymentHelper
-     * @param PaymentMethodContainer   $methodContainer
-     * @param PaymentService           $paymentService
-     * @param Dispatcher               $eventDispatcher
+     * @param PaymentHelper $paymentHelper
+     * @param PaymentMethodContainer $methodContainer
+     * @param PaymentService $paymentService
+     * @param Dispatcher $eventDispatcher
+     * @param NotificationServiceContract $notificationService
+     * @param OrderServiceContract $orderService
      */
     public function boot(
         PaymentHelper $paymentHelper,
         PaymentMethodContainer $methodContainer,
         PaymentService $paymentService,
-        Dispatcher $eventDispatcher
+        Dispatcher $eventDispatcher,
+        NotificationServiceContract $notificationService,
+        OrderServiceContract $orderService
     ) {
         // loop through all of the plugin's available payment methods
         /** @var string $paymentMethodClass */
@@ -115,6 +125,44 @@ class HeidelpayServiceProvider extends ServiceProvider
                     $event->setValue($value);
                     $event->setType($type);
                 }
+            }
+        );
+
+        // add payment information to the invoice pdf
+        $eventDispatcher->listen(
+            OrderPdfGenerationEvent::class,
+            function (OrderPdfGenerationEvent $event) use (
+                $notificationService, $paymentHelper, $orderService
+            ) {
+                $order = $event->getOrder();
+                $docType = $event->getDocType();
+
+                if ($docType !== Document::INVOICE) {
+                    return;
+                }
+
+                /** @var OrderPdfGeneration $orderPdfGeneration */
+                $orderPdfGeneration           = pluginApp(OrderPdfGeneration::class);
+                $language                     = $orderService->getLanguage($order);
+                $orderPdfGeneration->language = $language;
+
+                $paymentDetails = $paymentHelper->getPaymentDetailsForOrder($order);
+
+                if (!isset($paymentDetails['accountIBAN'], $paymentDetails['accountBIC'], $paymentDetails['accountHolder'], $paymentDetails['accountUsage'])) {
+                    // do nothing if no payment details are defined,
+                    return;
+                }
+
+                $adviceParts = [
+                    $notificationService->getTranslation('Heidelpay::template.pleaseTransferTheTotalTo', [], $language),
+                    $notificationService->getTranslation('Heidelpay::template.accountIban', [], $language) . ': ' . $paymentDetails['accountIBAN'],
+                    $notificationService->getTranslation('Heidelpay::template.accountBic', [], $language) . ': ' . $paymentDetails['accountBIC'],
+                    $notificationService->getTranslation('Heidelpay::template.accountHolder', [], $language) . ': ' . $paymentDetails['accountHolder'],
+                    $notificationService->getTranslation('Heidelpay::template.accountUsage', [], $language) . ': ' . $paymentDetails['accountUsage']
+                ];
+                $orderPdfGeneration->advice = implode(PHP_EOL, $adviceParts);
+
+                $event->addOrderPdfGeneration($orderPdfGeneration);
             }
         );
     }

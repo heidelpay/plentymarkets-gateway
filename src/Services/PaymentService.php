@@ -21,6 +21,7 @@ use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
+use Plenty\Modules\Comment\Contracts\CommentRepositoryContract;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
@@ -106,6 +107,10 @@ class PaymentService
      * @var BasketServiceContract
      */
     private $basketService;
+    /**
+     * @var CommentRepositoryContract
+     */
+    private $commentRepo;
 
     /**
      * PaymentService constructor.
@@ -157,7 +162,7 @@ class PaymentService
     /**
      * Executes payment tasks after an order has been created.
      *
-     * @param string         $paymentMethod
+     * @param string $paymentMethod
      * @param ExecutePayment $event
      *
      * @return array

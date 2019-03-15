@@ -1,22 +1,18 @@
 <hr>
+<strong>{{ trans("Heidelpay::template.pleaseTransferTheTotalTo") }}</strong>
 <div class="row">
-    <strong class="col-xs-6 col-sm-5">{{ trans("Heidelpay::template.pleaseTransferTheTotalTo") }}</strong>
-    <span class="col-xs-6 col-sm-7">
-        <div class="row">
-            <div class="col-xs-6">{{ trans("Heidelpay::template.accountIban") }}:</div>
-            <div class="col-xs-6">{{ accountIBAN }}</div>
-        </div>
-        <div class="row">
-            <div class="col-xs-6">{{ trans("Heidelpay::template.accountBic") }}:</div>
-            <div class="col-xs-6">{{ accountBIC }}</div>
-        </div>
-        <div class="row">
-            <div class="col-xs-6">{{ trans("Heidelpay::template.accountHolder") }}:</div>
-            <div class="col-xs-6">{{ accountHolder }}</div>
-        </div>
-        <div class="row">
-            <div class="col-xs-6">{{ trans("Heidelpay::template.accountUsage") }}:</div>
-            <div class="col-xs-6">{{ accountUsage }}</div>
-        </div>
-    </span>
+    <div class="col-xs-6">{{ trans("Heidelpay::template.accountIban") }}:</div>
+    <div class="col-xs-6">{{ accountIBAN }}</div>
+</div>
+<div class="row">
+    <div class="col-xs-6">{{ trans("Heidelpay::template.accountBic") }}:</div>
+    <div class="col-xs-6">{{ accountBIC }}</div>
+</div>
+<div class="row">
+    <div class="col-xs-6">{{ trans("Heidelpay::template.accountHolder") }}:</div>
+    <div class="col-xs-6">{{ accountHolder }}</div>
+</div>
+<div class="row">
+    <div class="col-xs-6">{{ trans("Heidelpay::template.accountUsage") }}:</div>
+    <div class="col-xs-6">{{ accountUsage }}</div>
 </div>

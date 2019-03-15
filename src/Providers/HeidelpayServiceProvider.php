@@ -99,12 +99,9 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $notificationService
             ) {
                 $mop = $event->getMop();
-                $notificationService->error('1', __METHOD__, ['event' => $event]);
                 $paymentMethod = $paymentHelper->mapMopToPaymentMethod($mop);
-                $notificationService->error('2', __METHOD__, ['method' => $paymentMethod]);
 
                 if (!empty($paymentMethod)) {
-                    $notificationService->error('3', __METHOD__, ['method' => $paymentMethod]);
                     list($type, $value) = $paymentService->getPaymentMethodContent($paymentMethod, $mop);
 
                     $event->setValue($value);

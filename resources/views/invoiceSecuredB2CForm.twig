@@ -3,11 +3,11 @@
 {% block content %}
     <form action="{{ submit_action }}" id="heidelpay-payment-form" method="post">
         <div class="row">
-            <div class="col-md-4"></div>
+            <div class="col-md-3"></div>
             <div class="col-md-2">
                 <label for="salutation" class="required">{{ trans('Heidelpay::template.salutation') }} <em>*</em></label>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <select id="salutation" name="customer_salutation" required>
                     <option value="" disabled {% if customer_gender == '' %}selected{% endif %}>{{ trans('Heidelpay::template.choose') }}</option>
                     <option value="MR" {% if customer_gender == 'male' %}selected{% endif %}>{{ trans('Heidelpay::template.mr') }}</option>
@@ -17,7 +17,7 @@
             <div class="col-md-4"></div>
         </div>
         <div class="row">
-            <div class="col-md-4"></div>
+            <div class="col-md-3"></div>
             <div class="col-md-2">
                 <label for="dateofbirth" class="required">{{ trans('Heidelpay::template.birthday') }} <em>*</em></label>
             </div>
@@ -64,7 +64,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-3"></div>
+            <div class="col-md-4"></div>
         </div>
         {% include "Heidelpay::partials/cancelSubmitButtons" %}
     </form>

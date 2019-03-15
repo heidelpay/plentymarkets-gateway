@@ -532,9 +532,11 @@ class PaymentHelper
         $transactions = $this->transactionRepo->getTransactionsByTxnId($txnId);
         $paymentDetails = ['error' => 'getPaymentDetailsByTxnId'];
 
+        return $transactions;
+
         foreach ($transactions as $transaction) {
             /** @var Transaction $transaction */
-            if ($transaction->transactionType === TransactionType::HP_AUTHORIZE) {
+            if ($transaction->transactionType === TransactionType::AUTHORIZE) {
                 $details       = $transaction->transactionDetails;
                 if (!isset(
                     $details['CONNECTOR.ACCOUNT_IBAN'],

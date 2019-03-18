@@ -137,7 +137,7 @@ class BasketService implements BasketServiceContract
         $shippingAddress = $addresses['shipping'];
 
         return  $billingAddress->gender === $shippingAddress->gender &&
-                $this->strCompare($billingAddress, $shippingAddress) &&
+                $this->strCompare($billingAddress->address1, $shippingAddress->address1) &&
                 $this->strCompare($billingAddress->address2, $shippingAddress->address2) &&
                 $billingAddress->postalCode === $shippingAddress->postalCode &&
                 (

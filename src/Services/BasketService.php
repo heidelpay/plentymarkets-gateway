@@ -202,12 +202,12 @@ class BasketService implements BasketServiceContract
     /**
      * Returns true if the strings match case insensitive.
      *
-     * @param Address $billingAddress
-     * @param Address $shippingAddress
+     * @param string $string1
+     * @param string $string2
      * @return bool
      */
-    private function strCompare(Address $billingAddress, Address $shippingAddress): bool
+    private function strCompare($string1, $string2): bool
     {
-        return strtolower($billingAddress->address1) === strtolower($shippingAddress->address1);
+        return strtolower($string1) === strtolower($string2);
     }
 }

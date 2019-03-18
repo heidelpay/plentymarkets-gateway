@@ -137,13 +137,13 @@ class BasketService implements BasketServiceContract
         $shippingAddress = $addresses['shipping'];
 
         return  $billingAddress->gender === $shippingAddress->gender &&
-                $billingAddress->address1 === $shippingAddress->address1 &&
-                $billingAddress->address2 === $shippingAddress->address2 &&
+                strcasecmp($billingAddress->address1, $shippingAddress->address1) &&
+                strcasecmp($billingAddress->address2, $shippingAddress->address2) &&
                 $billingAddress->postalCode === $shippingAddress->postalCode &&
                 (
-                    ($this->isBasketB2B()  && $billingAddress->name1 === $shippingAddress->name1) ||
-                    (!$this->isBasketB2B() && $billingAddress->name2 === $shippingAddress->name2
-                                           && $billingAddress->name3 === $shippingAddress->name3)
+                    ($this->isBasketB2B()  && strcasecmp($billingAddress->name1, $shippingAddress->name1)) ||
+                    (!$this->isBasketB2B() && strcasecmp($billingAddress->name2, $shippingAddress->name2)
+                                           && strcasecmp($billingAddress->name3, $shippingAddress->name3))
                 );
     }
         /**

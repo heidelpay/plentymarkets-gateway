@@ -140,7 +140,6 @@ class BasketService implements BasketServiceContract
                 $billingAddress->address1 === $shippingAddress->address1 &&
                 $billingAddress->address2 === $shippingAddress->address2 &&
                 $billingAddress->postalCode === $shippingAddress->postalCode &&
-                $billingAddress->town === $shippingAddress->town
                 (
                     ($this->isBasketB2B()  && $billingAddress->name1 === $shippingAddress->name1) ||
                     (!$this->isBasketB2B() && $billingAddress->name2 === $shippingAddress->name2

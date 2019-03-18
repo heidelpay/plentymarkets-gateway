@@ -113,6 +113,7 @@ Um diese Informationen auf der Buchungsbestätigungs-Seite darzustellen folgen S
 3. klappen Sie das Menü *Invoice Details (Heidelpay)* auf
 4. aktivieren sie den Ceres-Container ``Order confirmation: Additional payment information``
 5. klicken Sie den speichern Button
+
 ![Container-Verknüpfung](../images/preview_4.png)
 
 ## Beschreibung der Zahlungsabläufe 
@@ -134,10 +135,11 @@ Wenn die Zahlung erfolgreich ist, wird die Bestellung im Backend direkt als beza
 Wenn die Zahlung fehlschlägt, wird die Bestellung nicht erzeugt und der Kunde wird wieder auf die Checkout-Seite des Shops geleitet.
 
 ### Gesicherter Rechnungskauf B2C
-Um die Sicherung zu aktivieren müssen Sie im hIP eine Finalisierung (FIN) ausführen.\
+* Um die Sicherung zu aktivieren müssen Sie im hIP eine Finalisierung (FIN) ausführen.\
 Ab diesem Zeitpunkt startet der vertraglich festgelegte Versicherungzeitraum innerhalb dessen die Zahlung durch den Kunden erwartet wird.\
-Wenn der Kunde die Überweisung tätigt erscheint diese im hIP als Receipt (REC) und wird an die Push-URL ihres Shops gesendet.\
+* Wenn der Kunde die Überweisung tätigt erscheint diese im hIP als Receipt (REC) und wird an die Push-URL ihres Shops gesendet.\
 Hier wird daraufhin eine Zahlung angelegt und mit der Buchung verknüpft.
+* Die Überweisungsinformationen werden automatisch beim Erstellen auf die PDF-Rechnung gedruckt.  
 
 ### Alle Zahlarten
 * Zahlungen im Plenty-Backend enthalten die txnId (heidelpay Bestellnummer), die shortId (die eindeutige id der Transaktion d. h. Receipt, Debit oder Capture) und den Hinweis, dass es sich um eine durch heidelpay angelegte Zahlung handelt.

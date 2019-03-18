@@ -270,12 +270,15 @@ class PaymentService
         }
 
         if ($methodInstance->needsMatchingAddresses() && !$this->basketService->shippingMatchesBillingAddress()) {
+            $billingArray = $this->basketService->getCustomerAddressData()['billing']->toArray();
+            $shippingArray      = $this->basketService->getCustomerAddressData()['shipping']->toArray();
             $this->notification->error(
                 'payment.addressesShouldMatch',
                 __METHOD__,
-                [
-                   'billing' => $this->basketService->getCustomerAddressData()['billing']->toArray(),
-                   'shipping' => $this->basketService->getCustomerAddressData()['shipping']->toArray()
+                ['billing' => $billingArray,
+                 'shipping' => $shippingArray,
+                 'billingcountry' => $billingArray['countryId'],
+                 'shippingcountry' => $shippingArray['countryId']
                 ],
                 true
             );

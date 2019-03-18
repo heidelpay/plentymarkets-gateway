@@ -140,8 +140,8 @@ class BasketService implements BasketServiceContract
                 $this->strCompare($billingAddress['address1'], $shippingAddress['address1']) &&
                 $this->strCompare($billingAddress['address2'], $shippingAddress['address2']) &&
                 $billingAddress['postalCode'] === $shippingAddress['postalCode'] &&
-                $billingAddress['town'] === $shippingAddress['town']&&
-                $billingAddress['country'] === $shippingAddress['country']
+                $this->strCompare($billingAddress['town'], $shippingAddress['town']) &&
+                $this->strCompare($billingAddress['country'], $shippingAddress['country'])
                 (
                     ($this->isBasketB2B()  && $this->strCompare($billingAddress['name1'], $shippingAddress['name1'])) ||
                     (!$this->isBasketB2B() && $this->strCompare($billingAddress['name2'], $shippingAddress['name2'])

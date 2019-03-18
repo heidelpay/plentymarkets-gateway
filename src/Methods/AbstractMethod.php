@@ -36,6 +36,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     const RENDER_INVOICE_DATA = false;
     const B2C_ONLY = false;
     const COUNTRY_RESTRICTION = [];
+    const ADDRESSES_MUST_MATCH = false;
 
     /**
      * @var PaymentHelper $helper
@@ -107,7 +108,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
         }
 
         // show payment only if the billing and shipping address matches
-        if (!$this->basketService->shippingMatchesBillingAddress()) {
+        if ($this->needsMatchingAddresses() && !$this->basketService->shippingMatchesBillingAddress()) {
             return false;
         }
 
@@ -312,5 +313,13 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     public function getCountryRestrictions(): array
     {
         return static::COUNTRY_RESTRICTION;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function needsMatchingAddresses(): bool
+    {
+        return static::ADDRESSES_MUST_MATCH;
     }
 }

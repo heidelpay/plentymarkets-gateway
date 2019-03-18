@@ -137,13 +137,13 @@ class BasketService implements BasketServiceContract
         $shippingAddress = $addresses['shipping'];
 
         return  $billingAddress->gender === $shippingAddress->gender &&
-                strcasecmp($billingAddress->address1, $shippingAddress->address1) &&
-                strcasecmp($billingAddress->address2, $shippingAddress->address2) &&
+                $this->strCompare($billingAddress, $shippingAddress) &&
+                $this->strCompare($billingAddress->address2, $shippingAddress->address2) &&
                 $billingAddress->postalCode === $shippingAddress->postalCode &&
                 (
-                    ($this->isBasketB2B()  && strcasecmp($billingAddress->name1, $shippingAddress->name1)) ||
-                    (!$this->isBasketB2B() && strcasecmp($billingAddress->name2, $shippingAddress->name2)
-                                           && strcasecmp($billingAddress->name3, $shippingAddress->name3))
+                    ($this->isBasketB2B()  && $this->strCompare($billingAddress->name1, $shippingAddress->name1)) ||
+                    (!$this->isBasketB2B() && $this->strCompare($billingAddress->name2, $shippingAddress->name2)
+                                           && $this->strCompare($billingAddress->name3, $shippingAddress->name3))
                 );
     }
         /**
@@ -197,5 +197,17 @@ class BasketService implements BasketServiceContract
         $billingAddress = $this->getCustomerAddressData()['billing'];
         return $billingAddress ?
             $this->countryRepository->findIsoCode($billingAddress->countryId, 'isoCode2') : '';
+    }
+
+    /**
+     * Returns true if the strings match case insensitive.
+     *
+     * @param Address $billingAddress
+     * @param Address $shippingAddress
+     * @return bool
+     */
+    private function strCompare(Address $billingAddress, Address $shippingAddress): bool
+    {
+        return strtolower($billingAddress->address1) === strtolower($shippingAddress->address1);
     }
 }

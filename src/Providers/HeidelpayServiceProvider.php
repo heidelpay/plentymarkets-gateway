@@ -139,10 +139,10 @@ class HeidelpayServiceProvider extends ServiceProvider
                 /** @var Order $order */
                 $order = $event->getOrder();
                 $docType = $event->getDocType();
-                $mop = $order->methodOfPaymentId;
+                $mopId = $order->methodOfPaymentId;
 
                 /** @var AbstractMethod $paymentMethod */
-                $paymentMethod = $paymentHelper->mapMopToPaymentMethod($mop);
+                $paymentMethod = $paymentHelper->getPaymentMethodInstanceByMopId($mopId);
 
                 if ($docType !== Document::INVOICE) {
                     return;

@@ -270,10 +270,15 @@ class PaymentService
         }
 
         if ($methodInstance->needsMatchingAddresses() && !$this->basketService->shippingMatchesBillingAddress()) {
-            $this->notification->error('payment.addressesShouldMatch',
-                                       __METHOD__,
-                                       ['Addresses' => $this->basketService->getCustomerAddressData()],
-                                       true);
+            $this->notification->error(
+                'payment.addressesShouldMatch',
+                __METHOD__,
+                [
+                   'billing' => $this->basketService->getCustomerAddressData()['billing']->toArray(),
+                   'shipping' => $this->basketService->getCustomerAddressData()['shipping']->toArray()
+                ],
+                true
+            );
             return [GetPaymentMethodContent::RETURN_TYPE_ERROR, 'Heidelpay::payment.addressesShouldMatch'];
         }
 

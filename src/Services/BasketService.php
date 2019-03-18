@@ -123,6 +123,31 @@ class BasketService implements BasketServiceContract
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function shippingMatchesBillingAddress(): bool
+    {
+        $basket = $this->getBasket();
+        if ($basket->customerShippingAddressId === null || $basket->customerShippingAddressId === -99) {
+            return true;
+        }
+
+        $addresses = $this->getCustomerAddressData();
+        $billingAddress = $addresses['billing']->toArray();
+        $shippingAddress = $addresses['shipping']->toArray();
+
+        return  $billingAddress['gender'] === $shippingAddress['gender'] &&
+                $this->strCompare($billingAddress['address1'], $shippingAddress['address1']) &&
+                $this->strCompare($billingAddress['address2'], $shippingAddress['address2']) &&
+                $billingAddress['postalCode'] === $shippingAddress['postalCode'] &&
+                $this->strCompare($billingAddress['town'], $shippingAddress['town']) &&
+                (
+                    ($this->isBasketB2B()  && $this->strCompare($billingAddress['name1'], $shippingAddress['name1'])) ||
+                    (!$this->isBasketB2B() && $this->strCompare($billingAddress['name2'], $shippingAddress['name2'])
+                                           && $this->strCompare($billingAddress['name3'], $shippingAddress['name3']))
+                );
+    }
+        /**
      * Gathers address data (billing/invoice and shipping) and returns them as an array.
      *
      * @return Address[]
@@ -173,5 +198,17 @@ class BasketService implements BasketServiceContract
         $billingAddress = $this->getCustomerAddressData()['billing'];
         return $billingAddress ?
             $this->countryRepository->findIsoCode($billingAddress->countryId, 'isoCode2') : '';
+    }
+
+    /**
+     * Returns true if the strings match case insensitive.
+     *
+     * @param string $string1
+     * @param string $string2
+     * @return bool
+     */
+    private function strCompare($string1, $string2): bool
+    {
+        return strtolower($string1) === strtolower($string2);
     }
 }

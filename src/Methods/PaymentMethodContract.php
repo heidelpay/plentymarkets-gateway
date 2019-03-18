@@ -154,4 +154,11 @@ interface PaymentMethodContract
      * Returns an array with the countries the method is restricted to.
      */
     public function getCountryRestrictions(): array;
+
+    /**
+     * Returns true if the shipping and billing address have to match for this payment method.
+     *
+     * @return bool
+     */
+    public function needsMatchingAddresses(): bool;
 }

@@ -62,9 +62,14 @@ interface BasketServiceContract
     public function getBasket(): Basket;
 
     /**
-     * Returns the country code as isoCode2.
+     * Returns the country code of the billing address as isoCode2.
      *
      * @return string
      */
     public function getBillingCountryCode(): string;
+
+    /**
+     * Returns true if the shipping and billing address are equal.
+     */
+    public function shippingMatchesBillingAddress(): bool;
 }

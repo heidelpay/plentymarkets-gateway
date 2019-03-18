@@ -276,9 +276,7 @@ class PaymentService
                 'payment.addressesShouldMatch',
                 __METHOD__,
                 ['billing' => $billingArray,
-                 'shipping' => $shippingArray,
-                 'billingcountry' => $billingArray['countryId'],
-                 'shippingcountry' => $shippingArray['countryId']
+                 'shipping' => $shippingArray
                 ],
                 true
             );

@@ -67,4 +67,9 @@ interface BasketServiceContract
      * @return string
      */
     public function getBillingCountryCode(): string;
+
+    /**
+     * Returns true if the shipping and billing address are equal.
+     */
+    public function shippingMatchesBillingAddress(): bool;
 }

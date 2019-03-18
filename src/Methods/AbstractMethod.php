@@ -106,6 +106,11 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
                 return false;
         }
 
+        // show payment only if the billing and shipping address matches
+        if (!$this->basketService->shippingMatchesBillingAddress()) {
+            return false;
+        }
+
         return true;
     }
 

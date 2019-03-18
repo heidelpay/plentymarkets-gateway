@@ -123,6 +123,31 @@ class BasketService implements BasketServiceContract
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function shippingMatchesBillingAddress(): bool
+    {
+        $basket = $this->getBasket();
+        if ($basket->customerShippingAddressId === null || $basket->customerShippingAddressId === -99) {
+            return true;
+        }
+
+        $addresses = $this->getCustomerAddressData();
+        $billingAddress = $addresses['billing'];
+        $shippingAddress = $addresses['shipping'];
+
+        return  $billingAddress->gender === $shippingAddress->gender &&
+                $billingAddress->street === $shippingAddress->street &&
+                $billingAddress->houseNumber === $shippingAddress->houseNumber &&
+                $billingAddress->postalCode === $shippingAddress->postalCode &&
+                $billingAddress->town === $shippingAddress->town &&
+                $billingAddress->country === $shippingAddress->country
+                (
+                    ($this->isBasketB2B() && $billingAddress->careOf === $shippingAddress->careOf) ||
+                    (!$this->isBasketB2B() && $billingAddress->lastName === $shippingAddress->lastName)
+                );
+    }
+        /**
      * Gathers address data (billing/invoice and shipping) and returns them as an array.
      *
      * @return Address[]

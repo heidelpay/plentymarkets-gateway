@@ -140,6 +140,7 @@ class BasketService implements BasketServiceContract
                 $this->strCompare($billingAddress->address1, $shippingAddress->address1) &&
                 $this->strCompare($billingAddress->address2, $shippingAddress->address2) &&
                 $billingAddress->postalCode === $shippingAddress->postalCode &&
+                $billingAddress->town === $shippingAddress->town
                 (
                     ($this->isBasketB2B()  && $this->strCompare($billingAddress->name1, $shippingAddress->name1)) ||
                     (!$this->isBasketB2B() && $this->strCompare($billingAddress->name2, $shippingAddress->name2)
@@ -157,7 +158,7 @@ class BasketService implements BasketServiceContract
 
         $addresses = [];
         $addresses['billing'] = $basket->customerInvoiceAddressId ?
-            $this->addressRepository->findAddressById($basket->customerInvoiceAddressId) : null;
+            $this->addressRepository->findAddressById($basket->customerInvoiceAddressId)->toArray() : null;
 
         // if the shipping address is -99 or null, it is matching the billing address.
         if ($basket->customerShippingAddressId === null || $basket->customerShippingAddressId === -99) {
@@ -165,7 +166,8 @@ class BasketService implements BasketServiceContract
             return $addresses;
         }
 
-        $addresses['shipping'] = $this->addressRepository->findAddressById($basket->customerShippingAddressId);
+        $addresses['shipping'] =
+            $this->addressRepository->findAddressById($basket->customerShippingAddressId)->toArray();
         return $addresses;
     }
 

@@ -263,15 +263,17 @@ class PaymentService
 
         /** @var AbstractMethod $methodInstance */
         $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
-
         if (!$methodInstance instanceof PaymentMethodContract) {
             $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
             $value = $clientErrorMessage;
             return [$type, $value];
         }
 
-        $type = $methodInstance->getReturnType();
+        if ($methodInstance->needsMatchingAddresses() && !$this->basketService->shippingMatchesBillingAddress()) {
+            return [GetPaymentMethodContent::RETURN_TYPE_ERROR, 'Heidelpay::payment.addressesShouldMatch'];
+        }
 
+        $type = $methodInstance->getReturnType();
         if ($type === GetPaymentMethodContent::RETURN_TYPE_CONTINUE) {
             return [$type, $value];
         }

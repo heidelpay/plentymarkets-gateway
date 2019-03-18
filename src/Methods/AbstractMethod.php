@@ -5,6 +5,7 @@ namespace Heidelpay\Methods;
 use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Services\BasketServiceContract;
+use Heidelpay\Services\NotificationServiceContract;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Plugin\Application;
@@ -51,6 +52,10 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      * @var BasketServiceContract
      */
     private $basketService;
+    /**
+     * @var NotificationServiceContract
+     */
+    private $notificationService;
 
     /**
      * AbstractMethod constructor.
@@ -105,11 +110,6 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
         if (!empty($countryRestrictions) &&
             !in_array($this->basketService->getBillingCountryCode(), $countryRestrictions, true)) {
                 return false;
-        }
-
-        // show payment only if the billing and shipping address matches
-        if ($this->needsMatchingAddresses() && !$this->basketService->shippingMatchesBillingAddress()) {
-            return false;
         }
 
         return true;

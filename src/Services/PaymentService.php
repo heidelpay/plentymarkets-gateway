@@ -259,7 +259,7 @@ class PaymentService
     ): array {
         $value = '';
 
-        $clientErrorMessage = 'Heidelpay::payment.errorInternalErrorTryAgainLater';
+        $clientErrorMessage = $this->notification->getTranslation('Heidelpay::payment.errorInternalErrorTryAgainLater');
 
         /** @var AbstractMethod $methodInstance */
         $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
@@ -270,7 +270,8 @@ class PaymentService
         }
 
         if ($methodInstance->needsMatchingAddresses() && !$this->basketService->shippingMatchesBillingAddress()) {
-            return [GetPaymentMethodContent::RETURN_TYPE_ERROR, 'Heidelpay::payment.addressesShouldMatch'];
+            $value = $this->notification->getTranslation('Heidelpay::payment.addressesShouldMatch');
+            return [GetPaymentMethodContent::RETURN_TYPE_ERROR, $value];
         }
 
         $type = $methodInstance->getReturnType();

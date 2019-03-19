@@ -215,6 +215,7 @@ class ResponseController extends Controller
                __METHOD__,
                ['Message' => $e->getMessage()]
             );
+            $this->notification->error('test');
             return $this->response->redirectTo('checkout');
         }
 

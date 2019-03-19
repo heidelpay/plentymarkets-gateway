@@ -258,11 +258,7 @@ class PaymentService
         int $mopId
     ): array {
         $value = '';
-
-        $this->notification->error('test 1');
-
-        $clientErrorMessage = $this->translator->trans('Heidelpay::payment.errorInternalErrorTryAgainLater');
-        $this->notification->error('test 2',__METHOD__,['error' => $clientErrorMessage]);
+        $clientErrorMessage = $this->notification->getTranslation('Heidelpay::payment.errorInternalErrorTryAgainLater');
 
         /** @var AbstractMethod $methodInstance */
         $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
@@ -274,11 +270,7 @@ class PaymentService
 
         if ($methodInstance->needsMatchingAddresses() && !$this->basketService->shippingMatchesBillingAddress()) {
             $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
-            $this->notification->error('test 3');
-
-            $value = $this->translator->trans('Heidelpay::payment.addressesShouldMatch');
-            $this->notification->error('test 4',__METHOD__,['error' => $value]);
-
+            $value = $this->notification->getTranslation('Heidelpay::payment.addressesShouldMatch');
             return [$type, $value];
         }
 

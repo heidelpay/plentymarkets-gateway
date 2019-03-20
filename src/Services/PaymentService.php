@@ -18,16 +18,14 @@ use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\OrderTxnIdRelation;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Traits\Translator;
-use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
+use Plenty\Modules\Comment\Contracts\CommentRepositoryContract;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
-use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
@@ -57,14 +55,6 @@ class PaymentService
      * @var array
      */
     private $heidelpayRequest = [];
-    /**
-     * @var AddressRepositoryContract
-     */
-    private $addressRepository;
-    /**
-     * @var CountryRepositoryContract
-     */
-    private $countryRepository;
     /**
      * @var PaymentRepositoryContract
      */
@@ -110,19 +100,21 @@ class PaymentService
      */
     private $urlService;
     /**
-     * @var BasketRepositoryContract
-     */
-    private $basketRepository;
-    /**
      * @var ContactRepositoryContract
      */
     private $contactRepo;
+    /**
+     * @var BasketServiceContract
+     */
+    private $basketService;
+    /**
+     * @var CommentRepositoryContract
+     */
+    private $commentRepo;
 
     /**
      * PaymentService constructor.
      *
-     * @param AddressRepositoryContract $addressRepository
-     * @param CountryRepositoryContract $countryRepository
      * @param LibService $libraryService
      * @param PaymentRepositoryContract $paymentRepository
      * @param TransactionRepositoryContract $transactionRepo
@@ -134,12 +126,10 @@ class PaymentService
      * @param OrderTxnIdRelationRepositoryContract $orderTxnIdRepo
      * @param OrderRepositoryContract $orderRepo
      * @param UrlServiceContract $urlService
-     * @param BasketRepositoryContract $basketRepository
+     * @param BasketServiceContract $basketService
      * @param ContactRepositoryContract $contactRepo
      */
     public function __construct(
-        AddressRepositoryContract $addressRepository,
-        CountryRepositoryContract $countryRepository,
         LibService $libraryService,
         PaymentRepositoryContract $paymentRepository,
         TransactionRepositoryContract $transactionRepo,
@@ -151,11 +141,9 @@ class PaymentService
         OrderTxnIdRelationRepositoryContract $orderTxnIdRepo,
         OrderRepositoryContract $orderRepo,
         UrlServiceContract $urlService,
-        BasketRepositoryContract $basketRepository,
+        BasketServiceContract $basketService,
         ContactRepositoryContract $contactRepo
     ) {
-        $this->addressRepository = $addressRepository;
-        $this->countryRepository = $countryRepository;
         $this->libService = $libraryService;
         $this->paymentRepository = $paymentRepository;
         $this->transactionRepository = $transactionRepo;
@@ -167,14 +155,14 @@ class PaymentService
         $this->orderTxnIdRepo = $orderTxnIdRepo;
         $this->orderRepo = $orderRepo;
         $this->urlService = $urlService;
-        $this->basketRepository = $basketRepository;
         $this->contactRepo = $contactRepo;
+        $this->basketService = $basketService;
     }
 
     /**
      * Executes payment tasks after an order has been created.
      *
-     * @param string         $paymentMethod
+     * @param string $paymentMethod
      * @param ExecutePayment $event
      *
      * @return array
@@ -271,34 +259,34 @@ class PaymentService
     ): array {
         $value = '';
 
-        $clientErrorMessage = 'Heidelpay::payment.errorInternalErrorTryAgainLater';
+        $clientErrorMessage = $this->notification->getTranslation('Heidelpay::payment.errorInternalErrorTryAgainLater');
 
         /** @var AbstractMethod $methodInstance */
         $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
-
         if (!$methodInstance instanceof PaymentMethodContract) {
             $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
             $value = $clientErrorMessage;
             return [$type, $value];
         }
 
-        $type = $methodInstance->getReturnType();
+        if ($methodInstance->needsMatchingAddresses() && !$this->basketService->shippingMatchesBillingAddress()) {
+            $value = $this->notification->getTranslation('Heidelpay::payment.addressesShouldMatch');
+            return [GetPaymentMethodContent::RETURN_TYPE_ERROR, $value];
+        }
 
+        $type = $methodInstance->getReturnType();
         if ($type === GetPaymentMethodContent::RETURN_TYPE_CONTINUE) {
             return [$type, $value];
         }
 
         $value = $this->urlService->generateURL(Routes::HANDLE_FORM_URL);
 
+        $basket     = $this->basketService->getBasket();
         if ($methodInstance->hasToBeInitialized()) {
             try {
-                $result = $this->sendPaymentRequest(
-                    $this->basketRepository->load(),
-                    $paymentMethod,
-                    $methodInstance->getTransactionType(),
-                    $mopId
-                );
-                $value = $this->handleSyncResponse($type, $result);
+                $transactionType = $methodInstance->getTransactionType();
+                $result          = $this->sendPaymentRequest($basket, $paymentMethod, $transactionType, $mopId);
+                $value           = $this->handleSyncResponse($type, $result);
             } catch (\RuntimeException $e) {
                 $this->notification->error($clientErrorMessage, __METHOD__, [$type, $e->getMessage()], true);
                 $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
@@ -307,11 +295,9 @@ class PaymentService
             }
         }
 
-        $basket     = $this->basketRepository->load();
         $customerId = $basket->customerId;
-
-        $contact    = $this->contactRepo->findContactById($customerId);
-        $birthday   = explode('-', substr($contact->birthdayAt, 0, 10));
+        $contact    = $customerId ? $this->contactRepo->findContactById($customerId) : null;
+        $birthday   = $contact ? explode('-', substr($contact->birthdayAt, 0, 10)): null;
 
         if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
             // $value should contain the payment frame url (also form url)
@@ -345,9 +331,6 @@ class PaymentService
     {
         $basketArray = $basket->toArray();
 
-        /** @var BasketService $basketService */
-        $basketService = pluginApp(BasketService::class);
-
         /** @var SecretService $secretService */
         $secretService = pluginApp(SecretService::class);
 
@@ -359,7 +342,7 @@ class PaymentService
         $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
 
         // set customer personal information & address data
-        $addresses      = $this->getCustomerAddressData($basket);
+        $addresses      = $this->basketService->getCustomerAddressData();
         $billingAddress = $addresses['billing'];
         $this->heidelpayRequest['IDENTIFICATION_SHOPPERID'] = $basketArray['customerId'];
         $this->heidelpayRequest['NAME_GIVEN']               = $billingAddress->firstName;
@@ -368,12 +351,9 @@ class PaymentService
         $this->heidelpayRequest['ADDRESS_STREET']           = $this->getFullStreetAndHouseNumber($billingAddress);
         $this->heidelpayRequest['ADDRESS_ZIP']              = $billingAddress->postalCode;
         $this->heidelpayRequest['ADDRESS_CITY']             = $billingAddress->town;
-        $this->heidelpayRequest['ADDRESS_COUNTRY']          = $this->countryRepository->findIsoCode(
-            $billingAddress->countryId,
-            'isoCode2'
-        );
+        $this->heidelpayRequest['ADDRESS_COUNTRY']          = $this->basketService->getBillingCountryCode();
 
-        if ($billingAddress->companyName !== null) {
+        if ($this->basketService->isBasketB2B()) {
             $this->heidelpayRequest['NAME_COMPANY'] = $billingAddress->companyName;
         }
 
@@ -410,7 +390,7 @@ class PaymentService
         }
 
         if ($methodInstance->needsBasket()) {
-            $this->heidelpayRequest['BASKET_ID'] = $basketService->requestBasketId($basket, $heidelpayAuth);
+            $this->heidelpayRequest['BASKET_ID'] = $this->basketService->requestBasketId($basket, $heidelpayAuth);
         }
 
         // shop + module information
@@ -499,28 +479,6 @@ class PaymentService
         return $this->libService->handlePushNotification($post);
     }
     //</editor-fold>
-
-    /**
-     * Gathers address data (billing/invoice and shipping) and returns them as an array.
-     *
-     * @param Basket $basket
-     *
-     * @return Address[]
-     */
-    private function getCustomerAddressData(Basket $basket): array
-    {
-        $addresses = [];
-        $addresses['billing'] = $this->addressRepository->findAddressById($basket->customerInvoiceAddressId);
-
-        // if the shipping address is -99 or null, it is matching the billing address.
-        if ($basket->customerShippingAddressId === null || $basket->customerShippingAddressId === -99) {
-            $addresses['shipping'] = $addresses['billing'];
-            return $addresses;
-        }
-
-        $addresses['shipping'] = $this->addressRepository->findAddressById($basket->customerShippingAddressId);
-        return $addresses;
-    }
 
     /**
      * Returns street and house number as a single string.

@@ -3,11 +3,15 @@
 namespace Heidelpay\Services;
 
 use Heidelpay\Configs\MainConfigContract;
+use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
+use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Basket\Models\BasketItem;
 use Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract;
 use Plenty\Modules\Item\Item\Models\Item;
+use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 
 /**
  * Provides connection to heidelpay basketApi.
@@ -21,7 +25,7 @@ use Plenty\Modules\Item\Item\Models\Item;
  *
  * @package  heidelpay\plentymarkets-gateway\services
  */
-class BasketService
+class BasketService implements BasketServiceContract
 {
     /**
      * @var LibService
@@ -39,15 +43,33 @@ class BasketService
      * @var ItemRepositoryContract
      */
     private $itemRepo;
+    /**
+     * @var AddressRepositoryContract
+     */
+    private $addressRepository;
+    /**
+     * @var BasketRepositoryContract
+     */
+    private $basketRepo;
+    /**
+     * @var CountryRepositoryContract
+     */
+    private $countryRepository;
 
     /**
      * BasketService constructor.
+     * @param CountryRepositoryContract $countryRepository
+     * @param AddressRepositoryContract $addressRepository
+     * @param BasketRepositoryContract $basketRepo
      * @param LibService $libraryService
      * @param MainConfigContract $config
      * @param ItemRepositoryContract $itemRepo
      * @param AuthHelper $authHelper
      */
     public function __construct(
+        CountryRepositoryContract $countryRepository,
+        AddressRepositoryContract $addressRepository,
+        BasketRepositoryContract $basketRepo,
         LibService $libraryService,
         MainConfigContract $config,
         ItemRepositoryContract $itemRepo,
@@ -57,6 +79,9 @@ class BasketService
         $this->config = $config;
         $this->authHelper = $authHelper;
         $this->itemRepo = $itemRepo;
+        $this->addressRepository = $addressRepository;
+        $this->basketRepo = $basketRepo;
+        $this->countryRepository = $countryRepository;
     }
 
     /**
@@ -95,5 +120,95 @@ class BasketService
         $params['sandboxmode'] = $this->config->isInSandboxMode();
         $response = $this->libService->submitBasket($params);
         return $response['basketId'];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function shippingMatchesBillingAddress(): bool
+    {
+        $basket = $this->getBasket();
+        if ($basket->customerShippingAddressId === null || $basket->customerShippingAddressId === -99) {
+            return true;
+        }
+
+        $addresses = $this->getCustomerAddressData();
+        $billingAddress = $addresses['billing']->toArray();
+        $shippingAddress = $addresses['shipping']->toArray();
+
+        return  $billingAddress['gender'] === $shippingAddress['gender'] &&
+                $this->strCompare($billingAddress['address1'], $shippingAddress['address1']) &&
+                $this->strCompare($billingAddress['address2'], $shippingAddress['address2']) &&
+                $billingAddress['postalCode'] === $shippingAddress['postalCode'] &&
+                $this->strCompare($billingAddress['town'], $shippingAddress['town']) &&
+                (
+                    ($this->isBasketB2B()  && $this->strCompare($billingAddress['name1'], $shippingAddress['name1'])) ||
+                    (!$this->isBasketB2B() && $this->strCompare($billingAddress['name2'], $shippingAddress['name2'])
+                                           && $this->strCompare($billingAddress['name3'], $shippingAddress['name3']))
+                );
+    }
+        /**
+     * Gathers address data (billing/invoice and shipping) and returns them as an array.
+     *
+     * @return Address[]
+     */
+    public function getCustomerAddressData(): array
+    {
+        $basket = $this->getBasket();
+
+        $addresses = [];
+        $addresses['billing'] = $basket->customerInvoiceAddressId ?
+            $this->addressRepository->findAddressById($basket->customerInvoiceAddressId) : null;
+
+        // if the shipping address is -99 or null, it is matching the billing address.
+        if ($basket->customerShippingAddressId === null || $basket->customerShippingAddressId === -99) {
+            $addresses['shipping'] = $addresses['billing'];
+            return $addresses;
+        }
+
+        $addresses['shipping'] = $this->addressRepository->findAddressById($basket->customerShippingAddressId);
+        return $addresses;
+    }
+
+    /**
+     * Returns true if the billing address is B2B.
+     */
+    public function isBasketB2B(): bool
+    {
+        $billingAddress = $this->getCustomerAddressData()['billing'];
+
+        return $billingAddress ? $billingAddress->gender === null : false;
+    }
+
+    /**
+     * Fetches current basket and returns it.
+     *
+     * @return Basket
+     */
+    public function getBasket(): Basket
+    {
+        return $this->basketRepo->load();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getBillingCountryCode(): string
+    {
+        $billingAddress = $this->getCustomerAddressData()['billing'];
+        return $billingAddress ?
+            $this->countryRepository->findIsoCode($billingAddress->countryId, 'isoCode2') : '';
+    }
+
+    /**
+     * Returns true if the strings match case insensitive.
+     *
+     * @param string $string1
+     * @param string $string2
+     * @return bool
+     */
+    private function strCompare($string1, $string2): bool
+    {
+        return strtolower($string1) === strtolower($string2);
     }
 }

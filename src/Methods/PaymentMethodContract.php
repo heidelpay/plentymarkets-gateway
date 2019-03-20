@@ -144,4 +144,21 @@ interface PaymentMethodContract
      * @return bool
      */
     public function renderInvoiceData(): bool;
+
+    /**
+     * Returns true if the payment method is meant for B2C orders.
+     */
+    public function isB2cOnly(): bool;
+
+    /**
+     * Returns an array with the countries the method is restricted to.
+     */
+    public function getCountryRestrictions(): array;
+
+    /**
+     * Returns true if the shipping and billing address have to match for this payment method.
+     *
+     * @return bool
+     */
+    public function needsMatchingAddresses(): bool;
 }

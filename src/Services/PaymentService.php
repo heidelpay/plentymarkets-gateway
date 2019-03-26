@@ -270,7 +270,7 @@ class PaymentService
         }
 
         if ($methodInstance->needsMatchingAddresses() && !$this->basketService->shippingMatchesBillingAddress()) {
-            $value = $this->notification->getTranslation('Heidelpay::payment.addressesShouldMatch');
+            $value = $this->notification->getTranslation('Heidelpay::payment.errorAddressesShouldMatch');
             return [GetPaymentMethodContent::RETURN_TYPE_ERROR, $value];
         }
 

@@ -211,9 +211,10 @@ class ResponseController extends Controller
         try {
             $this->processResponse($response);
         } catch (\RuntimeException $e) {
-            $errorMessage = ($e->getCode() === ErrorCodes::ERROR_CODE_INSURANCE_DENIED) ?
+            $code         = $e->getCode();
+            $errorMessage = ($code === ErrorCodes::ERROR_CODE_INSURANCE_DENIED) ?
                 'payment.errorPaymentMethodDenied' : 'payment.errorDuringPaymentExecution';
-            $this->notification->error($errorMessage, __METHOD__, ['Message' => $e->getMessage()]);
+            $this->notification->error($errorMessage, __METHOD__, ['Message' => $e->getMessage(), 'ErrorCode' => $code]);
             return $this->response->redirectTo('checkout');
         }
 
@@ -261,7 +262,7 @@ class ResponseController extends Controller
             $responseObj = $response['response'];
             $processingReason = $responseObj['PROCESSING.REASON'] ?? '';
 
-            if (($processingReason === 'INSURANCE_ERROR') &&
+            if ($processingReason === 'INSURANCE_ERROR' &&
                 isset($responseObj['CRITERION_INSURANCE-RESERVATION']) &&
                 $responseObj['CRITERION_INSURANCE-RESERVATION'] === 'DENIED') {
                 $errorCode = ErrorCodes::ERROR_CODE_INSURANCE_DENIED;

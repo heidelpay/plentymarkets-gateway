@@ -1,5 +1,10 @@
 # heidelpay Payment Gateway Changelog
 
+## [1.2.2][1.2.2]
+
+### Changed
+- Dem Kunden wird nun mitgeteilt, wenn ihm eine gewählte Zahlart nicht angeboten werden kann. 
+
 ## [1.2.1][1.2.1]
 
 ### Fixed
@@ -61,3 +66,4 @@
 [1.1.2]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.1.1..1.1.2
 [1.2.0]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.1.2..1.2.0
 [1.2.1]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.2.0..1.2.1
+[1.2.2]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.2.1..1.2.2

@@ -263,8 +263,8 @@ class ResponseController extends Controller
             $processingReason = $responseObj['PROCESSING.REASON'] ?? '';
 
             if ($processingReason === 'INSURANCE_ERROR' &&
-                isset($responseObj['CRITERION_INSURANCE-RESERVATION']) &&
-                $responseObj['CRITERION_INSURANCE-RESERVATION'] === 'DENIED') {
+                isset($responseObj['CRITERION.INSURANCE-RESERVATION']) &&
+                $responseObj['CRITERION.INSURANCE-RESERVATION'] === 'DENIED') {
                 $errorCode = ErrorCodes::ERROR_CODE_INSURANCE_DENIED;
             }
             $errorMsg = $processingReason . ': ' . ($responseObj['PROCESSING.RETURN'] ?? '');

@@ -147,6 +147,7 @@ class HeidelpayServiceProvider extends ServiceProvider
                 if ($docType !== Document::INVOICE
                     || !$paymentMethod instanceof AbstractMethod
                     || !$paymentMethod->renderInvoiceData()) {
+                    // do nothing if invoice data does not need to be rendered
                     return;
                 }
 
@@ -156,11 +157,6 @@ class HeidelpayServiceProvider extends ServiceProvider
                 $orderPdfGeneration->language = $language;
 
                 $paymentDetails = $paymentHelper->getPaymentDetailsForOrder($order);
-
-                if (!$paymentMethod->renderInvoiceData()) {
-                    // do nothing if invoice data does not need to be rendered
-                    return;
-                }
 
                 $adviceParts = [
                     $notificationService->getTranslation('Heidelpay::template.pleaseTransferTheTotalTo', [], $language),

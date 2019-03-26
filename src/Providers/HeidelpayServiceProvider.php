@@ -144,7 +144,9 @@ class HeidelpayServiceProvider extends ServiceProvider
                 /** @var AbstractMethod $paymentMethod */
                 $paymentMethod = $paymentHelper->getPaymentMethodInstanceByMopId($mopId);
 
-                if ($docType !== Document::INVOICE) {
+                if ($docType !== Document::INVOICE
+                    || !$paymentMethod instanceof AbstractMethod
+                    || !$paymentMethod->renderInvoiceData()) {
                     return;
                 }
 

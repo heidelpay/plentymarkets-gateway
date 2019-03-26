@@ -95,7 +95,7 @@ class HeidelpayServiceProvider extends ServiceProvider
         // listen for the event that gets the payment method content
         $eventDispatcher->listen(
             GetPaymentMethodContent::class,
-            function (GetPaymentMethodContent $event) use (
+            static function (GetPaymentMethodContent $event) use (
                 $paymentHelper,
                 $paymentService
             ) {
@@ -114,7 +114,7 @@ class HeidelpayServiceProvider extends ServiceProvider
         // listen for the event that executes the payment
         $eventDispatcher->listen(
             ExecutePayment::class,
-            function (ExecutePayment $event) use (
+            static function (ExecutePayment $event) use (
                 $paymentHelper,
                 $paymentService
             ) {
@@ -133,7 +133,7 @@ class HeidelpayServiceProvider extends ServiceProvider
         // add payment information to the invoice pdf
         $eventDispatcher->listen(
             OrderPdfGenerationEvent::class,
-            function (OrderPdfGenerationEvent $event) use (
+            static function (OrderPdfGenerationEvent $event) use (
                 $notificationService, $paymentHelper, $orderService
             ) {
                 /** @var Order $order */

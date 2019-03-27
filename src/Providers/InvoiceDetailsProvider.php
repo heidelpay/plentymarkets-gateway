@@ -4,7 +4,6 @@ namespace Heidelpay\Providers;
 use Heidelpay\Constants\SessionKeys;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\PaymentMethodContract;
-use Heidelpay\Services\NotificationServiceContract;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
@@ -16,7 +15,6 @@ class InvoiceDetailsProvider
      * @param Twig $twig
      * @param FrontendSessionStorageFactoryContract $sessionStorage
      * @param PaymentHelper $helper
-     * @param NotificationServiceContract $notificationService
      * @param array $args
      * @return string
      */
@@ -24,22 +22,11 @@ class InvoiceDetailsProvider
         Twig $twig,
         FrontendSessionStorageFactoryContract $sessionStorage,
         PaymentHelper $helper,
-        NotificationServiceContract $notificationService,
         $args
     ): string {
         $orderFromStorage  = $sessionStorage->getOrder();
         $mopId   = $orderFromStorage->methodOfPayment;
         $txnId   = $sessionStorage->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
-        $notificationService->error('Arguments: ', __METHOD__, ['args' => $args]);
-
-        if (\is_array($args[0])) {
-            $notificationService->error('Its an Array', __METHOD__, ['Array' => $args[0]]);
-        } elseif ($args[0] instanceof Order) {
-            $notificationService->error('Its an Order', __METHOD__, ['Order' => $args[0]]);
-        } else {
-            $notificationService->error('Its something else', __METHOD__, ['Type' => \get_class($args[0])]);
-        }
-
 
         /** @var Order $order */
         $order = $args[0] ?? null;
@@ -57,10 +44,6 @@ class InvoiceDetailsProvider
                 }
             }
         }
-
-
-
-        $notificationService->error('Arguments: ', __METHOD__, ['MOP' => $mopId, 'TxnId' => $txnId]);
 
         /** @var PaymentMethodContract $paymentMethod */
         $paymentMethod = $helper->getPaymentMethodInstanceByMopId($mopId);

@@ -32,6 +32,7 @@ class InvoiceDetailsProvider
 
         $order = $args[0];
         if($order instanceof Order) {
+            $notificationService->error('Arguments: ', __METHOD__, ['Order' => $order]);
             $mopId = $order->methodOfPaymentId;
         }
 

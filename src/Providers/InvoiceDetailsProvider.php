@@ -6,6 +6,7 @@ use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Services\NotificationServiceContract;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Plenty\Modules\Order\Models\Order;
 use Plenty\Plugin\Templates\Twig;
 
 class InvoiceDetailsProvider
@@ -25,9 +26,14 @@ class InvoiceDetailsProvider
         NotificationServiceContract $notificationService,
         $args
     ): string {
-        $notificationService->error('Arguments: ', __METHOD__, ['ARGS' => $args]);
 
+        $notificationService->error('Arguments: ', __METHOD__, ['ARGS' => $args]);
         $mopId = $sessionStorage->getOrder()->methodOfPayment;
+
+        $order = $args[0];
+        if($order instanceof Order) {
+            $mopId = $order->methodOfPaymentId;
+        }
 
         /** @var PaymentMethodContract $paymentMethod */
         $paymentMethod = $helper->getPaymentMethodInstanceByMopId($mopId);

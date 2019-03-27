@@ -710,6 +710,7 @@ class PaymentService
         $comment->referenceType = Comment::REFERENCE_TYPE_ORDER;
         $comment->referenceValue = $order->id;
         $comment->text = 'This is a comment';
+        $comment->isVisibleForContact = true;
         $order->comments[] = $comment;
 
         $this->orderRepo->updateOrder($order->toArray(), $order->id);

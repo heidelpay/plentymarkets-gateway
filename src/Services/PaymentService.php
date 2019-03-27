@@ -163,7 +163,7 @@ class PaymentService
         $orderId = $event->getOrderId();
         $mopId = $event->getMop();
 
-        $logData = ['paymentMethod' => $paymentMethod, 'mopId' => $mopId, 'orderId' => $orderId];
+        $logData = compact('paymentMethod', 'mopId', 'orderId');
         $this->notification->debug('payment.debugExecutePayment', __METHOD__, $logData);
 
         $transactionDetails = [];
@@ -395,7 +395,7 @@ class PaymentService
         $this->heidelpayRequest['CRITERION_PUSH_URL'] = $this->urlService->generateURL(Routes::PUSH_NOTIFICATION_URL);
 
         $secret = $secretService->getSecretHash($transactionId);
-        if (null !== $secret) {
+        if ($secret !== null) {
             $this->heidelpayRequest['CRITERION_SECRET'] = $secret;
         }
 
@@ -519,7 +519,7 @@ class PaymentService
         $payment->properties = [
             $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_ORIGIN, (string) Payment::ORIGIN_PLUGIN),
             $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $txnData->txnId),
-            $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $bookingText),
+            $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $bookingText)
         ];
 
         $payment->regenerateHash = true;
@@ -574,7 +574,7 @@ class PaymentService
      */
     private function createNewTxnId(Basket $basket): string
     {
-        $transactionId = $transactionId = uniqid($basket->id . '.', true);
+        $transactionId = uniqid($basket->id . '.', true);
         $this->sessionStorageFactory->getPlugin()->setValue(SessionKeys::SESSION_KEY_TXN_ID, $transactionId);
         return $transactionId;
     }

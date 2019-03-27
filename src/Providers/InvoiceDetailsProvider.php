@@ -30,6 +30,14 @@ class InvoiceDetailsProvider
         $orderFromStorage  = $sessionStorage->getOrder();
         $mopId   = $orderFromStorage->methodOfPayment;
         $txnId   = $sessionStorage->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
+        $notificationService->error('Arguments: ', __METHOD__, ['args' => $args]);
+
+        if (\is_array($args[0])) {
+            $notificationService->error('Arguments: ', __METHOD__, ['args' => $args]);
+        } elseif ($args[0] instanceof Order) {
+            $notificationService->error('Arguments: ', __METHOD__, ['args' => $args]);
+        }
+
 
         /** @var Order $order */
         $order = $args[0] ?? null;

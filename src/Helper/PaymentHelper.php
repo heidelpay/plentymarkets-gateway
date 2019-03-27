@@ -538,9 +538,9 @@ class PaymentHelper
                 $details       = $transaction->transactionDetails;
                 if (!isset(
                     $details['CONNECTOR.ACCOUNT_IBAN'],
-                    $details['CONNECTOR.ACCOUNT_IBAN'],
-                    $details['CONNECTOR.ACCOUNT_IBAN'],
-                    $details['CONNECTOR.ACCOUNT_IBAN']
+                    $details['CONNECTOR.ACCOUNT_BIC'],
+                    $details['CONNECTOR.ACCOUNT_HOLDER'],
+                    $details['CONNECTOR.ACCOUNT_USAGE']
                 )) {
                     break;
                 }

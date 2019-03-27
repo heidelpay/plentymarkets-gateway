@@ -18,37 +18,47 @@ use Heidelpay\Helper\PaymentHelper;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Comment\Contracts\CommentRepositoryContract;
 use Plenty\Modules\Comment\Models\Comment;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
 
 class PaymentInfoService implements PaymentInfoServiceContract
 {
-    /**
-     * @var NotificationServiceContract
-     */
+    /** @var NotificationServiceContract */
     private $notificationService;
-    /**
-     * @var PaymentHelper
-     */
+
+    /** @var PaymentHelper */
     private $paymentHelper;
-    /**
-     * @var CommentRepositoryContract
-     */
+
+    /** @var CommentRepositoryContract */
     private $commentRepo;
+
+    /** @var OrderServiceContract */
+    private $orderService;
+    /**
+     * @var OrderRepositoryContract
+     */
+    private $orderRepository;
 
     /**
      * PaymentInformationService constructor.
      * @param NotificationServiceContract $notificationService
      * @param PaymentHelper $paymentHelper
      * @param CommentRepositoryContract $commentRepo
+     * @param OrderServiceContract $orderService
+     * @param OrderRepositoryContract $orderRepository
      */
     public function __construct(
         NotificationServiceContract $notificationService,
         PaymentHelper $paymentHelper,
-        CommentRepositoryContract $commentRepo
+        CommentRepositoryContract $commentRepo,
+        OrderServiceContract $orderService,
+        OrderRepositoryContract $orderRepository
     ) {
         $this->notificationService = $notificationService;
         $this->paymentHelper = $paymentHelper;
         $this->commentRepo = $commentRepo;
+        $this->orderService = $orderService;
+        $this->orderRepository = $orderRepository;
     }
 
     /**
@@ -77,15 +87,19 @@ class PaymentInfoService implements PaymentInfoServiceContract
      */
     public function addPaymentInfoToOrder(int $orderId)
     {
+        $order = $this->orderRepository->findOrderById($orderId);
+        $language = $this->orderService->getLanguage($order);
+        $commentText = $this->getPaymentInformationString($order, $language);
+
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
         $authHelper->processUnguarded(
-            function () use ($orderId) {
+            function () use ($orderId, $commentText) {
                 $this->commentRepo->createComment(
                     [
                         'referenceType'       => Comment::REFERENCE_TYPE_ORDER,
                         'referenceValue'      => $orderId,
-                        'text'                => 'My Comment',
+                        'text'                => $commentText,
                         'isVisibleForContact' => true
                     ]
                 );

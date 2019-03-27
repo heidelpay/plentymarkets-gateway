@@ -29,6 +29,7 @@ interface PaymentInfoServiceContract
 
     /**
      * Adds the payment information as a note to the order if it is an invoice order.
+     * It will be translated into the language of the buyer.
      *
      * @param int $orderId
      */

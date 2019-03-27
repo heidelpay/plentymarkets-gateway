@@ -129,6 +129,7 @@ class PaymentService
      * @param UrlServiceContract $urlService
      * @param BasketServiceContract $basketService
      * @param ContactRepositoryContract $contactRepo
+     * @param CommentRepositoryContract $commentRepo
      */
     public function __construct(
         LibService $libraryService,
@@ -143,7 +144,8 @@ class PaymentService
         OrderRepositoryContract $orderRepo,
         UrlServiceContract $urlService,
         BasketServiceContract $basketService,
-        ContactRepositoryContract $contactRepo
+        ContactRepositoryContract $contactRepo,
+        CommentRepositoryContract $commentRepo
     ) {
         $this->libService = $libraryService;
         $this->paymentRepository = $paymentRepository;
@@ -158,6 +160,7 @@ class PaymentService
         $this->urlService = $urlService;
         $this->contactRepo = $contactRepo;
         $this->basketService = $basketService;
+        $this->commentRepo = $commentRepo;
     }
 
     /**
@@ -705,15 +708,9 @@ class PaymentService
         $externalOrderId->value = $txnId;
         $order->properties[] = $externalOrderId;
 
-        /** @var Comment $comment */
-        $comment = pluginApp(Comment::class);
-        $comment->referenceType = Comment::REFERENCE_TYPE_ORDER;
-        $comment->referenceValue = $order->id;
-        $comment->text = 'This is a comment';
-        $comment->isVisibleForContact = true;
-        $order->comments[] = $comment;
-
         $this->orderRepo->updateOrder($order->toArray(), $order->id);
+
+        $this->commentRepo->createComment(['referenceType' => Comment::REFERENCE_TYPE_ORDER, 'referenceValue' => $orderId, 'text' => 'My Comment', 'isVisibleForContact' => true]);
     }
 
     //</editor-fold>

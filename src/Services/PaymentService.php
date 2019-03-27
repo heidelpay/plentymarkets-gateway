@@ -53,65 +53,49 @@ class PaymentService
 
     const CARD_METHODS = [CreditCard::class, DebitCard::class];
 
-    /**
-     * @var array
-     */
+    /** @var array $heidelpayRequest*/
     private $heidelpayRequest = [];
-    /**
-     * @var PaymentRepositoryContract
-     */
+
+    /** @var PaymentRepositoryContract $paymentRepository */
     private $paymentRepository;
-    /**
-     * @var PaymentHelper
-     */
+
+    /** @var PaymentHelper $paymentHelper */
     private $paymentHelper;
-    /**
-     * @var LibService
-     */
+
+    /** @var LibService $libService */
     private $libService;
-    /**
-     * @var Twig
-     */
+
+    /** @var Twig $twig */
     private $twig;
-    /**
-     * @var TransactionRepositoryContract
-     */
+
+    /** @var TransactionRepositoryContract $transactionRepository */
     private $transactionRepository;
-    /**
-     * @var FrontendSessionStorageFactoryContract
-     */
+
+    /** @var FrontendSessionStorageFactoryContract $sessionStorageFactory */
     private $sessionStorageFactory;
-    /**
-     * @var NotificationServiceContract
-     */
+
+    /** @var NotificationServiceContract $notification */
     private $notification;
-    /**
-     * @var MethodConfigContract
-     */
+
+    /** @var MethodConfigContract $methodConfig */
     private $methodConfig;
-    /**
-     * @var OrderTxnIdRelationRepositoryContract
-     */
+
+    /** @var OrderTxnIdRelationRepositoryContract $orderRepo */
     private $orderTxnIdRepo;
-    /**
-     * @var OrderRepositoryContract
-     */
+
+    /** @var OrderRepositoryContract $orderRepo */
     private $orderRepo;
-    /**
-     * @var UrlServiceContract
-     */
+
+    /** @var UrlServiceContract $urlService */
     private $urlService;
-    /**
-     * @var ContactRepositoryContract
-     */
+
+    /** @var ContactRepositoryContract $contactRepo */
     private $contactRepo;
-    /**
-     * @var BasketServiceContract
-     */
+
+    /** @var BasketServiceContract $basketService */
     private $basketService;
-    /**
-     * @var CommentRepositoryContract
-     */
+
+    /** @var CommentRepositoryContract $commentRepo */
     private $commentRepo;
 
     /**

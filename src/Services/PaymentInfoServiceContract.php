@@ -26,4 +26,11 @@ interface PaymentInfoServiceContract
      * @return string
      */
     public function getPaymentInformationString(Order $order, $language): string;
+
+    /**
+     * Adds the payment information as a note to the order if it is an invoice order.
+     *
+     * @param int $orderId
+     */
+    public function addPaymentInfoToOrder(int $orderId);
 }

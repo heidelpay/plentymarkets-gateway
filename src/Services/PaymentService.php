@@ -20,10 +20,8 @@ use Heidelpay\Models\Transaction;
 use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Comment\Contracts\CommentRepositoryContract;
-use Plenty\Modules\Comment\Models\Comment;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
@@ -97,6 +95,10 @@ class PaymentService
 
     /** @var CommentRepositoryContract $commentRepo */
     private $commentRepo;
+    /**
+     * @var PaymentInfoServiceContract
+     */
+    private $paymentInfoService;
 
     /**
      * PaymentService constructor.
@@ -114,7 +116,7 @@ class PaymentService
      * @param UrlServiceContract $urlService
      * @param BasketServiceContract $basketService
      * @param ContactRepositoryContract $contactRepo
-     * @param CommentRepositoryContract $commentRepo
+     * @param PaymentInfoServiceContract $paymentInfoService
      */
     public function __construct(
         LibService $libraryService,
@@ -130,7 +132,7 @@ class PaymentService
         UrlServiceContract $urlService,
         BasketServiceContract $basketService,
         ContactRepositoryContract $contactRepo,
-        CommentRepositoryContract $commentRepo
+        PaymentInfoServiceContract $paymentInfoService
     ) {
         $this->libService = $libraryService;
         $this->paymentRepository = $paymentRepository;
@@ -145,7 +147,7 @@ class PaymentService
         $this->urlService = $urlService;
         $this->contactRepo = $contactRepo;
         $this->basketService = $basketService;
-        $this->commentRepo = $commentRepo;
+        $this->paymentInfoService = $paymentInfoService;
     }
 
     /**
@@ -673,6 +675,7 @@ class PaymentService
         $relation =  $this->orderTxnIdRepo->createOrUpdateRelation($txnId, $mopId, $orderId);
         if ($orderId !== 0) {
             $this->assignTxnIdToOrder($txnId, $orderId);
+            $this->paymentInfoService->addPaymentInfoToOrder($orderId);
         }
         return $relation;
     }
@@ -694,20 +697,6 @@ class PaymentService
         $order->properties[] = $externalOrderId;
 
         $this->orderRepo->updateOrder($order->toArray(), $order->id);
-
-        /** @var AuthHelper $authHelper */
-        $authHelper = pluginApp(AuthHelper::class);
-        $authHelper->processUnguarded(
-            function () use ($orderId) {
-                $this->commentRepo->createComment(
-                    [
-                        'referenceType'       => Comment::REFERENCE_TYPE_ORDER,
-                        'referenceValue'      => $orderId,
-                        'text'                => 'My Comment',
-                        'isVisibleForContact' => true
-                    ]
-                );
-            });
     }
 
     //</editor-fold>

@@ -15,6 +15,9 @@
 namespace Heidelpay\Services;
 
 use Heidelpay\Helper\PaymentHelper;
+use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Modules\Comment\Contracts\CommentRepositoryContract;
+use Plenty\Modules\Comment\Models\Comment;
 use Plenty\Modules\Order\Models\Order;
 
 class PaymentInfoService implements PaymentInfoServiceContract
@@ -27,18 +30,25 @@ class PaymentInfoService implements PaymentInfoServiceContract
      * @var PaymentHelper
      */
     private $paymentHelper;
+    /**
+     * @var CommentRepositoryContract
+     */
+    private $commentRepo;
 
     /**
      * PaymentInformationService constructor.
      * @param NotificationServiceContract $notificationService
      * @param PaymentHelper $paymentHelper
+     * @param CommentRepositoryContract $commentRepo
      */
     public function __construct(
         NotificationServiceContract $notificationService,
-        PaymentHelper $paymentHelper
+        PaymentHelper $paymentHelper,
+        CommentRepositoryContract $commentRepo
     ) {
         $this->notificationService = $notificationService;
         $this->paymentHelper = $paymentHelper;
+        $this->commentRepo = $commentRepo;
     }
 
     /**
@@ -60,5 +70,25 @@ class PaymentInfoService implements PaymentInfoServiceContract
             $paymentDetails['accountUsage']
         ];
         return implode(PHP_EOL, $adviceParts);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addPaymentInfoToOrder(int $orderId)
+    {
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+        $authHelper->processUnguarded(
+            function () use ($orderId) {
+                $this->commentRepo->createComment(
+                    [
+                        'referenceType'       => Comment::REFERENCE_TYPE_ORDER,
+                        'referenceValue'      => $orderId,
+                        'text'                => 'My Comment',
+                        'isVisibleForContact' => true
+                    ]
+                );
+            });
     }
 }

@@ -7,6 +7,7 @@ use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Services\NotificationServiceContract;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Models\Order;
+use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Plugin\Templates\Twig;
 
 class InvoiceDetailsProvider
@@ -26,15 +27,23 @@ class InvoiceDetailsProvider
         NotificationServiceContract $notificationService,
         $args
     ): string {
+        $orderFromStorage  = $sessionStorage->getOrder();
+        $mopId   = $orderFromStorage->methodOfPayment;
+        $txnId   = $sessionStorage->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
 
-        $notificationService->error('Arguments: ', __METHOD__, ['ARGS' => $args]);
-        $mopId = $sessionStorage->getOrder()->methodOfPayment;
-
-        $order = $args[0];
-        if($order instanceof Order) {
-            $notificationService->error('Arguments: ', __METHOD__, ['Order' => $order]);
-            $mopId = $order->methodOfPaymentId;
+        /** @var Order $order */
+        $order = $args[0] ?? null;
+        if (\is_array($order)) {
+            foreach ($order['properties'] as $property) {
+                if ($property['typeId'] === OrderPropertyType::PAYMENT_METHOD) {
+                    $mopId = $property['value'];
+                }
+                if ($property['typeId'] === OrderPropertyType::EXTERNAL_ORDER_ID) {
+                    $txnId = $property['value'];
+                }
+            }
         }
+        $notificationService->error('Arguments: ', __METHOD__, ['MOP' => $mopId, 'TxnId' => $txnId]);
 
         /** @var PaymentMethodContract $paymentMethod */
         $paymentMethod = $helper->getPaymentMethodInstanceByMopId($mopId);
@@ -42,7 +51,6 @@ class InvoiceDetailsProvider
             return '';
         }
 
-        $txnId = $sessionStorage->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
         $paymentDetails = $helper->getPaymentDetailsByTxnId($txnId);
         return $twig->render('Heidelpay::content/InvoiceDetails', $paymentDetails);
     }

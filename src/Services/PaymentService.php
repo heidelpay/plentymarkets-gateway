@@ -22,6 +22,7 @@ use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Comment\Contracts\CommentRepositoryContract;
+use Plenty\Modules\Comment\Models\Comment;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
@@ -698,11 +699,18 @@ class PaymentService
     {
         $order = $this->orderRepo->findOrderById($orderId);
 
-        /** @var OrderProperty $orderProperty */
-        $orderProperty = pluginApp(OrderProperty::class);
-        $orderProperty->typeId = OrderPropertyType::EXTERNAL_ORDER_ID;
-        $orderProperty->value = $txnId;
-        $order->properties[] = $orderProperty;
+        /** @var OrderProperty $externalOrderId */
+        $externalOrderId = pluginApp(OrderProperty::class);
+        $externalOrderId->typeId = OrderPropertyType::EXTERNAL_ORDER_ID;
+        $externalOrderId->value = $txnId;
+        $order->properties[] = $externalOrderId;
+
+        /** @var Comment $comment */
+        $comment = pluginApp(Comment::class);
+        $comment->referenceType = Comment::REFERENCE_TYPE_ORDER;
+        $comment->referenceValue = $order->id;
+        $comment->text = 'This is a comment';
+        $order->comments[] = $comment;
 
         $this->orderRepo->updateOrder($order->toArray(), $order->id);
     }

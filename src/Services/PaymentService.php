@@ -20,6 +20,7 @@ use Heidelpay\Models\Transaction;
 use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Comment\Contracts\CommentRepositoryContract;
 use Plenty\Modules\Comment\Models\Comment;
@@ -710,7 +711,19 @@ class PaymentService
 
         $this->orderRepo->updateOrder($order->toArray(), $order->id);
 
-        $this->commentRepo->createComment(['referenceType' => Comment::REFERENCE_TYPE_ORDER, 'referenceValue' => $orderId, 'text' => 'My Comment', 'isVisibleForContact' => true]);
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+        $authHelper->processUnguarded(
+            function () use ($orderId) {
+                $this->commentRepo->createComment(
+                    [
+                        'referenceType'       => Comment::REFERENCE_TYPE_ORDER,
+                        'referenceValue'      => $orderId,
+                        'text'                => 'My Comment',
+                        'isVisibleForContact' => true
+                    ]
+                );
+            });
     }
 
     //</editor-fold>

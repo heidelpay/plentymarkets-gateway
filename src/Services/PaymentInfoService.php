@@ -15,6 +15,7 @@
 namespace Heidelpay\Services;
 
 use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Methods\AbstractMethod;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Comment\Contracts\CommentRepositoryContract;
 use Plenty\Modules\Comment\Models\Comment;
@@ -64,7 +65,7 @@ class PaymentInfoService implements PaymentInfoServiceContract
     /**
      * {@inheritDoc}
      */
-    public function getPaymentInformationString(Order $order, $language): string
+    public function getPaymentInformationString(Order $order, $language, $glue = PHP_EOL): string
     {
         $paymentDetails = $this->paymentHelper->getPaymentDetailsForOrder($order);
 
@@ -79,7 +80,7 @@ class PaymentInfoService implements PaymentInfoServiceContract
             $this->notificationService->getTranslation('Heidelpay::template.accountUsage', [], $language) . ': ' .
             $paymentDetails['accountUsage']
         ];
-        return implode(PHP_EOL, $adviceParts);
+        return implode($glue, $adviceParts);
     }
 
     /**
@@ -88,8 +89,13 @@ class PaymentInfoService implements PaymentInfoServiceContract
     public function addPaymentInfoToOrder(int $orderId)
     {
         $order = $this->orderRepository->findOrderById($orderId);
+        $instance = $this->paymentHelper->getPaymentMethodInstanceByMopId($order->methodOfPaymentId);
+        if (!$instance instanceof AbstractMethod || !$instance->renderInvoiceData()) {
+            return;
+        }
+
         $language = $this->orderService->getLanguage($order);
-        $commentText = $this->getPaymentInformationString($order, $language);
+        $commentText = $this->getPaymentInformationString($order, $language, '</br>');
 
         /** @var AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);

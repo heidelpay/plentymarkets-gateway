@@ -112,7 +112,8 @@ Um diese Informationen auf der Buchungsbestätigungs-Seite darzustellen folgen S
 2. wählen Sie im Drop-Down-Menü das Plug-in Set, für welches Sie die Änderung vornehmen möchten aus
 3. klappen Sie das Menü *Invoice Details (Heidelpay)* auf
 4. aktivieren sie den Ceres-Container ``Order confirmation: Additional payment information``
-5. klicken Sie den speichern Button
+5. aktivieren sie den Ceres-Container ``My account: Additional payment information``
+6. klicken Sie den speichern Button
 
 ![Container-Verknüpfung](../images/preview_4.png)
 
@@ -139,7 +140,12 @@ Wenn die Zahlung fehlschlägt, wird die Bestellung nicht erzeugt und der Kunde w
 Ab diesem Zeitpunkt startet der vertraglich festgelegte Versicherungzeitraum innerhalb dessen die Zahlung durch den Kunden erwartet wird.\
 * Wenn der Kunde die Überweisung tätigt erscheint diese im hIP als Receipt (REC) und wird an die Push-URL ihres Shops gesendet.\
 Hier wird daraufhin eine Zahlung angelegt und mit der Buchung verknüpft.
-* Die Überweisungsinformationen werden automatisch beim Erstellen auf die PDF-Rechnung gedruckt.  
+* Die Überweisungsinformationen werden automatisch beim Erstellen auf die PDF-Rechnung gedruckt.
+
+> Der _gesicherte Rechnungskauf B2C_ ist unter folgenden Bedingungen nutzbar:
+> 1. Versandadress und Rechnungsadresse sind identisch
+> 2. Das Buchungsland ist entweder Deutschland oder Österreich
+> 3. Die Adresse gehört nicht zu einer Firma
 
 ### Alle Zahlarten
 * Zahlungen im Plenty-Backend enthalten die txnId (heidelpay Bestellnummer), die shortId (die eindeutige id der Transaktion d. h. Receipt, Debit oder Capture) und den Hinweis, dass es sich um eine durch heidelpay angelegte Zahlung handelt.

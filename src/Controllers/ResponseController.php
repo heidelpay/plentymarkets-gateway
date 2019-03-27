@@ -2,6 +2,7 @@
 
 namespace Heidelpay\Controllers;
 
+use Heidelpay\Constants\ErrorCodes;
 use Heidelpay\Constants\Routes;
 use Heidelpay\Exceptions\SecurityHashInvalidException;
 use Heidelpay\Helper\PaymentHelper;
@@ -210,11 +211,10 @@ class ResponseController extends Controller
         try {
             $this->processResponse($response);
         } catch (\RuntimeException $e) {
-            $this->notification->error(
-               'payment.errorDuringPaymentExecution',
-               __METHOD__,
-               ['Message' => $e->getMessage()]
-            );
+            $code         = $e->getCode();
+            $errorMessage = ($code === ErrorCodes::ERROR_CODE_INSURANCE_DENIED) ?
+                'payment.errorPaymentMethodDenied' : 'payment.errorDuringPaymentExecution';
+            $this->notification->error($errorMessage, __METHOD__, ['Message' => $e->getMessage(), 'ErrorCode' => $code]);
             return $this->response->redirectTo('checkout');
         }
 
@@ -256,13 +256,21 @@ class ResponseController extends Controller
         }
 
         $errorMsg = 'An error occurred handling the transaction.';
+        $errorCode = ErrorCodes::ERROR_CODE_GENERAL_ERROR;
 
         if (isset($response['response'])) {
             $responseObj = $response['response'];
-            $errorMsg    = ($responseObj['PROCESSING.REASON'] ?? '') . ': ' . ($responseObj['PROCESSING.RETURN'] ?? '');
+            $processingReason = $responseObj['PROCESSING.REASON'] ?? '';
+
+            if ($processingReason === 'INSURANCE_ERROR' &&
+                isset($responseObj['CRITERION.INSURANCE-RESERVATION']) &&
+                $responseObj['CRITERION.INSURANCE-RESERVATION'] === 'DENIED') {
+                $errorCode = ErrorCodes::ERROR_CODE_INSURANCE_DENIED;
+            }
+            $errorMsg = $processingReason . ': ' . ($responseObj['PROCESSING.RETURN'] ?? '');
         }
 
-        throw new \RuntimeException($errorMsg);
+        throw new \RuntimeException($errorMsg, $errorCode);
     }
 
     /**

@@ -43,6 +43,10 @@ class InvoiceDetailsProvider
 
         /** @var Order $order */
         $order = $args[0] ?? null;
+        if ($order instanceof Order) {
+            $order = $order->toArray();
+        }
+
         if (\is_array($order)) {
             foreach ($order['properties'] as $property) {
                 if ($property['typeId'] === OrderPropertyType::PAYMENT_METHOD) {
@@ -53,6 +57,9 @@ class InvoiceDetailsProvider
                 }
             }
         }
+
+
+
         $notificationService->error('Arguments: ', __METHOD__, ['MOP' => $mopId, 'TxnId' => $txnId]);
 
         /** @var PaymentMethodContract $paymentMethod */

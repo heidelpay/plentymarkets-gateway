@@ -33,9 +33,11 @@ class InvoiceDetailsProvider
         $notificationService->error('Arguments: ', __METHOD__, ['args' => $args]);
 
         if (\is_array($args[0])) {
-            $notificationService->error('Arguments: ', __METHOD__, ['args' => $args]);
+            $notificationService->error('Its an Array', __METHOD__, ['Array' => $args[0]]);
         } elseif ($args[0] instanceof Order) {
-            $notificationService->error('Arguments: ', __METHOD__, ['args' => $args]);
+            $notificationService->error('Its an Order', __METHOD__, ['Order' => $args[0]]);
+        } else {
+            $notificationService->error('Its something else', __METHOD__, ['Type' => \get_class($args[0])]);
         }
 
 

@@ -47,9 +47,6 @@ class BasketService implements BasketServiceContract
     /** @var CountryRepositoryContract */
     private $countryRepository;
 
-    /** @var NotificationService */
-    private $notificationService;
-
     /**
      * BasketService constructor.
      *
@@ -60,7 +57,6 @@ class BasketService implements BasketServiceContract
      * @param MainConfigContract $config
      * @param ItemRepositoryContract $itemRepo
      * @param AuthHelper $authHelper
-     * @param NotificationService $notificationService
      */
     public function __construct(
         CountryRepositoryContract $countryRepository,
@@ -69,8 +65,7 @@ class BasketService implements BasketServiceContract
         LibService $libraryService,
         MainConfigContract $config,
         ItemRepositoryContract $itemRepo,
-        AuthHelper $authHelper,
-        NotificationService $notificationService
+        AuthHelper $authHelper
     ) {
         $this->libService          = $libraryService;
         $this->config              = $config;
@@ -79,7 +74,6 @@ class BasketService implements BasketServiceContract
         $this->addressRepo         = $addressRepository;
         $this->basketRepo          = $basketRepo;
         $this->countryRepository   = $countryRepository;
-        $this->notificationService = $notificationService;
     }
 
     /**
@@ -134,8 +128,6 @@ class BasketService implements BasketServiceContract
         $billingAddress = $addresses['billing']->toArray();
         $shippingAddress = $addresses['shipping']->toArray();
 
-        $this->notificationService->error('address', __METHOD__, ['shipping' => $shippingAddress, 'billing' => $billingAddress]);
-
         return  $billingAddress['gender'] === $shippingAddress['gender'] &&
                 $this->strCompare($billingAddress['address1'], $shippingAddress['address1']) &&
                 $this->strCompare($billingAddress['address2'], $shippingAddress['address2']) &&
@@ -157,29 +149,17 @@ class BasketService implements BasketServiceContract
     {
         $basket = $this->getBasket();
 
-        $this->notificationService->error('Basket address', __METHOD__, ['basket' => $basket]);
-
-        $addresses                = [];
-        $invoiceAddressId         = $basket->customerInvoiceAddressId;
-        $addresses['billing']     = $invoiceAddressId ? $this->addressRepo->findAddressById($invoiceAddressId) : null;
-
-        $this->notificationService->error('billing address #1', __METHOD__, ['addresses' => $addresses ]);
-
+        $addresses            = [];
+        $invoiceAddressId     = $basket->customerInvoiceAddressId;
+        $addresses['billing'] = $invoiceAddressId ? $this->addressRepo->findAddressById($invoiceAddressId) : null;
 
         // if the shipping address is -99 or null, it is matching the billing address.
         $shippingAddressId = $basket->customerShippingAddressId;
         if ($shippingAddressId === null || $shippingAddressId === -99) {
-            $this->notificationService->error('billing address #2', __METHOD__, ['addresses' => $addresses ]);
-
             $addresses['shipping'] = $addresses['billing'];
         } else {
-            $this->notificationService->error('billing address #3', __METHOD__, ['addresses' => $addresses ]);
-
             $addresses['shipping'] = $this->addressRepo->findAddressById($shippingAddressId);
         }
-
-        $this->notificationService->error('fetched addresses', __METHOD__, ['addresses' => $addresses]);
-
 
         return $addresses;
     }

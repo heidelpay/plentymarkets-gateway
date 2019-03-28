@@ -1,4 +1,16 @@
 <?php
+/**
+ * Provides connection to heidelpay basketApi.
+ *
+ * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
+ * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
+ *
+ * @link  http://dev.heidelpay.com/
+ *
+ * @author  Simon Gabriel <development@heidelpay.de>
+ *
+ * @package  heidelpay\plentymarkets-gateway\services
+ */
 
 namespace Heidelpay\Services;
 
@@ -13,47 +25,27 @@ use Plenty\Modules\Item\Item\Contracts\ItemRepositoryContract;
 use Plenty\Modules\Item\Item\Models\Item;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 
-/**
- * Provides connection to heidelpay basketApi.
- *
- * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
- * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
- *
- * @link  http://dev.heidelpay.com/
- *
- * @author  Simon Gabriel <development@heidelpay.de>
- *
- * @package  heidelpay\plentymarkets-gateway\services
- */
 class BasketService implements BasketServiceContract
 {
-    /**
-     * @var LibService
-     */
+    /** @var LibService */
     private $libService;
-    /**
-     * @var MainConfigContract
-     */
+
+    /** @var MainConfigContract */
     private $config;
-    /**
-     * @var AuthHelper
-     */
+
+    /** @var AuthHelper */
     private $authHelper;
-    /**
-     * @var ItemRepositoryContract
-     */
+
+    /** @var ItemRepositoryContract */
     private $itemRepo;
-    /**
-     * @var AddressRepositoryContract
-     */
+
+    /** @var AddressRepositoryContract */
     private $addressRepository;
-    /**
-     * @var BasketRepositoryContract
-     */
+
+    /** @var BasketRepositoryContract */
     private $basketRepo;
-    /**
-     * @var CountryRepositoryContract
-     */
+
+    /** @var CountryRepositoryContract */
     private $countryRepository;
 
     /**
@@ -98,7 +90,7 @@ class BasketService implements BasketServiceContract
         $params['auth'] = [
             'login' => $authData['USER_LOGIN'],
             'password' => $authData['USER_PWD'],
-            'senderId' => $authData['SECURITY_SENDER'],
+            'senderId' => $authData['SECURITY_SENDER']
         ];
         $params['basket'] = $basket->toArray();
 

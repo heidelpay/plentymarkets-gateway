@@ -1,7 +1,4 @@
 <?php
-
-namespace Heidelpay\Services;
-
 /**
  * Interface for the notification service.
  *
@@ -14,6 +11,9 @@ namespace Heidelpay\Services;
  *
  * @package  heidelpay\plentymarkets-gateway\services
  */
+
+namespace Heidelpay\Services;
+
 interface NotificationServiceContract
 {
     /**

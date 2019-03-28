@@ -3,7 +3,9 @@
 ## [1.2.2][1.2.2]
 
 ### Changed
-- Dem Kunden wird nun mitgeteilt, wenn ihm eine gewählte Zahlart nicht angeboten werden kann. 
+- Dem Kunden wird nun mitgeteilt, wenn ihm eine gewählte Zahlart nicht angeboten werden kann.
+- Im Kundenbereich können nun zusätzliche Bezahlinformationen eingeblendet werden (Rechnungskauf). [Siehe Beschreibung im User Guide.](user_guide_de.md)
+- Die Kapitel ``Konfiguration > Daten Container`` und ``Beschreibung der Zahlungsabläufe > Gesicherter Rechnungskauf B2C`` im User-Guide wurden aktualisiert.
 
 ## [1.2.1][1.2.1]
 

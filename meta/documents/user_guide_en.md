@@ -112,7 +112,8 @@ To show the information on your order confirmation page please follow these step
 2. choose the corresponding plug-in set from the drop down
 3. open the menu *Invoice Details (Heidelpay)*
 4. enable the ceres container ``Order confirmation: Additional payment information``
-5. click the save button
+5. enable the ceres container ``My account: Additional payment information``
+6. click the save button
 
 ![Container links](../images/preview_4.png)
 
@@ -143,6 +144,11 @@ This starts the insurance period in which the customer has to transfert the tota
 As soon as the customer transferred the total amount a receipt transaction (REC) appears within the hIP and is sent to the pushUrl of your shop.
 The shop module will then create a new payment and link it to the corresponding order.
 * The bank information for the customer will be written on the invoice pdf automatically on creation.
+
+> _Invoice secured B2C_ is only available under the following conditions:
+> 1. Shipping and billing address match
+> 2. The Country is either Germany or Austria
+> 3. The address does not belong to a company
 
 ### All payment methods
 * Payments contain the txnId (which is the heidelpay orderId), the shortId (the id of the transaction which lead to the payment i.e. Receipt, Debit or Capture) and the origin (i.e. heidelpay).

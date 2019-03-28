@@ -1,15 +1,4 @@
 <?php
-
-namespace Heidelpay\Services;
-
-use Heidelpay\Constants\Plugin;
-use Heidelpay\Methods\CreditCard;
-use Heidelpay\Methods\DebitCard;
-use Heidelpay\Methods\DirectDebit;
-use Heidelpay\Methods\Sofort;
-use Heidelpay\Methods\InvoiceSecuredB2C;
-use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
-
 /**
  * Provides for connection to the libraries.
  *
@@ -22,6 +11,16 @@ use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
  *
  * @package heidelpay\plentymarkets-gateway\services
  */
+
+namespace Heidelpay\Services;
+
+use Heidelpay\Constants\Plugin;
+use Heidelpay\Methods\CreditCard;
+use Heidelpay\Methods\DebitCard;
+use Heidelpay\Methods\DirectDebit;
+use Heidelpay\Methods\Sofort;
+use Heidelpay\Methods\InvoiceSecuredB2C;
+use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
 class LibService
 {
     /**
@@ -70,7 +69,7 @@ class LibService
         if ($result['error'] ?? false) {
             return [
                 'exceptionCode' => $result['error_no'] ?? 500,
-                'exceptionMsg' => $result['error_msg'] ?? 'Internal error',
+                'exceptionMsg' => $result['error_msg'] ?? 'Internal error'
             ];
         }
 

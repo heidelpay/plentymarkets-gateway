@@ -539,7 +539,7 @@ class PaymentHelper
         foreach ($transactions as $transaction) {
             /** @var Transaction $transaction */
             if ($transaction->transactionType === TransactionType::AUTHORIZE) {
-                $details       = $transaction->transactionDetails;
+                $details = $transaction->transactionDetails;
                 if (!isset(
                     $details['CONNECTOR.ACCOUNT_IBAN'],
                     $details['CONNECTOR.ACCOUNT_BIC'],
@@ -549,12 +549,12 @@ class PaymentHelper
                     break;
                 }
 
-                $accountIBAN   = $details['CONNECTOR.ACCOUNT_IBAN'];
-                $accountBIC    = $details['CONNECTOR.ACCOUNT_BIC'];
-                $accountHolder = $details['CONNECTOR.ACCOUNT_HOLDER'];
-                $accountUsage  = $details['CONNECTOR.ACCOUNT_USAGE'] ?? $transaction->shortId;
-
-                $paymentDetails = compact('accountIBAN', 'accountBIC', 'accountHolder', 'accountUsage');
+                $paymentDetails = [
+                    'accountIBAN'   => $details['CONNECTOR.ACCOUNT_IBAN'],
+                    'accountBIC'    => $details['CONNECTOR.ACCOUNT_BIC'],
+                    'accountHolder' => $details['CONNECTOR.ACCOUNT_HOLDER'],
+                    'accountUsage'  => $details['CONNECTOR.ACCOUNT_USAGE'] ?? $transaction->shortId
+                ];
             }
         }
 

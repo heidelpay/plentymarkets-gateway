@@ -55,21 +55,26 @@ class PaymentHelper
 
     /** @var PaymentMethodRepositoryContract $paymentMethodRepo */
     protected $paymentMethodRepo;
-    /** @var PaymentOrderRelationRepositoryContract */
+
+    /** @var PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo */
     private $paymentOrderRelationRepo;
-    /** @var MainConfigContract */
+
+    /** @var MainConfigContract $mainConfig */
     private $mainConfig;
-    /** @var MethodConfigContract */
+
+    /** @var MethodConfigContract $methodConfig */
     private $methodConfig;
-    /** @var PaymentPropertyRepositoryContract */
+
+    /** @var PaymentPropertyRepositoryContract $paymentPropertyRepo */
     private $paymentPropertyRepo;
-    /** @var OrderServiceContract */
+
+    /** @var OrderServiceContract $orderService */
     private $orderService;
-    /** @var OrderTxnIdRelationRepositoryContract */
+
+    /** @var OrderTxnIdRelationRepositoryContract $orderTxnIdRelationRepo */
     private $orderTxnIdRelationRepo;
-    /**
-     * @var TransactionRepositoryContract
-     */
+
+    /** @var TransactionRepositoryContract $transactionRepo */
     private $transactionRepo;
 
     /**
@@ -206,7 +211,7 @@ class PaymentHelper
             'TRANSACTION_CHANNEL' => $this->methodConfig->getTransactionChannel($paymentMethod),
             'TRANSACTION_MODE' => $this->mainConfig->getEnvironment(),
             'USER_LOGIN' => $this->mainConfig->getUserLogin(),
-            'USER_PWD' => $this->mainConfig->getUserPassword(),
+            'USER_PWD' => $this->mainConfig->getUserPassword()
         ];
     }
 
@@ -239,15 +244,14 @@ class PaymentHelper
      */
     public function mapHeidelpayTransactionStatus(array $paymentData): int
     {
+        $transactionStatus = TransactionStatus::NOK;
         if ($paymentData['isSuccess'] === true) {
-            return TransactionStatus::ACK;
+            $transactionStatus = TransactionStatus::ACK;
+        } elseif ($paymentData['isPending'] === true) {
+            $transactionStatus = TransactionStatus::PENDING;
         }
 
-        if ($paymentData['isPending'] === true) {
-            return TransactionStatus::PENDING;
-        }
-
-        return TransactionStatus::NOK;
+        return $transactionStatus;
     }
 
     /**
@@ -550,12 +554,7 @@ class PaymentHelper
                 $accountHolder = $details['CONNECTOR.ACCOUNT_HOLDER'];
                 $accountUsage  = $details['CONNECTOR.ACCOUNT_USAGE'] ?? $transaction->shortId;
 
-                $paymentDetails = [
-                    'accountIBAN'   => $accountIBAN,
-                    'accountBIC'    => $accountBIC,
-                    'accountHolder' => $accountHolder,
-                    'accountUsage'  => $accountUsage
-                ];
+                $paymentDetails = compact('accountIBAN', 'accountBIC', 'accountHolder', 'accountUsage');
             }
         }
 

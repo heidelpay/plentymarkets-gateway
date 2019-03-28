@@ -41,27 +41,27 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
         CreditCard::class => [
             self::ARRAY_KEY_CONFIG_KEY => CreditCard::CONFIG_KEY,
             self::ARRAY_KEY_KEY => CreditCard::KEY,
-            self::ARRAY_KEY_DEFAULT_NAME => CreditCard::DEFAULT_NAME,
+            self::ARRAY_KEY_DEFAULT_NAME => CreditCard::DEFAULT_NAME
         ],
         DebitCard::class => [
             self::ARRAY_KEY_CONFIG_KEY => DebitCard::CONFIG_KEY,
             self::ARRAY_KEY_KEY => DebitCard::KEY,
-            self::ARRAY_KEY_DEFAULT_NAME => DebitCard::DEFAULT_NAME,
+            self::ARRAY_KEY_DEFAULT_NAME => DebitCard::DEFAULT_NAME
         ],
         Sofort::class => [
             self::ARRAY_KEY_CONFIG_KEY => Sofort::CONFIG_KEY,
             self::ARRAY_KEY_KEY => Sofort::KEY,
-            self::ARRAY_KEY_DEFAULT_NAME => Sofort::DEFAULT_NAME,
+            self::ARRAY_KEY_DEFAULT_NAME => Sofort::DEFAULT_NAME
         ],
         DirectDebit::class => [
             self::ARRAY_KEY_CONFIG_KEY => DirectDebit::CONFIG_KEY,
             self::ARRAY_KEY_KEY => DirectDebit::KEY,
-            self::ARRAY_KEY_DEFAULT_NAME => DirectDebit::DEFAULT_NAME,
+            self::ARRAY_KEY_DEFAULT_NAME => DirectDebit::DEFAULT_NAME
         ],
         InvoiceSecuredB2C::class => [
             self::ARRAY_KEY_CONFIG_KEY => InvoiceSecuredB2C::CONFIG_KEY,
             self::ARRAY_KEY_KEY => InvoiceSecuredB2C::KEY,
-            self::ARRAY_KEY_DEFAULT_NAME => InvoiceSecuredB2C::DEFAULT_NAME,
+            self::ARRAY_KEY_DEFAULT_NAME => InvoiceSecuredB2C::DEFAULT_NAME
         ]
     ];
 
@@ -131,7 +131,7 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
     {
         $name = $this->get($this->getDisplayNameKey($paymentMethod));
 
-        if (null === $name) {
+        if ($name === null) {
             return 'Error loading payment method: ' . \get_class($paymentMethod);
         }
 
@@ -239,16 +239,19 @@ class MethodConfig extends BaseConfig implements MethodConfigContract
     {
         $type = $this->getMethodDescriptionType($paymentMethod);
 
-        if ($type === DescriptionTypes::INTERNAL) {
-            return $this->get($this->getDescriptionKey($paymentMethod, true));
+        switch ($type) {
+            case DescriptionTypes::INTERNAL:
+                $methodDescription = $this->get($this->getDescriptionKey($paymentMethod, true));
+                break;
+            case DescriptionTypes::EXTERNAL:
+                $methodDescription = $this->get($this->getDescriptionKey($paymentMethod));
+                break;
+            default:
+                $methodDescription = '';
+                break;
         }
 
-        if ($type === DescriptionTypes::EXTERNAL) {
-            return $this->get($this->getDescriptionKey($paymentMethod));
-        }
-
-        // in case of DescriptionTypes::NONE
-        return '';
+        return $methodDescription;
     }
     //</editor-fold>
 

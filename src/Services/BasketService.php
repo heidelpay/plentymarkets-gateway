@@ -203,6 +203,9 @@ class BasketService implements BasketServiceContract
      */
     private function strCompare($string1, $string2): bool
     {
-        return strtolower($string1) === strtolower($string2);
+        $needles = [' ', '-', '.', '(', ')'];
+        $normalizedString1 = str_replace($needles, '', strtolower(trim($string1)));
+        $normalizedString2 = str_replace($needles, '', strtolower(trim($string2)));
+        return $normalizedString1 === $normalizedString2;
     }
 }

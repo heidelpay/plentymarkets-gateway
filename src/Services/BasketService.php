@@ -11,7 +11,6 @@
  *
  * @package  heidelpay\plentymarkets-gateway\services
  */
-
 namespace Heidelpay\Services;
 
 use Heidelpay\Configs\MainConfigContract;
@@ -48,6 +47,9 @@ class BasketService implements BasketServiceContract
     /** @var CountryRepositoryContract */
     private $countryRepository;
 
+    /** @var NotificationService */
+    private $notificationService;
+
     /**
      * BasketService constructor.
      * @param CountryRepositoryContract $countryRepository
@@ -57,6 +59,7 @@ class BasketService implements BasketServiceContract
      * @param MainConfigContract $config
      * @param ItemRepositoryContract $itemRepo
      * @param AuthHelper $authHelper
+     * @param NotificationService $notificationService
      */
     public function __construct(
         CountryRepositoryContract $countryRepository,
@@ -65,7 +68,8 @@ class BasketService implements BasketServiceContract
         LibService $libraryService,
         MainConfigContract $config,
         ItemRepositoryContract $itemRepo,
-        AuthHelper $authHelper
+        AuthHelper $authHelper,
+        NotificationService $notificationService
     ) {
         $this->libService = $libraryService;
         $this->config = $config;
@@ -74,6 +78,7 @@ class BasketService implements BasketServiceContract
         $this->addressRepository = $addressRepository;
         $this->basketRepo = $basketRepo;
         $this->countryRepository = $countryRepository;
+        $this->notificationService = $notificationService;
     }
 
     /**
@@ -128,11 +133,14 @@ class BasketService implements BasketServiceContract
         $billingAddress = $addresses['billing']->toArray();
         $shippingAddress = $addresses['shipping']->toArray();
 
+        $this->notificationService->error('address', __METHOD__, ['shipping' => $shippingAddress, 'billing' => $billingAddress]);
+
         return  $billingAddress['gender'] === $shippingAddress['gender'] &&
                 $this->strCompare($billingAddress['address1'], $shippingAddress['address1']) &&
                 $this->strCompare($billingAddress['address2'], $shippingAddress['address2']) &&
                 $billingAddress['postalCode'] === $shippingAddress['postalCode'] &&
                 $this->strCompare($billingAddress['town'], $shippingAddress['town']) &&
+                $this->strCompare($billingAddress['country'], $shippingAddress['country']) &&
                 (
                     ($this->isBasketB2B()  && $this->strCompare($billingAddress['name1'], $shippingAddress['name1'])) ||
                     (!$this->isBasketB2B() && $this->strCompare($billingAddress['name2'], $shippingAddress['name2'])

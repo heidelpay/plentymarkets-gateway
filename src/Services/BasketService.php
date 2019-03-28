@@ -156,6 +156,8 @@ class BasketService implements BasketServiceContract
     {
         $basket = $this->getBasket();
 
+        $this->notificationService->error('Basket address', __METHOD__, ['basket' => $basket]);
+
         $addresses = [];
         $addresses['billing'] = $basket->customerInvoiceAddressId ?
             $this->addressRepository->findAddressById($basket->customerInvoiceAddressId) : null;

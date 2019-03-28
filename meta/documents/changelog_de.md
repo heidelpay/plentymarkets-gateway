@@ -6,6 +6,8 @@
 - Dem Kunden wird nun mitgeteilt, wenn ihm eine gewählte Zahlart nicht angeboten werden kann.
 - Im Kundenbereich können nun zusätzliche Bezahlinformationen eingeblendet werden (Rechnungskauf). [Siehe Beschreibung im User Guide.](user_guide_de.md)
 - Die Kapitel ``Konfiguration > Daten Container`` und ``Beschreibung der Zahlungsabläufe > Gesicherter Rechnungskauf B2C`` im User-Guide wurden aktualisiert.
+- Der Adressvergleich wurde optimiert um die Conversionrate für Rechnungszahlarten zu verbessern.
+- Im Händlerbackend werden nun die Zahlinformationen für Rechnungszahlarten angezeigt.
 
 ## [1.2.1][1.2.1]
 

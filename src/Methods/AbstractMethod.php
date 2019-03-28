@@ -180,6 +180,14 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     /**
      * @inheritdoc
      */
+    public static function getPaymentMethodKey(): string
+    {
+        return static::KEY;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getName(): string
     {
         return $this->config->getPaymentMethodName($this) ?: $this->getDefaultName();

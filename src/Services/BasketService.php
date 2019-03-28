@@ -159,14 +159,21 @@ class BasketService implements BasketServiceContract
         $this->notificationService->error('Basket address', __METHOD__, ['basket' => $basket]);
 
         $addresses                = [];
-        $invoiceAddressId = $basket->customerInvoiceAddressId;
+        $invoiceAddressId         = $basket->customerInvoiceAddressId;
         $addresses['billing']     = $invoiceAddressId ? $this->addressRepo->findAddressById($invoiceAddressId) : null;
+
+        $this->notificationService->error('billing address #1', __METHOD__, ['addresses' => $addresses ]);
+
 
         // if the shipping address is -99 or null, it is matching the billing address.
         $shippingAddressId = $basket->customerShippingAddressId;
         if ($shippingAddressId === null || $shippingAddressId === -99) {
+            $this->notificationService->error('billing address #2', __METHOD__, ['addresses' => $addresses ]);
+
             $addresses['shipping'] = $addresses['billing'];
         } else {
+            $this->notificationService->error('billing address #3', __METHOD__, ['addresses' => $addresses ]);
+
             $addresses['shipping'] = $this->addressRepo->findAddressById($shippingAddressId);
         }
 

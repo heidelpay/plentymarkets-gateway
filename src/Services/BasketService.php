@@ -39,7 +39,7 @@ class BasketService implements BasketServiceContract
     private $itemRepo;
 
     /** @var AddressRepositoryContract */
-    private $addressRepository;
+    private $addressRepo;
 
     /** @var BasketRepositoryContract */
     private $basketRepo;
@@ -71,13 +71,13 @@ class BasketService implements BasketServiceContract
         AuthHelper $authHelper,
         NotificationService $notificationService
     ) {
-        $this->libService = $libraryService;
-        $this->config = $config;
-        $this->authHelper = $authHelper;
-        $this->itemRepo = $itemRepo;
-        $this->addressRepository = $addressRepository;
-        $this->basketRepo = $basketRepo;
-        $this->countryRepository = $countryRepository;
+        $this->libService          = $libraryService;
+        $this->config              = $config;
+        $this->authHelper          = $authHelper;
+        $this->itemRepo            = $itemRepo;
+        $this->addressRepo         = $addressRepository;
+        $this->basketRepo          = $basketRepo;
+        $this->countryRepository   = $countryRepository;
         $this->notificationService = $notificationService;
     }
 
@@ -158,17 +158,21 @@ class BasketService implements BasketServiceContract
 
         $this->notificationService->error('Basket address', __METHOD__, ['basket' => $basket]);
 
-        $addresses = [];
-        $addresses['billing'] = $basket->customerInvoiceAddressId ?
-            $this->addressRepository->findAddressById($basket->customerInvoiceAddressId) : null;
+        $addresses                = [];
+        $invoiceAddressId = $basket->customerInvoiceAddressId;
+        $addresses['billing']     = $invoiceAddressId ? $this->addressRepo->findAddressById($invoiceAddressId) : null;
 
         // if the shipping address is -99 or null, it is matching the billing address.
-        if ($basket->customerShippingAddressId === null || $basket->customerShippingAddressId === -99) {
+        $shippingAddressId = $basket->customerShippingAddressId;
+        if ($shippingAddressId === null || $shippingAddressId === -99) {
             $addresses['shipping'] = $addresses['billing'];
-            return $addresses;
+        } else {
+            $addresses['shipping'] = $this->addressRepo->findAddressById($shippingAddressId);
         }
 
-        $addresses['shipping'] = $this->addressRepository->findAddressById($basket->customerShippingAddressId);
+        $this->notificationService->error('fetched addresses', __METHOD__, ['addresses' => $addresses]);
+
+
         return $addresses;
     }
 

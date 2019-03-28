@@ -207,9 +207,13 @@ class BasketService implements BasketServiceContract
         $normalizedString1 = str_replace($symbols, '', strtolower(trim($string1)));
         $normalizedString2 = str_replace($symbols, '', strtolower(trim($string2)));
 
-        $street = ['straße', 'strasse'];
-        $normalizedString1 = str_replace($street, 'str', $normalizedString1);
-        $normalizedString2 = str_replace($street, 'str', $normalizedString2);
+        $specialChars = ['ä', 'ü', 'ö', 'ß'];
+        $specialCharReplacements = ['ae', 'ue', 'oe', 'ss'];
+        $normalizedString1 = str_replace($specialChars, $specialCharReplacements, $normalizedString1);
+        $normalizedString2 = str_replace($specialChars, $specialCharReplacements, $normalizedString2);
+
+        $normalizedString1 = str_replace('strasse', 'str', $normalizedString1);
+        $normalizedString2 = str_replace('strasse', 'str', $normalizedString2);
 
         return $normalizedString1 === $normalizedString2;
     }

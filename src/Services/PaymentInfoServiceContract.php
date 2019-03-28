@@ -1,15 +1,15 @@
 <?php
 /**
- * Description
+ * Provides methods to handle payment information such as the bank data the client should transfer the amount to.
  *
- * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
- * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
+ * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
+ * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
  *
- * @link  http://dev.heidelpay.com/
+ * @link https://dev.heidelpay.com/plentymarkets
  *
- * @author  Simon Gabriel <development@heidelpay.de>
+ * @author Simon Gabriel <development@heidelpay.com>
  *
- * @package  heidelpay/${Package}
+ * @package heidelpay\plentymarkets-gateway\services
  */
 
 namespace Heidelpay\Services;

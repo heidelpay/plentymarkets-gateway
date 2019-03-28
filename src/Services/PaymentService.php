@@ -1,4 +1,16 @@
 <?php
+/**
+ * Provides service methods to handle payments.
+ *
+ * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
+ * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
+ *
+ * @link https://dev.heidelpay.com/plentymarkets
+ *
+ * @author Simon Gabriel <development@heidelpay.com>
+ *
+ * @package heidelpay\plentymarkets-gateway\services
+ */
 
 namespace Heidelpay\Services;
 
@@ -33,18 +45,6 @@ use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Plugin\Templates\Twig;
 
-/**
- * Provides service methods to handle payments.
- *
- * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
- * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
- *
- * @link https://dev.heidelpay.com/plentymarkets
- *
- * @author Simon Gabriel <development@heidelpay.com>
- *
- * @package heidelpay\plentymarkets-gateway\services
- */
 class PaymentService
 {
     use Translator;

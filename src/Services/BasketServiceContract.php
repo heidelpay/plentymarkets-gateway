@@ -11,11 +11,11 @@
  *
  * @package  heidelpay\plentymarkets-gateway\services
  */
-
 namespace Heidelpay\Services;
 
 use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Basket\Models\Basket;
+
 interface BasketServiceContract
 {
     /**

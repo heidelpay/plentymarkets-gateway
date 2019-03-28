@@ -1,11 +1,4 @@
 <?php
-namespace Heidelpay\Services;
-
-use Heidelpay\Constants\Plugin;
-use IO\Services\NotificationService as BaseNotificationService;
-use Plenty\Plugin\Log\Loggable;
-use Plenty\Plugin\Translation\Translator;
-
 /**
  * This service allows to add translated client notifications and log messages.
  *
@@ -18,6 +11,13 @@ use Plenty\Plugin\Translation\Translator;
  *
  * @package  heidelpay\plentymarkets-gateway\services
  */
+namespace Heidelpay\Services;
+
+use Heidelpay\Constants\Plugin;
+use IO\Services\NotificationService as BaseNotificationService;
+use Plenty\Plugin\Log\Loggable;
+use Plenty\Plugin\Translation\Translator;
+
 class NotificationService implements NotificationServiceContract
 {
     use Loggable;

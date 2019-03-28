@@ -69,7 +69,7 @@ class LibService
         if ($result['error'] ?? false) {
             return [
                 'exceptionCode' => $result['error_no'] ?? 500,
-                'exceptionMsg' => $result['error_msg'] ?? 'Internal error',
+                'exceptionMsg' => $result['error_msg'] ?? 'Internal error'
             ];
         }
 

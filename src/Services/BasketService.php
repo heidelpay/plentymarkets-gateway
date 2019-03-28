@@ -27,33 +27,25 @@ use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 
 class BasketService implements BasketServiceContract
 {
-    /**
-     * @var LibService
-     */
+    /** @var LibService */
     private $libService;
-    /**
-     * @var MainConfigContract
-     */
+
+    /** @var MainConfigContract */
     private $config;
-    /**
-     * @var AuthHelper
-     */
+
+    /** @var AuthHelper */
     private $authHelper;
-    /**
-     * @var ItemRepositoryContract
-     */
+
+    /** @var ItemRepositoryContract */
     private $itemRepo;
-    /**
-     * @var AddressRepositoryContract
-     */
+
+    /** @var AddressRepositoryContract */
     private $addressRepository;
-    /**
-     * @var BasketRepositoryContract
-     */
+
+    /** @var BasketRepositoryContract */
     private $basketRepo;
-    /**
-     * @var CountryRepositoryContract
-     */
+
+    /** @var CountryRepositoryContract */
     private $countryRepository;
 
     /**
@@ -98,7 +90,7 @@ class BasketService implements BasketServiceContract
         $params['auth'] = [
             'login' => $authData['USER_LOGIN'],
             'password' => $authData['USER_PWD'],
-            'senderId' => $authData['SECURITY_SENDER'],
+            'senderId' => $authData['SECURITY_SENDER']
         ];
         $params['basket'] = $basket->toArray();
 

@@ -1,12 +1,4 @@
 <?php
-namespace Heidelpay\Services\Database;
-
-use Heidelpay\Exceptions\SecurityHashInvalidException;
-use Heidelpay\Helper\PaymentHelper;
-use Heidelpay\Models\Contracts\TransactionRepositoryContract;
-use Heidelpay\Models\Transaction;
-use Heidelpay\Services\SecretService;
-
 /**
  * Transaction Service class
  *
@@ -19,6 +11,14 @@ use Heidelpay\Services\SecretService;
  *
  * @package heidelpay\plentymarkets-gateway\services
  */
+namespace Heidelpay\Services\Database;
+
+use Heidelpay\Exceptions\SecurityHashInvalidException;
+use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Models\Contracts\TransactionRepositoryContract;
+use Heidelpay\Models\Transaction;
+use Heidelpay\Services\SecretService;
+
 class TransactionService
 {
     const NO_ORDER_ID = -1;
@@ -157,7 +157,7 @@ class TransactionService
             'CRITERION.PAYMENT_METHOD', 'CRITERION.PUSH_URL', 'CRITERION.SDK_NAME', 'CRITERION.SDK_VERSION',
             'CRITERION.SHOPMODULE_VERSION', 'CRITERION.SHOP_TYPE', 'IDENTIFICATION.SHOPPERID',
             'IDENTIFICATION.SHORTID', 'IDENTIFICATION.TRANSACTIONID', 'IDENTIFICATION.UNIQUEID',
-            'PAYMENT.CODE', 'SECURITY.SENDER',
+            'PAYMENT.CODE', 'SECURITY.SENDER'
         ];
 
         foreach ($heidelpayData as $key => $value) {

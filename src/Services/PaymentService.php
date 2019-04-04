@@ -95,9 +95,8 @@ class PaymentService
 
     /** @var CommentRepositoryContract $commentRepo */
     private $commentRepo;
-    /**
-     * @var PaymentInfoServiceContract
-     */
+
+    /** @var PaymentInfoServiceContract */
     private $paymentInfoService;
 
     /**

@@ -11,7 +11,6 @@
  *
  * @package  heidelpay\plentymarkets-gateway\services
  */
-
 namespace Heidelpay\Services;
 
 use Heidelpay\Configs\MainConfigContract;
@@ -40,7 +39,7 @@ class BasketService implements BasketServiceContract
     private $itemRepo;
 
     /** @var AddressRepositoryContract */
-    private $addressRepository;
+    private $addressRepo;
 
     /** @var BasketRepositoryContract */
     private $basketRepo;
@@ -50,6 +49,7 @@ class BasketService implements BasketServiceContract
 
     /**
      * BasketService constructor.
+     *
      * @param CountryRepositoryContract $countryRepository
      * @param AddressRepositoryContract $addressRepository
      * @param BasketRepositoryContract $basketRepo
@@ -67,13 +67,13 @@ class BasketService implements BasketServiceContract
         ItemRepositoryContract $itemRepo,
         AuthHelper $authHelper
     ) {
-        $this->libService = $libraryService;
-        $this->config = $config;
-        $this->authHelper = $authHelper;
-        $this->itemRepo = $itemRepo;
-        $this->addressRepository = $addressRepository;
-        $this->basketRepo = $basketRepo;
-        $this->countryRepository = $countryRepository;
+        $this->libService          = $libraryService;
+        $this->config              = $config;
+        $this->authHelper          = $authHelper;
+        $this->itemRepo            = $itemRepo;
+        $this->addressRepo         = $addressRepository;
+        $this->basketRepo          = $basketRepo;
+        $this->countryRepository   = $countryRepository;
     }
 
     /**
@@ -133,6 +133,7 @@ class BasketService implements BasketServiceContract
                 $this->strCompare($billingAddress['address2'], $shippingAddress['address2']) &&
                 $billingAddress['postalCode'] === $shippingAddress['postalCode'] &&
                 $this->strCompare($billingAddress['town'], $shippingAddress['town']) &&
+                $this->strCompare($billingAddress['countryId'], $shippingAddress['countryId']) &&
                 (
                     ($this->isBasketB2B()  && $this->strCompare($billingAddress['name1'], $shippingAddress['name1'])) ||
                     (!$this->isBasketB2B() && $this->strCompare($billingAddress['name2'], $shippingAddress['name2'])
@@ -148,17 +149,18 @@ class BasketService implements BasketServiceContract
     {
         $basket = $this->getBasket();
 
-        $addresses = [];
-        $addresses['billing'] = $basket->customerInvoiceAddressId ?
-            $this->addressRepository->findAddressById($basket->customerInvoiceAddressId) : null;
+        $addresses            = [];
+        $invoiceAddressId     = $basket->customerInvoiceAddressId;
+        $addresses['billing'] = $invoiceAddressId ? $this->addressRepo->findAddressById($invoiceAddressId) : null;
 
         // if the shipping address is -99 or null, it is matching the billing address.
-        if ($basket->customerShippingAddressId === null || $basket->customerShippingAddressId === -99) {
+        $shippingAddressId = $basket->customerShippingAddressId;
+        if ($shippingAddressId === null || $shippingAddressId === -99) {
             $addresses['shipping'] = $addresses['billing'];
-            return $addresses;
+        } else {
+            $addresses['shipping'] = $this->addressRepo->findAddressById($shippingAddressId);
         }
 
-        $addresses['shipping'] = $this->addressRepository->findAddressById($basket->customerShippingAddressId);
         return $addresses;
     }
 
@@ -201,6 +203,18 @@ class BasketService implements BasketServiceContract
      */
     private function strCompare($string1, $string2): bool
     {
-        return strtolower($string1) === strtolower($string2);
+        $symbols = [' ', '-', '.', '(', ')'];
+        $normalizedString1 = str_replace($symbols, '', strtolower(trim($string1)));
+        $normalizedString2 = str_replace($symbols, '', strtolower(trim($string2)));
+
+        $specialChars = ['ä', 'ü', 'ö', 'ß'];
+        $specialCharReplacements = ['ae', 'ue', 'oe', 'ss'];
+        $normalizedString1 = str_replace($specialChars, $specialCharReplacements, $normalizedString1);
+        $normalizedString2 = str_replace($specialChars, $specialCharReplacements, $normalizedString2);
+
+        $normalizedString1 = str_replace('strasse', 'str', $normalizedString1);
+        $normalizedString2 = str_replace('strasse', 'str', $normalizedString2);
+
+        return $normalizedString1 === $normalizedString2;
     }
 }

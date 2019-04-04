@@ -38,18 +38,13 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     const COUNTRY_RESTRICTION = [];
     const ADDRESSES_MUST_MATCH = false;
 
-    /**
-     * @var PaymentHelper $helper
-     */
+    /** @var PaymentHelper $helper */
     protected $helper;
 
-    /**
-     * @var MethodConfigContract
-     */
+    /** @var MethodConfigContract */
     private $config;
-    /**
-     * @var BasketServiceContract
-     */
+
+    /** @var BasketServiceContract */
     private $basketService;
 
     /**

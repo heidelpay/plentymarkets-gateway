@@ -32,7 +32,7 @@ class RequestHelper
             return $request->get('customer_salutation');
         }
 
-        throw new RuntimeException('Salutation not set!');
+        throw new RuntimeException('payment.errorSalutationIsInvalid');
     }
 
     /**

@@ -20,6 +20,7 @@ use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Helper\RequestHelper;
 use Heidelpay\Services\BasketServiceContract;
+use function in_array;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Plugin\Http\Request;
 use RuntimeException;
@@ -79,6 +80,10 @@ class InvoiceSecuredB2C extends AbstractMethod
             throw new RuntimeException('payment.errorUnder18');
         }
 
+        // is valid salutation
         $salutation = $this->requestHelper->getSalutation($request);
+        if (!in_array($salutation, ['MR', 'MRS'])) {
+            throw new RuntimeException('payment.errorSalutationIsInvalid');
+        }
     }
 }

@@ -1,8 +1,14 @@
 <?php
 
 namespace Heidelpay\Methods;
+use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Constants\TransactionType;
+use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Helper\RequestHelper;
+use Heidelpay\Services\BasketServiceContract;
+use http\Exception\RuntimeException;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
+use Plenty\Plugin\Http\Request;
 
 /**
  * heidelpay Invoice Secured B2C Payment Method
@@ -31,4 +37,44 @@ class InvoiceSecuredB2C extends AbstractMethod
     const B2C_ONLY = true;
     const COUNTRY_RESTRICTION = ['DE', 'AT'];
     const ADDRESSES_MUST_MATCH = true;
+
+    /** @var RequestHelper */
+    private $requestHelper;
+
+    /**
+     * InvoiceSecuredB2C constructor.
+     *
+     * @param PaymentHelper $paymentHelper
+     * @param MethodConfigContract $config
+     * @param BasketServiceContract $basketService
+     * @param RequestHelper $requestHelper
+     */
+    public function __construct(
+        PaymentHelper $paymentHelper,
+        MethodConfigContract $config,
+        BasketServiceContract $basketService,
+        RequestHelper $requestHelper
+    ) {
+        $this->requestHelper = $requestHelper;
+
+        parent::__construct($paymentHelper, $config, $basketService);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function validateRequest(Request $request)
+    {
+        $dob = $this->requestHelper->getDateOfBirth($request);
+
+        // is valid date
+
+        // is over 18
+        $then = strtotime($dob);
+        if(time() < strtotime('+18 years', $then))  {
+            throw new RuntimeException('payment.errorUnder18');
+        }
+
+        $salutation = $this->requestHelper->getSalutation($request);
+    }
 }

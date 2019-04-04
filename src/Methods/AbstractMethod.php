@@ -9,6 +9,7 @@ use function in_array;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Plugin\Application;
+use Plenty\Plugin\Http\Request;
 use RuntimeException;
 
 /**
@@ -313,5 +314,12 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     public function needsMatchingAddresses(): bool
     {
         return static::ADDRESSES_MUST_MATCH;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function validateRequest(Request $request)
+    {
     }
 }

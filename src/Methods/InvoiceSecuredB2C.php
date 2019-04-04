@@ -1,15 +1,4 @@
 <?php
-
-namespace Heidelpay\Methods;
-use Heidelpay\Configs\MethodConfigContract;
-use Heidelpay\Constants\TransactionType;
-use Heidelpay\Helper\PaymentHelper;
-use Heidelpay\Helper\RequestHelper;
-use Heidelpay\Services\BasketServiceContract;
-use http\Exception\RuntimeException;
-use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
-use Plenty\Plugin\Http\Request;
-
 /**
  * heidelpay Invoice Secured B2C Payment Method
  *
@@ -22,6 +11,18 @@ use Plenty\Plugin\Http\Request;
  *
  * @package heidelpay\plentymarkets-gateway\payment-methods
  */
+
+namespace Heidelpay\Methods;
+
+use Heidelpay\Configs\MethodConfigContract;
+use Heidelpay\Constants\TransactionType;
+use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Helper\RequestHelper;
+use Heidelpay\Services\BasketServiceContract;
+use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
+use Plenty\Plugin\Http\Request;
+use RuntimeException;
+
 class InvoiceSecuredB2C extends AbstractMethod
 {
     const CONFIG_KEY = 'invoicesecuredb2c';

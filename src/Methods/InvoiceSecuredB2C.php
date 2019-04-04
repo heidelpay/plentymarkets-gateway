@@ -75,7 +75,7 @@ class InvoiceSecuredB2C extends AbstractMethod
         }
 
         // is over 18
-        if(time() < strtotime('+18 years', $dob))  {
+        if(time() < strtotime('+18 years', $dob->getTimestamp()))  {
             throw new RuntimeException('payment.errorUnder18');
         }
 

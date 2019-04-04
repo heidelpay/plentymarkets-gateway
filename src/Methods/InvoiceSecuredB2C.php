@@ -67,10 +67,9 @@ class InvoiceSecuredB2C extends AbstractMethod
      */
     public function validateRequest(Request $request)
     {
-        $dob = $this->requestHelper->getDateOfBirth($request);
+        $dob = DateTime::createFromFormat('Y-m-d', $this->requestHelper->getDateOfBirth($request));
 
         // is valid date
-        DateTime::createFromFormat('Y-m-d', $dob);
         if( DateTime::getLastErrors()['warning_count'] > 0 ){
             throw new RuntimeException('payment.errorDateOfBirthIsInvalid');
         }

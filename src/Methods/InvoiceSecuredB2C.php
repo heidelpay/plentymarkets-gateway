@@ -14,6 +14,7 @@
 
 namespace Heidelpay\Methods;
 
+use DateTime;
 use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\PaymentHelper;
@@ -66,13 +67,15 @@ class InvoiceSecuredB2C extends AbstractMethod
      */
     public function validateRequest(Request $request)
     {
-        $dob = $this->requestHelper->getDateOfBirth($request);
+        $dob = DateTime::createFromFormat('Y-m-d', $this->requestHelper->getDateOfBirth($request));
 
         // is valid date
+        if( DateTime::getLastErrors()['warning_count'] > 0 ){
+            throw new RuntimeException('payment.errorDateOfBirthIsInvalid');
+        }
 
         // is over 18
-        $then = strtotime($dob);
-        if(time() < strtotime('+18 years', $then))  {
+        if(time() < strtotime('+18 years', $dob))  {
             throw new RuntimeException('payment.errorUnder18');
         }
 

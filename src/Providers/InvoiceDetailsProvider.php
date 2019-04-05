@@ -4,6 +4,7 @@ namespace Heidelpay\Providers;
 use Heidelpay\Constants\SessionKeys;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\PaymentMethodContract;
+use function is_array;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
@@ -34,7 +35,7 @@ class InvoiceDetailsProvider
             $order = $order->toArray();
         }
 
-        if (\is_array($order)) {
+        if (is_array($order)) {
             foreach ($order['properties'] as $property) {
                 if ($property['typeId'] === OrderPropertyType::PAYMENT_METHOD) {
                     $mopId = $property['value'];

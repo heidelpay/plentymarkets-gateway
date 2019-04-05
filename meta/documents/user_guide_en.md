@@ -110,7 +110,7 @@ This modul provides for a data container to render additional payment informatio
 To show the information on your order confirmation page please follow these steps:
 1. switch to the menu item *CMS > Container Links*
 2. choose the corresponding plug-in set from the drop down
-3. open the menu *Invoice Details (Heidelpay)*
+3. open the menu *Invoice Details (heidelpay)*
 4. enable the ceres container ``Order confirmation: Additional payment information``
 5. enable the ceres container ``My account: Additional payment information``
 6. click the save button

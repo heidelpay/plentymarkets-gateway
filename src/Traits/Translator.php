@@ -1,6 +1,6 @@
 <?php
 /**
- * Extends the using class with translation capabilities.
+ * Extends the a class with translation capabilities.
  *
  * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.

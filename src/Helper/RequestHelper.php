@@ -1,12 +1,6 @@
 <?php
-
-namespace Heidelpay\Helper;
-
-use Plenty\Plugin\Http\Request;
-use RuntimeException;
-
 /**
- * Heidelpay provides for helper methods concerning the handling of requests.
+ * Provides for helper methods concerning the handling of requests.
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
@@ -17,6 +11,12 @@ use RuntimeException;
  *
  * @package heidelpay\plentymarkets-gateway\helpers
  */
+
+namespace Heidelpay\Helper;
+
+use Plenty\Plugin\Http\Request;
+use RuntimeException;
+
 class RequestHelper
 {
     /**

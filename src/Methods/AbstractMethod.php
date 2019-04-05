@@ -321,5 +321,6 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
      */
     public function validateRequest(Request $request)
     {
+        // do nothing by default
     }
 }

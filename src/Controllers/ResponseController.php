@@ -39,19 +39,23 @@ class ResponseController extends Controller
 
     /** @var Request $request */
     private $request;
+
     /** @var Response */
     private $response;
+
     /** @var PaymentService */
     private $paymentService;
+
     /** @var TransactionService*/
     private $transactionService;
+
     /** @var NotificationServiceContract */
     private $notification;
+
     /** @var UrlServiceContract */
     private $urlService;
-    /**
-     * @var RequestHelper
-     */
+
+    /** @var RequestHelper */
     private $requestHelper;
 
     /**

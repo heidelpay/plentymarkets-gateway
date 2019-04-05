@@ -151,14 +151,14 @@ class BasketService implements BasketServiceContract
 
         $addresses            = [];
         $invoiceAddressId     = $basket->customerInvoiceAddressId;
-        $addresses['billing'] = $invoiceAddressId ? $this->addressRepo->findAddressById($invoiceAddressId) : null;
+        $addresses['billing'] = empty($invoiceAddressId) ? null : $this->getAddressById($invoiceAddressId);
 
         // if the shipping address is -99 or null, it is matching the billing address.
         $shippingAddressId = $basket->customerShippingAddressId;
-        if ($shippingAddressId === null || $shippingAddressId === -99) {
+        if (empty($shippingAddressId) || $shippingAddressId === -99) {
             $addresses['shipping'] = $addresses['billing'];
         } else {
-            $addresses['shipping'] = $this->addressRepo->findAddressById($shippingAddressId);
+            $addresses['shipping'] = $this->getAddressById($shippingAddressId);
         }
 
         return $addresses;
@@ -166,11 +166,12 @@ class BasketService implements BasketServiceContract
 
     /**
      * Returns true if the billing address is B2B.
+     *
+     * @return bool
      */
     public function isBasketB2B(): bool
     {
         $billingAddress = $this->getCustomerAddressData()['billing'];
-
         return $billingAddress ? $billingAddress->gender === null : false;
     }
 
@@ -216,5 +217,21 @@ class BasketService implements BasketServiceContract
         $normalizedString2 = str_replace('strasse', 'str', $normalizedString2);
 
         return $normalizedString1 === $normalizedString2;
+    }
+
+    /**
+     * @param $addressId
+     * @return Address|null
+     */
+    private function getAddressById($addressId)
+    {
+        /** @var AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+        $address = $authHelper->processUnguarded(
+            function () use ($addressId) {
+                return $this->addressRepo->findAddressById($addressId);
+            }
+        );
+        return $address;
     }
 }

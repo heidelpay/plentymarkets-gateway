@@ -1,4 +1,16 @@
 <?php
+/**
+ * Provides for helper methods concerning payment objects.
+ *
+ * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
+ * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
+ *
+ * @link https://dev.heidelpay.com/plentymarkets
+ *
+ * @author Simon Gabriel <development@heidelpay.com>
+ *
+ * @package heidelpay\plentymarkets-gateway\helpers
+ */
 
 namespace Heidelpay\Helper;
 
@@ -34,18 +46,6 @@ use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Plugin\Log\Loggable;
 
-/**
- * Heidelpay Payment Helper Class
- *
- * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
- * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
- *
- * @link https://dev.heidelpay.com/plentymarkets
- *
- * @author Simon Gabriel <development@heidelpay.com>
- *
- * @package heidelpay\plentymarkets-gateway\helpers
- */
 class PaymentHelper
 {
     // notification service won't work since the base service is not available on boot time

@@ -5,9 +5,12 @@ namespace Heidelpay\Methods;
 use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Services\BasketServiceContract;
+use function in_array;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Plugin\Application;
+use Plenty\Plugin\Http\Request;
+use RuntimeException;
 
 /**
  * Abstract Payment Method Class
@@ -98,8 +101,8 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
         // enable the payment method only if it is allowed for the given billing country
         $countryRestrictions = $this->getCountryRestrictions();
         if (!empty($countryRestrictions) &&
-            !\in_array($this->basketService->getBillingCountryCode(), $countryRestrictions, true)) {
-                return false;
+            !in_array($this->basketService->getBillingCountryCode(), $countryRestrictions, true)) {
+            return false;
         }
 
         return true;
@@ -218,7 +221,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
 
     /**
      * {@inheritDoc}
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function getTransactionType(): string
     {
@@ -227,7 +230,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
         }
 
         if (!$this->config->hasTransactionType($this)) {
-            throw new \RuntimeException('payment.errorTransactionTypeUndefined');
+            throw new RuntimeException('payment.errorTransactionTypeUndefined');
         }
         return $this->config->getTransactionType($this);
     }
@@ -311,5 +314,13 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     public function needsMatchingAddresses(): bool
     {
         return static::ADDRESSES_MUST_MATCH;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function validateRequest(Request $request)
+    {
+        // do nothing by default
     }
 }

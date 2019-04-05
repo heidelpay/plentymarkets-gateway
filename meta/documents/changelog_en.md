@@ -4,10 +4,14 @@
 
 ### Changed
 - If a payment method cannot be used by the customer a specific error message is shown.
-- Additional payment information can now be shown within the customer backend (Invoice payment).  [See User Guide for details.](user_guide_en.md)
-- The sections ``Configuration > Data Container`` and ``Workflow description > Invoice secured B2C`` have been updated.
+- The sections ``Configuration > Data Container`` and ``Workflow description > Invoice secured B2C`` within the user guide have been updated.
 - The address comparison has been optimized to raise the conversion rate of invoice payments.
+
+### Added
+- Additional payment information can now be shown within the customer backend (Invoice payment).  [See User Guide for details.](user_guide_en.md)
 - Payment information for invoice payment types are now shown within the merchant backend.
+- An error message will be shown when the customer is under 18.
+- An error message will be shown when the salutation is invalid.
 
 ## [1.2.1][1.2.1]
 

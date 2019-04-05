@@ -110,7 +110,7 @@ Dieses Modul stellt einen Container zur Verfügung, der Zahlungsinformationen (z
 Um diese Informationen auf der Buchungsbestätigungs-Seite darzustellen folgen Sie bitte folgenden Schritten.
 1. wechseln Sie im Backend auf den Menüpunkt *CMS > Container-Verknüpfungen*
 2. wählen Sie im Drop-Down-Menü das Plug-in Set, für welches Sie die Änderung vornehmen möchten aus
-3. klappen Sie das Menü *Invoice Details (heidelpay)* auf
+3. klappen Sie das Menü *Invoice Details (Heidelpay)* auf
 4. aktivieren sie den Ceres-Container ``Order confirmation: Additional payment information``
 5. aktivieren sie den Ceres-Container ``My account: Additional payment information``
 6. klicken Sie den speichern Button

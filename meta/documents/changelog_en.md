@@ -10,8 +10,8 @@
 ### Added
 - Additional payment information can now be shown within the customer backend (Invoice payment).  [See User Guide for details.](user_guide_en.md)
 - Payment information for invoice payment types are now shown within the merchant backend.
-- An error message when the customer is under 18.
-- An error message when the salutation is invalid.
+- An error message will now be shown when the customer is under 18.
+- An error message will now be shown when the salutation is invalid.
 
 ## [1.2.1][1.2.1]
 

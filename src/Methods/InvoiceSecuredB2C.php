@@ -19,8 +19,8 @@ use Heidelpay\Configs\MethodConfigContract;
 use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Helper\RequestHelper;
+use Heidelpay\Helper\ValidationHelper;
 use Heidelpay\Services\BasketServiceContract;
-use function in_array;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Plugin\Http\Request;
 use RuntimeException;
@@ -43,6 +43,10 @@ class InvoiceSecuredB2C extends AbstractMethod
 
     /** @var RequestHelper */
     private $requestHelper;
+    /**
+     * @var ValidationHelper
+     */
+    private $validationHelper;
 
     /**
      * InvoiceSecuredB2C constructor.
@@ -51,14 +55,17 @@ class InvoiceSecuredB2C extends AbstractMethod
      * @param MethodConfigContract $config
      * @param BasketServiceContract $basketService
      * @param RequestHelper $requestHelper
+     * @param ValidationHelper $validationHelper
      */
     public function __construct(
         PaymentHelper $paymentHelper,
         MethodConfigContract $config,
         BasketServiceContract $basketService,
-        RequestHelper $requestHelper
+        RequestHelper $requestHelper,
+        ValidationHelper $validationHelper
     ) {
         $this->requestHelper = $requestHelper;
+        $this->validationHelper = $validationHelper;
 
         parent::__construct($paymentHelper, $config, $basketService);
     }
@@ -76,14 +83,10 @@ class InvoiceSecuredB2C extends AbstractMethod
         }
 
         // is over 18
-        if(time() < strtotime('+18 years', $dob->getTimestamp()))  {
-            throw new RuntimeException('payment.errorUnder18');
-        }
+        $this->validationHelper->validateLegalAge($dob);
 
         // is valid salutation
         $salutation = $this->requestHelper->getSalutation($request);
-        if (!in_array($salutation, ['MR', 'MRS'])) {
-            throw new RuntimeException('payment.errorSalutationIsInvalid');
-        }
+        $this->validationHelper->validateSalutation($salutation);
     }
 }

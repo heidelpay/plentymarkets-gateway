@@ -45,6 +45,8 @@ use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Plugin\Log\Loggable;
+use RuntimeException;
+use function count;
 
 class PaymentHelper
 {
@@ -300,7 +302,7 @@ class PaymentHelper
      * @param Payment $payment
      * @param int $orderId
      * @return Order
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId): Order
     {
@@ -427,13 +429,13 @@ class PaymentHelper
      *
      * @param $txnObject
      * @return mixed
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function getTransactionCode($txnObject)
     {
         $paymentCodeParts = explode('.', $txnObject['PAYMENT.CODE']);
-        if (\count($paymentCodeParts) < 2) {
-            throw new \RuntimeException('general.errorUnknownPaymentCode');
+        if (count($paymentCodeParts) < 2) {
+            throw new RuntimeException('general.errorUnknownPaymentCode');
         }
         list(, $txnCode) = $paymentCodeParts;
         return $txnCode;

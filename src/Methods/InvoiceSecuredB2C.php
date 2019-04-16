@@ -43,9 +43,8 @@ class InvoiceSecuredB2C extends AbstractMethod
 
     /** @var RequestHelper */
     private $requestHelper;
-    /**
-     * @var ValidationHelper
-     */
+
+    /** @var ValidationHelper */
     private $validationHelper;
 
     /**

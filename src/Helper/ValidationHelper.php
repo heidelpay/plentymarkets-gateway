@@ -1,6 +1,6 @@
 <?php
 /**
- * Provides for helper methods concerning the validation data.
+ * Provides for helper methods concerning the validation of data.
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
@@ -37,7 +37,7 @@ class ValidationHelper
     }
 
     /**
-     * Throws exception if the given birthdate shows the customer is not of legal age.
+     * Throws exception if the given birthday shows the customer is not of legal age.
      *
      * @param  DateTime $dob
      * @throws RuntimeException

@@ -46,6 +46,10 @@ class BasketService implements BasketServiceContract
 
     /** @var CountryRepositoryContract */
     private $countryRepository;
+    /**
+     * @var NotificationService
+     */
+    private $notification;
 
     /**
      * BasketService constructor.
@@ -57,6 +61,7 @@ class BasketService implements BasketServiceContract
      * @param MainConfigContract $config
      * @param ItemRepositoryContract $itemRepo
      * @param AuthHelper $authHelper
+     * @param NotificationService $notification
      */
     public function __construct(
         CountryRepositoryContract $countryRepository,
@@ -65,7 +70,8 @@ class BasketService implements BasketServiceContract
         LibService $libraryService,
         MainConfigContract $config,
         ItemRepositoryContract $itemRepo,
-        AuthHelper $authHelper
+        AuthHelper $authHelper,
+        NotificationService $notification
     ) {
         $this->libService          = $libraryService;
         $this->config              = $config;
@@ -74,6 +80,7 @@ class BasketService implements BasketServiceContract
         $this->addressRepo         = $addressRepository;
         $this->basketRepo          = $basketRepo;
         $this->countryRepository   = $countryRepository;
+        $this->notification = $notification;
     }
 
     /**
@@ -172,6 +179,7 @@ class BasketService implements BasketServiceContract
     public function isBasketB2B(): bool
     {
         $billingAddress = $this->getCustomerAddressData()['billing'];
+        $this->notification->error('Check is Basket B2B', __METHOD__, ['billingAddtess'=>$billingAddress]);
         return $billingAddress ? $billingAddress->gender === null : false;
     }
 

@@ -418,7 +418,6 @@ class PaymentHelper
 
             default:
                 // do nothing
-                $this->getLogger(__METHOD__)->critical('general.errorMethodNotFound', ['Method' => $paymentMethod]);
                 break;
         }
         return $instance;

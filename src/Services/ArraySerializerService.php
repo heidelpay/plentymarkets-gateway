@@ -26,7 +26,7 @@ class ArraySerializerService
     public function serializeKeyValue(array $arrayToSerialize): string
     {
         return implode(self::SERIALIZER_PAIR_DELIMITER, array_map(
-            function ($value, $key) {
+            static function ($value, $key) {
                 return $key . self::SERIALIZER_KEY_VALUE_DELIMITER . $value;
             },
             $arrayToSerialize,

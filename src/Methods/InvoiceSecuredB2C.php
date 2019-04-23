@@ -1,9 +1,4 @@
 <?php
-
-namespace Heidelpay\Methods;
-use Heidelpay\Constants\TransactionType;
-use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
-
 /**
  * heidelpay Invoice Secured B2C Payment Method
  *
@@ -16,6 +11,20 @@ use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
  *
  * @package heidelpay\plentymarkets-gateway\payment-methods
  */
+
+namespace Heidelpay\Methods;
+
+use DateTime;
+use Heidelpay\Configs\MethodConfigContract;
+use Heidelpay\Constants\TransactionType;
+use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Helper\RequestHelper;
+use Heidelpay\Helper\ValidationHelper;
+use Heidelpay\Services\BasketServiceContract;
+use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
+use Plenty\Plugin\Http\Request;
+use RuntimeException;
+
 class InvoiceSecuredB2C extends AbstractMethod
 {
     const CONFIG_KEY = 'invoicesecuredb2c';
@@ -31,4 +40,52 @@ class InvoiceSecuredB2C extends AbstractMethod
     const B2C_ONLY = true;
     const COUNTRY_RESTRICTION = ['DE', 'AT'];
     const ADDRESSES_MUST_MATCH = true;
+
+    /** @var RequestHelper */
+    private $requestHelper;
+
+    /** @var ValidationHelper */
+    private $validationHelper;
+
+    /**
+     * InvoiceSecuredB2C constructor.
+     *
+     * @param PaymentHelper $paymentHelper
+     * @param MethodConfigContract $config
+     * @param BasketServiceContract $basketService
+     * @param RequestHelper $requestHelper
+     * @param ValidationHelper $validationHelper
+     */
+    public function __construct(
+        PaymentHelper $paymentHelper,
+        MethodConfigContract $config,
+        BasketServiceContract $basketService,
+        RequestHelper $requestHelper,
+        ValidationHelper $validationHelper
+    ) {
+        $this->requestHelper = $requestHelper;
+        $this->validationHelper = $validationHelper;
+
+        parent::__construct($paymentHelper, $config, $basketService);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function validateRequest(Request $request)
+    {
+        $dob = DateTime::createFromFormat('Y-m-d', $this->requestHelper->getDateOfBirth($request));
+
+        // is valid date
+        if( DateTime::getLastErrors()['warning_count'] > 0 ){
+            throw new RuntimeException('payment.errorDateOfBirthIsInvalid');
+        }
+
+        // is over 18
+        $this->validationHelper->validateLegalAge($dob);
+
+        // is valid salutation
+        $salutation = $this->requestHelper->getSalutation($request);
+        $this->validationHelper->validateSalutation($salutation);
+    }
 }

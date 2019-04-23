@@ -1,5 +1,18 @@
 # heidelpay Payment Gateway Changelog
 
+## [1.2.2][1.2.2]
+
+### Changed
+- Dem Kunden wird nun mitgeteilt, wenn ihm eine gewählte Zahlart nicht angeboten werden kann.
+- Die Kapitel ``Konfiguration > Daten Container`` und ``Beschreibung der Zahlungsabläufe > Gesicherter Rechnungskauf B2C`` im User-Guide wurden aktualisiert.
+- Der Adressvergleich wurde optimiert um die Conversionrate für Rechnungszahlarten zu verbessern.
+
+### Added
+- Im Kundenbereich können nun zusätzliche Bezahlinformationen eingeblendet werden (Rechnungskauf). [Siehe Beschreibung im User Guide.](user_guide_de.md)
+- Im Händlerbackend werden nun die Zahlinformationen für Rechnungszahlarten angezeigt.
+- Es gibt nun eine Fehlermeldung, wenn ein Kunde unter 18 ist.
+- Es gibt nun eine Fehlermeldung, wenn die Anrede des Kunden nicht gültig ist.
+
 ## [1.2.1][1.2.1]
 
 ### Fixed
@@ -61,3 +74,4 @@
 [1.1.2]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.1.1..1.1.2
 [1.2.0]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.1.2..1.2.0
 [1.2.1]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.2.0..1.2.1
+[1.2.2]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.2.1..1.2.2

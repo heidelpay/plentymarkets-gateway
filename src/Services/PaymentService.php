@@ -1,4 +1,16 @@
 <?php
+/**
+ * Provides service methods to handle payments.
+ *
+ * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
+ * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
+ *
+ * @link https://dev.heidelpay.com/plentymarkets
+ *
+ * @author Simon Gabriel <development@heidelpay.com>
+ *
+ * @package heidelpay\plentymarkets-gateway\services
+ */
 
 namespace Heidelpay\Services;
 
@@ -33,84 +45,59 @@ use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Plugin\Templates\Twig;
 
-/**
- * Provides service methods to handle payments.
- *
- * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
- * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
- *
- * @link https://dev.heidelpay.com/plentymarkets
- *
- * @author Simon Gabriel <development@heidelpay.com>
- *
- * @package heidelpay\plentymarkets-gateway\services
- */
 class PaymentService
 {
     use Translator;
 
     const CARD_METHODS = [CreditCard::class, DebitCard::class];
 
-    /**
-     * @var array
-     */
+    /** @var array $heidelpayRequest*/
     private $heidelpayRequest = [];
-    /**
-     * @var PaymentRepositoryContract
-     */
+
+    /** @var PaymentRepositoryContract $paymentRepository */
     private $paymentRepository;
-    /**
-     * @var PaymentHelper
-     */
+
+    /** @var PaymentHelper $paymentHelper */
     private $paymentHelper;
-    /**
-     * @var LibService
-     */
+
+    /** @var LibService $libService */
     private $libService;
-    /**
-     * @var Twig
-     */
+
+    /** @var Twig $twig */
     private $twig;
-    /**
-     * @var TransactionRepositoryContract
-     */
+
+    /** @var TransactionRepositoryContract $transactionRepository */
     private $transactionRepository;
-    /**
-     * @var FrontendSessionStorageFactoryContract
-     */
+
+    /** @var FrontendSessionStorageFactoryContract $sessionStorageFactory */
     private $sessionStorageFactory;
-    /**
-     * @var NotificationServiceContract
-     */
+
+    /** @var NotificationServiceContract $notification */
     private $notification;
-    /**
-     * @var MethodConfigContract
-     */
+
+    /** @var MethodConfigContract $methodConfig */
     private $methodConfig;
-    /**
-     * @var OrderTxnIdRelationRepositoryContract
-     */
+
+    /** @var OrderTxnIdRelationRepositoryContract $orderRepo */
     private $orderTxnIdRepo;
-    /**
-     * @var OrderRepositoryContract
-     */
+
+    /** @var OrderRepositoryContract $orderRepo */
     private $orderRepo;
-    /**
-     * @var UrlServiceContract
-     */
+
+    /** @var UrlServiceContract $urlService */
     private $urlService;
-    /**
-     * @var ContactRepositoryContract
-     */
+
+    /** @var ContactRepositoryContract $contactRepo */
     private $contactRepo;
-    /**
-     * @var BasketServiceContract
-     */
+
+    /** @var BasketServiceContract $basketService */
     private $basketService;
-    /**
-     * @var CommentRepositoryContract
-     */
+
+    /** @var CommentRepositoryContract $commentRepo */
     private $commentRepo;
+
+    /** @var PaymentInfoServiceContract */
+    private $paymentInfoService;
 
     /**
      * PaymentService constructor.
@@ -128,6 +115,7 @@ class PaymentService
      * @param UrlServiceContract $urlService
      * @param BasketServiceContract $basketService
      * @param ContactRepositoryContract $contactRepo
+     * @param PaymentInfoServiceContract $paymentInfoService
      */
     public function __construct(
         LibService $libraryService,
@@ -142,7 +130,8 @@ class PaymentService
         OrderRepositoryContract $orderRepo,
         UrlServiceContract $urlService,
         BasketServiceContract $basketService,
-        ContactRepositoryContract $contactRepo
+        ContactRepositoryContract $contactRepo,
+        PaymentInfoServiceContract $paymentInfoService
     ) {
         $this->libService = $libraryService;
         $this->paymentRepository = $paymentRepository;
@@ -157,6 +146,7 @@ class PaymentService
         $this->urlService = $urlService;
         $this->contactRepo = $contactRepo;
         $this->basketService = $basketService;
+        $this->paymentInfoService = $paymentInfoService;
     }
 
     /**
@@ -172,7 +162,7 @@ class PaymentService
         $orderId = $event->getOrderId();
         $mopId = $event->getMop();
 
-        $logData = ['paymentMethod' => $paymentMethod, 'mopId' => $mopId, 'orderId' => $orderId];
+        $logData = compact('paymentMethod', 'mopId', 'orderId');
         $this->notification->debug('payment.debugExecutePayment', __METHOD__, $logData);
 
         $transactionDetails = [];
@@ -270,7 +260,7 @@ class PaymentService
         }
 
         if ($methodInstance->needsMatchingAddresses() && !$this->basketService->shippingMatchesBillingAddress()) {
-            $value = $this->notification->getTranslation('Heidelpay::payment.addressesShouldMatch');
+            $value = $this->notification->getTranslation('Heidelpay::payment.errorAddressesShouldMatch');
             return [GetPaymentMethodContent::RETURN_TYPE_ERROR, $value];
         }
 
@@ -404,7 +394,7 @@ class PaymentService
         $this->heidelpayRequest['CRITERION_PUSH_URL'] = $this->urlService->generateURL(Routes::PUSH_NOTIFICATION_URL);
 
         $secret = $secretService->getSecretHash($transactionId);
-        if (null !== $secret) {
+        if ($secret !== null) {
             $this->heidelpayRequest['CRITERION_SECRET'] = $secret;
         }
 
@@ -528,7 +518,7 @@ class PaymentService
         $payment->properties = [
             $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_ORIGIN, (string) Payment::ORIGIN_PLUGIN),
             $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $txnData->txnId),
-            $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $bookingText),
+            $this->paymentHelper->newPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, $bookingText)
         ];
 
         $payment->regenerateHash = true;
@@ -583,7 +573,7 @@ class PaymentService
      */
     private function createNewTxnId(Basket $basket): string
     {
-        $transactionId = $transactionId = uniqid($basket->id . '.', true);
+        $transactionId = uniqid($basket->id . '.', true);
         $this->sessionStorageFactory->getPlugin()->setValue(SessionKeys::SESSION_KEY_TXN_ID, $transactionId);
         return $transactionId;
     }
@@ -684,6 +674,7 @@ class PaymentService
         $relation =  $this->orderTxnIdRepo->createOrUpdateRelation($txnId, $mopId, $orderId);
         if ($orderId !== 0) {
             $this->assignTxnIdToOrder($txnId, $orderId);
+            $this->paymentInfoService->addPaymentInfoToOrder($orderId);
         }
         return $relation;
     }
@@ -698,11 +689,11 @@ class PaymentService
     {
         $order = $this->orderRepo->findOrderById($orderId);
 
-        /** @var OrderProperty $orderProperty */
-        $orderProperty = pluginApp(OrderProperty::class);
-        $orderProperty->typeId = OrderPropertyType::EXTERNAL_ORDER_ID;
-        $orderProperty->value = $txnId;
-        $order->properties[] = $orderProperty;
+        /** @var OrderProperty $externalOrderId */
+        $externalOrderId = pluginApp(OrderProperty::class);
+        $externalOrderId->typeId = OrderPropertyType::EXTERNAL_ORDER_ID;
+        $externalOrderId->value = $txnId;
+        $order->properties[] = $externalOrderId;
 
         $this->orderRepo->updateOrder($order->toArray(), $order->id);
     }

@@ -1,7 +1,4 @@
 <?php
-
-namespace Heidelpay\Methods;
-
 /**
  * heidelpay Payment Method Interface
  *
@@ -14,6 +11,13 @@ namespace Heidelpay\Methods;
  *
  * @package heidelpay\plentymarkets-gateway\payment-methods
  */
+
+namespace Heidelpay\Methods;
+
+
+use Plenty\Plugin\Http\Request;
+use RuntimeException;
+
 interface PaymentMethodContract
 {
     /**
@@ -161,4 +165,12 @@ interface PaymentMethodContract
      * @return bool
      */
     public function needsMatchingAddresses(): bool;
+
+    /**
+     * Checks the given request object and throws exception if it is invalid.
+     *
+     * @param Request $request
+     * @throws RuntimeException
+     */
+    public function validateRequest(Request $request);
 }

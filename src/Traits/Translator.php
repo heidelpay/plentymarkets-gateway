@@ -1,11 +1,6 @@
 <?php
-
-namespace Heidelpay\Traits;
-
-use Plenty\Plugin\Translation\Translator as BaseTranslator;
-
 /**
- * Extends the using class with translation capabilities.
+ * Extends a class with translation capabilities.
  *
  * @license Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  * @copyright Copyright © 2016-present heidelpay GmbH. All rights reserved.
@@ -16,6 +11,11 @@ use Plenty\Plugin\Translation\Translator as BaseTranslator;
  *
  * @package  heidelpay/plenty-gateway/traits
  */
+
+namespace Heidelpay\Traits;
+
+use Plenty\Plugin\Translation\Translator as BaseTranslator;
+
 trait Translator
 {
     /** @var BaseTranslator */

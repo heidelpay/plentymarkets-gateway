@@ -3,7 +3,7 @@
 namespace Heidelpay\Constants;
 
 /**
- * Class for general Plugin constants
+ * Constant class for error codes
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
@@ -14,9 +14,9 @@ namespace Heidelpay\Constants;
  *
  * @package heidelpay\plentymarkets-gateway\constants
  */
-class Plugin
+class ErrorCodes
 {
-    const KEY = 'heidelpay';
-    const NAME = 'Heidelpay';
-    const VERSION = '1.2.2';
+    const ERROR_CODE_NO_ERROR = 0;
+    const ERROR_CODE_GENERAL_ERROR = 1;
+    const ERROR_CODE_INSURANCE_DENIED = 2;
 }

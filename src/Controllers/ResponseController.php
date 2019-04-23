@@ -2,9 +2,11 @@
 
 namespace Heidelpay\Controllers;
 
+use Heidelpay\Constants\ErrorCodes;
 use Heidelpay\Constants\Routes;
 use Heidelpay\Exceptions\SecurityHashInvalidException;
 use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Helper\RequestHelper;
 use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
@@ -16,6 +18,7 @@ use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Http\Request;
 use Plenty\Plugin\Http\Response;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
 /**
@@ -36,16 +39,24 @@ class ResponseController extends Controller
 
     /** @var Request $request */
     private $request;
+
     /** @var Response */
     private $response;
+
     /** @var PaymentService */
     private $paymentService;
+
     /** @var TransactionService*/
     private $transactionService;
+
     /** @var NotificationServiceContract */
     private $notification;
+
     /** @var UrlServiceContract */
     private $urlService;
+
+    /** @var RequestHelper */
+    private $requestHelper;
 
     /**
      * ResponseController constructor.
@@ -56,6 +67,7 @@ class ResponseController extends Controller
      * @param TransactionService $transactionService
      * @param NotificationServiceContract $notification
      * @param UrlServiceContract $urlService
+     * @param RequestHelper $requestHelper
      */
     public function __construct(
         Request $request,
@@ -63,7 +75,8 @@ class ResponseController extends Controller
         PaymentService $paymentService,
         TransactionService $transactionService,
         NotificationServiceContract $notification,
-        UrlServiceContract $urlService
+        UrlServiceContract $urlService,
+        RequestHelper $requestHelper
     ) {
         $this->request = $request;
         $this->response = $response;
@@ -71,6 +84,7 @@ class ResponseController extends Controller
         $this->transactionService = $transactionService;
         $this->notification = $notification;
         $this->urlService = $urlService;
+        $this->requestHelper = $requestHelper;
     }
 
     //<editor-fold desc="Helpers">
@@ -81,7 +95,7 @@ class ResponseController extends Controller
      * @param $responseObject
      *
      * @return bool
-     * @throws \Heidelpay\Exceptions\SecurityHashInvalidException
+     * @throws SecurityHashInvalidException
      */
     private function createAndHandleTransaction($response, $responseObject): bool
     {
@@ -103,52 +117,11 @@ class ResponseController extends Controller
             if ($response['isSuccess'] && !$response['isPending']) {
                 $this->paymentService->handleTransaction($txn);
             }
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $this->notification->warning($e->getMessage(), __METHOD__, ['data' => ['data' => $response['response']]]);
             return false;
         }
         return true;
-    }
-
-
-
-    /**
-     * Returns the salutation from the post request.
-     *
-     * @return string
-     * @throws \RuntimeException
-     */
-    private function getSalutation(): string
-    {
-        if ($this->request->exists('customer_salutation')) {
-            return $this->request->get('customer_salutation');
-        }
-
-        throw new \RuntimeException('Salutation not set!');
-    }
-
-    /**
-     * Returns the date of birth from the request.
-     *
-     * @return string
-     * @throws \RuntimeException
-     */
-    private function getDateOfBirth(): string
-    {
-        if ($this->request->exists('customer_dob_day') &&
-            $this->request->exists('customer_dob_month') &&
-            $this->request->exists('customer_dob_year')) {
-            return implode(
-                             '-',
-                             [
-                                 $this->request->get('customer_dob_year'),
-                                 $this->request->get('customer_dob_month'),
-                                 $this->request->get('customer_dob_day')
-                             ]
-                         );
-        }
-
-        throw new \RuntimeException('Date of birth not set!');
     }
     //</editor-fold>
 
@@ -168,7 +141,7 @@ class ResponseController extends Controller
         // if the transaction is successful or pending, return the success url.
         try {
             $this->processResponse($response);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $this->notification->debug('response.debugReturnFailureUrl', __METHOD__, ['Message' => $e->getMessage()]);
             return $this->urlService->generateURL(Routes::CHECKOUT_CANCEL);
         }
@@ -183,7 +156,7 @@ class ResponseController extends Controller
      * @param BasketRepositoryContract $basketRepo
      * @param PaymentHelper $paymentHelper
      * @return BaseResponse
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function handleSyncRequest(
         BasketRepositoryContract $basketRepo,
@@ -199,22 +172,31 @@ class ResponseController extends Controller
             return $this->response->redirectTo('checkout');
         }
 
+        try {
+            $methodInstance->validateRequest($this->request);
+        } catch (RuntimeException $e) {
+            $this->notification->error($e->getMessage(), __METHOD__, [$this->request]);
+            return $this->response->redirectTo('checkout');
+        }
+
         $response = $this->paymentService->sendPaymentRequest(
             $basket,
             $paymentMethod,
             $methodInstance->getTransactionType(),
             $mopId,
-            ['birthday' => $this->getDateOfBirth(), 'salutation' => $this->getSalutation()]
+            [
+                'birthday' => $this->requestHelper->getDateOfBirth($this->request),
+                'salutation' => $this->requestHelper->getSalutation($this->request)
+            ]
         );
 
         try {
             $this->processResponse($response);
-        } catch (\RuntimeException $e) {
-            $this->notification->error(
-               'payment.errorDuringPaymentExecution',
-               __METHOD__,
-               ['Message' => $e->getMessage()]
-            );
+        } catch (RuntimeException $e) {
+            $code         = $e->getCode();
+            $errorMessage = ($code === ErrorCodes::ERROR_CODE_INSURANCE_DENIED) ?
+                'payment.errorPaymentMethodDenied' : 'payment.errorDuringPaymentExecution';
+            $this->notification->error($errorMessage, __METHOD__, ['Message' => $e->getMessage(), 'ErrorCode' => $code]);
             return $this->response->redirectTo('checkout');
         }
 
@@ -229,7 +211,7 @@ class ResponseController extends Controller
      * @test
      *
      * @param array $response
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function processResponse($response)
     {
@@ -256,13 +238,21 @@ class ResponseController extends Controller
         }
 
         $errorMsg = 'An error occurred handling the transaction.';
+        $errorCode = ErrorCodes::ERROR_CODE_GENERAL_ERROR;
 
         if (isset($response['response'])) {
             $responseObj = $response['response'];
-            $errorMsg    = ($responseObj['PROCESSING.REASON'] ?? '') . ': ' . ($responseObj['PROCESSING.RETURN'] ?? '');
+            $processingReason = $responseObj['PROCESSING.REASON'] ?? '';
+
+            if ($processingReason === 'INSURANCE_ERROR' &&
+                isset($responseObj['CRITERION.INSURANCE-RESERVATION']) &&
+                $responseObj['CRITERION.INSURANCE-RESERVATION'] === 'DENIED') {
+                $errorCode = ErrorCodes::ERROR_CODE_INSURANCE_DENIED;
+            }
+            $errorMsg = $processingReason . ': ' . ($responseObj['PROCESSING.RETURN'] ?? '');
         }
 
-        throw new \RuntimeException($errorMsg);
+        throw new RuntimeException($errorMsg, $errorCode);
     }
 
     /**

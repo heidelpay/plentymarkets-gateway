@@ -1,10 +1,4 @@
 <?php
-
-namespace Heidelpay\Services;
-
-use Heidelpay\Configs\MainConfigContract;
-use Heidelpay\Exceptions\SecurityHashInvalidException;
-
 /**
  * Provides secret hash generation and validation capabilities.
  *
@@ -17,6 +11,12 @@ use Heidelpay\Exceptions\SecurityHashInvalidException;
  *
  * @package  heidelpay\plentymarkets-gateway\services
  */
+
+namespace Heidelpay\Services;
+
+use Heidelpay\Configs\MainConfigContract;
+use Heidelpay\Exceptions\SecurityHashInvalidException;
+
 class SecretService
 {
     /**

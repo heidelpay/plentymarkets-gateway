@@ -26,6 +26,11 @@
                 cancelButton.disabled = true;
                 form.submit();
             }
-        }
+        };
+
+        cancelButton.onclick = function () {
+            triggerButton.disabled = true;
+            cancelButton.disabled = true;
+        };
     </script>
 {% endblock %}

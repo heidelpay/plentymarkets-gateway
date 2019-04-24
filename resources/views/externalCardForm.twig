@@ -21,9 +21,11 @@
         if (window.addEventListener) {
             window.addEventListener('message', receiveResponse);
             submitButton.addEventListener('click', submitIFrame);
+            cancelButton.addEventListener('click', cancel);
         } else if (window.attachEvent) {
             window.attachEvent('onmessage', receiveResponse);
             submitButton.attachEvent('onclick', submitIFrame);
+            submitButton.attachEvent('onclick', cancel);
         }
 
         function getIFrameDomain(elem) {
@@ -41,6 +43,11 @@
                 submitButton.disabled = false;
                 cancelButton.disabled = false;
             }
+        }
+
+        function cancel() {
+            submitButton.disabled = true;
+            cancelButton.disabled = true;
         }
 
         function submitIFrame() {

@@ -17,12 +17,10 @@
     let triggerButton = document.getElementById('heidelpaySubmitBtn');
 
     triggerButton.onclick = function () {
-        triggerButton.disabled = true;
         let isFormValid = form.reportValidity();
         if (isFormValid) {
+            triggerButton.disabled = true;
             form.submit();
-            return;
         }
-        triggerButton.disabled = false;
     }
 </script>

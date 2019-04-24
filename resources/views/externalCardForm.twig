@@ -38,11 +38,13 @@
             var responseContent = JSON.parse(event.data);
             if (responseContent["POST.VALIDATION"] === "NOK") {
                 submitButton.disabled = false;
+                cancelButton.disabled = false;
             }
         }
 
         function submitIFrame() {
             submitButton.disabled = true;
+            cancelButton.disabled = true;
             paymentIFrame.contentWindow.postMessage("{}", targetOrigin);
         }
     </script>

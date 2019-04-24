@@ -19,18 +19,28 @@
         let triggerButton = document.getElementById('heidelpaySubmitBtn');
         let cancelButton = document.getElementById('heidelpayCancelBtn');
 
-        triggerButton.onclick = function () {
+        if (window.addEventListener) {
+            window.addEventListener('message', receiveResponse);
+            triggerButton.addEventListener('click', submitIFrame);
+            cancelButton.addEventListener('click', cancel);
+        } else if (window.attachEvent) {
+            window.attachEvent('onmessage', receiveResponse);
+            triggerButton.attachEvent('onclick', submitIFrame);
+            triggerButton.attachEvent('onclick', cancel);
+        }
+
+        function cancel() {
+            triggerButton.disabled = true;
+            cancelButton.disabled = true;
+        }
+
+        function submitForm() {
             let isFormValid = form.reportValidity();
             if (isFormValid) {
                 triggerButton.disabled = true;
                 cancelButton.disabled = true;
                 form.submit();
             }
-        };
-
-        cancelButton.onclick = function () {
-            triggerButton.disabled = true;
-            cancelButton.disabled = true;
-        };
+        }
     </script>
 {% endblock %}

@@ -20,21 +20,22 @@
         let cancelButton = document.getElementById('heidelpayCancelBtn');
 
         if (window.addEventListener) {
-            window.addEventListener('message', receiveResponse);
-            triggerButton.addEventListener('click', submitIFrame);
+            triggerButton.addEventListener('click', submitForm);
             cancelButton.addEventListener('click', cancel);
         } else if (window.attachEvent) {
-            window.attachEvent('onmessage', receiveResponse);
-            triggerButton.attachEvent('onclick', submitIFrame);
+            triggerButton.attachEvent('onclick', submitForm);
             triggerButton.attachEvent('onclick', cancel);
         }
 
-        function cancel() {
+        function cancel(event) {
+            event.preventDefault();
             triggerButton.disabled = true;
             cancelButton.disabled = true;
+            document.location.replace("/checkout");
         }
 
-        function submitForm() {
+        function submitForm(event) {
+            event.preventDefault();
             let isFormValid = form.reportValidity();
             if (isFormValid) {
                 triggerButton.disabled = true;

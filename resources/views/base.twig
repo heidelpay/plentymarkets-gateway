@@ -14,4 +14,34 @@
 </div>
 
 {% block scripts %}
+    <script>
+        let form = document.getElementById('heidelpay-payment-form');
+        let triggerButton = document.getElementById('heidelpaySubmitBtn');
+        let cancelButton = document.getElementById('heidelpayCancelBtn');
+
+        if (window.addEventListener) {
+            triggerButton.addEventListener('click', submitForm);
+            cancelButton.addEventListener('click', cancel);
+        } else if (window.attachEvent) {
+            triggerButton.attachEvent('onclick', submitForm);
+            triggerButton.attachEvent('onclick', cancel);
+        }
+
+        function cancel(event) {
+            event.preventDefault();
+            triggerButton.disabled = true;
+            cancelButton.disabled = true;
+            document.location.replace("/checkout");
+        }
+
+        function submitForm(event) {
+            event.preventDefault();
+            let isFormValid = form.reportValidity();
+            if (isFormValid) {
+                triggerButton.disabled = true;
+                cancelButton.disabled = true;
+                form.submit();
+            }
+        }
+    </script>
 {% endblock %}

@@ -15,14 +15,17 @@
     <script type="text/javascript">
         var paymentIFrame = document.getElementById('heidelpayIFrame');
         var submitButton = document.getElementById('heidelpaySubmitBtn');
+        var cancelButton = document.getElementById('heidelpayCancelBtn');
         var targetOrigin = getIFrameDomain(paymentIFrame);
 
         if (window.addEventListener) {
             window.addEventListener('message', receiveResponse);
             submitButton.addEventListener('click', submitIFrame);
+            cancelButton.addEventListener('click', cancel);
         } else if (window.attachEvent) {
             window.attachEvent('onmessage', receiveResponse);
             submitButton.attachEvent('onclick', submitIFrame);
+            submitButton.attachEvent('onclick', cancel);
         }
 
         function getIFrameDomain(elem) {
@@ -38,11 +41,19 @@
             var responseContent = JSON.parse(event.data);
             if (responseContent["POST.VALIDATION"] === "NOK") {
                 submitButton.disabled = false;
+                cancelButton.disabled = false;
             }
+        }
+
+        function cancel() {
+            submitButton.disabled = true;
+            cancelButton.disabled = true;
+            document.location.replace("/checkout");
         }
 
         function submitIFrame() {
             submitButton.disabled = true;
+            cancelButton.disabled = true;
             paymentIFrame.contentWindow.postMessage("{}", targetOrigin);
         }
     </script>

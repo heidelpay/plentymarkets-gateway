@@ -13,9 +13,16 @@
     <div class="col-md-3"></div>
 </div>
 <script>
-    document.getElementById("heidelpaySubmitBtn").addEventListener("click", myFunction);
+    let form = document.getElementById('heidelpayForm');
+    let triggerButton = document.getElementById('heidelpaySubmitBtn');
 
-    function myFunction() {
-        document.getElementById('heidelpaySubmitBtn').disabled = true;
+    triggerButton.onclick = function () {
+        triggerButton.disabled = true;
+        let isFormValid = form.reportValidity();
+        if (isFormValid) {
+            form.submit();
+            return;
+        }
+        triggerButton.disabled = false;
     }
 </script>

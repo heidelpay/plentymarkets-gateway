@@ -14,4 +14,18 @@
 </div>
 
 {% block scripts %}
+    <script>
+        let form = document.getElementById('heidelpay-payment-form');
+        let triggerButton = document.getElementById('heidelpaySubmitBtn');
+        let cancelButton = document.getElementById('heidelpayCancelBtn');
+
+        triggerButton.onclick = function () {
+            let isFormValid = form.reportValidity();
+            if (isFormValid) {
+                triggerButton.disabled = true;
+                cancelButton.disabled = true;
+                form.submit();
+            }
+        }
+    </script>
 {% endblock %}

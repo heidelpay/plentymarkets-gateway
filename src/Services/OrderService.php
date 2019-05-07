@@ -14,12 +14,14 @@
 
 namespace Heidelpay\Services;
 
+use Exception;
 use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
+use RuntimeException;
 
 class OrderService implements OrderServiceContract
 {
@@ -73,13 +75,13 @@ class OrderService implements OrderServiceContract
                     return $this->orderRepo->findOrderById($orderId, ['comments']);
                 }
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // no need to handle here
         }
 
         // Check whether the order exists
         if (!$order instanceof Order) {
-            throw new \RuntimeException('payment.warningOrderDoesNotExist');
+            throw new RuntimeException('payment.warningOrderDoesNotExist');
         }
         return $order;
     }

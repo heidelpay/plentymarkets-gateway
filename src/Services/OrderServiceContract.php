@@ -15,6 +15,7 @@
 namespace Heidelpay\Services;
 
 use Plenty\Modules\Order\Models\Order;
+use RuntimeException;
 
 interface OrderServiceContract
 {
@@ -31,7 +32,7 @@ interface OrderServiceContract
      *
      * @param int $orderId
      * @return Order
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function getOrder(int $orderId): Order;
 
@@ -40,7 +41,7 @@ interface OrderServiceContract
      *
      * @param $txnId
      * @return Order
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function getOrderByTxnId($txnId): Order;
 }

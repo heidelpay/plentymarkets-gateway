@@ -16,6 +16,7 @@ namespace Heidelpay\Services;
 
 use Heidelpay\Configs\MainConfigContract;
 use Heidelpay\Exceptions\SecurityHashInvalidException;
+use RuntimeException;
 
 class SecretService
 {
@@ -39,14 +40,14 @@ class SecretService
      *
      * @param $value
      * @return string
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function getSecretHash($value): string
     {
         $secretKey = $this->config->getSecretKey();
 
         if ($secretKey === '') {
-            throw new \RuntimeException('general.errorSecretKeyIsNotConfigured');
+            throw new RuntimeException('general.errorSecretKeyIsNotConfigured');
         }
 
         return hash('sha512', $value . $secretKey);
@@ -59,7 +60,7 @@ class SecretService
      * @param $hash
      * @return bool
      * @throws SecurityHashInvalidException
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function verifySecretHash($value, $hash): bool
     {

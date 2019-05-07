@@ -133,11 +133,11 @@ class HeidelpayServiceProvider extends ServiceProvider
             }
         );
 
-        // add payment information to the invoice pdf
+        // handle document generation
         $eventDispatcher->listen(
             OrderPdfGenerationEvent::class,
             static function (OrderPdfGenerationEvent $event) use (
-                $paymentHelper, $paymentInfoService, $orderService
+                $paymentHelper, $paymentInfoService, $orderService, $paymentService
             ) {
                 /** @var Order $order */
                 $order = $event->getOrder();
@@ -147,19 +147,36 @@ class HeidelpayServiceProvider extends ServiceProvider
                 /** @var AbstractMethod $paymentMethod */
                 $paymentMethod = $paymentHelper->getPaymentMethodInstanceByMopId($mopId);
 
-                if ($docType !== Document::INVOICE
-                    || !$paymentMethod instanceof AbstractMethod
-                    || !$paymentMethod->renderInvoiceData()) {
-                    // do nothing if invoice data does not need to be rendered
+                if (!$paymentMethod instanceof AbstractMethod) {
                     return;
                 }
 
-                /** @var OrderPdfGeneration $orderPdfGeneration */
-                $orderPdfGeneration           = pluginApp(OrderPdfGeneration::class);
-                $language                     = $orderService->getLanguage($order);
-                $orderPdfGeneration->language = $language;
-                $orderPdfGeneration->advice   = $paymentInfoService->getPaymentInformationString($order, $language);
-                $event->addOrderPdfGeneration($orderPdfGeneration);
+                switch ($docType) {
+                    case Document::INVOICE:
+                        // add payment information to the invoice pdf
+                        if ($paymentMethod->renderInvoiceData()) {
+                            /** @var OrderPdfGeneration $orderPdfGeneration */
+                            $orderPdfGeneration           = pluginApp(OrderPdfGeneration::class);
+                            $language                     = $orderService->getLanguage($order);
+                            $orderPdfGeneration->language = $language;
+                            $orderPdfGeneration->advice   = $paymentInfoService->getPaymentInformationString($order, $language);
+                            $event->addOrderPdfGeneration($orderPdfGeneration);
+                        }
+                    break;
+                    case Document::DELIVERY_NOTE:
+                        // perform finalize transaction
+                        if ($paymentMethod->sendFinalizeTransaction()) {
+                            $paymentService->handleShipment($event);
+                        }
+                        break;
+                    default:
+                        // do nothing
+                        break;
+                }
+
+
+
+
             }
         );
     }

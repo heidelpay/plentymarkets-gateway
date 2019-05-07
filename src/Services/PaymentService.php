@@ -614,6 +614,14 @@ class PaymentService
         return null;
     }
 
+    /**
+     * Handle shipment.
+     * @param $event
+     */
+    public function handleShipment($event) {
+        $this->notification->error('Finalize Transaction', __METHOD__,  ['Event' => $event]);
+    }
+
     //<editor-fold desc="Helpers">
     /**
      * Handles the given transaction by type

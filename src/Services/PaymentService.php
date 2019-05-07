@@ -616,10 +616,10 @@ class PaymentService
 
     /**
      * Handle shipment.
-     * @param $event
+     * @param $data
      */
-    public function handleShipment($event) {
-        $this->notification->error('Finalize Transaction', __METHOD__,  ['Event' => $event]);
+    public function handleShipment($data) {
+        $this->notification->error('Finalize Transaction', __METHOD__, $data);
     }
 
     //<editor-fold desc="Helpers">

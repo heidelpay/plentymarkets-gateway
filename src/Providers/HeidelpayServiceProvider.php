@@ -166,7 +166,7 @@ class HeidelpayServiceProvider extends ServiceProvider
                     case Document::DELIVERY_NOTE:
                         // perform finalize transaction
                         if ($paymentMethod->sendFinalizeTransaction()) {
-                            $paymentService->handleShipment($event);
+                            $paymentService->handleShipment([$event->getOrder()]);
                         }
                         break;
                     default:

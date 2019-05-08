@@ -12,6 +12,7 @@ use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Services\NotificationServiceContract;
 use Heidelpay\Services\PaymentService;
+use Heidelpay\Services\ResponseService;
 use Heidelpay\Services\UrlServiceContract;
 use Heidelpay\Traits\Translator;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
@@ -58,6 +59,9 @@ class ResponseController extends Controller
     /** @var RequestHelper */
     private $requestHelper;
 
+    /** @var ResponseService */
+    private $responseHandlerService;
+
     /**
      * ResponseController constructor.
      *
@@ -68,6 +72,7 @@ class ResponseController extends Controller
      * @param NotificationServiceContract $notification
      * @param UrlServiceContract $urlService
      * @param RequestHelper $requestHelper
+     * @param ResponseService $responseHandlerService
      */
     public function __construct(
         Request $request,
@@ -76,7 +81,8 @@ class ResponseController extends Controller
         TransactionService $transactionService,
         NotificationServiceContract $notification,
         UrlServiceContract $urlService,
-        RequestHelper $requestHelper
+        RequestHelper $requestHelper,
+        ResponseService $responseHandlerService
     ) {
         $this->request = $request;
         $this->response = $response;
@@ -85,6 +91,7 @@ class ResponseController extends Controller
         $this->notification = $notification;
         $this->urlService = $urlService;
         $this->requestHelper = $requestHelper;
+        $this->responseHandlerService = $responseHandlerService;
     }
 
     //<editor-fold desc="Helpers">
@@ -136,7 +143,7 @@ class ResponseController extends Controller
         // get all post parameters except the 'plentyMarkets' one injected by the plentymarkets core.
         // also scrap the 'lang' parameter which will be sent when e.g. Sofort is being used.
         $postResponse = $this->request->except(['plentyMarkets', 'lang']);
-        $response = $this->paymentService->handlePaymentResponse(['response' => $postResponse]);
+        $response = $this->responseHandlerService->handlePaymentResponse(['response' => $postResponse]);
 
         // if the transaction is successful or pending, return the success url.
         try {
@@ -264,7 +271,7 @@ class ResponseController extends Controller
     {
         $postPayload = $this->request->getContent();
         $this->notification->debug('response.debugPushNotificationReceived', __METHOD__, ['content' => $postPayload]);
-        $response = $this->paymentService->handlePushNotification(['xmlContent' => $postPayload]);
+        $response = $this->responseHandlerService->handlePushNotification(['xmlContent' => $postPayload]);
         $responseObject = $response['response'];
 
         if (isset($response['exceptionCode'])) {

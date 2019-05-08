@@ -21,6 +21,8 @@ use Heidelpay\Services\OrderServiceContract;
 use Heidelpay\Services\PaymentInfoService;
 use Heidelpay\Services\PaymentInfoServiceContract;
 use Heidelpay\Services\PaymentService;
+use Heidelpay\Services\ResponseService;
+use Heidelpay\Services\ResponseServiceContract;
 use Heidelpay\Services\UrlService;
 use Heidelpay\Services\UrlServiceContract;
 use Plenty\Modules\Document\Models\Document;
@@ -63,6 +65,7 @@ class HeidelpayServiceProvider extends ServiceProvider
         $app->bind(BasketServiceContract::class, BasketService::class);
         $app->bind(OrderServiceContract::class, OrderService::class);
         $app->bind(PaymentInfoServiceContract::class, PaymentInfoService::class);
+        $app->bind(ResponseServiceContract::class, ResponseService::class);
     }
 
     /**

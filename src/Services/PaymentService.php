@@ -46,9 +46,7 @@ use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Plugin\Templates\Twig;
 use RuntimeException;
-use function array_key_exists;
 use function in_array;
-use function is_array;
 
 class PaymentService
 {
@@ -103,10 +101,12 @@ class PaymentService
 
     /** @var PaymentInfoServiceContract */
     private $paymentInfoService;
-    /**
-     * @var AddressHelper
-     */
+
+    /** @var AddressHelper */
     private $addressHelper;
+
+    /** @var ResponseService */
+    private $responseHandler;
 
     /**
      * PaymentService constructor.
@@ -126,6 +126,7 @@ class PaymentService
      * @param ContactRepositoryContract $contactRepo
      * @param PaymentInfoServiceContract $paymentInfoService
      * @param AddressHelper $addressHelper
+     * @param ResponseService $responseHandler
      */
     public function __construct(
         LibService $libraryService,
@@ -142,7 +143,8 @@ class PaymentService
         BasketServiceContract $basketService,
         ContactRepositoryContract $contactRepo,
         PaymentInfoServiceContract $paymentInfoService,
-        AddressHelper $addressHelper
+        AddressHelper $addressHelper,
+        ResponseService $responseHandler
     ) {
         $this->libService = $libraryService;
         $this->paymentRepository = $paymentRepository;
@@ -159,6 +161,7 @@ class PaymentService
         $this->basketService = $basketService;
         $this->paymentInfoService = $paymentInfoService;
         $this->addressHelper = $addressHelper;
+        $this->responseHandler = $responseHandler;
     }
 
     /**
@@ -255,10 +258,8 @@ class PaymentService
      *
      * @return array
      */
-    public function getPaymentMethodContent(
-        string $paymentMethod,
-        int $mopId
-    ): array {
+    public function getPaymentMethodContent(string $paymentMethod, int $mopId): array
+    {
         $value = '';
 
         $clientErrorMessage = $this->notification->getTranslation('Heidelpay::payment.errorInternalErrorTryAgainLater');
@@ -288,7 +289,7 @@ class PaymentService
             try {
                 $transactionType = $methodInstance->getTransactionType();
                 $result          = $this->sendPaymentRequest($basket, $paymentMethod, $transactionType, $mopId);
-                $value           = $this->handleSyncResponse($type, $result);
+                $value           = $this->responseHandler->handleSyncResponse($type, $result);
             } catch (RuntimeException $e) {
                 $this->notification->error($clientErrorMessage, __METHOD__, [$type, $e->getMessage()], true);
                 $type = GetPaymentMethodContent::RETURN_TYPE_ERROR;
@@ -424,172 +425,6 @@ class PaymentService
 
         ksort($this->heidelpayRequest);
     }
-
-    /**
-     * @param Basket $basket
-     * @param string $paymentMethod
-     * @param int $mopId
-     * @param string $transactionId
-     * @param array $additionalParams
-     * @throws RuntimeException
-     */
-    private function prepareFinalizeTransaction(
-        Basket $basket,
-        string $paymentMethod,
-        int $mopId,
-        string $transactionId,
-        array $additionalParams = [])
-    {
-        $basketArray = $basket->toArray();
-
-        /** @var SecretService $secretService */
-        $secretService = pluginApp(SecretService::class);
-
-        /** @var PaymentMethodContract $methodInstance */
-        $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
-
-        // set authentication data
-        $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($paymentMethod);
-        $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
-
-        // set customer personal information & address data
-        $addresses      = $this->basketService->getCustomerAddressData();
-        $billingAddress = $addresses['billing'];
-        $this->heidelpayRequest['IDENTIFICATION_SHOPPERID'] = $basketArray['customerId'];
-        $this->heidelpayRequest['NAME_GIVEN']               = $billingAddress->firstName;
-        $this->heidelpayRequest['NAME_FAMILY']              = $billingAddress->lastName;
-        $this->heidelpayRequest['CONTACT_EMAIL']            = $billingAddress->email;
-        $this->heidelpayRequest['ADDRESS_STREET']           = $this->addressHelper->getStreetAndHno($billingAddress);
-        $this->heidelpayRequest['ADDRESS_ZIP']              = $billingAddress->postalCode;
-        $this->heidelpayRequest['ADDRESS_CITY']             = $billingAddress->town;
-        $this->heidelpayRequest['ADDRESS_COUNTRY']          = $this->basketService->getBillingCountryCode();
-
-        if ($this->basketService->isBasketB2B()) {
-            $this->heidelpayRequest['NAME_COMPANY'] = $billingAddress->companyName;
-        }
-
-        $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $transactionId;
-
-        // set amount to net if showNetPrice === true
-        if ($this->sessionStorageFactory->getCustomer()->showNetPrice) {
-            $basketArray['itemSum']        = $basketArray['itemSumNet'];
-            $basketArray['basketAmount']   = $basketArray['basketAmountNet'];
-            $basketArray['shippingAmount'] = $basketArray['shippingAmountNet'];
-        }
-
-        // set basket information (amount, currency, orderId, ...)
-        $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $basketArray['basketAmount'];
-        $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $basketArray['currency'];
-
-        $this->heidelpayRequest['FRONTEND_ENABLED']      = $methodInstance->needsCustomerInput() ? 'TRUE' : 'FALSE';
-        $this->heidelpayRequest['FRONTEND_LANGUAGE']     = $this->sessionStorageFactory->getLocaleSettings()->language;
-        $this->heidelpayRequest['FRONTEND_RESPONSE_URL'] = $this->urlService->generateURL(Routes::RESPONSE_URL);
-
-        // add the origin domain, which is important for the CSP
-        // set 'PREVENT_ASYNC_REDIRECT' to false, to ensure the customer is being redirected after submitting the form.
-        if (in_array($paymentMethod, self::CARD_METHODS, true)) {
-            $this->heidelpayRequest['FRONTEND_PAYMENT_FRAME_ORIGIN'] = $this->urlService->getDomain();
-            $this->heidelpayRequest['FRONTEND_PREVENT_ASYNC_REDIRECT'] = 'false';
-        }
-
-        if (isset($additionalParams['birthday'])) {
-            $this->heidelpayRequest['NAME_BIRTHDATE']  = $additionalParams['birthday'];
-        }
-
-        if (isset($additionalParams['salutation'])) {
-            $this->heidelpayRequest['NAME_SALUTATION']  = $additionalParams['salutation'];
-        }
-
-        if ($methodInstance->needsBasket()) {
-            $this->heidelpayRequest['BASKET_ID'] = $this->basketService->requestBasketId($basket, $heidelpayAuth);
-        }
-
-        // shop + module information
-        $this->heidelpayRequest['CRITERION_STORE_ID'] = $this->paymentHelper->getWebstoreId();
-        $this->heidelpayRequest['CRITERION_MOP'] = $mopId;
-        $this->heidelpayRequest['CRITERION_SHOP_TYPE'] = 'plentymarkets 7';
-        $this->heidelpayRequest['CRITERION_SHOPMODULE_VERSION'] = Plugin::VERSION;
-        $this->heidelpayRequest['CRITERION_BASKET_ID'] = $basketArray['id'];
-        $this->heidelpayRequest['CRITERION_ORDER_ID'] = $basketArray['orderId'];
-        $this->heidelpayRequest['CRITERION_ORDER_TIMESTAMP'] = $basketArray['orderTimestamp'];
-        $this->heidelpayRequest['CRITERION_PUSH_URL'] = $this->urlService->generateURL(Routes::PUSH_NOTIFICATION_URL);
-
-        $secret = $secretService->getSecretHash($transactionId);
-        if ($secret !== null) {
-            $this->heidelpayRequest['CRITERION_SECRET'] = $secret;
-        }
-
-        // general
-        $this->heidelpayRequest['FRONTEND_CSS_PATH'] = $this->methodConfig->getIFrameCssPath($methodInstance);
-
-        ksort($this->heidelpayRequest);
-    }
-
-    //<editor-fold desc="Handlers">
-    /**
-     * @param string $type
-     * @param $response
-     * @return mixed
-     * @throws RuntimeException
-     */
-    private function handleSyncResponse(string $type, $response)
-    {
-        if (!is_array($response)) {
-            return $response;
-        }
-
-        // return the exception message, if present.
-        if (isset($response['exceptionCode'])) {
-            throw new RuntimeException($response['exceptionCode']);
-        }
-
-        if (!$response['isSuccess']) {
-            throw new RuntimeException($response['response']['PROCESSING.RETURN']);
-        }
-
-        // return rendered html content
-        if ($type === GetPaymentMethodContent::RETURN_TYPE_HTML) {
-            // return the payment frame url, if it is needed
-            if (array_key_exists('FRONTEND.PAYMENT_FRAME_URL', $response['response'])) {
-                return $response['response']['FRONTEND.PAYMENT_FRAME_URL'];
-            }
-
-            return $response['response']['FRONTEND.REDIRECT_URL'];
-        }
-
-        // return the redirect url, if present.
-        if ($type === GetPaymentMethodContent::RETURN_TYPE_REDIRECT_URL) {
-            return $response['response']['FRONTEND.REDIRECT_URL'];
-        }
-
-
-        return $response;
-    }
-
-    /**
-     * Handles the asynchronous response coming from the heidelpay API.
-     *
-     * @param array $post
-     *
-     * @return array
-     */
-    public function handlePaymentResponse(array $post): array
-    {
-        return $this->libService->handleResponse($post);
-    }
-
-    /**
-     * Calls the handler for the push notification processing.
-     *
-     * @param array $post
-     *
-     * @return array
-     */
-    public function handlePushNotification(array $post): array
-    {
-        return $this->libService->handlePushNotification($post);
-    }
-    //</editor-fold>
 
     /**
      * Create a plentymarkets payment entity.

@@ -5,6 +5,9 @@
 ### Changed
 - Der 'bezahlen'-Button wird nun nach dem Klick deaktiviert, um zu verhindern, dass mehr als einmal geklickt wird.
 
+### Fixed
+- Es wurde ein Problem behoben, dass beim Rendern der Rechnungsinformationen dazu führte, dass ein Fehler auftrat, wenn die Zahlart nicht von heidelpay war.
+
 ## [1.2.2][1.2.2]
 
 ### Changed

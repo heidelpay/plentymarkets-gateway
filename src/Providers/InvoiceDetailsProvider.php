@@ -3,6 +3,7 @@ namespace Heidelpay\Providers;
 
 use Heidelpay\Constants\SessionKeys;
 use Heidelpay\Helper\PaymentHelper;
+use Heidelpay\Methods\AbstractMethod;
 use Heidelpay\Methods\PaymentMethodContract;
 use function is_array;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
@@ -48,7 +49,7 @@ class InvoiceDetailsProvider
 
         /** @var PaymentMethodContract $paymentMethod */
         $paymentMethod = $helper->getPaymentMethodInstanceByMopId($mopId);
-        if (!$paymentMethod->renderInvoiceData()) {
+        if (!$paymentMethod instanceof AbstractMethod && !$paymentMethod->renderInvoiceData()) {
             return '';
         }
 

@@ -5,6 +5,9 @@
 ### Changed
 - Disable submit button on click to avoid more then one submit.
 
+### Fixed
+- Fixed a problem appearing on invoice generation if the payment does not belong to heidelpay.
+
 ## [1.2.2][1.2.2]
 
 ### Changed

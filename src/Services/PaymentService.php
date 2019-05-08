@@ -20,6 +20,7 @@ use Heidelpay\Constants\Routes;
 use Heidelpay\Constants\SessionKeys;
 use Heidelpay\Constants\TransactionStatus;
 use Heidelpay\Constants\TransactionType;
+use Heidelpay\Helper\AddressHelper;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\AbstractMethod;
 use Heidelpay\Methods\CreditCard;
@@ -30,7 +31,6 @@ use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\OrderTxnIdRelation;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Traits\Translator;
-use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Comment\Contracts\CommentRepositoryContract;
@@ -103,6 +103,10 @@ class PaymentService
 
     /** @var PaymentInfoServiceContract */
     private $paymentInfoService;
+    /**
+     * @var AddressHelper
+     */
+    private $addressHelper;
 
     /**
      * PaymentService constructor.
@@ -121,6 +125,7 @@ class PaymentService
      * @param BasketServiceContract $basketService
      * @param ContactRepositoryContract $contactRepo
      * @param PaymentInfoServiceContract $paymentInfoService
+     * @param AddressHelper $addressHelper
      */
     public function __construct(
         LibService $libraryService,
@@ -136,7 +141,8 @@ class PaymentService
         UrlServiceContract $urlService,
         BasketServiceContract $basketService,
         ContactRepositoryContract $contactRepo,
-        PaymentInfoServiceContract $paymentInfoService
+        PaymentInfoServiceContract $paymentInfoService,
+        AddressHelper $addressHelper
     ) {
         $this->libService = $libraryService;
         $this->paymentRepository = $paymentRepository;
@@ -152,6 +158,7 @@ class PaymentService
         $this->contactRepo = $contactRepo;
         $this->basketService = $basketService;
         $this->paymentInfoService = $paymentInfoService;
+        $this->addressHelper = $addressHelper;
     }
 
     /**
@@ -352,7 +359,7 @@ class PaymentService
         $this->heidelpayRequest['NAME_GIVEN']               = $billingAddress->firstName;
         $this->heidelpayRequest['NAME_FAMILY']              = $billingAddress->lastName;
         $this->heidelpayRequest['CONTACT_EMAIL']            = $billingAddress->email;
-        $this->heidelpayRequest['ADDRESS_STREET']           = $this->getFullStreetAndHouseNumber($billingAddress);
+        $this->heidelpayRequest['ADDRESS_STREET']           = $this->addressHelper->getStreetAndHno($billingAddress);
         $this->heidelpayRequest['ADDRESS_ZIP']              = $billingAddress->postalCode;
         $this->heidelpayRequest['ADDRESS_CITY']             = $billingAddress->town;
         $this->heidelpayRequest['ADDRESS_COUNTRY']          = $this->basketService->getBillingCountryCode();
@@ -452,7 +459,7 @@ class PaymentService
         $this->heidelpayRequest['NAME_GIVEN']               = $billingAddress->firstName;
         $this->heidelpayRequest['NAME_FAMILY']              = $billingAddress->lastName;
         $this->heidelpayRequest['CONTACT_EMAIL']            = $billingAddress->email;
-        $this->heidelpayRequest['ADDRESS_STREET']           = $this->getFullStreetAndHouseNumber($billingAddress);
+        $this->heidelpayRequest['ADDRESS_STREET']           = $this->addressHelper->getStreetAndHno($billingAddress);
         $this->heidelpayRequest['ADDRESS_ZIP']              = $billingAddress->postalCode;
         $this->heidelpayRequest['ADDRESS_CITY']             = $billingAddress->town;
         $this->heidelpayRequest['ADDRESS_COUNTRY']          = $this->basketService->getBillingCountryCode();
@@ -583,18 +590,6 @@ class PaymentService
         return $this->libService->handlePushNotification($post);
     }
     //</editor-fold>
-
-    /**
-     * Returns street and house number as a single string.
-     *
-     * @param Address $address
-     *
-     * @return string
-     */
-    private function getFullStreetAndHouseNumber(Address $address): string
-    {
-        return $address->street . ' ' . $address->houseNumber;
-    }
 
     /**
      * Create a plentymarkets payment entity.

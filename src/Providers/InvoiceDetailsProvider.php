@@ -49,7 +49,7 @@ class InvoiceDetailsProvider
 
         /** @var PaymentMethodContract $paymentMethod */
         $paymentMethod = $helper->getPaymentMethodInstanceByMopId($mopId);
-        if (!$paymentMethod instanceof AbstractMethod && !$paymentMethod->renderInvoiceData()) {
+        if (!$paymentMethod instanceof AbstractMethod || !$paymentMethod->renderInvoiceData()) {
             return '';
         }
 

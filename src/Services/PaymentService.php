@@ -21,6 +21,7 @@ use Heidelpay\Constants\SessionKeys;
 use Heidelpay\Constants\TransactionStatus;
 use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\AddressHelper;
+use Heidelpay\Helper\OrderModelHelper;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\AbstractMethod;
 use Heidelpay\Methods\CreditCard;
@@ -108,6 +109,9 @@ class PaymentService
     /** @var ResponseService */
     private $responseHandler;
 
+    /** @var OrderModelHelper */
+    private $modelHelper;
+
     /**
      * PaymentService constructor.
      *
@@ -127,6 +131,7 @@ class PaymentService
      * @param PaymentInfoServiceContract $paymentInfoService
      * @param AddressHelper $addressHelper
      * @param ResponseService $responseHandler
+     * @param OrderModelHelper $modelHelper
      */
     public function __construct(
         LibService $libraryService,
@@ -144,7 +149,8 @@ class PaymentService
         ContactRepositoryContract $contactRepo,
         PaymentInfoServiceContract $paymentInfoService,
         AddressHelper $addressHelper,
-        ResponseService $responseHandler
+        ResponseService $responseHandler,
+        OrderModelHelper $modelHelper
     ) {
         $this->libService = $libraryService;
         $this->paymentRepository = $paymentRepository;
@@ -162,6 +168,7 @@ class PaymentService
         $this->paymentInfoService = $paymentInfoService;
         $this->addressHelper = $addressHelper;
         $this->responseHandler = $responseHandler;
+        $this->modelHelper = $modelHelper;
     }
 
     /**
@@ -560,9 +567,11 @@ class PaymentService
      * @param Order $order
      */
     public function handleShipment(Order $order) {
-        $basket = $this->basketService->getBasket();
+        $mopId = $this->modelHelper->getMopId($order);
+        $paymentMethod = $this->paymentHelper->mapMopToPaymentMethod($mopId);
+        $txnId = $this->modelHelper->getTxnId($order);
 //        $this->prepareFinalizeTransaction($order->orderItems, $order->);
-        $this->notification->error('Finalize Transaction', __METHOD__, ['Order' => $order, 'Basket' => $basket]);
+        $this->notification->error('Finalize Transaction', __METHOD__, ['Order' => $order, 'Mop' => $mopId, 'Method' => $paymentMethod, 'TxnId' => $txnId]);
     }
 
     //<editor-fold desc="Helpers">

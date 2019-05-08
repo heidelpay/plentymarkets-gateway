@@ -728,11 +728,11 @@ class PaymentService
      * Handle shipping event.
      *
      * @param Order $order
-     * @throws RuntimeException
      */
     public function handleShipment(Order $order) {
+        $basket = $this->basketService->getBasket();
 //        $this->prepareFinalizeTransaction($order->orderItems, $order->);
-        $this->notification->error('Finalize Transaction', __METHOD__, ['Order' => $order]);
+        $this->notification->error('Finalize Transaction', __METHOD__, ['Order' => $order, 'Basket' => $basket]);
     }
 
     //<editor-fold desc="Helpers">

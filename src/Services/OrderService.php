@@ -19,8 +19,6 @@ use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Order\Property\Models\OrderProperty;
-use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use RuntimeException;
 
 class OrderService implements OrderServiceContract
@@ -42,21 +40,6 @@ class OrderService implements OrderServiceContract
     ) {
         $this->orderRepo              = $orderRepository;
         $this->orderTxnIdRelationRepo = $orderTxnIdRelationRepo;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getLanguage(Order $order): string
-    {
-        /** @var OrderProperty $property */
-        foreach ($order->properties as $property) {
-            if ($property->typeId === OrderPropertyType::DOCUMENT_LANGUAGE) {
-                return $property->value;
-            }
-        }
-
-        return 'DE';
     }
 
     /**

@@ -14,6 +14,7 @@
 
 namespace Heidelpay\Services;
 
+use Heidelpay\Helper\OrderModelHelper;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\AbstractMethod;
 use Plenty\Modules\Authorization\Services\AuthHelper;
@@ -33,33 +34,32 @@ class PaymentInfoService implements PaymentInfoServiceContract
     /** @var CommentRepositoryContract */
     private $commentRepo;
 
-    /** @var OrderServiceContract */
-    private $orderService;
-    /**
-     * @var OrderRepositoryContract
-     */
+    /** @var OrderRepositoryContract */
     private $orderRepository;
+
+    /** @var OrderModelHelper */
+    private $modelHelper;
 
     /**
      * PaymentInformationService constructor.
      * @param NotificationServiceContract $notificationService
      * @param PaymentHelper $paymentHelper
      * @param CommentRepositoryContract $commentRepo
-     * @param OrderServiceContract $orderService
      * @param OrderRepositoryContract $orderRepository
+     * @param OrderModelHelper $modelHelper
      */
     public function __construct(
         NotificationServiceContract $notificationService,
         PaymentHelper $paymentHelper,
         CommentRepositoryContract $commentRepo,
-        OrderServiceContract $orderService,
-        OrderRepositoryContract $orderRepository
+        OrderRepositoryContract $orderRepository,
+        OrderModelHelper $modelHelper
     ) {
         $this->notificationService = $notificationService;
         $this->paymentHelper = $paymentHelper;
         $this->commentRepo = $commentRepo;
-        $this->orderService = $orderService;
         $this->orderRepository = $orderRepository;
+        $this->modelHelper = $modelHelper;
     }
 
     /**
@@ -94,7 +94,7 @@ class PaymentInfoService implements PaymentInfoServiceContract
             return;
         }
 
-        $language = $this->orderService->getLanguage($order);
+        $language = $this->modelHelper->getLanguage($order);
         $commentText = $this->getPaymentInformationString($order, $language, '</br>');
 
         /** @var AuthHelper $authHelper */

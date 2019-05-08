@@ -20,14 +20,6 @@ use RuntimeException;
 interface OrderServiceContract
 {
     /**
-     * Returns the language code of the given order or 'DE' as default.
-     *
-     * @param Order $order
-     * @return string
-     */
-    public function getLanguage(Order $order): string;
-
-    /**
      * Fetches the Order object to the given orderId.
      *
      * @param int $orderId

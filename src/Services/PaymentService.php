@@ -581,17 +581,6 @@ class PaymentService
             case TransactionType::RECEIPT:
                 $this->handleIncomingPayment($txn);
                 break;
-            case TransactionType::AUTHORIZE:         // intended fall-through
-            case TransactionType::REGISTRATION:      // intended fall-through
-            case TransactionType::CHARGEBACK:        // intended fall-through
-            case TransactionType::CREDIT:            // intended fall-through
-            case TransactionType::DEREGISTRATION:    // intended fall-through
-            case TransactionType::FINALIZE:          // intended fall-through
-            case TransactionType::INITIALIZE:        // intended fall-through
-            case TransactionType::REBILL:            // intended fall-through
-            case TransactionType::REFUND:            // intended fall-through
-            case TransactionType::REREGISTRATION:    // intended fall-through
-            case TransactionType::REVERSAL:          // intended fall-through
             default:
                 // do nothing if the given Transaction needs no handling
                 break;

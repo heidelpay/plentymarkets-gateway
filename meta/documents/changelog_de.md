@@ -1,5 +1,13 @@
 # heidelpay Payment Gateway Changelog
 
+## [1.2.3][1.2.3]
+
+### Changed
+- Der 'bezahlen' und der 'abbrechen' Button werden nun nach dem Klick deaktiviert, um zu verhindern, dass mehr als einmal geklickt wird.
+
+### Fixed
+- Es wurde ein Problem behoben, dass beim Rendern der Success-Page bzw. der Buchungen des Kunden im Backend dazu führte, dass ein Fehler auftrat, wenn die Zahlart nicht von heidelpay war.
+
 ## [1.2.2][1.2.2]
 
 ### Changed
@@ -75,3 +83,4 @@
 [1.2.0]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.1.2..1.2.0
 [1.2.1]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.2.0..1.2.1
 [1.2.2]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.2.1..1.2.2
+[1.2.3]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.2.2..1.2.3

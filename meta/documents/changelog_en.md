@@ -6,7 +6,7 @@
 - Disable submit and cancel button on click to avoid more then one submit.
 
 ### Fixed
-- Fixed a problem appearing on invoice generation if the payment does not belong to heidelpay.
+- Fixed a problem appearing when rendering the success page and the orders in the customer backend if the payment does not belong to heidelpay.
 
 ## [1.2.2][1.2.2]
 

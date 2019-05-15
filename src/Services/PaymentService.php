@@ -339,15 +339,6 @@ class PaymentService
         string $transactionId,
         array $additionalParams = [])
     {
-        $this->notification->error('payment transaction', __METHOD__, [
-            'Basket' => $basket,
-            'method' => $paymentMethod,
-            'mop' => $mopId,
-            'txnId' => $transactionId,
-            'params' => $additionalParams
-            ]);
-
-
         $basketArray = $basket->toArray();
 
         /** @var SecretService $secretService */

@@ -436,22 +436,29 @@ class PaymentService
     /**
      * Prepare finalize transaction for the given transactionId.
      *
-     * @param $mopId
-     * @param $txnId
+     * @param Order $order
      */
-    private function prepareFinalizeTransaction($mopId, $txnId)
+    private function prepareFinalizeTransaction(Order $order)
     {
+        $txnId = $this->modelHelper->getTxnId($order);
         $this->notification->error('Finalize Transaction #1', __METHOD__, ['Mop' => $mopId, 'TxnId' => $txnId]);
 
-        $txns = $this->transactionRepository->getTransactionsByTxnId($txnId);
-        $this->notification->error('Finalize Transaction #2', __METHOD__, ['transactions' => $txns]);
+        $reservationTransaction = $this->transactionRepository->getTransactionByType($txnId);
 
-        $txnPa = $this->transactionRepository->getTransactionByType($txnId);
-        $this->notification->error('Finalize Transaction #3', __METHOD__, ['transactions' => $txnPa]);
+        if (!$reservationTransaction instanceof Transaction) {
+            $this->notification->error('request.errorPaMissingForFin', __METHOD__, ['Order' => $order]);
+            return;
+        }
 
+        $this->notification->error(
+            'Finalize Transaction #2',
+            __METHOD__,
+            ['transactions' => $reservationTransaction, 'uniqueId'=> $reservationTransaction->uniqueId]
+        );
+
+        $mopId = $this->modelHelper->getMopId($order);
         $paymentMethodInstance = $this->paymentHelper->getPaymentMethodInstanceByMopId($mopId);
 
-        // get authorization transaction for the given txnId
         // get uniqueId, amount and currency
         // perform finalize with reference to the given uniqueId
 
@@ -591,8 +598,7 @@ class PaymentService
      * @param Order $order
      */
     public function handleShipment(Order $order) {
-        $mopId = $this->modelHelper->getMopId($order);
-        $this->prepareFinalizeTransaction($mopId, $this->modelHelper->getTxnId($order));
+        $this->prepareFinalizeTransaction($order);
     }
 
     //<editor-fold desc="Helpers">

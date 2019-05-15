@@ -204,27 +204,6 @@ class LibService
 
     //</editor-fold>
 
-    //<editor-fold desc="Send follow up requests">
-
-    /**
-     * Submits a finalize transaction.
-     *
-     * @param string $paymentMethod
-     * @param array $params
-     *
-     * @return array
-     */
-    protected function sendFinalizeTransaction(string $paymentMethod, array $params): array
-    {
-        if ($paymentMethod === InvoiceSecuredB2C::class) {
-            return $this->executeLibCall('invoiceSecuredB2CFinalizeTransaction', $params);
-        }
-
-        return [];
-    }
-
-    //</editor-fold>
-
     //<editor-fold desc="Basket">
     /**
      * @param array $params

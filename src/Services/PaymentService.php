@@ -440,9 +440,9 @@ class PaymentService
      */
     private function prepareFinalizeTransaction(Order $order)
     {
-        $txnId = $this->modelHelper->getTxnId($order);
-        $this->notification->error('Finalize Transaction #1', __METHOD__, ['Mop' => $mopId, 'TxnId' => $txnId]);
+        $this->notification->debug('request.debugPreparingFinalize', __METHOD__, ['Order' => $order]);
 
+        $txnId = $this->modelHelper->getTxnId($order);
         $reservationTransaction = $this->transactionRepository->getTransactionByType($txnId);
 
         if (!$reservationTransaction instanceof Transaction) {

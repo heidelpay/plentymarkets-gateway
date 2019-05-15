@@ -462,6 +462,7 @@ class PaymentService
         $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($paymentMethod);
         $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
 
+        $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $txnId;
 
         // set basket information (amount, currency, orderId, ...)
         $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $amount;

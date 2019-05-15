@@ -434,6 +434,28 @@ class PaymentService
     }
 
     /**
+     * Prepare finalize transaction for the given transactionId.
+     *
+     * @param $mopId
+     * @param $txnId
+     */
+    private function prepareFinalizeTransaction($mopId, $txnId)
+    {
+        $this->notification->error('Finalize Transaction #1', __METHOD__, ['Mop' => $mopId, 'TxnId' => $txnId]);
+
+        $txns = $this->transactionRepository->getTransactionsByTxnId($txnId);
+        $this->notification->error('Finalize Transaction #2', __METHOD__, ['transactions' => $txns]);
+
+
+        $paymentMethodInstance = $this->paymentHelper->getPaymentMethodInstanceByMopId($mopId);
+
+        // get authorization transaction for the given txnId
+        // get uniqueId, amount and currency
+        // perform finalize with reference to the given uniqueId
+
+    }
+
+    /**
      * Create a plentymarkets payment entity.
      *
      * @param Transaction $txnData
@@ -568,10 +590,7 @@ class PaymentService
      */
     public function handleShipment(Order $order) {
         $mopId = $this->modelHelper->getMopId($order);
-        $paymentMethod = $this->paymentHelper->mapMopToPaymentMethod($mopId);
-        $txnId = $this->modelHelper->getTxnId($order);
-//        $this->prepareFinalizeTransaction($order->orderItems, $order->);
-        $this->notification->error('Finalize Transaction', __METHOD__, ['Order' => $order, 'Mop' => $mopId, 'Method' => $paymentMethod, 'TxnId' => $txnId]);
+        $this->prepareFinalizeTransaction($mopId, $this->modelHelper->getTxnId($order));
     }
 
     //<editor-fold desc="Helpers">

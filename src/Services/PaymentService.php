@@ -623,18 +623,19 @@ class PaymentService
         $this->prepareFinalizeTransaction($order, $paymentMethod, $reservationTransaction, $txnId);
 
         // perform FIN Transaction
-        $response = $this->libService->sendTransactionRequest($paymentMethod, [
+        list($response,,$isError,) = $this->libService->sendTransactionRequest($paymentMethod, [
             'request' => $this->heidelpayRequest,
             'transactionType' => TransactionType::FINALIZE,
             'referenceId' => $reservationTransaction->uniqueId
         ]);
 
-//        // create transaction2
-//        $txn = $this->transactionService->createTransaction($response);
-//        $message = 'response.debugCreatedTransaction';
-
-//        $this->notification->debug($message, __METHOD__, ['Response' => $response, 'Transaction' => $txn]);
-        $this->notification->error('fin result', __METHOD__, ['Response' => $response]);
+        // store finalize transaction to database
+        if (!$isError) {
+            $txn = $this->transactionService->createTransaction($response);
+            $this->notification->debug('request.debugFinalizeTransactionCreated', __METHOD__, ['Transaction' => $txn]);
+            return;
+        }
+        $this->notification->debug('request.errorPerformingFinalize', __METHOD__, ['Response' => $response]);
     }
 
     //<editor-fold desc="Helpers">

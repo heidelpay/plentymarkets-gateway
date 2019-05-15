@@ -446,6 +446,8 @@ class PaymentService
         $txns = $this->transactionRepository->getTransactionsByTxnId($txnId);
         $this->notification->error('Finalize Transaction #2', __METHOD__, ['transactions' => $txns]);
 
+        $txnPa = $this->transactionRepository->getTransactionByType($txnId);
+        $this->notification->error('Finalize Transaction #3', __METHOD__, ['transactions' => $txnPa]);
 
         $paymentMethodInstance = $this->paymentHelper->getPaymentMethodInstanceByMopId($mopId);
 

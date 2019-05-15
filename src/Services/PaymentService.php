@@ -628,6 +628,7 @@ class PaymentService
             'transactionType' => TransactionType::FINALIZE,
             'referenceId' => $reservationTransaction->uniqueId
         ]);
+        $this->notification->error('kram', __METHOD__, ['Response' => $response]);
 
         // store finalize transaction to database
         if (!$isError) {

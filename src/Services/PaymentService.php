@@ -623,7 +623,7 @@ class PaymentService
         $this->prepareFinalizeTransaction($order, $paymentMethod, $reservationTransaction, $txnId);
 
         // perform FIN Transaction
-        list($response,,$isError,) = $this->libService->sendTransactionRequest($paymentMethod, [
+        $response = $this->libService->sendTransactionRequest($paymentMethod, [
             'request' => $this->heidelpayRequest,
             'transactionType' => TransactionType::FINALIZE,
             'referenceId' => $reservationTransaction->uniqueId
@@ -631,12 +631,12 @@ class PaymentService
         $this->notification->error('kram', __METHOD__, ['Response' => $response]);
 
         // store finalize transaction to database
-        if (!$isError) {
-            $txn = $this->transactionService->createTransaction($response);
-            $this->notification->debug('request.debugFinalizeTransactionCreated', __METHOD__, ['Transaction' => $txn]);
-            return;
-        }
-        $this->notification->debug('request.errorPerformingFinalize', __METHOD__, ['Response' => $response]);
+//        if (!$isError) {
+//            $txn = $this->transactionService->createTransaction($response);
+//            $this->notification->debug('request.debugFinalizeTransactionCreated', __METHOD__, ['Transaction' => $txn]);
+//            return;
+//        }
+//        $this->notification->debug('request.errorPerformingFinalize', __METHOD__, ['Response' => $response]);
     }
 
     //<editor-fold desc="Helpers">

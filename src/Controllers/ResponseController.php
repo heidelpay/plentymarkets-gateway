@@ -62,6 +62,9 @@ class ResponseController extends Controller
     /** @var ResponseService */
     private $responseHandlerService;
 
+    /** @var PaymentHelper */
+    private $paymentHelper;
+
     /**
      * ResponseController constructor.
      *
@@ -73,6 +76,7 @@ class ResponseController extends Controller
      * @param UrlServiceContract $urlService
      * @param RequestHelper $requestHelper
      * @param ResponseService $responseHandlerService
+     * @param PaymentHelper $paymentHelper
      */
     public function __construct(
         Request $request,
@@ -82,7 +86,8 @@ class ResponseController extends Controller
         NotificationServiceContract $notification,
         UrlServiceContract $urlService,
         RequestHelper $requestHelper,
-        ResponseService $responseHandlerService
+        ResponseService $responseHandlerService,
+        PaymentHelper $paymentHelper
     ) {
         $this->request = $request;
         $this->response = $response;
@@ -92,6 +97,7 @@ class ResponseController extends Controller
         $this->urlService = $urlService;
         $this->requestHelper = $requestHelper;
         $this->responseHandlerService = $responseHandlerService;
+        $this->paymentHelper = $paymentHelper;
     }
 
     //<editor-fold desc="Helpers">
@@ -115,7 +121,7 @@ class ResponseController extends Controller
             if ($txn instanceof Transaction) {
                 $message = 'response.debugTransactionAlreadyExists';
             } else {
-                $txn = $this->transactionService->createTransaction($response);
+                $txn = $this->transactionService->createTransaction($response, $this->paymentHelper->getWebstoreId());
                 $message = 'response.debugCreatedTransaction';
             }
 

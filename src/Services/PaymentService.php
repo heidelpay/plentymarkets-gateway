@@ -619,7 +619,8 @@ class PaymentService
         }
 
         // prepare FIN Transaction
-        $paymentMethod = $this->paymentHelper->mapMopToPaymentMethod($this->modelHelper->getMopId($order));
+        $mopId           = $this->modelHelper->getMopId($order);
+        $paymentMethod = $this->paymentHelper->mapMopToPaymentMethod($mopId);
         $this->prepareFinalizeTransaction($order, $paymentMethod, $reservationTransaction, $txnId);
 
         // perform FIN Transaction
@@ -628,15 +629,14 @@ class PaymentService
             'transactionType' => TransactionType::FINALIZE,
             'referenceId' => $reservationTransaction->uniqueId
         ]);
-        $this->notification->error('kram', __METHOD__, ['Response' => $response]);
 
         // store finalize transaction to database
-//        if (!$isError) {
-//            $txn = $this->transactionService->createTransaction($response);
-//            $this->notification->debug('request.debugFinalizeTransactionCreated', __METHOD__, ['Transaction' => $txn]);
-//            return;
-//        }
-//        $this->notification->debug('request.errorPerformingFinalize', __METHOD__, ['Response' => $response]);
+        if (!$response['isError']) {
+            $txn = $this->transactionService->createTransaction($response['response'], $this->paymentHelper->getWebstoreId(), $mopId, $order->id);
+            $this->notification->debug('request.debugFinalizeTransactionCreated', __METHOD__, ['Transaction' => $txn]);
+            return;
+        }
+        $this->notification->debug('request.errorPerformingFinalize', __METHOD__, ['Response' => $response]);
     }
 
     //<editor-fold desc="Helpers">

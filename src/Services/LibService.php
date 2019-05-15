@@ -104,6 +104,7 @@ class LibService
     //</editor-fold>
 
     //<editor-fold desc="Transaction Requests">
+
     /**
      * Calls a method depending on the given payment method
      * for sending a transaction request.
@@ -150,7 +151,7 @@ class LibService
      */
     protected function sendCreditCardTransactionRequest(array $params): array
     {
-        return $this->executeLibCall('creditcardTransactionRequest', $params);
+        return $this->executeLibCall('invoiceSecuredB2CFinalizeTransaction', $params);
     }
 
     /**
@@ -199,6 +200,27 @@ class LibService
     protected function sendDirectDebitTransactionRequest(array $params): array
     {
         return $this->executeLibCall('directdebitTransactionRequest', $params);
+    }
+
+    //</editor-fold>
+
+    //<editor-fold desc="Send follow up requests">
+
+    /**
+     * Submits a finalize transaction.
+     *
+     * @param string $paymentMethod
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function sendFinalizeTransaction(string $paymentMethod, array $params): array
+    {
+        if ($paymentMethod === InvoiceSecuredB2C::class) {
+            return $this->executeLibCall('invoiceSecuredB2CFinalizeTransaction', $params);
+        }
+
+        return [];
     }
 
     //</editor-fold>

@@ -437,33 +437,43 @@ class PaymentService
      * Prepare finalize transaction for the given transactionId.
      *
      * @param Order $order
+     * @param string $paymentMethod
+     * @param Transaction $reservationTransaction
+     * @param string $txnId
+     * @throws RuntimeException
      */
-    private function prepareFinalizeTransaction(Order $order)
-    {
+    private function prepareFinalizeTransaction(
+        Order $order,
+        string $paymentMethod,
+        Transaction $reservationTransaction,
+        string $txnId
+    ) {
         $this->notification->debug('request.debugPreparingFinalize', __METHOD__, ['Order' => $order]);
 
-        $txnId = $this->modelHelper->getTxnId($order);
-        $reservationTransaction = $this->transactionRepository->getTransactionByType($txnId);
-
-        if (!$reservationTransaction instanceof Transaction) {
-            $this->notification->error('request.errorPaMissingForFin', __METHOD__, ['Order' => $order]);
-            return;
-        }
-
-        $mopId = $this->modelHelper->getMopId($order);
-        $paymentMethodInstance = $this->paymentHelper->getPaymentMethodInstanceByMopId($mopId);
-
-        $referenceId = $reservationTransaction->uniqueId;
         $amount = $reservationTransaction->transactionDetails['PRESENTATION.AMOUNT'] ?? null;
         $currency = $reservationTransaction->transactionDetails['PRESENTATION.CURRENCY'] ?? null;
 
-        if (empty($referenceId) || empty($amount) || empty($currency)) {
+        if (empty($amount) || empty($currency)) {
             $this->notification->error('request.errorTransactionDetailsMissing', __METHOD__, ['Transaction' => $reservationTransaction]);
             return;
         }
 
-        // perform finalize with reference to the given uniqueId
+        // set authentication data
+        $heidelpayAuth = $this->paymentHelper->getHeidelpayAuthenticationConfig($paymentMethod);
+        $this->heidelpayRequest = array_merge($this->heidelpayRequest, $heidelpayAuth);
 
+
+        // set basket information (amount, currency, orderId, ...)
+        $this->heidelpayRequest['PRESENTATION_AMOUNT'] = $amount;
+        $this->heidelpayRequest['PRESENTATION_CURRENCY'] = $currency;
+
+        // set secret hash
+        /** @var SecretService $secretService */
+        $secretService = pluginApp(SecretService::class);
+        $secret = $secretService->getSecretHash($txnId);
+        if ($secret !== null) {
+            $this->heidelpayRequest['CRITERION_SECRET'] = $secret;
+        }
     }
 
     /**
@@ -598,9 +608,27 @@ class PaymentService
      * Handle shipping event.
      *
      * @param Order $order
+     * @throws RuntimeException
      */
     public function handleShipment(Order $order) {
-        $this->prepareFinalizeTransaction($order);
+        // get PA for this order
+        $txnId = $this->modelHelper->getTxnId($order);
+        $reservationTransaction = $this->transactionRepository->getTransactionByType($txnId);
+        if (!$reservationTransaction instanceof Transaction) {
+            $this->notification->error('request.errorPaMissingForFin', __METHOD__, ['Order' => $order]);
+            return;
+        }
+
+        // prepare FIN Transaction
+        $paymentMethod = $this->paymentHelper->mapMopToPaymentMethod($this->modelHelper->getMopId($order));
+        $this->prepareFinalizeTransaction($order, $paymentMethod, $reservationTransaction, $txnId);
+
+        // perform FIN Transaction
+        $result = $this->libService->sendTransactionRequest($paymentMethod, [
+            'request' => $this->heidelpayRequest,
+            'transactionType' => TransactionType::FINALIZE,
+            'referenceId' => $reservationTransaction->uniqueId
+        ]);
     }
 
     //<editor-fold desc="Helpers">

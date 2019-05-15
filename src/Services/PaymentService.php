@@ -632,7 +632,7 @@ class PaymentService
 
         // store finalize transaction to database
         if (!$response['isError']) {
-            $txn = $this->transactionService->createTransaction($response['response'], $this->paymentHelper->getWebstoreId(), $mopId, $order->id);
+            $txn = $this->transactionService->createTransaction($response, $this->paymentHelper->getWebstoreId(), $mopId, $order->id);
             $this->notification->debug('request.debugFinalizeTransactionCreated', __METHOD__, ['Transaction' => $txn]);
             return;
         }

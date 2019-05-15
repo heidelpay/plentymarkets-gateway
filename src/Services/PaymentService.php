@@ -450,16 +450,18 @@ class PaymentService
             return;
         }
 
-        $this->notification->error(
-            'Finalize Transaction #2',
-            __METHOD__,
-            ['transactions' => $reservationTransaction, 'uniqueId'=> $reservationTransaction->uniqueId]
-        );
-
         $mopId = $this->modelHelper->getMopId($order);
         $paymentMethodInstance = $this->paymentHelper->getPaymentMethodInstanceByMopId($mopId);
 
-        // get uniqueId, amount and currency
+        $referenceId = $reservationTransaction->uniqueId;
+        $amount = $reservationTransaction->transactionDetails['PRESENTATION.AMOUNT'] ?? null;
+        $currency = $reservationTransaction->transactionDetails['PRESENTATION.CURRENCY'] ?? null;
+
+        if (empty($referenceId) || empty($amount) || empty($currency)) {
+            $this->notification->error('request.errorTransactionDetailsMissing', __METHOD__, ['Transaction' => $reservationTransaction]);
+            return;
+        }
+
         // perform finalize with reference to the given uniqueId
 
     }

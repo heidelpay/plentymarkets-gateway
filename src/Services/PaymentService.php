@@ -31,6 +31,7 @@ use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\OrderTxnIdRelation;
 use Heidelpay\Models\Transaction;
+use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
@@ -111,6 +112,10 @@ class PaymentService
 
     /** @var OrderModelHelper */
     private $modelHelper;
+    /**
+     * @var TransactionService
+     */
+    private $transactionService;
 
     /**
      * PaymentService constructor.
@@ -150,7 +155,8 @@ class PaymentService
         PaymentInfoServiceContract $paymentInfoService,
         AddressHelper $addressHelper,
         ResponseService $responseHandler,
-        OrderModelHelper $modelHelper
+        OrderModelHelper $modelHelper,
+        TransactionService $transactionService
     ) {
         $this->libService = $libraryService;
         $this->paymentRepository = $paymentRepository;
@@ -169,6 +175,7 @@ class PaymentService
         $this->addressHelper = $addressHelper;
         $this->responseHandler = $responseHandler;
         $this->modelHelper = $modelHelper;
+        $this->transactionService = $transactionService;
     }
 
     /**
@@ -616,11 +623,18 @@ class PaymentService
         $this->prepareFinalizeTransaction($order, $paymentMethod, $reservationTransaction, $txnId);
 
         // perform FIN Transaction
-        $result = $this->libService->sendTransactionRequest($paymentMethod, [
+        $response = $this->libService->sendTransactionRequest($paymentMethod, [
             'request' => $this->heidelpayRequest,
             'transactionType' => TransactionType::FINALIZE,
             'referenceId' => $reservationTransaction->uniqueId
         ]);
+
+//        // create transaction2
+//        $txn = $this->transactionService->createTransaction($response);
+//        $message = 'response.debugCreatedTransaction';
+
+//        $this->notification->debug($message, __METHOD__, ['Response' => $response, 'Transaction' => $txn]);
+        $this->notification->error('fin result', __METHOD__, ['Response' => $response]);
     }
 
     //<editor-fold desc="Helpers">

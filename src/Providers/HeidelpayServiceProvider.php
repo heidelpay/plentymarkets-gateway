@@ -177,10 +177,6 @@ class HeidelpayServiceProvider extends ServiceProvider
                         // do nothing
                         break;
                 }
-
-
-
-
             }
         );
     }

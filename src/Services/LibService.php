@@ -151,7 +151,7 @@ class LibService
      */
     protected function sendCreditCardTransactionRequest(array $params): array
     {
-        return $this->executeLibCall('invoiceSecuredB2CFinalizeTransaction', $params);
+        return $this->executeLibCall('creditcardTransactionRequest', $params);
     }
 
     /**

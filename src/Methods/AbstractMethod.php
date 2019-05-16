@@ -40,6 +40,7 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     const B2C_ONLY = false;
     const COUNTRY_RESTRICTION = [];
     const ADDRESSES_MUST_MATCH = false;
+    const SEND_FINALIZE_TRANSACTION = false;
 
     /** @var PaymentHelper $helper */
     protected $helper;
@@ -290,6 +291,14 @@ abstract class AbstractMethod extends PaymentMethodService implements PaymentMet
     public function renderInvoiceData(): bool
     {
         return static::RENDER_INVOICE_DATA;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function sendFinalizeTransaction(): bool
+    {
+        return static::SEND_FINALIZE_TRANSACTION;
     }
 
     /**

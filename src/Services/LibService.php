@@ -104,6 +104,7 @@ class LibService
     //</editor-fold>
 
     //<editor-fold desc="Transaction Requests">
+
     /**
      * Calls a method depending on the given payment method
      * for sending a transaction request.

@@ -14,12 +14,12 @@
 
 namespace Heidelpay\Services;
 
+use Exception;
 use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Order\Property\Models\OrderProperty;
-use Plenty\Modules\Order\Property\Models\OrderPropertyType;
+use RuntimeException;
 
 class OrderService implements OrderServiceContract
 {
@@ -45,21 +45,6 @@ class OrderService implements OrderServiceContract
     /**
      * {@inheritDoc}
      */
-    public function getLanguage(Order $order): string
-    {
-        /** @var OrderProperty $property */
-        foreach ($order->properties as $property) {
-            if ($property->typeId === OrderPropertyType::DOCUMENT_LANGUAGE) {
-                return $property->value;
-            }
-        }
-
-        return 'DE';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getOrder(int $orderId): Order
     {
         $order = null;
@@ -73,13 +58,13 @@ class OrderService implements OrderServiceContract
                     return $this->orderRepo->findOrderById($orderId, ['comments']);
                 }
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // no need to handle here
         }
 
         // Check whether the order exists
         if (!$order instanceof Order) {
-            throw new \RuntimeException('payment.warningOrderDoesNotExist');
+            throw new RuntimeException('payment.warningOrderDoesNotExist');
         }
         return $order;
     }

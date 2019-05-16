@@ -14,52 +14,50 @@
 
 namespace Heidelpay\Services;
 
+use Heidelpay\Helper\CommentHelper;
+use Heidelpay\Helper\OrderModelHelper;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\AbstractMethod;
-use Plenty\Modules\Authorization\Services\AuthHelper;
-use Plenty\Modules\Comment\Contracts\CommentRepositoryContract;
-use Plenty\Modules\Comment\Models\Comment;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
 
 class PaymentInfoService implements PaymentInfoServiceContract
 {
     /** @var NotificationServiceContract */
-    private $notificationService;
+    private $notification;
 
     /** @var PaymentHelper */
     private $paymentHelper;
 
-    /** @var CommentRepositoryContract */
-    private $commentRepo;
-
-    /** @var OrderServiceContract */
-    private $orderService;
-    /**
-     * @var OrderRepositoryContract
-     */
+    /** @var OrderRepositoryContract */
     private $orderRepository;
+
+    /** @var OrderModelHelper */
+    private $modelHelper;
+
+    /** @var CommentHelper */
+    private $commentHelper;
 
     /**
      * PaymentInformationService constructor.
      * @param NotificationServiceContract $notificationService
      * @param PaymentHelper $paymentHelper
-     * @param CommentRepositoryContract $commentRepo
-     * @param OrderServiceContract $orderService
      * @param OrderRepositoryContract $orderRepository
+     * @param OrderModelHelper $modelHelper
+     * @param CommentHelper $commentHelper
      */
     public function __construct(
         NotificationServiceContract $notificationService,
         PaymentHelper $paymentHelper,
-        CommentRepositoryContract $commentRepo,
-        OrderServiceContract $orderService,
-        OrderRepositoryContract $orderRepository
+        OrderRepositoryContract $orderRepository,
+        OrderModelHelper $modelHelper,
+        CommentHelper $commentHelper
     ) {
-        $this->notificationService = $notificationService;
-        $this->paymentHelper = $paymentHelper;
-        $this->commentRepo = $commentRepo;
-        $this->orderService = $orderService;
+        $this->notification    = $notificationService;
+        $this->paymentHelper   = $paymentHelper;
         $this->orderRepository = $orderRepository;
+        $this->modelHelper     = $modelHelper;
+        $this->commentHelper   = $commentHelper;
     }
 
     /**
@@ -67,18 +65,13 @@ class PaymentInfoService implements PaymentInfoServiceContract
      */
     public function getPaymentInformationString(Order $order, $language, $glue = PHP_EOL): string
     {
-        $paymentDetails = $this->paymentHelper->getPaymentDetailsForOrder($order);
-
-        $adviceParts                = [
-            $this->notificationService->getTranslation('Heidelpay::template.pleaseTransferTheTotalTo', [], $language),
-            $this->notificationService->getTranslation('Heidelpay::template.accountIban', [], $language) . ': ' .
-            $paymentDetails['accountIBAN'],
-            $this->notificationService->getTranslation('Heidelpay::template.accountBic', [], $language) . ': ' .
-            $paymentDetails['accountBIC'],
-            $this->notificationService->getTranslation('Heidelpay::template.accountHolder', [], $language) . ': ' .
-            $paymentDetails['accountHolder'],
-            $this->notificationService->getTranslation('Heidelpay::template.accountUsage', [], $language) . ': ' .
-            $paymentDetails['accountUsage']
+        $details = $this->paymentHelper->getPaymentDetailsForOrder($order);
+        $adviceParts = [
+            $this->notification->translate('template.pleaseTransferTheTotalTo', [], $language),
+            $this->notification->translate('template.accountIban', [], $language) . ': ' . $details['accountIBAN'],
+            $this->notification->translate('template.accountBic', [], $language) . ': ' . $details['accountBIC'],
+            $this->notification->translate('template.accountHolder', [], $language) . ': ' . $details['accountHolder'],
+            $this->notification->translate('template.accountUsage', [], $language) . ': ' . $details['accountUsage']
         ];
         return implode($glue, $adviceParts);
     }
@@ -94,21 +87,9 @@ class PaymentInfoService implements PaymentInfoServiceContract
             return;
         }
 
-        $language = $this->orderService->getLanguage($order);
+        $language = $this->modelHelper->getLanguage($order);
         $commentText = $this->getPaymentInformationString($order, $language, '</br>');
+        $this->commentHelper->createOrderComment($orderId, $commentText);
 
-        /** @var AuthHelper $authHelper */
-        $authHelper = pluginApp(AuthHelper::class);
-        $authHelper->processUnguarded(
-            function () use ($orderId, $commentText) {
-                $this->commentRepo->createComment(
-                    [
-                        'referenceType'       => Comment::REFERENCE_TYPE_ORDER,
-                        'referenceValue'      => $orderId,
-                        'text'                => $commentText,
-                        'isVisibleForContact' => true
-                    ]
-                );
-            });
     }
 }

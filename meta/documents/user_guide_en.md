@@ -138,10 +138,13 @@ If the payment is successful, the order is immediately marked paid in your backe
 If the payment fails, the order is not created and the customer will be redirected to the checkout page.
 
 ### Invoice secured B2C
-* In order to start the insurance of a Payment you need to trigger a finalize transaction (FIN) from the hIP.\
-This starts the insurance period in which the customer has to transfert the total amount of the order.\
-* This period is determined within your contract with heidelpay.\
-As soon as the customer transferred the total amount a receipt transaction (REC) appears within the hIP and is sent to the pushUrl of your shop.
+* In order to start the insurance of a Payment you need to trigger a finalize transaction (FIN)
+  * You can do this in your hIP account (heidelpay Intelligence Platform)
+  * or by creating the delivery note within the shop backend (e. g. by clicking `Create delivery note`).
+* When triggering the finalize from the shop backend a note with the result will be added to the order.
+* The finalize starts the insurance period in which the customer has to pay the total amount of the order.
+* The insurance period is determined within your contract with heidelpay.
+* As soon as the total amount is paid by the customer a receipt transaction (REC) appears within the hIP and is sent to the pushUrl of your shop.
 The shop module will then create a new payment and link it to the corresponding order.
 * The bank information for the customer will be written on the invoice pdf automatically on creation.
 

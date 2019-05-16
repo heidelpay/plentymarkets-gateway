@@ -639,7 +639,7 @@ class PaymentService
             $message = 'request.debugFinalizeTransactionCreated';
             $this->notification->debug($message, __METHOD__, ['Transaction' => $txn]);
         } else {
-            $message = 'request.errorPerformingFinalize';
+            $message = 'request.warningPerformingFinalize';
             $this->notification->warning($message, __METHOD__, ['Response' => $response]);
         }
         $commentText = $this->notification->getTranslation($message, [], 'en-EN');

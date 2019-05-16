@@ -640,9 +640,15 @@ class PaymentService
             $this->notification->debug($message, __METHOD__, ['Transaction' => $txn]);
         } else {
             $message = 'request.warningPerformingFinalize';
+            $details = [];
+            $details[] = 'Reason: '. $response['response']['PROCESSING.REASON'] ?? 'unknown';
+            $details[] = 'Message: '. $response['response']['PROCESSING.RETURN'] ?? 'unknown';
             $this->notification->warning($message, __METHOD__, ['Response' => $response]);
         }
         $commentText = $this->notification->getTranslation($message, [], 'en-EN');
+        if (isset($details)) {
+            $commentText = implode('<br>', array_merge([$commentText], $details));
+        }
         $this->commentHelper->createOrderComment($order->id, $commentText);
     }
 

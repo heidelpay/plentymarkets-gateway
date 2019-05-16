@@ -638,12 +638,11 @@ class PaymentService
             $txn = $this->transactionService->createTransaction($response, $this->paymentHelper->getWebstoreId(), $mopId, $order->id);
             $message = 'request.debugFinalizeTransactionCreated';
             $this->notification->debug($message, __METHOD__, ['Transaction' => $txn]);
-            $this->commentHelper->createOrderComment($order->id, $message);
-            return;
+        } else {
+            $message = 'request.errorPerformingFinalize';
+            $this->notification->warning($message, __METHOD__, ['Response' => $response]);
         }
-        $message = 'request.errorPerformingFinalize';
-        $this->notification->warning($message, __METHOD__, ['Response' => $response]);
-        $commentText = $this->notification->getTranslation('Heidelpay::' . $message);
+        $commentText = $this->notification->getTranslation($message, [], 'en-EN');
         $this->commentHelper->createOrderComment($order->id, $commentText);
     }
 

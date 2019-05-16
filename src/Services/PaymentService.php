@@ -21,6 +21,7 @@ use Heidelpay\Constants\SessionKeys;
 use Heidelpay\Constants\TransactionStatus;
 use Heidelpay\Constants\TransactionType;
 use Heidelpay\Helper\AddressHelper;
+use Heidelpay\Helper\CommentHelper;
 use Heidelpay\Helper\OrderModelHelper;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\AbstractMethod;
@@ -35,7 +36,6 @@ use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
-use Plenty\Modules\Comment\Contracts\CommentRepositoryContract;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
@@ -98,9 +98,6 @@ class PaymentService
     /** @var BasketServiceContract $basketService */
     private $basketService;
 
-    /** @var CommentRepositoryContract $commentRepo */
-    private $commentRepo;
-
     /** @var PaymentInfoServiceContract */
     private $paymentInfoService;
 
@@ -112,10 +109,12 @@ class PaymentService
 
     /** @var OrderModelHelper */
     private $modelHelper;
-    /**
-     * @var TransactionService
-     */
+
+    /** @var TransactionService */
     private $transactionService;
+
+    /** @var CommentHelper */
+    private $commentHelper;
 
     /**
      * PaymentService constructor.
@@ -137,6 +136,8 @@ class PaymentService
      * @param AddressHelper $addressHelper
      * @param ResponseService $responseHandler
      * @param OrderModelHelper $modelHelper
+     * @param TransactionService $transactionService
+     * @param CommentHelper $commentHelper
      */
     public function __construct(
         LibService $libraryService,
@@ -156,7 +157,8 @@ class PaymentService
         AddressHelper $addressHelper,
         ResponseService $responseHandler,
         OrderModelHelper $modelHelper,
-        TransactionService $transactionService
+        TransactionService $transactionService,
+        CommentHelper $commentHelper
     ) {
         $this->libService = $libraryService;
         $this->paymentRepository = $paymentRepository;
@@ -176,6 +178,7 @@ class PaymentService
         $this->responseHandler = $responseHandler;
         $this->modelHelper = $modelHelper;
         $this->transactionService = $transactionService;
+        $this->commentHelper = $commentHelper;
     }
 
     /**
@@ -633,10 +636,14 @@ class PaymentService
         // store finalize transaction to database
         if (!$response['isError']) {
             $txn = $this->transactionService->createTransaction($response, $this->paymentHelper->getWebstoreId(), $mopId, $order->id);
-            $this->notification->debug('request.debugFinalizeTransactionCreated', __METHOD__, ['Transaction' => $txn]);
+            $message = 'request.debugFinalizeTransactionCreated';
+            $this->notification->debug($message, __METHOD__, ['Transaction' => $txn]);
             return;
         }
-        $this->notification->debug('request.errorPerformingFinalize', __METHOD__, ['Response' => $response]);
+        $message = 'request.errorPerformingFinalize';
+        $this->notification->warning($message, __METHOD__, ['Response' => $response]);
+        $commentText = $this->notification->getTranslation('Heidelpay::' . $message);
+        $this->commentHelper->createOrderComment($order->id, $commentText);
     }
 
     //<editor-fold desc="Helpers">

@@ -19,13 +19,12 @@ use Plenty\Modules\Comment\Models\Comment;
 
 class OrderCommentHelper
 {
-    /**
-     * @var CommentRepositoryContract
-     */
+    /** @var CommentRepositoryContract */
     private $commentRepo;
 
     /**
      * OrderCommentHelper constructor.
+     *
      * @param CommentRepositoryContract $commentRepo
      */
     public function __construct(CommentRepositoryContract $commentRepo)

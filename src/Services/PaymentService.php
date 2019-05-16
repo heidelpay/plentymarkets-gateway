@@ -638,6 +638,7 @@ class PaymentService
             $txn = $this->transactionService->createTransaction($response, $this->paymentHelper->getWebstoreId(), $mopId, $order->id);
             $message = 'request.debugFinalizeTransactionCreated';
             $this->notification->debug($message, __METHOD__, ['Transaction' => $txn]);
+            $this->commentHelper->createOrderComment($order->id, $message);
             return;
         }
         $message = 'request.errorPerformingFinalize';

@@ -279,7 +279,7 @@ class PaymentService
     {
         $value = '';
 
-        $clientErrorMessage = $this->notification->getTranslation('Heidelpay::payment.errorInternalErrorTryAgainLater');
+        $clientErrorMessage = $this->notification->translate('payment.errorInternalErrorTryAgainLater');
 
         /** @var AbstractMethod $methodInstance */
         $methodInstance = $this->paymentHelper->getPaymentMethodInstance($paymentMethod);
@@ -290,7 +290,7 @@ class PaymentService
         }
 
         if ($methodInstance->needsMatchingAddresses() && !$this->basketService->shippingMatchesBillingAddress()) {
-            $value = $this->notification->getTranslation('Heidelpay::payment.errorAddressesShouldMatch');
+            $value = $this->notification->translate('payment.errorAddressesShouldMatch');
             return [GetPaymentMethodContent::RETURN_TYPE_ERROR, $value];
         }
 
@@ -645,7 +645,7 @@ class PaymentService
             $details[] = 'Message: '. $response['response']['PROCESSING.RETURN'] ?? 'unknown';
             $this->notification->warning($message, __METHOD__, ['Response' => $response]);
         }
-        $commentText = $this->notification->getTranslation($message, [], 'en-EN');
+        $commentText = $this->notification->translate($message, [], 'en-EN');
         if (isset($details)) {
             $commentText = implode('<br>', array_merge([$commentText], $details));
         }

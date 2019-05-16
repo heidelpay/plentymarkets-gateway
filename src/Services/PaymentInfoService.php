@@ -24,7 +24,7 @@ use Plenty\Modules\Order\Models\Order;
 class PaymentInfoService implements PaymentInfoServiceContract
 {
     /** @var NotificationServiceContract */
-    private $notificationService;
+    private $notification;
 
     /** @var PaymentHelper */
     private $paymentHelper;
@@ -53,11 +53,11 @@ class PaymentInfoService implements PaymentInfoServiceContract
         OrderModelHelper $modelHelper,
         CommentHelper $commentHelper
     ) {
-        $this->notificationService = $notificationService;
-        $this->paymentHelper = $paymentHelper;
+        $this->notification    = $notificationService;
+        $this->paymentHelper   = $paymentHelper;
         $this->orderRepository = $orderRepository;
-        $this->modelHelper = $modelHelper;
-        $this->commentHelper = $commentHelper;
+        $this->modelHelper     = $modelHelper;
+        $this->commentHelper   = $commentHelper;
     }
 
     /**
@@ -65,18 +65,13 @@ class PaymentInfoService implements PaymentInfoServiceContract
      */
     public function getPaymentInformationString(Order $order, $language, $glue = PHP_EOL): string
     {
-        $paymentDetails = $this->paymentHelper->getPaymentDetailsForOrder($order);
-
-        $adviceParts                = [
-            $this->notificationService->getTranslation('Heidelpay::template.pleaseTransferTheTotalTo', [], $language),
-            $this->notificationService->getTranslation('Heidelpay::template.accountIban', [], $language) . ': ' .
-            $paymentDetails['accountIBAN'],
-            $this->notificationService->getTranslation('Heidelpay::template.accountBic', [], $language) . ': ' .
-            $paymentDetails['accountBIC'],
-            $this->notificationService->getTranslation('Heidelpay::template.accountHolder', [], $language) . ': ' .
-            $paymentDetails['accountHolder'],
-            $this->notificationService->getTranslation('Heidelpay::template.accountUsage', [], $language) . ': ' .
-            $paymentDetails['accountUsage']
+        $details = $this->paymentHelper->getPaymentDetailsForOrder($order);
+        $adviceParts = [
+            $this->notification->translate('template.pleaseTransferTheTotalTo', [], $language),
+            $this->notification->translate('template.accountIban', [], $language) . ': ' . $details['accountIBAN'],
+            $this->notification->translate('template.accountBic', [], $language) . ': ' . $details['accountBIC'],
+            $this->notification->translate('template.accountHolder', [], $language) . ': ' . $details['accountHolder'],
+            $this->notification->translate('template.accountUsage', [], $language) . ': ' . $details['accountUsage']
         ];
         return implode($glue, $adviceParts);
     }

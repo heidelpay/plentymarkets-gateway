@@ -17,7 +17,7 @@ use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Comment\Contracts\CommentRepositoryContract;
 use Plenty\Modules\Comment\Models\Comment;
 
-class OrderCommentHelper
+class CommentHelper
 {
     /** @var CommentRepositoryContract */
     private $commentRepo;

@@ -14,7 +14,7 @@
 
 namespace Heidelpay\Services;
 
-use Heidelpay\Helper\OrderCommentHelper;
+use Heidelpay\Helper\CommentHelper;
 use Heidelpay\Helper\OrderModelHelper;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Methods\AbstractMethod;
@@ -35,7 +35,7 @@ class PaymentInfoService implements PaymentInfoServiceContract
     /** @var OrderModelHelper */
     private $modelHelper;
 
-    /** @var OrderCommentHelper */
+    /** @var CommentHelper */
     private $commentHelper;
 
     /**
@@ -44,14 +44,14 @@ class PaymentInfoService implements PaymentInfoServiceContract
      * @param PaymentHelper $paymentHelper
      * @param OrderRepositoryContract $orderRepository
      * @param OrderModelHelper $modelHelper
-     * @param OrderCommentHelper $commentHelper
+     * @param CommentHelper $commentHelper
      */
     public function __construct(
         NotificationServiceContract $notificationService,
         PaymentHelper $paymentHelper,
         OrderRepositoryContract $orderRepository,
         OrderModelHelper $modelHelper,
-        OrderCommentHelper $commentHelper
+        CommentHelper $commentHelper
     ) {
         $this->notificationService = $notificationService;
         $this->paymentHelper = $paymentHelper;

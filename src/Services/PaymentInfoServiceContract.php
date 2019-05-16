@@ -22,10 +22,12 @@ interface PaymentInfoServiceContract
      * Returns the payment information for the given order as string if it is an invoice payment type.
      *
      * @param Order $order
-     * @param $language
+     * @param string $language
+     * @param string $glue
+     *
      * @return string
      */
-    public function getPaymentInformationString(Order $order, $language): string;
+    public function getPaymentInformationString(Order $order, $language, $glue = PHP_EOL): string;
 
     /**
      * Adds the payment information as a note to the order if it is an invoice order.

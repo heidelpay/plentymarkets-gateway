@@ -141,9 +141,10 @@ If the payment fails, the order is not created and the customer will be redirect
 * In order to start the insurance of a Payment you need to trigger a finalize transaction (FIN)
   * You can do this from your hIP account (heidelpay Intelligence Platform)
   * or by clicking `Create delivery note` for the order in the shop backend
-This starts the insurance period in which the customer has to transfert the total amount of the order.\
-* This period is determined within your contract with heidelpay.\
-As soon as the customer transferred the total amount a receipt transaction (REC) appears within the hIP and is sent to the pushUrl of your shop.
+* When triggering the finalize from the shop backend the result will be added to the order as a note.
+* The finalize starts the insurance period in which the customer has to pay the total amount of the order.
+* The insurance period is determined within your contract with heidelpay.
+* As soon as the total amount is paid by the customer a receipt transaction (REC) appears within the hIP and is sent to the pushUrl of your shop.
 The shop module will then create a new payment and link it to the corresponding order.
 * The bank information for the customer will be written on the invoice pdf automatically on creation.
 

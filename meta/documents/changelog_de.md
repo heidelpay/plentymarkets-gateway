@@ -5,6 +5,9 @@
 ### Added
 - Für Rechnungskäufe können ab jetzt aus dem Backend heraus Finalisierungen durchgeführt werden. [Siehe Beschreibung im User Guide.](user_guide_de.md)
 
+### Changed
+- Der User Guide wurde aktualisiert.
+
 ## [1.2.3][1.2.3]
 
 ### Changed

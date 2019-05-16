@@ -3,7 +3,7 @@
 ## [1.3.0][1.3.0]
 
 ### Added
-- From now on orders with invoice payment type can be finalized from the store backend. [See User Guide for details.](user_guide_en.md)
+- From now on orders with invoice payment type can be finalized in the store backend. [See User Guide for details.](user_guide_en.md)
 
 ### Changed
 - The user guide has been updated.

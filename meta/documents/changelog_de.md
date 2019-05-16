@@ -1,5 +1,10 @@
 # heidelpay Payment Gateway Changelog
 
+## [1.3.0][1.3.0]
+
+### Added
+- Für Rechnungskäufe können ab jetzt aus dem Backend heraus Finalisierungen durchgeführt werden. [Siehe Beschreibung im User Guide.](user_guide_de.md)
+
 ## [1.2.3][1.2.3]
 
 ### Changed
@@ -84,3 +89,4 @@
 [1.2.1]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.2.0..1.2.1
 [1.2.2]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.2.1..1.2.2
 [1.2.3]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.2.2..1.2.3
+[1.3.0]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.2.3..1.3.0

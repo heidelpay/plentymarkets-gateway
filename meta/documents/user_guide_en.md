@@ -138,7 +138,7 @@ If the payment is successful, the order is immediately marked paid in your backe
 If the payment fails, the order is not created and the customer will be redirected to the checkout page.
 
 ### Invoice secured B2C
-* In order to start the insurance of a Payment you need to trigger a finalize transaction (FIN)
+* In order to start the insurance of a payment you need to trigger a finalize transaction (FIN)
   * You can do this in your hIP account (heidelpay Intelligence Platform)
   * or by creating the delivery note within the shop backend (e. g. by clicking `Create delivery note`).
 * When triggering the finalize from the shop backend a note with the result will be added to the order.

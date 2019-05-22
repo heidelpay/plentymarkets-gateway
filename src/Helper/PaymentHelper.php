@@ -310,7 +310,7 @@ class PaymentHelper
         $order = $this->orderService->getOrder($orderId);
 
         $additionalInfo = ['Order' => $order, 'Payment' => $payment];
-        $this->getLogger(__METHOD__)->debug('Heidelpay::payment.debugAssignPaymentToOrder', $additionalInfo);
+        $this->getLogger(__METHOD__)->debug('payment.debugAssignPaymentToOrder', $additionalInfo);
 
         /** @var Payment $paymentObject */
         foreach ($order->payments as $paymentObject) {

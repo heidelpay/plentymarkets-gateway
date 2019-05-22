@@ -82,5 +82,5 @@ interface NotificationServiceContract
      * @param string $locale
      * @return mixed
      */
-    public function getTranslation($message, $parameters = [], $locale = null);
+    public function translate($message, $parameters = [], $locale = null);
 }

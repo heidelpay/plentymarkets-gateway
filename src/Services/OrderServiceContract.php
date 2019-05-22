@@ -15,23 +15,16 @@
 namespace Heidelpay\Services;
 
 use Plenty\Modules\Order\Models\Order;
+use RuntimeException;
 
 interface OrderServiceContract
 {
-    /**
-     * Returns the language code of the given order or 'DE' as default.
-     *
-     * @param Order $order
-     * @return string
-     */
-    public function getLanguage(Order $order): string;
-
     /**
      * Fetches the Order object to the given orderId.
      *
      * @param int $orderId
      * @return Order
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function getOrder(int $orderId): Order;
 
@@ -40,7 +33,7 @@ interface OrderServiceContract
      *
      * @param $txnId
      * @return Order
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function getOrderByTxnId($txnId): Order;
 }

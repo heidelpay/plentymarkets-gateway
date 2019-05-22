@@ -40,6 +40,7 @@ class InvoiceSecuredB2C extends AbstractMethod
     const B2C_ONLY = true;
     const COUNTRY_RESTRICTION = ['DE', 'AT'];
     const ADDRESSES_MUST_MATCH = true;
+    const SEND_FINALIZE_TRANSACTION = true;
 
     /** @var RequestHelper */
     private $requestHelper;

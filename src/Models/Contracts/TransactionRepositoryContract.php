@@ -2,6 +2,7 @@
 
 namespace Heidelpay\Models\Contracts;
 
+use Heidelpay\Constants\TransactionType;
 use Heidelpay\Models\Transaction;
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 
@@ -59,11 +60,12 @@ interface TransactionRepositoryContract
     public function getTransactionsByCustomerId(int $customerId): array;
 
     /**
+     * @param string $txnId
      * @param string $transactionType
      *
-     * @return array
+     * @return Transaction|null
      */
-    public function getTransactionsByType(string $transactionType): array;
+    public function getTransactionByType(string $txnId, string $transactionType = TransactionType::AUTHORIZE);
 
     /**
      * @param Transaction|Model $transaction

@@ -1,6 +1,6 @@
 <?php
 /**
- * Performs credit card transaction requests.
+ * Performs invoice secured b2c transaction requests.
  *
  * @license Use of this software requires acceptance of the License Agreement. See LICENSE file.
  * @copyright Copyright © 2017-present heidelpay GmbH. All rights reserved.
@@ -12,13 +12,14 @@
  * @package heidelpay\plentymarkets-gateway\external-lib-callbacks
  */
 
+use Heidelpay\PhpPaymentApi\PaymentMethods\InvoiceB2CSecuredPaymentMethod;
 use Heidelpay\PhpPaymentApi\Request;
 
 /** @var array $requestParams */
 $requestParams = SdkRestApi::getParam('request');
 $transactionType = SdkRestApi::getParam('transactionType');
 
-$paymentMethod = new \Heidelpay\PhpPaymentApi\PaymentMethods\InvoiceB2CSecuredPaymentMethod();
+$paymentMethod = new InvoiceB2CSecuredPaymentMethod();
 $paymentMethod->setRequest(Request::fromPost($requestParams));
 
 $responseArray = null;
@@ -30,7 +31,7 @@ $cssPath = $paymentMethod->getRequest()->getFrontend()->getCssPath();
 
 try {
     if (!is_callable([$paymentMethod, $transactionType])) {
-        throw new \Exception('Invalid transaction type for InvoiceB2CSecured payment method (' . $transactionType . ')!');
+        throw new Exception('Invalid transaction type for InvoiceB2CSecured payment method (' . $transactionType . ')!');
     }
 
     if ($refId !== null) {
@@ -43,7 +44,7 @@ try {
     } else {
         $response = $paymentMethod->{$transactionType}($paymentFrameOrigin, $preventAsyncRedirect, $cssPath);
     }
-} catch (\Exception $e) {
+} catch (Exception $e) {
     $errorResponse = [
         'exceptionCode' => $e->getCode(),
         'exceptionMsg' => $e->getMessage(),

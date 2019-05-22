@@ -107,8 +107,8 @@ class NotificationService implements NotificationServiceContract
      */
     protected function notify($level, $message, $method, array $logData, $justLog = false)
     {
-        $message = self::PREFIX . $message;
-        $translation = $this->getTranslation($message);
+        $message = strpos($message, self::PREFIX) !== 0 ? self::PREFIX . $message : $message;
+        $translation = $this->translate($message);
 
         switch ($level) {
             case self::LEVEL_DEBUG:
@@ -141,7 +141,7 @@ class NotificationService implements NotificationServiceContract
             case self::LEVEL_CRITICAL: // intended Fall-Through (handle unknown levels as critical)
             default:
                 // The client gets a general error message.
-                $this->getNotifier()->error($this->getTranslation('general.errorGeneralErrorTryAgainLater'));
+                $this->getNotifier()->error($this->translate('general.errorGeneralErrorTryAgainLater'));
                 $this->getLogger($method)->critical($message, $logData);
                 break;
         }
@@ -150,8 +150,9 @@ class NotificationService implements NotificationServiceContract
     /**
      * {@inheritDoc}
      */
-    public function getTranslation($message, $parameters = [], $locale = null)
+    public function translate($message, $parameters = [], $locale = null)
     {
+        $message = strpos($message, self::PREFIX) !== 0 ? self::PREFIX . $message : $message;
         return $this->translator->trans($message, $parameters, $locale);
     }
 

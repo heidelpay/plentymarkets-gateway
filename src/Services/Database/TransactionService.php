@@ -13,11 +13,14 @@
  */
 namespace Heidelpay\Services\Database;
 
+use Exception;
 use Heidelpay\Exceptions\SecurityHashInvalidException;
 use Heidelpay\Helper\PaymentHelper;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\SecretService;
+use RuntimeException;
+use function in_array;
 
 class TransactionService
 {
@@ -55,7 +58,7 @@ class TransactionService
      * @param int|null $paymentMethodId
      * @param int|null $orderId
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      *
      * @return Transaction
      */
@@ -107,12 +110,12 @@ class TransactionService
 
         try {
             $txn = $this->transactionRepository->createTransaction($data);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // no need to handle
         }
 
         if (!$txn instanceof Transaction) {
-            throw new \RuntimeException('response.errorTransactionNotCreated');
+            throw new RuntimeException('response.errorTransactionNotCreated');
         }
 
         return $txn;
@@ -161,7 +164,7 @@ class TransactionService
         ];
 
         foreach ($heidelpayData as $key => $value) {
-            if (preg_match($groupPattern, $key) || \in_array($key, $toDelete, true)) {
+            if (preg_match($groupPattern, $key) || in_array($key, $toDelete, true)) {
                 unset($heidelpayData[$key]);
             }
         }
@@ -183,7 +186,7 @@ class TransactionService
      *
      * @param $heidelpayResponse
      * @throws SecurityHashInvalidException
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function verifyTransaction($heidelpayResponse)
     {

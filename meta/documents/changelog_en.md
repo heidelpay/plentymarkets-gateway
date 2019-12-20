@@ -1,5 +1,11 @@
 # heidelpay Payment Gateway Changelog
 
+## [1.3.1][1.3.1]
+
+### Changed
+- Change net/gross pricing due to forum topic https://forum.plentymarkets.com/t/heidelpay-zieht-nur-nettobetrag-ein/540028/13
+
+
 ## [1.3.0][1.3.0]
 
 ### Added
@@ -93,3 +99,4 @@
 [1.2.2]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.2.1..1.2.2
 [1.2.3]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.2.2..1.2.3
 [1.3.0]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.2.3..1.3.0
+[1.3.1]: https://github.com/heidelpay/plentymarkets-gateway/compare/1.3.0..1.3.1

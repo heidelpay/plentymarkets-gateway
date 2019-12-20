@@ -36,6 +36,7 @@ use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
+use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
@@ -379,8 +380,12 @@ class PaymentService
 
         $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $transactionId;
 
-        // set amount to net if showNetPrice === true
-        if ($this->sessionStorageFactory->getCustomer()->showNetPrice) {
+        // Workaround to decide whether to use net or gross
+        // ref. forum https://forum.plentymarkets.com/t/heidelpay-zieht-nur-nettobetrag-ein/540028/13
+        /** @var VatService $vatService */
+        $vatService = pluginApp(VatService::class);
+        if (!count($vatService->getCurrentTotalVats())) {
+            $this->notification->info('request.debugUsingNetInsteadOfGrossAmount', __METHOD__);
             $basketArray['itemSum']        = $basketArray['itemSumNet'];
             $basketArray['basketAmount']   = $basketArray['basketAmountNet'];
             $basketArray['shippingAmount'] = $basketArray['shippingAmountNet'];

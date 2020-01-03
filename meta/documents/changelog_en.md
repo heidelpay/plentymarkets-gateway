@@ -3,8 +3,7 @@
 ## [1.3.1][1.3.1]
 
 ### Changed
-- Change net/gross pricing due to forum topic https://forum.plentymarkets.com/t/heidelpay-zieht-nur-nettobetrag-ein/540028/13
-
+- Change condition to choose between net- and gross- price due to forum topic https://forum.plentymarkets.com/t/heidelpay-zieht-nur-nettobetrag-ein/540028/13.
 
 ## [1.3.0][1.3.0]
 

@@ -3,7 +3,7 @@
 ## [1.3.1][1.3.1]
 
 ### Changed
-- Change Netto/Brutto Bepreisung auf Grund von Foreneintrag https://forum.plentymarkets.com/t/heidelpay-zieht-nur-nettobetrag-ein/540028/13
+- Update der Bedingung zur Unterscheidung zwischen Netto- und Bruttopreis auf Grund von Foreneintrag https://forum.plentymarkets.com/t/heidelpay-zieht-nur-nettobetrag-ein/540028/13.
 
 ## [1.3.0][1.3.0]
 

@@ -259,12 +259,10 @@ class PaymentService
         $this->createOrUpdateRelation($txnId, $mopId);
         $this->preparePaymentTransaction($basket, $paymentMethod, $mopId, $txnId, $additionalParams);
 
-        $result = $this->libService->sendTransactionRequest($paymentMethod, [
+        return $this->libService->sendTransactionRequest($paymentMethod, [
             'request' => $this->heidelpayRequest,
             'transactionType' => $transactionType
         ]);
-
-        return $result;
     }
 
     /**
@@ -351,6 +349,7 @@ class PaymentService
         array $additionalParams = [])
     {
         $basketArray = $basket->toArray();
+        $this->notification->info('request.debugPreparingRequest', __METHOD__, ['basket' => $basketArray]);
 
         /** @var SecretService $secretService */
         $secretService = pluginApp(SecretService::class);
@@ -385,10 +384,10 @@ class PaymentService
         /** @var VatService $vatService */
         $vatService = pluginApp(VatService::class);
         if (!count($vatService->getCurrentTotalVats())) {
-            $this->notification->info('request.debugUsingNetInsteadOfGrossAmount', __METHOD__);
             $basketArray['itemSum']        = $basketArray['itemSumNet'];
             $basketArray['basketAmount']   = $basketArray['basketAmountNet'];
             $basketArray['shippingAmount'] = $basketArray['shippingAmountNet'];
+            $this->notification->info('request.debugUsingNetInsteadOfGrossAmount', __METHOD__, ['basket' => $basketArray]);
         }
 
         // set basket information (amount, currency, orderId, ...)

@@ -385,7 +385,7 @@ class PaymentService
         $vatService = pluginApp(VatService::class);
         $this->notification->error('vats', __METHOD__, ['vats' => $vatService->getCurrentTotalVats()]);
 
-        if (!count($vatService->getCurrentTotalVats())) {
+        if (empty($vatService->getCurrentTotalVats())) {
             $basketArray['itemSum']        = $basketArray['itemSumNet'];
             $basketArray['basketAmount']   = $basketArray['basketAmountNet'];
             $basketArray['shippingAmount'] = $basketArray['shippingAmountNet'];

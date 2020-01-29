@@ -383,7 +383,7 @@ class PaymentService
         // ref. forum https://forum.plentymarkets.com/t/heidelpay-zieht-nur-nettobetrag-ein/540028/13
         /** @var VatService $vatService */
         $vatService = pluginApp(VatService::class);
-        $this->notification->error('vats', __METHOD__, ['vats' => $vatService->getCurrentTotalVats()]);
+        $this->notification->error('vats', __METHOD__, ['basket' => $basketArray, 'vats' => $vatService->getCurrentTotalVats()]);
 
         if (empty($vatService->getCurrentTotalVats())) {
             $basketArray['itemSum']        = $basketArray['itemSumNet'];

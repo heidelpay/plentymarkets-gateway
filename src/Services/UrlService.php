@@ -14,10 +14,13 @@
 namespace Heidelpay\Services;
 
 use Plenty\Modules\Helper\Services\WebstoreHelper;
+use Plenty\Plugin\Log\Loggable;
 use RuntimeException;
 
 class UrlService implements UrlServiceContract
 {
+    use Loggable;
+
     /**
      * Generates the full URL for a given route.
      *
@@ -26,15 +29,15 @@ class UrlService implements UrlServiceContract
      */
     public function generateURL($route): string
     {
-        $responseURL = $this->getDomain() . '/' . $route;
+        $responseUrl = $this->getDomain() . '/' . $route;
         if (isset($_COOKIE['PluginSetPreview'])) {
-            $var = rtrim($responseURL, '/');
-            throw new RuntimeException("before: ${responseURL}\nnow: ${var}");
 
-            $responseURL = rtrim($responseURL, '/');
-            $responseURL .= '?pluginSetPreview=' . $_COOKIE ['PluginSetPreview'];
+            $responseUrlTrimmed = rtrim($responseUrl, '/');
+            $responseUrl = $responseUrlTrimmed . '?pluginSetPreview=' . $_COOKIE ['PluginSetPreview'];
+
+            $this->getLogger(self::class)->error('responseUrl', ['responseURL' => $responseUrl, 'responseUrlTrimmed' => $responseUrlTrimmed]);
         }
-        return $responseURL;
+        return $responseUrl;
     }
 
     /**

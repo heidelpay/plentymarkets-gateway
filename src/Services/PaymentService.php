@@ -349,7 +349,7 @@ class PaymentService
         array $additionalParams = [])
     {
         $basketArray = $basket->toArray();
-        $this->notification->info('request.debugPreparingRequest', __METHOD__, ['basket' => $basketArray]);
+        $this->notification->debug('request.debugPreparingRequest', __METHOD__, ['basket' => $basketArray]);
 
         /** @var SecretService $secretService */
         $secretService = pluginApp(SecretService::class);
@@ -380,16 +380,13 @@ class PaymentService
         $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $transactionId;
 
         // Workaround to decide whether to use net or gross
-        // ref. forum https://forum.plentymarkets.com/t/heidelpay-zieht-nur-nettobetrag-ein/540028/13
         /** @var VatService $vatService */
         $vatService = pluginApp(VatService::class);
-        $this->notification->error('vats', __METHOD__, ['basket' => $basketArray, 'vats' => $vatService->getCurrentTotalVats()]);
-
         if (empty($vatService->getCurrentTotalVats())) {
             $basketArray['itemSum']        = $basketArray['itemSumNet'];
             $basketArray['basketAmount']   = $basketArray['basketAmountNet'];
             $basketArray['shippingAmount'] = $basketArray['shippingAmountNet'];
-            $this->notification->info('request.debugUsingNetInsteadOfGrossAmount', __METHOD__, ['basket' => $basketArray]);
+            $this->notification->debug('request.debugUsingNetInsteadOfGrossAmount', __METHOD__, ['basket' => $basketArray]);
         }
 
         // set basket information (amount, currency, orderId, ...)

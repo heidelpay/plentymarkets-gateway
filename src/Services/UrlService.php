@@ -15,7 +15,6 @@ namespace Heidelpay\Services;
 
 use Plenty\Modules\Helper\Services\WebstoreHelper;
 use Plenty\Plugin\Log\Loggable;
-use RuntimeException;
 
 class UrlService implements UrlServiceContract
 {
@@ -33,9 +32,8 @@ class UrlService implements UrlServiceContract
         if (isset($_COOKIE['PluginSetPreview'])) {
 
             $responseUrlTrimmed = rtrim($responseUrl, '/');
-            $responseUrl = $responseUrlTrimmed . '?pluginSetPreview=' . $_COOKIE ['PluginSetPreview'];
-
             $this->getLogger(self::class)->error('responseUrl', ['responseURL' => $responseUrl, 'responseUrlTrimmed' => $responseUrlTrimmed]);
+            $responseUrl = $responseUrlTrimmed . '?pluginSetPreview=' . $_COOKIE ['PluginSetPreview'];
         }
         return $responseUrl;
     }

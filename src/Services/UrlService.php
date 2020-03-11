@@ -27,6 +27,7 @@ class UrlService implements UrlServiceContract
     {
         $responseURL = $this->getDomain() . '/' . $route;
         if (isset($_COOKIE['PluginSetPreview'])) {
+            $responseURL = rtrim($responseURL, '/');
             $responseURL .= '?pluginSetPreview=' . $_COOKIE ['PluginSetPreview'];
         }
         return $responseURL;

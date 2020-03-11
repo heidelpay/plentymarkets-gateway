@@ -5,6 +5,9 @@
 ### Changed
 - Change condition to choose between net- and gross- price due to forum topic https://forum.plentymarkets.com/t/heidelpay-zieht-nur-nettobetrag-ein/540028/13.
 
+### Fixed
+- A trailing slash is now removed from URLs before appending GET-Parameters.
+
 ## [1.3.0][1.3.0]
 
 ### Added

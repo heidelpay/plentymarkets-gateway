@@ -5,6 +5,9 @@
 ### Changed
 - Update der Bedingung zur Unterscheidung zwischen Netto- und Bruttopreis auf Grund von Foreneintrag https://forum.plentymarkets.com/t/heidelpay-zieht-nur-nettobetrag-ein/540028/13.
 
+### Fixed
+- Ein Slash am Ende von URLs wird nun entfernt, bevor GET-Parameter angehängt werden.
+
 ## [1.3.0][1.3.0]
 
 ### Added

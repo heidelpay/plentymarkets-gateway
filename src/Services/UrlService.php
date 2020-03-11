@@ -14,6 +14,7 @@
 namespace Heidelpay\Services;
 
 use Plenty\Modules\Helper\Services\WebstoreHelper;
+use RuntimeException;
 
 class UrlService implements UrlServiceContract
 {
@@ -27,6 +28,9 @@ class UrlService implements UrlServiceContract
     {
         $responseURL = $this->getDomain() . '/' . $route;
         if (isset($_COOKIE['PluginSetPreview'])) {
+            $var = rtrim($responseURL, '/');
+            throw new RuntimeException("before: ${responseURL}\nnow: ${var}");
+
             $responseURL = rtrim($responseURL, '/');
             $responseURL .= '?pluginSetPreview=' . $_COOKIE ['PluginSetPreview'];
         }

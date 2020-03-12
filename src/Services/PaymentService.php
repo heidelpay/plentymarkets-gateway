@@ -36,6 +36,7 @@ use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Traits\Translator;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Basket\Models\Basket;
+use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
@@ -258,12 +259,10 @@ class PaymentService
         $this->createOrUpdateRelation($txnId, $mopId);
         $this->preparePaymentTransaction($basket, $paymentMethod, $mopId, $txnId, $additionalParams);
 
-        $result = $this->libService->sendTransactionRequest($paymentMethod, [
+        return $this->libService->sendTransactionRequest($paymentMethod, [
             'request' => $this->heidelpayRequest,
             'transactionType' => $transactionType
         ]);
-
-        return $result;
     }
 
     /**
@@ -350,6 +349,7 @@ class PaymentService
         array $additionalParams = [])
     {
         $basketArray = $basket->toArray();
+        $this->notification->debug('request.debugPreparingRequest', __METHOD__, ['basket' => $basketArray]);
 
         /** @var SecretService $secretService */
         $secretService = pluginApp(SecretService::class);
@@ -379,11 +379,14 @@ class PaymentService
 
         $this->heidelpayRequest['IDENTIFICATION_TRANSACTIONID'] = $transactionId;
 
-        // set amount to net if showNetPrice === true
-        if ($this->sessionStorageFactory->getCustomer()->showNetPrice) {
+        // Workaround to decide whether to use net or gross
+        /** @var VatService $vatService */
+        $vatService = pluginApp(VatService::class);
+        if (empty($vatService->getCurrentTotalVats())) {
             $basketArray['itemSum']        = $basketArray['itemSumNet'];
             $basketArray['basketAmount']   = $basketArray['basketAmountNet'];
             $basketArray['shippingAmount'] = $basketArray['shippingAmountNet'];
+            $this->notification->debug('request.debugUsingNetInsteadOfGrossAmount', __METHOD__, ['basket' => $basketArray]);
         }
 
         // set basket information (amount, currency, orderId, ...)

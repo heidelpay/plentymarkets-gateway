@@ -157,3 +157,9 @@ Hier wird daraufhin eine Zahlung angelegt und mit der Buchung verknüpft.
 ## Technische Besonderheiten
 * Leider ist es nicht möglich die Bestellung im Nachhinein zu erzeugen, d. h. wenn zum Beispiel die Rückleitung in den Shop nach dem Bezahlen schief geht. Auch wenn die Zahlung erfolgreich im heidelpay backend gespeichert worden ist.\
 Durch die Fehlermeldung im Buchungstext von Zahlungen, die nicht zugeordnet werden konnten, ist es möglich diese Fehlerfälle zu erkennen und zu behandeln.
+* Wenn unter `Einrichtung > Mandant > ... > SEO > URL-Aufbau > Sonstiges` die Einstellung `Slash (/) am Ende von URLs` auf `immer anhängen` gestellt ist führt dies dazu, dass einige Aktionen im Preview-Modus nicht funktionieren.
+Um sicher zu stellen, dass alles wie gewünscht funktioniert sollte diese Einstellung auf `Nicht anpassen` gestellt sein.
+* In einigen Fällen kommt es dazu, dass Zahlungen zwar im hIP erscheinen, aber keine Bestellungen im Plentymarketsbackend angelegt werden.
+Oder das Bestellungen zwar angelegt werden, Zahlungseingänge aber nicht automatisch zugeordnet werden können, sodass eine manuelle zuordnung erforderlich wird.
+Dies kann passieren, wenn Kunden nach einer Bezahlung die Rückleitung in den Shop vorzeitig abbrechen.
+Ein Beispiel hierfür ist, wenn nach der Bezahlung per `Sofort` der Browser oder Tab geschlossen wird bevor der Kunde die Bestellbestätigungsseite sieht.

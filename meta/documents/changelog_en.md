@@ -4,6 +4,7 @@
 
 ### Changed
 - Change condition to choose between net- and gross- price due to forum topic https://forum.plentymarkets.com/t/heidelpay-zieht-nur-nettobetrag-ein/540028/13.
+- Section 'Known Issues' has been updated in the user guide.
 
 ## [1.3.0][1.3.0]
 

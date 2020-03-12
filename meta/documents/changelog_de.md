@@ -4,6 +4,7 @@
 
 ### Changed
 - Update der Bedingung zur Unterscheidung zwischen Netto- und Bruttopreis auf Grund von Foreneintrag https://forum.plentymarkets.com/t/heidelpay-zieht-nur-nettobetrag-ein/540028/13.
+- Der Abschnitt `Technische Besonderheiten` im User Guide wurde aktualisiert.
 
 ## [1.3.0][1.3.0]
 

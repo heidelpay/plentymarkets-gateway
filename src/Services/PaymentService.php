@@ -40,7 +40,6 @@ use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
@@ -721,15 +720,8 @@ class PaymentService
      */
     protected function assignTxnIdToOrder(string $txnId, int $orderId)
     {
-        $order = $this->orderRepo->findOrderById($orderId);
-
-        /** @var OrderProperty $externalOrderId */
-        $externalOrderId = pluginApp(OrderProperty::class);
-        $externalOrderId->typeId = OrderPropertyType::EXTERNAL_ORDER_ID;
-        $externalOrderId->value = $txnId;
-        $order->properties[] = $externalOrderId;
-
-        $this->orderRepo->updateOrder($order->toArray(), $order->id);
+        $properties = [['typeId' => OrderPropertyType::EXTERNAL_ORDER_ID, 'value' => $txnId]];
+        $this->orderRepo->updateOrder(['properties' => $properties], $orderId);
     }
 
     //</editor-fold>

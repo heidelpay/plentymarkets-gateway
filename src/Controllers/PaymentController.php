@@ -45,7 +45,10 @@ class PaymentController extends Controller
      */
     public function checkoutSuccess(): BaseResponse
     {
+        $start = microtime();
         $this->notification->success('payment.infoPaymentSuccessful', __METHOD__);
+        $stop = microtime();
+        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__, ['start' => $start, 'stop' => $stop]);
         return $this->response->redirectTo('place-order');
     }
 

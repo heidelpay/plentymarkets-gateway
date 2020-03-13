@@ -197,13 +197,12 @@ class PaymentService
         $logData = compact('paymentMethod', 'mopId', 'orderId');
         $this->notification->debug('payment.debugExecutePayment', __METHOD__, $logData);
 
-        $transactionDetails = [];
-        $transaction = null;
-
         // Retrieve heidelpay Transaction by txnId to get values needed for plenty payment (e.g. amount etc).
         $txnId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
         $this->createOrUpdateRelation($txnId, $mopId, $orderId);
 
+        $transactionDetails = [];
+        $transaction = null;
         $transactions = $this->transactionRepository->getTransactionsByTxnId($txnId);
         foreach ($transactions as $transaction) {
             $allowedStatus = [TransactionStatus::ACK, TransactionStatus::PENDING];

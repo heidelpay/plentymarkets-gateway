@@ -107,6 +107,8 @@ class NotificationService implements NotificationServiceContract
      */
     protected function notify($level, $message, $method, array $logData, $justLog = false)
     {
+        $logData['timestamp'] = microtime();
+
         $message = strpos($message, self::PREFIX) !== 0 ? self::PREFIX . $message : $message;
         $translation = $this->translate($message);
 

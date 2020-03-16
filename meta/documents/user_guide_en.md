@@ -160,9 +160,9 @@ The shop module will then create a new payment and link it to the corresponding 
 ## Known Issues
 * Unfortunately there is no way for us to create the order if the initial order creation fails, even if the payment has been successfully booked in our backend.\
 However you will be able to tell there has been an error when there are unassigned payments in your plenty backend showing an error in the booking text.
-* Setting the property `Slash (/) am Ende von URLs` under `Setup > Client > ... > SEO > URL structure > Other` is set to `immer anhängen` can lead to problems in preview mode.
+* Setting the property `Slash (/) am Ende von URLs` under `Setup > Client > ... > SEO > URL structure > Other` to `immer anhängen` can lead to problems in preview mode.
 To make sure everything works as intended set the property to `Nicht anpassen`.
 * In some cases the payment is shown in hIP but there is no order created in plentymarkets backend.
-Or that the order is create however payments fail to be automatically assigned to the order in which case they need to be assigned manually.
+Or the order is create however payments fail to be automatically assigned in which case they need to be assigned manually.
 This can occur when the customer aborts redirect into the shop after payment.
-An example is closing the browser or tab after paying with sofort before the checkout success page is shown to the customer.
+An example is closing the browser or tab after paying with `sofort` before the checkout success page is shown to the customer.

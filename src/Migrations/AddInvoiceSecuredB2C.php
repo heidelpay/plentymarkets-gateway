@@ -29,14 +29,12 @@ class AddInvoiceSecuredB2C
      * CreateHeidelpayTables constructor.
      * @param PaymentHelper $paymentHelper
      */
-    public function __construct(
-        PaymentHelper $paymentHelper
-    )
+    public function __construct(PaymentHelper $paymentHelper)
     {
         $this->paymentHelper = $paymentHelper;
     }
 
-    public function run(Migrate $migrate)
+    public function run(Migrate $migrate): void
     {
         $this->getLogger(__METHOD__)->error('Run Migration: ' . self::class);
 

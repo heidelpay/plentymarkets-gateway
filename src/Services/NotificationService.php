@@ -22,22 +22,19 @@ class NotificationService implements NotificationServiceContract
 {
     use Loggable;
 
-    const LEVEL_DEBUG = 'debug';
-    const LEVEL_INFO = 'info';
-    const LEVEL_SUCCESS = 'success';
-    const LEVEL_WARNING = 'warning';
-    const LEVEL_ERROR = 'error';
-    const LEVEL_CRITICAL = 'critical';
+    private const LEVEL_DEBUG = 'debug';
+    private const LEVEL_INFO = 'info';
+    private const LEVEL_SUCCESS = 'success';
+    private const LEVEL_WARNING = 'warning';
+    private const LEVEL_ERROR = 'error';
+    private const LEVEL_CRITICAL = 'critical';
 
-    const PREFIX = Plugin::NAME . '::';
+    private const PREFIX = Plugin::NAME . '::';
 
-    /**
-     * @var BaseNotificationService
-     */
+    /** @var BaseNotificationService */
     private $notifier;
-    /**
-     * @var Translator
-     */
+
+    /** @var Translator*/
     private $translator;
 
     /**
@@ -53,7 +50,7 @@ class NotificationService implements NotificationServiceContract
     /**
      * {@inheritDoc}
      */
-    public function debug($message, $method = 'no method given', array $logData = [])
+    public function debug($message, $method = 'unknown', array $logData = []): void
     {
         $this->notify(self::LEVEL_DEBUG, $message, $method, $logData);
     }
@@ -61,7 +58,7 @@ class NotificationService implements NotificationServiceContract
     /**
      * {@inheritDoc}
      */
-    public function info($message, $method = 'no method given', array $logData = [], $justLog = false)
+    public function info($message, $method = 'unknown', array $logData = [], $justLog = false): void
     {
         $this->notify(self::LEVEL_INFO, $message, $method, $logData, $justLog);
     }
@@ -69,7 +66,7 @@ class NotificationService implements NotificationServiceContract
     /**
      * {@inheritDoc}
      */
-    public function success($message, $method = 'no method given', array $logData = [], $justLog = false)
+    public function success($message, $method = 'unknown', array $logData = [], $justLog = false): void
     {
         $this->notify(self::LEVEL_SUCCESS, $message, $method, $logData, $justLog);
     }
@@ -77,7 +74,7 @@ class NotificationService implements NotificationServiceContract
     /**
      * {@inheritDoc}
      */
-    public function warning($message, $method = 'no context given', array $logData = [], $justLog = false)
+    public function warning($message, $method = 'unknown', array $logData = [], $justLog = false): void
     {
         $this->notify(self::LEVEL_WARNING, $message, $method, $logData, $justLog);
     }
@@ -85,7 +82,7 @@ class NotificationService implements NotificationServiceContract
     /**
      * {@inheritDoc}
      */
-    public function error($message, $method = 'no context given', array $logData = [], $justLog = false)
+    public function error($message, $method = 'unknown', array $logData = [], $justLog = false): void
     {
         $this->notify(self::LEVEL_ERROR, $message, $method, $logData, $justLog);
     }
@@ -93,20 +90,21 @@ class NotificationService implements NotificationServiceContract
     /**
      * {@inheritDoc}
      */
-    public function critical($message, $method = 'no context given', array $logData = [])
+    public function critical($message, $method = 'unknown', array $logData = []): void
     {
         $this->notify(self::LEVEL_CRITICAL, $message, $method, $logData);
     }
 
     /**
-     * @param $level
-     * @param $message
-     * @param $method
+     * @param string $level
+     * @param string $message
+     * @param string $method
      * @param array $logData
      * @param bool $justLog
      */
-    protected function notify($level, $message, $method, array $logData, $justLog = false)
+    protected function notify($level, $message, $method, array $logData, $justLog = false): void
     {
+        $logData['method'] = $method;
         $logData['timestamp'] = microtime();
 
         $message = strpos($message, self::PREFIX) !== 0 ? self::PREFIX . $message : $message;
@@ -152,7 +150,7 @@ class NotificationService implements NotificationServiceContract
     /**
      * {@inheritDoc}
      */
-    public function translate($message, $parameters = [], $locale = null)
+    public function translate($message, $parameters = [], $locale = null): string
     {
         $message = strpos($message, self::PREFIX) !== 0 ? self::PREFIX . $message : $message;
         return $this->translator->trans($message, $parameters, $locale);

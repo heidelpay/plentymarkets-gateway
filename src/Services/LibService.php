@@ -87,6 +87,7 @@ class LibService
      */
     public function handleResponse(array $params): array
     {
+        $params['identifier'] = $params['response']['IDENTIFICATION_TRANSACTIONID'] ?? 'unknown';
         return $this->executeLibCall('handleAsyncResponse', $params);
     }
 
@@ -99,6 +100,7 @@ class LibService
      */
     public function handlePushNotification(array $params): array
     {
+        $params['identifier'] = $params['Transaction']['txnId'] ?? 'unknown';
         return $this->executeLibCall('handlePushNotification', $params);
     }
     //</editor-fold>
@@ -151,6 +153,7 @@ class LibService
      */
     protected function sendCreditCardTransactionRequest(array $params): array
     {
+        $params['identifier'] = $params['Parameters']['request']['IDENTIFICATION_TRANSACTIONID'] ?? 'unknown';
         return $this->executeLibCall('creditcardTransactionRequest', $params);
     }
 
@@ -163,6 +166,7 @@ class LibService
      */
     protected function sendDebitCardTransactionRequest(array $params): array
     {
+        $params['identifier'] = $params['Parameters']['request']['IDENTIFICATION_TRANSACTIONID'] ?? 'unknown';
         return $this->executeLibCall('debitcardTransactionRequest', $params);
     }
 
@@ -175,6 +179,7 @@ class LibService
      */
     protected function sendSofortTransactionRequest(array $params): array
     {
+        $params['identifier'] = $params['Parameters']['request']['IDENTIFICATION_TRANSACTIONID'] ?? 'unknown';
         return $this->executeLibCall('sofortTransactionRequest', $params);
     }
 
@@ -187,6 +192,7 @@ class LibService
      */
     protected function sendInvoiceSecuredB2CTransactionRequest(array $params): array
     {
+        $params['identifier'] = $params['Parameters']['request']['IDENTIFICATION_TRANSACTIONID'] ?? 'unknown';
         return $this->executeLibCall('invoiceSecuredB2CTransactionRequest', $params);
     }
 
@@ -199,6 +205,7 @@ class LibService
      */
     protected function sendDirectDebitTransactionRequest(array $params): array
     {
+        $params['identifier'] = $params['Parameters']['request']['IDENTIFICATION_TRANSACTIONID'] ?? 'unknown';
         return $this->executeLibCall('directdebitTransactionRequest', $params);
     }
 
@@ -212,6 +219,7 @@ class LibService
      */
     public function submitBasket(array $params): array
     {
+        $params['identifier'] = $params['Parameters']['request']['IDENTIFICATION_TRANSACTIONID'] ?? 'unknown';
         return $this->executeLibCall('submitBasket', $params);
     }
     //</editor-fold>

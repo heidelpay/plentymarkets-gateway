@@ -309,7 +309,7 @@ class PaymentHelper
         /** @var Order $order */
         $order = $this->orderService->getOrder($orderId);
 
-        $additionalInfo = ['Order' => $order, 'Payment' => $payment];
+        $additionalInfo = ['Order' => $order, 'Payment' => $payment, 'method' => __METHOD__, 'timestamp' => microtime()];
         $this->getLogger(__METHOD__)->debug('payment.debugAssignPaymentToOrder', $additionalInfo);
 
         /** @var Payment $paymentObject */
@@ -467,7 +467,10 @@ class PaymentHelper
         $bookingTextProperty = $this->getPaymentProperty($paymentObject, PaymentProperty::TYPE_BOOKING_TEXT);
 
         if (!$bookingTextProperty instanceof PaymentProperty) {
-            $this->getLogger(__METHOD__)->error('Heidelpay::payment.errorBookingTextIsMissing');
+            $this->getLogger(__METHOD__)->error(
+                'Heidelpay::payment.errorBookingTextIsMissing',
+                ['method' => __METHOD__, 'timestamp' => microtime()]
+            );
             return $this;
         }
 

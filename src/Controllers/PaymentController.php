@@ -23,6 +23,7 @@ class PaymentController extends Controller
 {
     /** @var Response */
     private $response;
+
     /** @var NotificationServiceContract */
     private $notification;
 
@@ -38,6 +39,7 @@ class PaymentController extends Controller
     ) {
         $this->response = $response;
         $this->notification = $notification;
+        Controller::__construct();
     }
 
     /**

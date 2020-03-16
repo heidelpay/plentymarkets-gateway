@@ -4,6 +4,7 @@ namespace Heidelpay\Models\Repositories;
 use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
 use Heidelpay\Models\OrderTxnIdRelation;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
+use RuntimeException;
 
 /**
  * OrderTxnIdRelationRepository class
@@ -93,7 +94,7 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function getOrderTxnIdRelationByTxnId(string $txnId)
     {
@@ -106,6 +107,7 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
 
     /**
      * {@inheritDoc}
+     * @throws RuntimeException
      */
     public function getOrderIdByTxnId(string $txnId): int
     {
@@ -114,6 +116,7 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
 
     /**
      * {@inheritDoc}
+     * @throws RuntimeException
      */
     public function createOrUpdateRelation(string $txnId, int $mopId, int $orderId = 0)
     {

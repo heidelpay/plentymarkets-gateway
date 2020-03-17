@@ -199,7 +199,10 @@ class PaymentService
 
         // Retrieve heidelpay Transaction by txnId to get values needed for plenty payment (e.g. amount etc).
         $txnId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
+
+        $this->notification->error('>>>>>>>>>>>>>>>>>>>>>>>>>>> Mit relation Generierung vor dem Anlegen der Order', 'Start');
         $this->createOrUpdateRelation($txnId, $mopId, $orderId);
+        $this->notification->error('>>>>>>>>>>>>>>>>>>>>>>>>>>> Mit relation Generierung vor dem Anlegen der Order', 'Ende');
 
         $transactionDetails = [];
         $transaction = null;
@@ -252,7 +255,6 @@ class PaymentService
         int $mopId,
         array $additionalParams = []
     ): array {
-
         $txnId = $this->createNewTxnId($basket);
         $this->createOrUpdateRelation($txnId, $mopId);
         $this->preparePaymentTransaction($basket, $paymentMethod, $mopId, $txnId, $additionalParams);
@@ -696,6 +698,8 @@ class PaymentService
     }
 
     /**
+     * This method creates a relation between the newly created txnId and the order.
+     *
      * @param string $txnId
      * @param int $mopId
      * @param int $orderId

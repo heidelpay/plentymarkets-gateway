@@ -173,7 +173,7 @@ class NotificationService implements NotificationServiceContract
      */
     protected function getTime()
     {
-        [$usec, $sec] = explode(' ', microtime());
+        list($usec, $sec) = explode(' ', microtime());
         $usec = str_replace('0.', '.', $usec);     //remove the leading '0.' from usec
         return date('H:i:s', $sec) . $usec;       //appends the decimal portion of seconds
     }

@@ -22,9 +22,10 @@ interface OrderTxnIdRelationRepositoryContract
      *
      * @param int $orderId
      * @param string $txnId
+     * @param int $mopId
      * @return OrderTxnIdRelation
      */
-    public function createOrderTxnIdRelation(int $orderId, string $txnId): OrderTxnIdRelation;
+    public function createOrderTxnIdRelation(int $orderId, string $txnId, int $mopId): OrderTxnIdRelation;
 
     /**
      * Update relation object.

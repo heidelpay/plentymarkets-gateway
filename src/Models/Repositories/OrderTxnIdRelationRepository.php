@@ -38,7 +38,7 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
     /**
      * @inheritdoc
      */
-    public function createOrderTxnIdRelation(int $orderId, string $txnId): OrderTxnIdRelation
+    public function createOrderTxnIdRelation(int $orderId, string $txnId, int $mopId): OrderTxnIdRelation
     {
         /** @var OrderTxnIdRelation $relation */
         $relation = pluginApp(OrderTxnIdRelation::class);
@@ -46,6 +46,7 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
         $now = date('Y-m-d H:i:s');
         $relation->txnId = $txnId;
         $relation->orderId = $orderId;
+        $relation->mopId = $mopId;
         $relation->assignedAt = $relation->createdAt = $relation->updatedAt = $now;
 
         $relation = $this->database->save($relation);

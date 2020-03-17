@@ -22,14 +22,14 @@ class NotificationService implements NotificationServiceContract
 {
     use Loggable;
 
-    private const LEVEL_DEBUG = 'debug';
-    private const LEVEL_INFO = 'info';
-    private const LEVEL_SUCCESS = 'success';
-    private const LEVEL_WARNING = 'warning';
-    private const LEVEL_ERROR = 'error';
-    private const LEVEL_CRITICAL = 'critical';
+    const LEVEL_DEBUG = 'debug';
+    const LEVEL_INFO = 'info';
+    const LEVEL_SUCCESS = 'success';
+    const LEVEL_WARNING = 'warning';
+    const LEVEL_ERROR = 'error';
+    const LEVEL_CRITICAL = 'critical';
 
-    private const PREFIX = Plugin::NAME . '::';
+    const PREFIX = Plugin::NAME . '::';
 
     /** @var BaseNotificationService */
     private $notifier;

@@ -256,7 +256,7 @@ class PaymentService
         array $additionalParams = []
     ): array {
         $txnId = $this->createNewTxnId($basket);
-        $this->createOrUpdateRelation($txnId, $mopId);
+//        $this->createOrUpdateRelation($txnId, $mopId);
         $this->preparePaymentTransaction($basket, $paymentMethod, $mopId, $txnId, $additionalParams);
 
         return $this->libService->sendTransactionRequest($paymentMethod, [

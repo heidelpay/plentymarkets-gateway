@@ -39,7 +39,7 @@ class PaymentController extends Controller
     ) {
         $this->response = $response;
         $this->notification = $notification;
-        Controller::__construct();
+        parent::__construct();
     }
 
     /**

@@ -98,7 +98,7 @@ class ResponseController extends Controller
         $this->requestHelper = $requestHelper;
         $this->responseHandlerService = $responseHandlerService;
         $this->paymentHelper = $paymentHelper;
-        Controller::__construct();
+        parent::__construct();
     }
 
     //<editor-fold desc="Helpers">

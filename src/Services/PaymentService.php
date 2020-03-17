@@ -201,7 +201,7 @@ class PaymentService
         $txnId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
 
         $this->notification->error('>>>>>>>>>>>>>>>>>>>>>>>>>>> Mit relation Generierung vor dem Anlegen der Order', 'Start');
-        $this->createOrUpdateRelation($txnId, $mopId, $orderId);
+        $this->createOrderRelation($txnId, $mopId, $orderId);
         $this->notification->error('>>>>>>>>>>>>>>>>>>>>>>>>>>> Mit relation Generierung vor dem Anlegen der Order', 'Ende');
 
         $transactionDetails = [];
@@ -256,7 +256,6 @@ class PaymentService
         array $additionalParams = []
     ): array {
         $txnId = $this->createNewTxnId($basket);
-//        $this->createOrUpdateRelation($txnId, $mopId);
         $this->preparePaymentTransaction($basket, $paymentMethod, $mopId, $txnId, $additionalParams);
 
         return $this->libService->sendTransactionRequest($paymentMethod, [
@@ -705,13 +704,11 @@ class PaymentService
      * @param int $orderId
      * @return OrderTxnIdRelation|null
      */
-    public function createOrUpdateRelation(string $txnId, int $mopId, int $orderId = 0)
+    public function createOrderRelation(string $txnId, int $mopId, int $orderId)
     {
-        $relation =  $this->orderTxnIdRepo->createOrUpdateRelation($txnId, $mopId, $orderId);
-        if ($orderId !== 0) {
-            $this->assignTxnIdToOrder($txnId, $orderId);
-            $this->paymentInfoService->addPaymentInfoToOrder($orderId);
-        }
+        $relation =  $this->orderTxnIdRepo->createOrderTxnIdRelation($txnId, $mopId, $orderId);
+        $this->assignTxnIdToOrder($txnId, $orderId);
+        $this->paymentInfoService->addPaymentInfoToOrder($orderId);
         return $relation;
     }
 

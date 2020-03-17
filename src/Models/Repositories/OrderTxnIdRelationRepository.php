@@ -38,7 +38,7 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
     /**
      * @inheritdoc
      */
-    public function createOrderTxnIdRelation(int $orderId, string $txnId, int $mopId): OrderTxnIdRelation
+    public function createOrderTxnIdRelation(int $orderId, string $txnId): OrderTxnIdRelation
     {
         /** @var OrderTxnIdRelation $relation */
         $relation = pluginApp(OrderTxnIdRelation::class);
@@ -46,7 +46,6 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
         $now = date('Y-m-d H:i:s');
         $relation->txnId = $txnId;
         $relation->orderId = $orderId;
-        $relation->mopId = $mopId;
         $relation->assignedAt = $relation->createdAt = $relation->updatedAt = $now;
 
         $relation = $this->database->save($relation);
@@ -112,22 +111,5 @@ class OrderTxnIdRelationRepository implements OrderTxnIdRelationRepositoryContra
     public function getOrderIdByTxnId(string $txnId): int
     {
         return $this->getOrderTxnIdRelationByTxnId($txnId)->orderId;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @throws RuntimeException
-     */
-    public function createOrUpdateRelation(string $txnId, int $mopId, int $orderId = 0)
-    {
-        $relation = $this->getOrderTxnIdRelationByTxnId($txnId);
-        if (!$relation instanceof OrderTxnIdRelation) {
-            $relation = $this->createOrderTxnIdRelation($orderId, $txnId, $mopId);
-        } else {
-            $relation->orderId = $orderId;
-            $relation->mopId = $orderId;
-            $relation = $this->updateOrderTxnIdRelation($relation);
-        }
-        return $relation;
     }
 }

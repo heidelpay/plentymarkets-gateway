@@ -22,10 +22,9 @@ interface OrderTxnIdRelationRepositoryContract
      *
      * @param int $orderId
      * @param string $txnId
-     * @param int $mopId
      * @return OrderTxnIdRelation
      */
-    public function createOrderTxnIdRelation(int $orderId, string $txnId, int $mopId): OrderTxnIdRelation;
+    public function createOrderTxnIdRelation(int $orderId, string $txnId): OrderTxnIdRelation;
 
     /**
      * Update relation object.
@@ -69,14 +68,4 @@ interface OrderTxnIdRelationRepositoryContract
      * @return int|null
      */
     public function getOrderIdByTxnId(string $txnId);
-
-    /**
-     * Return updated or created object.
-     *
-     * @param string $txnId
-     * @param int $mopId
-     * @param int $orderId
-     * @return OrderTxnIdRelation|null
-     */
-    public function createOrUpdateRelation(string $txnId, int $mopId, int $orderId = 0);
 }

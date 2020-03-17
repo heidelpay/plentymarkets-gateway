@@ -706,7 +706,7 @@ class PaymentService
      */
     public function createOrderRelation(string $txnId, int $mopId, int $orderId)
     {
-        $relation =  $this->orderTxnIdRepo->createOrderTxnIdRelation($txnId, $mopId, $orderId);
+        $relation =  $this->orderTxnIdRepo->createOrderTxnIdRelation($orderId, $txnId, $mopId);
         $this->assignTxnIdToOrder($txnId, $orderId);
         $this->paymentInfoService->addPaymentInfoToOrder($orderId);
         return $relation;

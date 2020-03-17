@@ -105,7 +105,7 @@ class NotificationService implements NotificationServiceContract
     protected function notify($level, $message, $method, array $logData, $justLog = false): void
     {
         $logData['method'] = $method;
-        $logData['timestamp'] = microtime();
+        $logData['timestamp'] = $this->getTime();
 
         $message = strpos($message, self::PREFIX) !== 0 ? self::PREFIX . $message : $message;
         $translation = $this->translate($message);
@@ -166,5 +166,15 @@ class NotificationService implements NotificationServiceContract
         }
 
         return $this->notifier;
+    }
+
+    /**
+     * @return float|string
+     */
+    protected function getTime()
+    {
+        [$usec, $sec] = explode(' ', microtime());
+        $usec = str_replace('0.', '.', $usec);     //remove the leading '0.' from usec
+        return date('H:i:s', $sec) . $usec;       //appends the decimal portion of seconds
     }
 }

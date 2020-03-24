@@ -30,7 +30,6 @@ use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\PaymentMethodContract;
 use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
-use Heidelpay\Models\OrderTxnIdRelation;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Traits\Translator;
@@ -197,12 +196,10 @@ class PaymentService
         $logData = compact('paymentMethod', 'mopId', 'orderId');
         $this->notification->debug('payment.debugExecutePayment', __METHOD__, $logData);
 
-        // Retrieve heidelpay Transaction by txnId to get values needed for plenty payment (e.g. amount etc).
+        // Retrieve heidelpay transaction Id from session
         $txnId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
-
-        $this->notification->error('>>>>>>>>>>>>>>>>>>>>>>>>>>> Mit relation Generierung vor dem Anlegen der Order', 'Start');
-        $this->createOrderRelation($txnId, $mopId, $orderId);
-        $this->notification->error('>>>>>>>>>>>>>>>>>>>>>>>>>>> Mit relation Generierung vor dem Anlegen der Order', 'Ende');
+        $this->assignExternalOrderIdToOrder($orderId, $txnId);
+        $this->paymentInfoService->addPaymentInfoToOrder($orderId);
 
         $transactionDetails = [];
         $transaction = null;
@@ -534,15 +531,15 @@ class PaymentService
      * Attach plenty payment to plenty order (if it exists).
      *
      * @param Payment $payment
-     * @param int $orderId
+     * @param Order $order
      * @throws RuntimeException
      */
-    public function assignPlentyPayment(Payment $payment, int $orderId)
+    public function assignPlentyPayment(Payment $payment, Order $order)
     {
         try {
-            $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $orderId);
+            $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $order);
         } catch (RuntimeException $e) {
-            $logData = ['Payment' => $payment, 'orderId' => $orderId];
+            $logData = ['Payment' => $payment, 'orderId' => $order];
             $this->notification->warning($e->getMessage(), __METHOD__, $logData);
             $this->paymentHelper->setBookingTextError($payment, $e->getMessage());
             throw new RuntimeException('Heidelpay::error.errorDuringPaymentExecution');
@@ -687,40 +684,22 @@ class PaymentService
     {
         $this->notification->debug('payment.debugHandleIncomingPayment', __METHOD__, ['Transaction' => $txn]);
 
-        $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txn->txnId);
-        if (!$relation instanceof OrderTxnIdRelation) {
-            throw new RuntimeException('response.errorOrderTxnIdRelationNotFound');
-        }
-
         $payment = $this->createOrGetPlentyPayment($txn);
-        $this->assignPlentyPayment($payment, $relation->orderId);
-    }
 
-    /**
-     * This method creates a relation between the newly created txnId and the order.
-     *
-     * @param string $txnId
-     * @param int $mopId
-     * @param int $orderId
-     * @return void
-     */
-    public function createOrderRelation(string $txnId, int $mopId, int $orderId): void
-    {
-//        $relation =  $this->orderTxnIdRepo->createOrderTxnIdRelation($orderId, $txnId, $mopId);
-        $this->assignTxnIdToOrder($txnId, $orderId);
-        $this->paymentInfoService->addPaymentInfoToOrder($orderId);
-//        return $relation;
+        // auto assign payment to order
+        $order = $this->orderRepo->findOrderByExternalOrderId($txn->txnId);
+        $this->assignPlentyPayment($payment, $order);
     }
 
     /**
      * Adds the txnId to the order as external orderId.
      *
-     * @param string $txnId
      * @param int $orderId
+     * @param string $externalOrderId
      */
-    protected function assignTxnIdToOrder(string $txnId, int $orderId)
+    protected function assignExternalOrderIdToOrder(int $orderId, string $externalOrderId): void
     {
-        $properties = [['typeId' => OrderPropertyType::EXTERNAL_ORDER_ID, 'value' => $txnId]];
+        $properties = [['typeId' => OrderPropertyType::EXTERNAL_ORDER_ID, 'value' => $externalOrderId]];
         $this->orderRepo->updateOrder(['properties' => $properties], $orderId);
     }
 

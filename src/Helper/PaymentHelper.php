@@ -300,15 +300,11 @@ class PaymentHelper
      * Assign the payment to an order in plentymarkets
      *
      * @param Payment $payment
-     * @param int $orderId
+     * @param Order $order
      * @return Order
-     * @throws RuntimeException
      */
-    public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId): Order
+    public function assignPlentyPaymentToPlentyOrder(Payment $payment, Order $order): Order
     {
-        /** @var Order $order */
-        $order = $this->orderService->getOrder($orderId);
-
         $additionalInfo = ['Order' => $order, 'Payment' => $payment, 'method' => __METHOD__, 'timestamp' => microtime()];
         $this->getLogger(__METHOD__)->debug('payment.debugAssignPaymentToOrder', $additionalInfo);
 

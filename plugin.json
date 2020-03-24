@@ -21,7 +21,7 @@
   },
   "categories": ["3519"],
   "keywords": ["heidelpay", "plentymarkets", "plugin", "payment", "payment method", "credit card", "debit card", "sofort", "direct debit"],
-  "version": "1.3.0",
+  "version": "1.3.1",
   "license": "Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.",
   "price": 0.00,
   "author": "heidelpay GmbH",

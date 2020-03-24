@@ -28,9 +28,7 @@ use Heidelpay\Methods\AbstractMethod;
 use Heidelpay\Methods\CreditCard;
 use Heidelpay\Methods\DebitCard;
 use Heidelpay\Methods\PaymentMethodContract;
-use Heidelpay\Models\Contracts\OrderTxnIdRelationRepositoryContract;
 use Heidelpay\Models\Contracts\TransactionRepositoryContract;
-use Heidelpay\Models\OrderTxnIdRelation;
 use Heidelpay\Models\Transaction;
 use Heidelpay\Services\Database\TransactionService;
 use Heidelpay\Traits\Translator;
@@ -40,7 +38,6 @@ use Plenty\Modules\Frontend\Services\VatService;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Order\Property\Models\OrderProperty;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
@@ -49,6 +46,7 @@ use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Plugin\Templates\Twig;
 use RuntimeException;
+
 use function in_array;
 
 class PaymentService
@@ -83,9 +81,6 @@ class PaymentService
 
     /** @var MethodConfigContract $methodConfig */
     private $methodConfig;
-
-    /** @var OrderTxnIdRelationRepositoryContract $orderRepo */
-    private $orderTxnIdRepo;
 
     /** @var OrderRepositoryContract $orderRepo */
     private $orderRepo;
@@ -128,7 +123,6 @@ class PaymentService
      * @param FrontendSessionStorageFactoryContract $sessionStorageFac
      * @param NotificationServiceContract $notification
      * @param MethodConfigContract $methodConfig
-     * @param OrderTxnIdRelationRepositoryContract $orderTxnIdRepo
      * @param OrderRepositoryContract $orderRepo
      * @param UrlServiceContract $urlService
      * @param BasketServiceContract $basketService
@@ -149,7 +143,6 @@ class PaymentService
         FrontendSessionStorageFactoryContract $sessionStorageFac,
         NotificationServiceContract $notification,
         MethodConfigContract $methodConfig,
-        OrderTxnIdRelationRepositoryContract $orderTxnIdRepo,
         OrderRepositoryContract $orderRepo,
         UrlServiceContract $urlService,
         BasketServiceContract $basketService,
@@ -169,7 +162,6 @@ class PaymentService
         $this->sessionStorageFactory = $sessionStorageFac;
         $this->notification = $notification;
         $this->methodConfig = $methodConfig;
-        $this->orderTxnIdRepo = $orderTxnIdRepo;
         $this->orderRepo = $orderRepo;
         $this->urlService = $urlService;
         $this->contactRepo = $contactRepo;
@@ -193,18 +185,17 @@ class PaymentService
     public function executePayment(string $paymentMethod, ExecutePayment $event): array
     {
         $orderId = $event->getOrderId();
-        $mopId = $event->getMop();
 
-        $logData = compact('paymentMethod', 'mopId', 'orderId');
+        $logData = compact('paymentMethod', 'orderId');
         $this->notification->debug('payment.debugExecutePayment', __METHOD__, $logData);
+
+
+        // Retrieve heidelpay transaction Id from session
+        $txnId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
+        $this->createOrUpdateRelation($txnId, $orderId);
 
         $transactionDetails = [];
         $transaction = null;
-
-        // Retrieve heidelpay Transaction by txnId to get values needed for plenty payment (e.g. amount etc).
-        $txnId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
-        $this->createOrUpdateRelation($txnId, $mopId, $orderId);
-
         $transactions = $this->transactionRepository->getTransactionsByTxnId($txnId);
         foreach ($transactions as $transaction) {
             $allowedStatus = [TransactionStatus::ACK, TransactionStatus::PENDING];
@@ -256,7 +247,6 @@ class PaymentService
     ): array {
 
         $txnId = $this->createNewTxnId($basket);
-        $this->createOrUpdateRelation($txnId, $mopId);
         $this->preparePaymentTransaction($basket, $paymentMethod, $mopId, $txnId, $additionalParams);
 
         return $this->libService->sendTransactionRequest($paymentMethod, [
@@ -535,15 +525,15 @@ class PaymentService
      * Attach plenty payment to plenty order (if it exists).
      *
      * @param Payment $payment
-     * @param int $orderId
+     * @param Order $order
      * @throws RuntimeException
      */
-    public function assignPlentyPayment(Payment $payment, int $orderId)
+    public function assignPlentyPayment(Payment $payment, Order $order): void
     {
         try {
-            $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $orderId);
+            $this->paymentHelper->assignPlentyPaymentToPlentyOrder($payment, $order);
         } catch (RuntimeException $e) {
-            $logData = ['Payment' => $payment, 'orderId' => $orderId];
+            $logData = ['Payment' => $payment, 'order' => $order];
             $this->notification->warning($e->getMessage(), __METHOD__, $logData);
             $this->paymentHelper->setBookingTextError($payment, $e->getMessage());
             throw new RuntimeException('Heidelpay::error.errorDuringPaymentExecution');
@@ -688,48 +678,33 @@ class PaymentService
     {
         $this->notification->debug('payment.debugHandleIncomingPayment', __METHOD__, ['Transaction' => $txn]);
 
-        $relation = $this->orderTxnIdRepo->getOrderTxnIdRelationByTxnId($txn->txnId);
-        if (!$relation instanceof OrderTxnIdRelation) {
-            throw new RuntimeException('response.errorOrderTxnIdRelationNotFound');
-        }
-
         $payment = $this->createOrGetPlentyPayment($txn);
-        $this->assignPlentyPayment($payment, $relation->orderId);
+
+        // auto assign payment to order
+        $order = $this->orderRepo->findOrderByExternalOrderId($txn->txnId);
+        $this->assignPlentyPayment($payment, $order);
     }
 
     /**
      * @param string $txnId
-     * @param int $mopId
      * @param int $orderId
-     * @return OrderTxnIdRelation|null
      */
-    public function createOrUpdateRelation(string $txnId, int $mopId, int $orderId = 0)
+    public function createOrUpdateRelation(string $txnId, int $orderId = 0)
     {
-        $relation =  $this->orderTxnIdRepo->createOrUpdateRelation($txnId, $mopId, $orderId);
-        if ($orderId !== 0) {
-            $this->assignTxnIdToOrder($txnId, $orderId);
-            $this->paymentInfoService->addPaymentInfoToOrder($orderId);
-        }
-        return $relation;
+        $this->assignExternalOrderIdToOrder($orderId, $txnId);
+        $this->paymentInfoService->addPaymentInfoToOrder($orderId);
     }
 
     /**
      * Adds the txnId to the order as external orderId.
      *
-     * @param string $txnId
      * @param int $orderId
+     * @param string $externalOrderId
      */
-    protected function assignTxnIdToOrder(string $txnId, int $orderId)
+    protected function assignExternalOrderIdToOrder(int $orderId, string $externalOrderId): void
     {
-        $order = $this->orderRepo->findOrderById($orderId);
-
-        /** @var OrderProperty $externalOrderId */
-        $externalOrderId = pluginApp(OrderProperty::class);
-        $externalOrderId->typeId = OrderPropertyType::EXTERNAL_ORDER_ID;
-        $externalOrderId->value = $txnId;
-        $order->properties[] = $externalOrderId;
-
-        $this->orderRepo->updateOrder($order->toArray(), $order->id);
+        $properties = [['typeId' => OrderPropertyType::EXTERNAL_ORDER_ID, 'value' => $externalOrderId]];
+        $this->orderRepo->updateOrder(['properties' => $properties], $orderId);
     }
 
     //</editor-fold>

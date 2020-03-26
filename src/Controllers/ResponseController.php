@@ -113,11 +113,10 @@ class ResponseController extends Controller
     private function createAndHandleTransaction($response, $responseObject): bool
     {
         try {
-            $txn = $this->transactionService->getTransactionIfItExists($responseObject);
-
             // verify hash
             $this->transactionService->verifyTransaction($responseObject);
 
+            $txn = $this->transactionService->getTransactionIfItExists($responseObject);
             if ($txn instanceof Transaction) {
                 $message = 'response.debugTransactionAlreadyExists';
             } else {

@@ -49,6 +49,7 @@ use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Plugin\Templates\Twig;
 use RuntimeException;
+
 use function in_array;
 
 class PaymentService
@@ -231,6 +232,8 @@ class PaymentService
         } catch (RuntimeException $e) {
             return ['error', $e->getMessage()];
         }
+
+        $this->notification->error('End of payment execution!', __METHOD__);
 
         return ['success', 'Heidelpay::info.infoPaymentSuccessful'];
     }

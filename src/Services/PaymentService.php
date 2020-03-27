@@ -223,6 +223,8 @@ class PaymentService
             return ['error', $e->getMessage()];
         }
 
+        $this->notification->error('End of payment execution!', __METHOD__);
+
         return ['success', 'Heidelpay::info.infoPaymentSuccessful'];
     }
 

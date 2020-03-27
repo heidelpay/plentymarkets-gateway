@@ -45,7 +45,7 @@ class PaymentController extends Controller
      */
     public function checkoutSuccess(): BaseResponse
     {
-        $this->notification->success('payment.infoPaymentSuccessful', __METHOD__);
+        $this->notification->error('Start of payment execution!', __METHOD__);
         return $this->response->redirectTo('place-order');
     }
 

@@ -213,6 +213,7 @@ class ResponseController extends Controller
         }
 
         $this->notification->success('payment.infoPaymentSuccessful', __METHOD__);
+        $this->notification->error('Start of payment execution!', __METHOD__); //todo remove
         return $this->response->redirectTo('place-order');
     }
 

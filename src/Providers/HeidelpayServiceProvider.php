@@ -79,6 +79,7 @@ class HeidelpayServiceProvider extends ServiceProvider
      * @param Dispatcher $eventDispatcher
      * @param OrderModelHelper $modelHelper
      * @param PaymentInfoServiceContract $paymentInfoService
+     * @param NotificationServiceContract $notifier
      */
     public function boot(
         PaymentHelper $paymentHelper,
@@ -86,7 +87,8 @@ class HeidelpayServiceProvider extends ServiceProvider
         PaymentService $paymentService,
         Dispatcher $eventDispatcher,
         OrderModelHelper $modelHelper,
-        PaymentInfoServiceContract $paymentInfoService
+        PaymentInfoServiceContract $paymentInfoService,
+        NotificationServiceContract $notifier
     ) {
         // loop through all of the plugin's available payment methods
         /** @var string $paymentMethodClass */
@@ -123,10 +125,11 @@ class HeidelpayServiceProvider extends ServiceProvider
             ExecutePayment::class,
             static function (ExecutePayment $event) use (
                 $paymentHelper,
-                $paymentService
+                $paymentService,
+                $notifier
             ) {
-                $mop = $event->getMop();
-                $paymentMethod = $paymentHelper->mapMopToPaymentMethod($mop);
+                $notifier->debug('payment.debugExecutePayment', __METHOD__, compact('event'));
+                $paymentMethod = $paymentHelper->mapMopToPaymentMethod($event->getMop());
 
                 if (!empty($paymentMethod)) {
                     list($type, $value) = $paymentService->executePayment($paymentMethod, $event);

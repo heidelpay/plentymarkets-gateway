@@ -193,19 +193,11 @@ class PaymentService
      */
     public function executePayment(string $paymentMethod, ExecutePayment $event): array
     {
-        $orderId = $event->getOrderId();
-        $mopId = $event->getMop();
-
-        $logData = compact('paymentMethod', 'mopId', 'orderId');
-        $this->notification->debug('payment.debugExecutePayment', __METHOD__, $logData);
-
-        $transactionDetails = [];
-        $transaction = null;
-
         // Retrieve heidelpay Transaction by txnId to get values needed for plenty payment (e.g. amount etc).
         $txnId = $this->sessionStorageFactory->getPlugin()->getValue(SessionKeys::SESSION_KEY_TXN_ID);
-        $this->createOrUpdateRelation($txnId, $mopId, $orderId);
+        $this->createOrUpdateRelation($txnId, $event->getMop(), $event->getOrderId());
 
+        $transaction = null;
         $transactions = $this->transactionRepository->getTransactionsByTxnId($txnId);
         foreach ($transactions as $transaction) {
             $allowedStatus = [TransactionStatus::ACK, TransactionStatus::PENDING];
